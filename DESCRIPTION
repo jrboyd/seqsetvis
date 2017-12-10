@@ -1,0 +1,26 @@
+Package: peakvisr
+Type: Package
+Title: Interactive Visualizations for User Friendly ChIP-seq Peak Comparison and Analysis
+Version: 0.99.1
+Author: Joseph R Boyd <jrboyd@uvm.edu>
+Maintainer: Joseph R Boyd <jrboyd@uvm.edu>
+Description: Makes the visual analysis of ChIP-seq peak sets and enrichment tracks
+    as easy as possible at all stages.  This assumes you have a set of bed-like files 
+    representing areas of enrichment (peaks) or other biologically relevant regions 
+    (promoters, enhancers) and bigwigs representing enrichment for the same samples 
+    or other relevant samples.
+License: MIT
+Encoding: UTF-8
+LazyData: true
+Suggests: testthat
+Depends: 
+Imports: 
+    limma, 
+    GenomicRanges, 
+    assertthat, 
+    ggplot2,
+    venneuler,
+    pacman,
+    dplyr,
+    ggforce,
+    textshape

@@ -1,0 +1,5 @@
+exportPattern("^[[:alpha:]]+")
+export(vennCounts)
+import(GenomicRanges, IRanges, S4Vectors)
+import(assertthat)
+importFrom('limma', 'vennCounts')
