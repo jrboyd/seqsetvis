@@ -14,13 +14,11 @@ Encoding: UTF-8
 LazyData: true
 Suggests: testthat
 Depends: 
+    ggplot2,
+    GenomicRanges
 Imports: 
     limma, 
-    GenomicRanges, 
     assertthat, 
-    ggplot2,
     venneuler,
-    pacman,
-    dplyr,
-    ggforce,
-    textshape
+    ggforce
+

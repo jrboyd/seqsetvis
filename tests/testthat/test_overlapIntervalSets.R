@@ -1,6 +1,5 @@
-library(GenomicRanges)
+library(peakvisr)
 library(testthat)
-library(assertthat)
 a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1))
 b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1))
 c = GRanges("chr1", IRanges(8:10*10+5, 8:10*10+6))
@@ -13,17 +12,23 @@ test_that("overlapIntervalSets grs input are valid", {
   expect_s4_class(overlapIntervalSets(list("a" = a, "b" = b)), class = "GRanges")
 })
 
-test_that("gg_venn grs input are valid", {
+test_that("ggVenn various other paramters don't throw error", {
   olap = overlapIntervalSets(list("a" = a, "b" = b, "c" = c))
-  p = ggVenn(olap, circle.col = c("red", "blue", "green"))
-  p
+  p = ggVenn(olap, circle.col = c("red", "blue", "green"), fill_alpha = .1,
+             counts_txt_size = 10, show_outside_count = T,
+             counts_as_labels = T)
   expect_s3_class(p, class = "ggplot")
-
-
-  olap = overlapIntervalSets(list("a" = a, "b" = b))
-  p = ggVenn(elementMetadata(olap))
-  p
+  p = ggVenn(olap, circle.col = c("red", "blue", "green"), fill_circles = F,
+             counts_txt_size = 10, show_outside_count = T,
+             counts_as_labels = T)
   expect_s3_class(p, class = "ggplot")
-  ggVenn(olap, circle.col = c("red", "blue", "green"), labels_size = 50, counts_size = 10, show_outside_count = F) +
-    coord_fixed()
+})
+
+test_that("col2hex", {
+  string_colors = c("red", "blue", "green")
+  rgb_colors = col2rgb(string_colors)
+  hex_colors = c("#FF0000", "#0000FF", "#00FF00")
+  expect_equal(col2hex(string_colors), hex_colors)
+  expect_error(col2hex(rgb_colors))
+  expect_error(col2hex("asdf"))
 })
