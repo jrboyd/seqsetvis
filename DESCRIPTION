@@ -15,10 +15,13 @@ LazyData: true
 Suggests: testthat
 Depends: 
     ggplot2,
-    GenomicRanges
+    GenomicRanges,
+    data.table
 Imports: 
+    rtracklayer,
     limma, 
     assertthat, 
     venneuler,
     ggforce
+    
 
