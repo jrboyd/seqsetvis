@@ -3,7 +3,7 @@
 #' @param bed_file A bed-like file
 #' @param output_GRanges output data.frame before GRanges conversion
 #' @return GRanges with metadata columns describing overlap overlap of input grs
-#' @examples
+#' @examples TODO easyLoadGRanges()
 easyLoadGRanges = function(bed_file, output_GRanges = T){
 
 }
@@ -49,7 +49,7 @@ overlapIntervalSets = function(grs, ext = 0, use_first = F){
   }
   assert_that(is.list(grs))
   if(is.null(names(grs))){
-    warning("no names set for input grs, assigning arbitrary names.")
+    # warning("no names set for input grs, assigning arbitrary names.")
     names(grs) = paste0("set_", LETTERS[seq_along(grs)])
   }
   if(use_first){

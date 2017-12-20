@@ -12,13 +12,13 @@ test_that("overlapIntervalSets grs input are valid", {
   expect_s4_class(overlapIntervalSets(list("a" = a, "b" = b)), class = "GRanges")
 })
 
-test_that("ggVenn various other paramters don't throw error", {
+test_that("setPlotVenn various other paramters don't throw error", {
   olap = overlapIntervalSets(list("a" = a, "b" = b, "c" = c))
-  p = ggVenn(olap, circle.col = c("red", "blue", "green"), fill_alpha = .1,
+  p = setPlotVenn(olap, circle_color = c("red", "blue", "green"), fill_alpha = .1,
              counts_txt_size = 10, show_outside_count = T,
              counts_as_labels = T)
   expect_s3_class(p, class = "ggplot")
-  p = ggVenn(olap, circle.col = c("red", "blue", "green"), fill_circles = F,
+  p = setPlotVenn(olap, circle_color = c("red", "blue", "green"), fill_circles = F,
              counts_txt_size = 10, show_outside_count = T,
              counts_as_labels = T)
   expect_s3_class(p, class = "ggplot")

@@ -50,21 +50,25 @@ peak_memb = elementMetadata(peak_tab)
 
 cols = RColorBrewer::brewer.pal(4, "Dark2")
 ###venn diagrams
-ggVenn(peak_memb[,1:2], circle.col = cols[1:2])
-ggVenn(peak_memb[,3:4], circle.col = cols[3:4])
-ggVenn(peak_memb[,c(1,3)], circle.col = cols[c(1, 3)])
-ggVenn(peak_memb[,c(2,4)], circle.col = cols[c(2, 4)])
+setPlotVenn(object = peak_memb[,1:2], circle.col = cols[1:2])
+setPlotVenn(peak_memb[,3:4], circle.col = cols[3:4])
+setPlotVenn(peak_memb[,c(1,3)], circle.col = cols[c(1, 3)])
+setPlotVenn(peak_memb[,c(2,4)], circle.col = cols[c(2, 4)])
+
+setPlotVenn(peak_memb[,c(1:3)], circle.col = cols[c(1:3)])
+# setPlotVenn(peak_memb[,c(1:4)], circle.col = cols[c(1:4)])
+# setPlotVenn(peak_memb[,c(1:4, 1)], circle.col = cols[c(1:4)])
 
 ###barplots
-ggBars(peak_memb) + scale_fill_manual(values = cols)
+setPlotBars(peak_memb) + scale_fill_manual(values = cols)
 
 ###pie
-ggPie(peak_memb) + scale_fill_manual(values = cols)
+setPlotPie(peak_memb) + scale_fill_manual(values = cols)
 
 ###euler
-ggEuler(peak_memb, line_width = 2)
+setPlotEuler(peak_memb, line_width = 2)
 
-bw_files = dir("inst/extdata/bigwigs/full", full.names = T)
+bw_files = dir("inst/extdata/bigwigs/full", full.names = T, pattern = ".bw")
 names(bw_files) = bw_files %>% basename %>%
   sub("_pooled_F.+w", "", .)
 
@@ -72,17 +76,20 @@ names(peak_tab) = paste0("region_", seq_along(peak_tab))
 
 # runx_10a = subset(peak_tab, H7_H3K4ME3)
 qgr = centerFixedSizeGRanges(peak_tab, 20000)
-qgr = read.table("/slipstream/home/joeboyd/H7_bivalent_enst_promoter_ext2500_5573genes.bed")
-
+# qgr = read.table("/slipstream/home/joeboyd/H7_bivalent_enst_promoter_ext2500_5573genes.bed")
+qgr = subset(qgr, H7_H3K27ME3 & H7_H3K4ME3)
+qgr = subset(qgr, seqnames != "chrY")
 wsize = 50
 
-bw_list = lapply(names(bw_files), function(nam){
-  f = bw_files[nam]
-  dt = fetchWindowedBigwig(bw_file = f, win_size = wsize, qgr = qgr)
-  dt$sample = nam
-  dt
-})
-all_bw_dt = rbindlist(bw_list)
+# bw_list = lapply(names(bw_files), function(nam){
+#   f = bw_files[nam]
+#   dt = fetchWindowedBigwig(bw_file = f, win_size = wsize, qgr = qgr)
+#   dt$sample = nam
+#   dt
+# })
+# all_bw_dt = rbindlist(bw_list)
+all_bw_dt = fetchWindowedBigwigList(bw_files)
+
 bw_dt = all_bw_dt[sample == "MCF7_H3K4ME3"]
 m_dt = bw_dt[, .(mFE = mean(FE)), by = .( x)]
 spline_dt = bw_dt[, spline(x, FE), by = id]

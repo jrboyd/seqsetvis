@@ -3,9 +3,44 @@ library(magrittr)
 library(GenomicRanges)
 # library(peakvisr)
 
-bw_urls = c("ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE77nnn/GSE77772/suppl/GSE77772_MCF7_H3K27ME3_logFE.bw",
-            "ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE69nnn/GSE69377/suppl/GSE69377_MCF7_H3K4ME3_logFE.bw")
+#Goal, find interesting clustering of histone modifications at gene promoters
+library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+# genes(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
+tx = transcripts(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
+# exons(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
+# cds(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
 
+library(biomaRt)
+ensembl=useMart("ensembl",dataset="hsapiens_gene_ensembl")
+subset(listFilters(ensembl), grepl("UCSC", description))
+subset(listFilters(ensembl), grepl("ENSG", description))
+subset(listFilters(ensembl), grepl("ENST", description))
+subset(listFilters(ensembl), grepl("HGNC", description))
+subset(listFilters(ensembl), grepl("GO", description))
+go = "GO:0030154" #cell differentiation
+tx_meta =  getBM(mart = ensembl,
+                           attributes = c("ucsc", "ensembl_gene_id", "hgnc_symbol", "ensembl_transcript_id"),
+                           filters = c("ucsc"),
+                           values = list(tx$tx_name))
+
+tx_meta_cell_diff =  getBM(mart = ensembl,
+                 attributes = c("ucsc", "ensembl_gene_id", "hgnc_symbol", "ensembl_transcript_id"),
+                 filters = c("ucsc", "go"),
+                 values = list(tx$tx_name, go))
+
+tx_cell_diff = subset(tx, tx_name %in% tx_meta_cell_diff$ucsc)
+dt.tx_cell_diff = as.data.table(merge(tx_cell_diff, tx_meta_cell_diff, by.x = "tx_name", by.y = "ucsc"))
+dt.tx_cell_diff[strand == "+", end := start]
+dt.tx_cell_diff[strand == "-", start := end]
+ext = 2000L
+dt.tx_cell_diff[, c("start", "end") := .(start - ext, end + ext - 1L)]
+tx_cell_diff = GRanges(dt.tx_cell_diff)
+
+
+
+subset(listFilters(ensembl), grepl("UCSC", description))
+listDatasets(ensembl)
+mart = biomaRt::listMarts()
 
 qgr = read.table("/slipstream/home/joeboyd/H7_bivalent_enst_promoter_ext2500_5573genes.bed")
 colnames(qgr) = c("seqnames", "start", "end", "id", "zero", "strand")
@@ -118,3 +153,4 @@ plot_dt[zFE > cap, zFE := cap]
 ggplot(plot_dt[id %in% tp]) + geom_raster(aes(x = x, y = id, fill = zFE)) +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
   scale_fill_gradient2(low = "black", mid = "black", high = "yellow") + facet_grid(. ~ sample)
+

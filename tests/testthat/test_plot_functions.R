@@ -5,11 +5,25 @@ b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1))
 c = GRanges("chr1", IRanges(8:10*10+5, 8:10*10+6))
 
 #test all plotting functions
-method_names = c("ggVenn", "ggEuler", "ggBars", "ggPie", "ggMembershipHeatmap")
+method_names = c("setPlotVenn", "setPlotEuler", "setPlotBars", "setPlotPie", "setPlotHeatmap")
 for(met_name in method_names){
+  # test_that(paste(met_name , "exists"), {
+  #   expect_true(exists(met_name))
+  #   expect_failure(expect_error(get(met_name)))
+  # })
+  if(!exists(met_name)){
+    warning(paste("function", met_name, "couldn't be found! not tested."))
+    next
+  }
   met = get(met_name)
+  if(!is.function(met)){
+    warning(paste("function", met_name, "wasn't a function! not tested."))
+    next
+  }
+
 
   test_that(paste(met_name, "accepts overlapIntervalSets output."), {
+
     olap = overlapIntervalSets(list("a" = a, "b" = b, "c" = c))
     p = met(olap)
     p
