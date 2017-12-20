@@ -99,6 +99,21 @@ test_that("fetchWindowedBigwigList works with proper inputs", {
   }
 })
 
+test_that("regionSetPlotBandedQuantiles works with proper inputs", {
+  bw_files = rep(test_bw, 3)
+  names(bw_files) = paste0("bw_", 1:3)
+  for(win in c(1, 3)){
+    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                           win_size = win,
+                                                           qgr = test_qgr,
+                                                           bw_variable_name = "group")})
+    p_noBy = regionSetPlotBandedQuantiles(res)
+    p_wBy = regionSetPlotBandedQuantiles(res, by_ = "group")
+    expect_s3_class(p_noBy, "ggplot")
+    expect_s3_class(p_wBy, "ggplot")
+  }
+})
+
 a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1:7 + 10))
 b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1:6 + 8))
 

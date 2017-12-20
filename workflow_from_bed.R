@@ -83,9 +83,17 @@ ggplot(all_bw_dt) + geom_raster(aes(x = x, y = id, fill = lgFE)) +
   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
   scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals) + facet_grid(. ~ sample)
 
+regionSetPlotBandedQuantiles(all_bw_dt)
+
+plot1_dt = copy(all_bw_dt[sample == "H7_H3K27ME3"])
+plot2_dt = copy(all_bw_dt[sample == "MCF7_H3K27ME3"])
+regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample")
+regionSetPlotBandedQuantiles(all_bw_dt, y_ = "lgFE", by_ = "sample")
+regionSetPlotBandedQuantiles(all_bw_dt, y_ = "FE", by_ = "sample")
+regionSetPlotBandedQuantiles(plot2_dt)
 
 
-plot_dt = copy(all_bw_dt)
+plot_dt = copy(all_bw_dt[sample == "H3K27ME3"])
 
 # dc_dt = dcast(plot_dt[abs(x) < 200], id ~ sample + x, value.var = "capFE")
 dc_dt = dcast(plot_dt[abs(x) < 1000], id ~ sample + x, value.var = "lgFE")
