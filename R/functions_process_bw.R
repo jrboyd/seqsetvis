@@ -227,50 +227,6 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
   return(dt)
 }
 
-# extracts data.table, one row per qgr from bw_gr
-
-# ggBandedQuantiles = function(bw_dt, hsv_min = 0, hsv_max = 0.7, n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95, is_centered = T,
-#                              win_size = 50) {
-#   # hsv_min = 0; hsv_max = .7; n_quantile = 18; quantile_min = .05; quantile_max = .95; is_centered = T; win_size = 50
-#   require(data.table)
-#   q2do = 0:n_quantile/n_quantile
-#   q2do = round(quantile_min + q2do * (quantile_max - quantile_min), digits = 3)
-#   dt = bw_dt[, .(qs = .(.(quantile(FE, q2do)))), by = x]
-#   dt = cbind(dt, as.data.table(t(sapply(dt$qs, function(x) x[[1]]))))
-#   dt$qs = NULL
-#   dtm = melt(dt, id.vars = "x")
-#   setkey(dtm, variable)
-#   q2do_str = paste0(q2do * 100, "%")
-#   dt_low = dtm[q2do_str[-length(q2do_str)], .(x, low_q = variable, low = value)]
-#   dt_high = dtm[q2do_str[-1], .(x, high_q = variable, high = value)]
-#   dt_c = cbind(dt_low, dt_high[, -1])
-#   dt_c = dt_c[, .(x, low, high, q_range = paste0(sub("%", "", low_q), "-", high_q))]
-#   q_o = unique(dt_c$q_range)
-#   dt_c$q_range = factor(dt_c$q_range, levels = q_o)
-#   if (!is.null(win_size)) {
-#     dt_c[, `:=`(xe, x + as.integer(win_size))]
-#     dt_c = melt(dt_c, id.vars = c("low", "high", "q_range"), value.name = "x")
-#     dt_c = dt_c[order(variable, decreasing = T)][order(x)][order(q_range)]
-#   }
-#   if (is.numeric(is_centered)) {
-#     dt_c[, `:=`(x, x - is_centered)]
-#   } else if (is.logical(is_centered)) {
-#     if (is_centered) {
-#       dt_c[, `:=`(x, x - median(x))]
-#     }
-#   }
-#   cols = rainbow(length(q_o), start = hsv_min, end = hsv_max)
-#   names(cols) = q_o
-#   dt_c$rn = 1:nrow(dt_c)
-#   dt_c[, `:=`(c("q_low", "q_high"), tstrsplit(sub("%", "", q_range), split = "-", keep = 1:2)), by = rn]
-#   dt_c[, `:=`(q_num, (as.numeric(q_low) + as.numeric(q_high))/2)]
-#   dt_c[, `:=`(c("rn", "q_low", "q_high"), NULL)]
-#   ggplot(dt_c) + geom_ribbon(aes(x = x, ymin = low, ymax = high, fill = q_range)) + labs(fill = "quantile band", y = "FE", x = "bp",
-#                                                                                          title = "Enrichment Profiles", subtitle = "aggregated by quantile range") + scale_fill_manual(values = cols) + scale_color_manual(breaks = q2do,
-#                                                                                                                                                                                                                            palette = cols)
-#
-# }
-
 regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
                                         hsv_min = 0, hsv_max = 0.7,
                                         n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95,
