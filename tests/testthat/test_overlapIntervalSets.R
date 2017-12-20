@@ -5,7 +5,7 @@ b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1))
 c = GRanges("chr1", IRanges(8:10*10+5, 8:10*10+6))
 
 test_that("overlapIntervalSets grs input are valid", {
-  expect_warning(overlapIntervalSets(list(a, b))) #unnamed list throws warning
+  # expect_warning(overlapIntervalSets(list(a, b))) #unnamed list throws warning
   expect_error(overlapIntervalSets(a))
   expect_error(overlapIntervalSets(1))
   expect_s4_class(overlapIntervalSets(GRangesList("a" = a, "b" = b)), class = "GRanges")

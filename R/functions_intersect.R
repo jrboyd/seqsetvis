@@ -54,11 +54,11 @@ overlapIntervalSets = function(grs, ext = 0, use_first = F){
   }
   if(use_first){
     base_gr = grs[[1]]
-    elementMetadata(base_gr) = NULL
+    mcols(base_gr) = NULL
     # grs = grs[-1]
   }else{
     require(magrittr)
-    base_gr = lapply(grs, function(x){elementMetadata(x) = NULL; x}) %>% GRangesList %>% unlist %>% reduce
+    base_gr = lapply(grs, function(x){mcols(x) = NULL; x}) %>% GRangesList %>% unlist %>% reduce
   }
   start(base_gr) = start(base_gr) - ext
   end(base_gr) = end(base_gr) + ext
@@ -68,12 +68,12 @@ overlapIntervalSets = function(grs, ext = 0, use_first = F){
   suppressWarnings({
     for(i in 1:length(grs)){
       nam = names(grs)[i]
-      elementMetadata(base_gr)[[nam]] = F
+      mcols(base_gr)[[nam]] = F
       olaps = findOverlaps(base_gr, grs[[i]])
-      elementMetadata(base_gr)[[nam]][queryHits(olaps)] = T
+      mcols(base_gr)[[nam]][queryHits(olaps)] = T
     }
     if(use_first){
-      base_gr$no_hit = apply(elementMetadata(base_gr), 1, function(x)all(!x))
+      base_gr$no_hit = apply(mcols(base_gr), 1, function(x)all(!x))
     }
     # base_gr$group = "no_hit"
     # for(i in rev(seq_along(grs))){
@@ -82,6 +82,7 @@ overlapIntervalSets = function(grs, ext = 0, use_first = F){
     #   base_gr[queryHits(olaps)]$group = names(grs)  [i]
     # }
   })
+  names(base_gr) = 1:length(base_gr)
   return(base_gr)
 }
 

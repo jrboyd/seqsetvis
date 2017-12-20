@@ -46,18 +46,18 @@ peak_gr = lapply(td, function(nam){
 })
 
 peak_tab = overlapIntervalSets(peak_gr_raw[1:4])
-peak_memb = elementMetadata(peak_tab)
+peak_memb = mcols(peak_tab)
 
 cols = RColorBrewer::brewer.pal(4, "Dark2")
 ###venn diagrams
-setPlotVenn(object = peak_memb[,1:2], circle.col = cols[1:2])
-setPlotVenn(peak_memb[,3:4], circle.col = cols[3:4])
-setPlotVenn(peak_memb[,c(1,3)], circle.col = cols[c(1, 3)])
-setPlotVenn(peak_memb[,c(2,4)], circle.col = cols[c(2, 4)])
+setPlotVenn(object = peak_memb[,1:2], circle_color = cols[1:2])
+setPlotVenn(peak_memb[,3:4], circle_color = cols[3:4])
+setPlotVenn(peak_memb[,c(1,3)], circle_color = cols[c(1, 3)])
+setPlotVenn(peak_memb[,c(2,4)], circle_color = cols[c(2, 4)])
 
-setPlotVenn(peak_memb[,c(1:3)], circle.col = cols[c(1:3)])
-# setPlotVenn(peak_memb[,c(1:4)], circle.col = cols[c(1:4)])
-# setPlotVenn(peak_memb[,c(1:4, 1)], circle.col = cols[c(1:4)])
+setPlotVenn(peak_memb[,c(1:3)], circle_color = cols[c(1:3)])
+# setPlotVenn(peak_memb[,c(1:4)], circle_color = cols[c(1:4)])
+# setPlotVenn(peak_memb[,c(1:4, 1)], circle_color = cols[c(1:4)])
 
 ###barplots
 setPlotBars(peak_memb) + scale_fill_manual(values = cols)

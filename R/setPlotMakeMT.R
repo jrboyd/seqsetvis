@@ -5,9 +5,9 @@ setGeneric("setPlotMakeMT", function(object){
 
 setMethod("setPlotMakeMT", signature(object = "list"), function(object){
   if (all(sapply(object, class) == "GRanges")) {#GRanges are a special case
-    print("handling list of GRanges like GRangeList.")
+    # print("handling list of GRanges like GRangeList.")
     # object = overlapIntervalSets(object)
-    return(GRangesList(object))
+    return(setPlotMakeMT(GRangesList(object)))
   }
   if (all(sapply(object, class) != "character")) {
     object = lapply(object, as.character)
@@ -25,7 +25,7 @@ setMethod("setPlotMakeMT", signature(object = "GRangesList"), function(object){
 })
 
 setMethod("setPlotMakeMT", signature(object = "GRanges"), function(object){
-  object = elementMetadata(object)
+  object = mcols(object)
   setPlotMakeMT(object)
 })
 
@@ -43,7 +43,12 @@ setMethod("setPlotMakeMT", signature(object = "data.frame"), function(object){
   if (is.null(colnames(object))) {
     colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])
   }
-  object
+  if(all(colnames(object) == paste0("V", 1:ncol(object)))){
+    colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])
+  }
+  mat = as.matrix(object)
+  rownames(mat) = rownames(object)
+  return(mat)
 })
 #
 # ###TODO this is suitable for a S4 generic method

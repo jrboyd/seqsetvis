@@ -1,7 +1,7 @@
 # plotting functions for set comparison go here
 # all plotting functions accept a variety of objects as first argument and
-# handle them via the S4  generic input2membership_matrix
-# input2membership_matrix has implemented methods for:
+# handle them via the S4  generic setPlotMakeMT
+# setPlotMakeMT has implemented methods for:
 #   - membership table
 #       columns are sets
 #       rows are members
@@ -12,7 +12,7 @@
 
 #' ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets
 #'
-#' @param object will be passed to \code\link{input2membership_matrix} for conversion to membership matrix
+#' @param object will be passed to \code\link{setPlotMakeMT} for conversion to membership matrix
 #' @param group_names useful if names weren't provided or were lost in creating membership matrix
 #' @param counts_txt_size font size for count numbers
 #' @param counts_as_labels if TRUE, geom_label is used instead of geom_text.  can be easier to read.
@@ -27,7 +27,7 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
                   counts_as_labels = F, show_outside_count = F, lwd = 3,
                   circle_color = NULL, fill_circles = T,
                   fill_alpha = ifelse(fill_circles, 0.5, 0), counts_color = NULL) {
-  object = input2membership_matrix(object)
+  object = setPlotMakeMT(object)
   all(apply(object, 2, class) == "logical")
   object <- limma::vennCounts(object)
   set_counts <- object[, "Counts"]
@@ -127,7 +127,7 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
 }
 
 setPlotBars = function(object) {
-  object = input2membership_matrix(object)
+  object = setPlotMakeMT(object)
   hit_counts = colSums(object)
   hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)))
   p <- ggplot(hit_counts_df, aes(x = group, y = count, fill = group)) + labs(x = "") + geom_bar(width = 1, stat = "identity") +
@@ -138,7 +138,7 @@ setPlotBars = function(object) {
 }
 
 setPlotBars2 = function(object, flip_group_stage = F) {
-  object = input2membership_matrix(object)
+  object = setPlotMakeMT(object)
   hit_counts = colSums(object)
   hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)), stage = "merged")
   raw_counts = sapply(peak_gr, length)
@@ -171,7 +171,7 @@ setPlotBars2 = function(object, flip_group_stage = F) {
 
 
 setPlotPie2 = function(object) {
-  object = input2membership_matrix(object)
+  object = setPlotMakeMT(object)
   hit_counts = colSums(object)
   hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)), stage = "merged")
   raw_counts = sapply(peak_gr, length)
@@ -199,7 +199,7 @@ setPlotPie2 = function(object) {
 }
 
 setPlotPie = function(object) {
-  object = input2membership_matrix(object)
+  object = setPlotMakeMT(object)
   hit_counts = colSums(object)
   hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)))
 
@@ -219,7 +219,7 @@ setPlotPie = function(object) {
 #' @return ggplot of venneuler results
 #' @import venneuler
 setPlotEuler = function(object, line_width = 2) {
-  object = input2membership_matrix(object)
+  object = setPlotMakeMT(object)
   cn = colnames(object)
   todo = expand.grid(lapply(1:ncol(object), function(x) 0:1))
   grp_names = apply(todo, 1, function(x) {
@@ -258,7 +258,7 @@ setPlotEuler = function(object, line_width = 2) {
 }
 
 setPlotHeatmap = function(df, raster_approximation = T, raster_width_min = 1000, raster_height_min = 1000) {
-  df = input2membership_matrix(df)
+  df = setPlotMakeMT(df)
   mat = ifelse(as.matrix(df), 0, 1)
   for (i in rev(1:ncol(mat))) {
     mat = mat[order(mat[, i], decreasing = T), , drop = F]

@@ -5,12 +5,14 @@ test_bw = system.file("extdata/test_bigwigs/test_loading.bw", package = "peakvis
 pos = c(20, 180, 210, 440, 520, 521)
 region_size = 30
 test_qgr = GRanges("chrTest", IRanges(pos+1, pos + region_size))
+exp_colnames = c("seqnames", "start", "end", "width", "strand", "id", "FE", "x")
 
 test_that("fetchWindowedBigwig return expected for valid even win_size", {
   #these should all work cleanly
   for(win in c(2, 6, 10, 30)){
     bw_dt = fetchWindowedBigwig(bw_file = test_bw, win_size = win, qgr = test_qgr)
     expect_is(bw_dt, "data.table")
+    expect_equal(colnames(bw_dt), exp_colnames)
     for(tid in unique(bw_dt$id)){
       test_dt = bw_dt[id == tid]
       expect_equal(nrow(test_dt), region_size / win) #expected number of regions
@@ -24,6 +26,7 @@ test_that("fetchWindowedBigwig return expected for valid odd win_size", {
   for(win in c(1, 3, 5, 15)){
     bw_dt = fetchWindowedBigwig(bw_file = test_bw, win_size = win, qgr = test_qgr)
     expect_is(bw_dt, "data.table")
+    expect_equal(colnames(bw_dt), exp_colnames)
     for(tid in unique(bw_dt$id)){
       test_dt = bw_dt[id == tid]
       expect_equal(nrow(test_dt), region_size / win) #expected number of regions
@@ -53,7 +56,48 @@ test_that("fetchWindowedBigwig throws warning if widths vary", {
   }
 })
 
+test_that("fetchWindowedBigwigList works with proper inputs", {
+  bw_files = rep(test_bw, 3)
+  names(bw_files) = paste0("bw_", 1:3)
+  hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                         win_size = 3,
+                                                         qgr = test_qgr)})
+  expect_s3_class(res, "data.table")
+  expect_equal(colnames(res), c(exp_colnames, "sample"))
+})
 
+test_that("fetchWindowedBigwigList can set variable name", {
+  bw_files = rep(test_bw, 3)
+  names(bw_files) = paste0("bw_", 1:3)
+  hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                         win_size = 3,
+                                                         qgr = test_qgr,
+                                                         bw_variable_name = "group")})
+  expect_s3_class(res, "data.table")
+  expect_equal(colnames(res), c(exp_colnames, "group"))
+})
+
+test_that("fetchWindowedBigwigList duplicate names throws error", {
+  bw_files = rep(test_bw, 3)
+  expect_error(
+    fetchWindowedBigwigList(bw_files = bw_files,
+                            win_size = 3,
+                            qgr = test_qgr)
+  )
+})
+
+test_that("fetchWindowedBigwigList works with proper inputs", {
+  bw_files = rep(test_bw, 3)
+  names(bw_files) = paste0("bw_", 1:3)
+  for(win in c(1, 3)){
+    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                           win_size = win,
+                                                           qgr = test_qgr,
+                                                           bw_variable_name = "group")})
+    expect_s3_class(res, "data.table")
+    expect_equal(colnames(res), c(exp_colnames, "sample"))
+  }
+})
 
 a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1:7 + 10))
 b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1:6 + 8))
@@ -93,7 +137,7 @@ test_that("centerFixedSizeGRanges size sifts are reversible", {
   a5_from4rev = centerFixedSizeGRanges(grs = a4_from5, fixed_size = 5)
   a4_from6rev = centerFixedSizeGRanges(grs = a6_from4, fixed_size = 4)
   a4_from9rev = centerFixedSizeGRanges(grs = a9_from4, fixed_size = 4)
-#recover even from even
+  #recover even from even
   expect_true(all(a4 == a4_from6rev))
   expect_true(all(a6 == a6_from4))
 
