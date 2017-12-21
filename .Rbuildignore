@@ -5,3 +5,4 @@
 ^inst/extdata/peak_calls/full$
 ^inst/extdata/bigwigs/full$
 ^inst/extdata/peak_calls/grab_peaks\.sh$
+^R/old_sources$

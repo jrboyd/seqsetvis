@@ -86,7 +86,67 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
 #
 # regionSetPlotHeatmap
 #
-# regionSetPlotScatter
+regionSetPlotScatter = function(bw_dt, x_name, y_name,
+                                value_var = "FE", xy_var = "sample",
+                                by_ = "id",
+
+                                plot_val = c("max", "mean", "median"),
+                                plot_type = c("standard", "volcano")[1],
+                                show_help = F, fixed_coords = T){
+  bw_dt = copy(all_bw_dt)
+  x_name = "H7_H3K27ME3"
+  y_name = "H7_H3K4ME3"
+  bw_dt[get(xy_var) == x_name, max()]
+  #isolate because these trigger updates of xy_plot_dt() which already triggers reactivity
+  if(ptype == "standard"){
+    bw_dt[, max(xval, yval)]
+    lim = c(0, bw_dt[, max(xval, yval)])
+    p = ggplot(bw_dt) +
+      geom_point(aes(x = xval, y = yval, col = plotting_group)) +
+      labs(x = x_, y = y_, title = "Max FE in regions") +
+      ylim(lim) + xlim(lim)
+    if(fixed_coords) p = p + coord_fixed()
+    if(show_help){
+      pos1 = .2 * max(lim)
+      pos2 = .8 * max(lim)
+      p = p + annotate("segment", x = 0, xend = 0, y = pos1, yend = pos2, arrow = arrow())
+      p = p + annotate("label", x = 0, y = mean(lim), label = gsub(" ", "\n", paste(y_, "binding")), hjust = 0)
+      p = p + annotate("segment", x = pos1, xend = pos2, y = 0, yend = 0, arrow = arrow())
+      p = p + annotate("label", x = mean(lim), y = 0, label = paste(x_, "binding"), vjust = 0)
+      p = p + annotate("label", x = 0, y = 0, label = "no\nbinding", hjust = 0, vjust = 0)
+      p = p + annotate("segment", x = pos1, xend = pos2, y = pos1, yend = pos2, arrow = arrow())
+      p = p + annotate("label", x = mean(lim), y = mean(lim), label = gsub(" ", "\n", paste("both binding")))
+      p
+    }
+  }else if(ptype == "volcano"){
+    bw_dt[, xvolcano := log2(max(yval, 1) / max(xval, 1)), by = id]
+    bw_dt[, yvolcano := max(min(yval, xval), 1), by = id]
+    xmax = bw_dt[, max(abs(c(xvolcano)))]
+    lim = c(-xmax, xmax)
+    p = ggplot(bw_dt) +
+      geom_point(aes(x = xvolcano, y = yvolcano, col = plotting_group)) +
+      labs(x = paste("log2 fold-change of", y_, "over", x_),
+           y = paste("log2 min of", y_, "and", x_), title = "Max FE in regions") +
+      xlim(lim)
+    if(fixed_coords) p = p + coord_fixed()
+    if(show_help){
+      pos1 = .2 * max(lim)
+      pos2 = .8 * max(lim)
+      p = p + annotate("segment", y = 1, yend = 1, x = pos1, xend = pos2, arrow = arrow())
+      p = p + annotate("label", y = 1, x = max(lim)/2, label = gsub(" ", "\n", paste(y_, "binding")), vjust = 0)
+      p = p + annotate("segment", y = 1, yend = 1, x = -pos1, xend = -pos2, arrow = arrow())
+      p = p + annotate("label", y = 1, x = -max(lim)/2, label = gsub(" ", "\n", paste(x_, "binding")), vjust = 0)
+      p = p + annotate("label", x = 0, y = 1, label = "no\nbinding", hjust = .5, vjust = 0)
+      ylim = range(bw_dt$yvolcano)
+      ypos1 = 1 + (max(ylim) - min(ylim)) * .2
+      ypos2 = 1 + (max(ylim) - min(ylim)) * .8
+      p = p + annotate("segment", x = 0, xend = 0, y = ypos1, yend = ypos2, arrow = arrow())
+      p = p + annotate("label", x = mean(lim), y = mean(ylim), label = gsub(" ", "\n", paste("both binding")))
+      p
+    }
+  }
+  p
+}
 
 #' perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments
 #' clusters are sorted using hclust on centers
