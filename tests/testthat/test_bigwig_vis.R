@@ -86,19 +86,6 @@ test_that("fetchWindowedBigwigList duplicate names throws error", {
   )
 })
 
-test_that("fetchWindowedBigwigList works with proper inputs", {
-  bw_files = rep(test_bw, 3)
-  names(bw_files) = paste0("bw_", 1:3)
-  for(win in c(1, 3)){
-    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
-                                                           win_size = win,
-                                                           qgr = test_qgr,
-                                                           bw_variable_name = "group")})
-    expect_s3_class(res, "data.table")
-    expect_equal(colnames(res), c(exp_colnames, "sample"))
-  }
-})
-
 test_that("regionSetPlotBandedQuantiles works with proper inputs", {
   bw_files = rep(test_bw, 3)
   names(bw_files) = paste0("bw_", 1:3)

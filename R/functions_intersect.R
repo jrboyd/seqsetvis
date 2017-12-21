@@ -1,35 +1,35 @@
-#' Try to load a bed-like file and convert it to a GRanges object
+#' #' Try to load a bed-like file and convert it to a GRanges object
+#' #'
+#' #' @param bed_file A bed-like file
+#' #' @param output_GRanges output data.frame before GRanges conversion
+#' #' @return GRanges with metadata columns describing overlap overlap of input grs
+#' #' @examples TODO easyLoadGRanges()
+#' easyLoadGRanges = function(bed_file, output_GRanges = T){
 #'
-#' @param bed_file A bed-like file
-#' @param output_GRanges output data.frame before GRanges conversion
-#' @return GRanges with metadata columns describing overlap overlap of input grs
-#' @examples TODO easyLoadGRanges()
-easyLoadGRanges = function(bed_file, output_GRanges = T){
-
-}
-
-library(shiny)
-library(miniUI)
-library(ggplot2)
-loaderGadget = function(f){
-  ui <- miniPage(
-    gadgetTitleBar("My Gadget"),
-    miniContentPanel(
-      # Define layout, inputs, outputs
-    )
-  )
-
-  server <- function(input, output, session) {
-    # Define reactive expressions, outputs, etc.
-
-    # When the Done button is clicked, return a value
-    observeEvent(input$done, {
-      stopApp(nrow(read.table(f)))
-    })
-  }
-
-  runGadget(ui, server)
-}
+#' }
+#'
+#' library(shiny)
+#' library(miniUI)
+#' library(ggplot2)
+#' loaderGadget = function(f){
+#'   ui <- miniPage(
+#'     gadgetTitleBar("My Gadget"),
+#'     miniContentPanel(
+#'       # Define layout, inputs, outputs
+#'     )
+#'   )
+#'
+#'   server <- function(input, output, session) {
+#'     # Define reactive expressions, outputs, etc.
+#'
+#'     # When the Done button is clicked, return a value
+#'     observeEvent(input$done, {
+#'       stopApp(nrow(read.table(f)))
+#'     })
+#'   }
+#'
+#'   runGadget(ui, server)
+#' }
 
 #' Intersect a list of GRanges to create a single GRanges object of
 #' merged ranges including metadata describing overlaps per input GRanges

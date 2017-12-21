@@ -12,12 +12,13 @@ Description: Makes the visual analysis of ChIP-seq peak sets and enrichment trac
 License: MIT
 Encoding: UTF-8
 LazyData: true
-Suggests: testthat
-Depends: 
+Suggests: testthat,
+    covr
+Depends:
     ggplot2,
     GenomicRanges,
     data.table
-Imports: 
+Imports:
     rtracklayer,
     limma, 
     assertthat, 
