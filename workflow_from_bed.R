@@ -49,6 +49,9 @@ end(qgr) = end(qgr) - 1
 start(qgr) = start(qgr) - 10000
 end(qgr) = end(qgr) + 10000
 
+peak_files = dir("inst/extdata/peak_calls/full/", pattern = "narrow", full.names = T)
+
+overlapIntervalSets()
 
 wsize = 50
 scale_floor = .3

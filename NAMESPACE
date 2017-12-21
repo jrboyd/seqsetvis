@@ -1,7 +1,7 @@
 exportPattern("^[[:alpha:]]+")
 export(vennCounts)
 import(data.table, except = c("shift", "first", "second"))
-import(GenomicRanges, IRanges, S4Vectors)
+import(GenomicRanges)
 import(assertthat)
 
 importFrom('limma', 'vennCounts')
