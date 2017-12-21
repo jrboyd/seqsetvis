@@ -1,5 +1,4 @@
 library(rtracklayer)
-library(pbapply)
 library(data.table)
 
 #' Transforms set of GRanges to all have the same size.

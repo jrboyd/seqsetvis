@@ -101,6 +101,33 @@ test_that("regionSetPlotBandedQuantiles works with proper inputs", {
   }
 })
 
+
+test_that("regionSetPlotScatter works with basic inputs", {
+  bw_files = rep(test_bw, 3)
+  names(bw_files) = paste0("bw_", 1:3)
+  hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                         win_size = 3,
+                                                         qgr = test_qgr)})
+  p1 = regionSetPlotScatter(res, x_name = "bw_1", y_name = "bw_2")
+  expect_s3_class(p1, "ggplot")
+  p2 = regionSetPlotScatter(res, x_name = "bw_1", y_name = "bw_2", plot_type = "volcano")
+  expect_s3_class(p2, "ggplot")
+})
+
+test_that("regionSetPlotScatter works with other inputs", {
+  bw_files = rep(test_bw, 3)
+  names(bw_files) = paste0("bw_", 1:3)
+  hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                         win_size = 3,
+                                                         qgr = test_qgr)})
+  p1 = regionSetPlotScatter(res, x_name = "bw_1", y_name = "bw_2", value_variable = "x")
+  expect_s3_class(p1, "ggplot")
+  p2 = regionSetPlotScatter(res, x_name = "bw_1", y_name = "bw_3", value_function = median)
+  expect_s3_class(p2, "ggplot")
+
+  p2 = regionSetPlotScatter(res, x_name = "region_1", y_name = "region_2", value_function = median, by_ = "sample", xy_variable = "id")
+})
+
 a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1:7 + 10))
 b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1:6 + 8))
 
@@ -157,4 +184,5 @@ test_that("centerFixedSizeGRanges size sifts are reversible", {
   expect_true(all(a4 == a4_from5))
   expect_true(all(a4 == a4_from9rev))
 })
+
 

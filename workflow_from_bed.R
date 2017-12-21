@@ -50,9 +50,20 @@ start(qgr) = start(qgr) - 10000
 end(qgr) = end(qgr) + 10000
 
 peak_files = dir("inst/extdata/peak_calls/full/", pattern = "narrow", full.names = T)
+names(peak_files) = peak_files %>% basename %>%
+  sub("_pooled_peak.+roadPeak", "", .) %>%
+  sub("_pooled_peak.+arrowPeak", "", .)
+peak_df = lapply(peak_files, read.table)
+peak_gr = lapply(peak_df, function(x){
+  colnames(x) = c("seqnames", "start", "end", "peak_id", "score", "dot", "FE", "pval", "qval", "rel_summit")
+  GRanges(x)
+})
 
-overlapIntervalSets()
-
+# names(qgr) = qgr$id
+peak_gr$base = qgr
+peak_gr = rev(peak_gr)
+peak_olap = overlapIntervalSets(peak_gr, use_first = T)
+as.data.table(mcols(peak_olap))
 wsize = 50
 scale_floor = .3
 scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
