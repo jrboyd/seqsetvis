@@ -1,4 +1,4 @@
-library(peakvisr)
+# library(peakvisr)
 library(testthat)
 a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1))
 b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1))

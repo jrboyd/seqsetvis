@@ -1,4 +1,3 @@
-# library(peakvisr)
 library(testthat)
 
 xs = (0:5-1.5)*5

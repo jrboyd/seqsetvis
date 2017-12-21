@@ -1,4 +1,4 @@
-library(peakvisr)
+# library(peakvisr)
 library(testthat)
 set_a = 1:8
 set_b = 5:9
@@ -10,7 +10,7 @@ gr_c = GRanges("chr1", IRanges(set_c*10+-4, set_c*10+1))
 
 expected_table = as.matrix(data.frame("set_A" = 1:10 %in% set_a,
                             "set_B" = 1:10 %in% set_b,
-                            "set_C" = 1:10 %in% set_c, row.names = 1:10),)
+                            "set_C" = 1:10 %in% set_c, row.names = 1:10))
 
 expected_table_named = as.matrix(data.frame("a" = 1:10 %in% set_a,
                                   "b" = 1:10 %in% set_b,
