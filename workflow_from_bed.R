@@ -3,44 +3,44 @@ library(magrittr)
 library(GenomicRanges)
 # library(peakvisr)
 
-#Goal, find interesting clustering of histone modifications at gene promoters
-library(TxDb.Hsapiens.UCSC.hg38.knownGene)
-# genes(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
-tx = transcripts(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
-# exons(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
-# cds(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
-
-library(biomaRt)
-ensembl=useMart("ensembl",dataset="hsapiens_gene_ensembl")
-subset(listFilters(ensembl), grepl("UCSC", description))
-subset(listFilters(ensembl), grepl("ENSG", description))
-subset(listFilters(ensembl), grepl("ENST", description))
-subset(listFilters(ensembl), grepl("HGNC", description))
-subset(listFilters(ensembl), grepl("GO", description))
-go = "GO:0030154" #cell differentiation
-tx_meta =  getBM(mart = ensembl,
-                           attributes = c("ucsc", "ensembl_gene_id", "hgnc_symbol", "ensembl_transcript_id"),
-                           filters = c("ucsc"),
-                           values = list(tx$tx_name))
-
-tx_meta_cell_diff =  getBM(mart = ensembl,
-                 attributes = c("ucsc", "ensembl_gene_id", "hgnc_symbol", "ensembl_transcript_id"),
-                 filters = c("ucsc", "go"),
-                 values = list(tx$tx_name, go))
-
-tx_cell_diff = subset(tx, tx_name %in% tx_meta_cell_diff$ucsc)
-dt.tx_cell_diff = as.data.table(merge(tx_cell_diff, tx_meta_cell_diff, by.x = "tx_name", by.y = "ucsc"))
-dt.tx_cell_diff[strand == "+", end := start]
-dt.tx_cell_diff[strand == "-", start := end]
-ext = 2000L
-dt.tx_cell_diff[, c("start", "end") := .(start - ext, end + ext - 1L)]
-tx_cell_diff = GRanges(dt.tx_cell_diff)
-
-
-
-subset(listFilters(ensembl), grepl("UCSC", description))
-listDatasets(ensembl)
-mart = biomaRt::listMarts()
+# #Goal, find interesting clustering of histone modifications at gene promoters
+# library(TxDb.Hsapiens.UCSC.hg38.knownGene)
+# # genes(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
+# tx = transcripts(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
+# # exons(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
+# # cds(TxDb.Hsapiens.UCSC.hg38.knownGene, filter = list(tx_chrom = "chr19"))
+#
+# library(biomaRt)
+# ensembl=useMart("ensembl",dataset="hsapiens_gene_ensembl")
+# subset(listFilters(ensembl), grepl("UCSC", description))
+# subset(listFilters(ensembl), grepl("ENSG", description))
+# subset(listFilters(ensembl), grepl("ENST", description))
+# subset(listFilters(ensembl), grepl("HGNC", description))
+# subset(listFilters(ensembl), grepl("GO", description))
+# go = "GO:0030154" #cell differentiation
+# tx_meta =  getBM(mart = ensembl,
+#                            attributes = c("ucsc", "ensembl_gene_id", "hgnc_symbol", "ensembl_transcript_id"),
+#                            filters = c("ucsc"),
+#                            values = list(tx$tx_name))
+#
+# tx_meta_cell_diff =  getBM(mart = ensembl,
+#                  attributes = c("ucsc", "ensembl_gene_id", "hgnc_symbol", "ensembl_transcript_id"),
+#                  filters = c("ucsc", "go"),
+#                  values = list(tx$tx_name, go))
+#
+# tx_cell_diff = subset(tx, tx_name %in% tx_meta_cell_diff$ucsc)
+# dt.tx_cell_diff = as.data.table(merge(tx_cell_diff, tx_meta_cell_diff, by.x = "tx_name", by.y = "ucsc"))
+# dt.tx_cell_diff[strand == "+", end := start]
+# dt.tx_cell_diff[strand == "-", start := end]
+# ext = 2000L
+# dt.tx_cell_diff[, c("start", "end") := .(start - ext, end + ext - 1L)]
+# tx_cell_diff = GRanges(dt.tx_cell_diff)
+#
+#
+#
+# subset(listFilters(ensembl), grepl("UCSC", description))
+# listDatasets(ensembl)
+# mart = biomaRt::listMarts()
 
 qgr = read.table("/slipstream/home/joeboyd/H7_bivalent_enst_promoter_ext2500_5573genes.bed")
 colnames(qgr) = c("seqnames", "start", "end", "id", "zero", "strand")
@@ -69,28 +69,46 @@ all_bw_dt = all_bw_dt[x > -4000 & x < 12000]
 
 
 all_bw_dt$id = factor(all_bw_dt$id)
-ggplot(all_bw_dt) + geom_raster(aes(x = x, y = id, fill = FE)) +
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
-  scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals) + facet_grid(. ~ sample)
-
+# ggplot(all_bw_dt) + geom_raster(aes(x = x, y = id, fill = FE)) +
+#   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
+#   scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals) + facet_grid(. ~ sample)
+#
 all_bw_dt[, capFE := FE / max(FE), by = sample]
-ggplot(all_bw_dt) + geom_raster(aes(x = x, y = id, fill = capFE)) +
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
-  scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals) + facet_grid(. ~ sample)
-
+# ggplot(all_bw_dt) + geom_raster(aes(x = x, y = id, fill = capFE)) +
+#   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
+#   scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals) + facet_grid(. ~ sample)
+#
 all_bw_dt[, lgFE := log2(FE + 1)]
-ggplot(all_bw_dt) + geom_raster(aes(x = x, y = id, fill = lgFE)) +
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
-  scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals) + facet_grid(. ~ sample)
+# ggplot(all_bw_dt) + geom_raster(aes(x = x, y = id, fill = lgFE)) +
+#   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
+#   scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals) + facet_grid(. ~ sample)
 
-regionSetPlotBandedQuantiles(all_bw_dt)
+# pdf('qbands.pdf')
+regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample",
+                             symm_colors = F, hsv_hue_min = 0, hsv_hue_max = .7)
+regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample",
+                             symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7)
+regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample",
+                             symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7,
+                             hsv_reverse = T)
+regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample",
+                             symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7,
+                             hsv_reverse = T, hsv_value = .8, hsv_saturation = .8)
+regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample", hsv_grayscale = T,
+                             symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7,
+                             hsv_reverse = T)
+regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample", hsv_grayscale = T,
+                             symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7,
+                             hsv_reverse = F)
+regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample", hsv_grayscale = T,
+                             symm_colors = F, hsv_hue_min = 0, hsv_hue_max = .7,
+                             hsv_reverse = F)
+# dev.off()
 
-plot1_dt = copy(all_bw_dt[sample == "H7_H3K27ME3"])
-plot2_dt = copy(all_bw_dt[sample == "MCF7_H3K27ME3"])
-regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample")
-regionSetPlotBandedQuantiles(all_bw_dt, y_ = "lgFE", by_ = "sample")
-regionSetPlotBandedQuantiles(all_bw_dt, y_ = "FE", by_ = "sample")
-regionSetPlotBandedQuantiles(plot2_dt)
+# regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample", symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7)
+# regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample", symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7, )
+# regionSetPlotBandedQuantiles(all_bw_dt, y_ = "lgFE", by_ = "sample")
+# regionSetPlotBandedQuantiles(all_bw_dt, y_ = "FE", by_ = "sample")
 
 
 plot_dt = copy(all_bw_dt[sample == "H3K27ME3"])

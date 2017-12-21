@@ -23,5 +23,6 @@ Imports:
     limma, 
     assertthat, 
     venneuler,
+    units,
     ggforce
 RoxygenNote: 6.0.1

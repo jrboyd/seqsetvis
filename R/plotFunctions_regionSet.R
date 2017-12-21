@@ -1,5 +1,8 @@
 regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
-                                        hsv_min = 0, hsv_max = 0.7,
+                                        hsv_reverse = F,
+                                        hsv_saturation = 1, hsv_value = 1,
+                                        hsv_grayscale = F,
+                                        hsv_hue_min = 0, hsv_hue_max = 0.7, symm_colors = F,
                                         n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95,
                                         is_centered = T, win_size = 50) {
   # hsv_min = 0; hsv_max = .7; n_quantile = 18; quantile_min = .05; quantile_max = .95; is_centered = T; win_size = 50
@@ -37,7 +40,29 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
   })
   plot_dt = rbindlist(all_q)
   q_o = unique(plot_dt$q_range)
-  cols = rainbow(length(q_o), start = hsv_min, end = hsv_max)
+  if(symm_colors){
+    ncol = ceiling(length(q_o) / 2)
+    if(hsv_grayscale){
+      gray_vals = hsv_hue_min + (hsv_hue_max - hsv_hue_min)*((seq_len(ncol) - 1)/(ncol - 1))
+      cols = gray(gray_vals)
+    }else{
+      cols = rainbow(ncol, start = hsv_hue_min, end = hsv_hue_max, s = hsv_saturation, v = hsv_value)
+    }
+    if(hsv_reverse) cols = rev(cols)
+    ci = c(seq_len(ncol), rev(seq_len(ncol) - ifelse(length(q_o) %% 2 == 0, 0, 1)))
+    cols = cols[ci]
+  }else{
+    ncol = length(q_o)
+    if(hsv_grayscale){
+      gray_vals = hsv_hue_min + (hsv_hue_max - hsv_hue_min)*((seq_len(ncol) - 1)/(ncol - 1))
+      cols = gray(gray_vals)
+    }else{
+      cols = rainbow(ncol, start = hsv_hue_min, end = hsv_hue_max, s = hsv_saturation, v = hsv_value)
+    }
+
+    if(hsv_reverse) cols = rev(cols)
+  }
+
   names(cols) = q_o
 
   #copy factor level order if any
