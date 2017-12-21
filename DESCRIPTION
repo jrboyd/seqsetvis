@@ -1,4 +1,4 @@
-Package: peakvisr
+Package: seqsetvis
 Type: Package
 Title: Interactive Visualizations for User Friendly ChIP-seq Peak Comparison and Analysis
 Version: 0.99.1
