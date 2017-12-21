@@ -99,24 +99,11 @@ all_bw_dt[, lgFE := log2(FE + 1)]
 
 # pdf('qbands.pdf')
 regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample",
-                             symm_colors = F, hsv_hue_min = 0, hsv_hue_max = .7)
-regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample",
-                             symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7)
-regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample",
-                             symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7,
-                             hsv_reverse = T)
-regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample",
-                             symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7,
-                             hsv_reverse = T, hsv_value = .8, hsv_saturation = .8)
-regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample", hsv_grayscale = T,
                              symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7,
                              hsv_reverse = T)
 regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample", hsv_grayscale = T,
                              symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7,
-                             hsv_reverse = F)
-regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample", hsv_grayscale = T,
-                             symm_colors = F, hsv_hue_min = 0, hsv_hue_max = .7,
-                             hsv_reverse = F)
+                             hsv_reverse = T)
 # dev.off()
 
 # regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample", symm_colors = T, hsv_hue_min = 0, hsv_hue_max = .7)
