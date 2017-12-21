@@ -7,7 +7,7 @@
 fetchWindowedBigwig(bw_file, qgr, win_size = 50)
 }
 \arguments{
-\item{bw_file}{The bigwig file to read from.}
+\item{bw_file}{The character vector path to bigwig files to read from.}
 
 \item{qgr}{Set of GRanges to query.  For valid results the width of each
 interval should be identical and evenly divisible by \code{win_size}.}

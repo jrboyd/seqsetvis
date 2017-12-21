@@ -1,6 +1,3 @@
-library(rtracklayer)
-library(data.table)
-
 #' Transforms set of GRanges to all have the same size.
 #'
 #' \code{centerFixedSizeGranges} First calculates the central coordinate of each

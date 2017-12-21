@@ -4,8 +4,8 @@
 \alias{centerAtMax}
 \title{centers profile of x and y.  default is to center by region but across all samples.}
 \usage{
-centerAtMax(dt, x_ = "x", y_ = "y", by_ = "", view_size = NULL,
-  trim_to_valid = T)
+centerAtMax(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL,
+  trim_to_valid = T, check_by_dupes = T)
 }
 \arguments{
 \item{x_}{the variable name of the x-values. default is 'x'}
