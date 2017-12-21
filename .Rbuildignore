@@ -2,3 +2,6 @@
 ^\.Rproj\.user$
 ^\.travis\.yml$
 ^codecov\.yml$
+^inst/extdata/peak_calls/full$
+^inst/extdata/bigwigs/full$
+^inst/extdata/peak_calls/grab_peaks\.sh$

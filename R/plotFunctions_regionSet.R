@@ -83,7 +83,10 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
   }
   p
 }
-
+#
+# regionSetPlotHeatmap
+#
+# regionSetPlotScatter
 
 #' perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments
 #' clusters are sorted using hclust on centers

@@ -2,7 +2,7 @@
 
 language: R
 r: bioc-devel
-sudo: true
+sudo: false
 cache: packages
 
 before_install:
