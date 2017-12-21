@@ -1,4 +1,4 @@
-library(testthat)
-library(peakvisr)
-
-test_check("peakvisr")
+# library(testthat)
+# library(seqsetvis)
+#
+# test_check("seqsetvis")

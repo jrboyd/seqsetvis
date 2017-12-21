@@ -120,12 +120,19 @@ test_that("regionSetPlotScatter works with other inputs", {
   hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
                                                          win_size = 3,
                                                          qgr = test_qgr)})
-  p1 = regionSetPlotScatter(res, x_name = "bw_1", y_name = "bw_2", value_variable = "x")
+  p1 = regionSetPlotScatter(res, x_name = "bw_1", y_name = "bw_2",
+                            value_variable = "x")
   expect_s3_class(p1, "ggplot")
-  p2 = regionSetPlotScatter(res, x_name = "bw_1", y_name = "bw_3", value_function = median)
+  p2 = regionSetPlotScatter(res, x_name = "bw_1", y_name = "bw_3",
+                            value_function = median)
   expect_s3_class(p2, "ggplot")
-
-  p2 = regionSetPlotScatter(res, x_name = "region_1", y_name = "region_2", value_function = median, by_ = "sample", xy_variable = "id")
+  p3 = regionSetPlotScatter(res, x_name = "region_1", y_name = "region_2",
+                            value_function = median,
+                            by_ = "sample", xy_variable = "id")
+  memb = data.frame(id = unique(res$id), plotting_group = letters[1:6])
+  p4 = regionSetPlotScatter(bw_dt = res, x_name = "bw_1", y_name = "bw_1",
+                            plotting_group = memb)
+  expect_s3_class(p4, "ggplot")
 })
 
 a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1:7 + 10))

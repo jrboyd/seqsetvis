@@ -1,7 +1,7 @@
 ###load peak sets
 library(magrittr)
 library(GenomicRanges)
-# library(peakvisr)
+# library(seqsetvis )
 
 # #Goal, find interesting clustering of histone modifications at gene promoters
 # library(TxDb.Hsapiens.UCSC.hg38.knownGene)

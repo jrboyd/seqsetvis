@@ -4,8 +4,7 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
                                         hsv_grayscale = F,
                                         hsv_hue_min = 0, hsv_hue_max = 0.7, symm_colors = F,
                                         n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95,
-                                        is_centered = T, win_size = 50) {
-  # hsv_min = 0; hsv_max = .7; n_quantile = 18; quantile_min = .05; quantile_max = .95; is_centered = T; win_size = 50
+                                        is_centered = T) {
   q2do = 0:n_quantile/n_quantile
   q2do = round(quantile_min + q2do * (quantile_max - quantile_min), digits = 3)
 
@@ -83,9 +82,7 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
   }
   p
 }
-#
-# regionSetPlotHeatmap
-#
+
 regionSetPlotScatter = function(bw_dt, x_name, y_name,
                                 plotting_group = NULL,
                                 value_variable = "FE", xy_variable = "sample",
@@ -157,6 +154,108 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
   if(fixed_coords) p = p + coord_fixed()
   p
 }
+
+#
+regionSetPlotHeatmap = function(bw_dt, max_disp = 2000){
+  plot_dt = copy(bw_dt)
+  #sample down to max_disp
+  uniq = unique(plot_dt$hit)
+  hit_disp = sample(uniq, min(max_disp, length(uniq)))
+  plot_dt = plot_dt[hit %in% hit_disp]
+
+  #this should be warning or error, not silent removal
+  # k = !duplicated(plot_dt[, paste(hit, x, sample)])
+  # plot_dt = plot_dt[k,]
+
+  # plot_dt[FE > 20, FE := 20]
+  ###convert bp to x and add space between samples
+  plot_dt[, xbp := x]
+  plot_dt$sample = factor(plot_dt$sample, levels = to_disp)
+  plot_dt[, x := xbp / 50 + 1]
+  col_size = max(plot_dt$x)
+  plot_dt[, x := x + col_size * (as.numeric(sample) - 1)]
+  ##add space between samples
+  col_gap_size = round(max(plot_dt$x) * .02)
+  plot_dt[, x := x + col_gap_size * floor((x-1) / col_size)]
+  ##text location for labels in center of each column
+  x_txt = col_size / 2 + (col_size + col_gap_size) * (1:length(to_disp)-1)
+
+  ###sort by row mean first
+  hit_val = plot_dt[ , .(val = mean(FE)), by = hit]
+  total_hit_o = as.character(hit_val[order(val), hit])
+  setkey(plot_dt, hit)
+  plot_dt = plot_dt[.(total_hit_o)]
+
+  ###perform clustering on rows
+  nclust = 6
+  nclust = min(nclust, length(uniq)/2)
+  if(nclust < 2) return(NULL)
+  # print(paste("nclust", nclust))
+  dc_dt = dcast(plot_dt, formula = hit ~ x, value.var = "FE")
+  p_mat = as.matrix(dc_dt[,-1])
+  p_mat[is.na(p_mat)] = 0
+  rownames(p_mat) = dc_dt$hit
+  km = kmeans(p_mat, centers = nclust)
+  hc_centers = hclust(dist(km$centers, method = "euc"))
+  hc_reo = 1:nclust
+  names(hc_reo) = hc_centers$order
+
+  ###debug stuff
+  # layout(matrix(1))
+  # plot(hc_centers)
+  # heatmap.2(km$centers[names(hc_reo),], Colv = F, Rowv = F, trace = "n")
+  # layout(matrix(1:10, ncol = 2))
+  # par(mai = rep(0,4))
+  # for(i in names(hc_reo)){
+  #   test_hit = km$cluster == i
+  #   test_hit = names(test_hit)[test_hit]
+  #   plot(colMeans(p_mat[test_hit,]))
+  #   title(i)
+  # }
+
+  # require(ggdendro)
+  # dendro_data(hc_centers)
+  o = order(hc_reo[as.character(km$cluster)])
+
+
+  # plot(clusts)
+  hit_o = names(km$cluster)[o]
+  plot_dt$hit = factor(plot_dt$hit, levels = hit_o)
+  plot_dt$y = as.numeric(factor(plot_dt$hit))
+
+  ymax = max(plot_dt$y)
+  row_gap_size = round(ymax * .02)
+
+  clusts = hc_reo[as.character(km$cluster[o])]
+  clust_counts = table(clusts)
+  cs_counts = cumsum(clust_counts)
+  starts = c(1, cs_counts[-nclust] + 1)
+  ends = c(cs_counts)
+  plot_dt$y_gap = 0
+  setkey(plot_dt, y)
+  for(i in 2:nclust){
+    s = starts[i]
+    e = ends[i]
+    gap = row_gap_size * (i - 1)
+    plot_dt[.(s:e), y_gap := gap ]
+  }
+  plot_dt[, y := y + y_gap]
+  plot_dt$y_gap = NULL
+  # setkey(plot_dt, hit)
+  ggplot(plot_dt) +
+    geom_raster(aes(x = x, y = y, fill = FE)) +
+    # facet_grid(. ~ sample) +
+    scale_y_reverse() + labs(x = "", y = "") +
+    theme(axis.text = element_blank(),
+          axis.ticks = element_blank(),
+          panel.background = element_blank(),
+          strip.background = element_blank()) +
+    annotate("text", x = x_txt, y = - .02 * ymax, label = to_disp, hjust = .5, vjust = 0)
+
+
+}
+
+
 
 #' perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments
 #' clusters are sorted using hclust on centers
