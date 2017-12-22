@@ -10,7 +10,7 @@ setPlotVenn(object, group_names = NULL, counts_txt_size = 5,
   0.5, 0), counts_color = NULL)
 }
 \arguments{
-\item{object}{will be passed to \code\link{setPlotMakeMT} for conversion to membership matrix}
+\item{object}{will be passed to \code{\link{setPlotMakeMT}} for conversion to membership matrix}
 
 \item{group_names}{useful if names weren't provided or were lost in creating membership matrix}
 

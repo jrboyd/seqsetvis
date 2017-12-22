@@ -159,9 +159,9 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
 regionSetPlotHeatmap = function(bw_dt, max_disp = 2000){
   plot_dt = copy(bw_dt)
   #sample down to max_disp
-  uniq = unique(plot_dt$hit)
+  uniq = unique(plot_dt$id)
   hit_disp = sample(uniq, min(max_disp, length(uniq)))
-  plot_dt = plot_dt[hit %in% hit_disp]
+  plot_dt = plot_dt[id %in% hit_disp]
 
   #this should be warning or error, not silent removal
   # k = !duplicated(plot_dt[, paste(hit, x, sample)])

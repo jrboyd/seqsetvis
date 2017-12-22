@@ -12,7 +12,7 @@
 
 #' ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets
 #'
-#' @param object will be passed to \code\link{setPlotMakeMT} for conversion to membership matrix
+#' @param object will be passed to \code{\link{setPlotMakeMT}} for conversion to membership matrix
 #' @param group_names useful if names weren't provided or were lost in creating membership matrix
 #' @param counts_txt_size font size for count numbers
 #' @param counts_as_labels if TRUE, geom_label is used instead of geom_text.  can be easier to read.

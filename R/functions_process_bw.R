@@ -83,7 +83,7 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
 #' efficiently combine results
 #'
 #' \code{fetchWindowedBigwigList} iteratively calls \code{fetchWindowedBigwig}.
-#' See \code\link{fetchWindowedBigwig} for more info.
+#' See \code{\link{fetchWindowedBigwig}} for more info.
 #'
 #' @param bw_files The character vector paths to bigwig files to read from.
 #' @param qgr Set of GRanges to query.  For valid results the width of each

@@ -27,7 +27,7 @@ A tidy formatted data.table containing fetched values.
 }
 \description{
 \code{fetchWindowedBigwigList} iteratively calls \code{fetchWindowedBigwig}.
-See \code\link{fetchWindowedBigwig} for more info.
+See \code{\link{fetchWindowedBigwig}} for more info.
 }
 \details{
 if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
