@@ -1,5 +1,6 @@
-# library(peakvisr)
+library(seqsetvis)
 library(testthat)
+library(GenomicRanges)
 # library(rtracklayer)
 test_bw = system.file("extdata/test_bigwigs/test_loading.bw", package = "seqsetvis", mustWork = T)
 pos = c(20, 180, 210, 440, 520, 521)
@@ -101,6 +102,34 @@ test_that("regionSetPlotBandedQuantiles works with proper inputs", {
   }
 })
 
+test_that("regionSetPlotBandedQuantiles different hsv setting", {
+  bw_files = rep(test_bw, 3)
+  names(bw_files) = paste0("bw_", 1:3)
+  for(win in c(1, 3)){
+    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                           win_size = win,
+                                                           qgr = test_qgr,
+                                                           bw_variable_name = "group")})
+
+    res$group = factor(res$group)
+
+    p_rev = regionSetPlotBandedQuantiles(res, by_ = "group", hsv_reverse = T)
+    expect_s3_class(p_rev, "ggplot")
+
+    p_symm = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = T)
+    expect_s3_class(p_symm, "ggplot")
+
+    p_symmgray = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = T, hsv_grayscale = T)
+    expect_s3_class(p_symmgray, "ggplot")
+
+    p_symmrev = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = T, hsv_reverse = T)
+    expect_s3_class(p_symmrev, "ggplot")
+
+    p_symmrev = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = T, hsv_reverse = T)
+    expect_s3_class(p_symmrev, "ggplot")
+  }
+})
+
 
 test_that("regionSetPlotScatter works with basic inputs", {
   bw_files = rep(test_bw, 3)
@@ -132,6 +161,27 @@ test_that("regionSetPlotScatter works with other inputs", {
   memb = data.frame(id = unique(res$id), plotting_group = letters[1:6])
   p4 = regionSetPlotScatter(bw_dt = res, x_name = "bw_1", y_name = "bw_1",
                             plotting_group = memb)
+  expect_s3_class(p4, "ggplot")
+})
+
+test_that("regionSetPlotScatter works with help enabled inputs", {
+  bw_files = rep(test_bw, 3)
+  names(bw_files) = paste0("bw_", 1:3)
+  hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                         win_size = 3,
+                                                         qgr = test_qgr)})
+  p1 = regionSetPlotScatter(res, x_name = "bw_1", y_name = "bw_2",
+                            value_variable = "x", show_help = T)
+  expect_s3_class(p1, "ggplot")
+  p2 = regionSetPlotScatter(res, x_name = "bw_1", y_name = "bw_3",
+                            value_function = median, show_help = T)
+  expect_s3_class(p2, "ggplot")
+  p3 = regionSetPlotScatter(res, x_name = "region_1", y_name = "region_2",
+                            value_function = median,
+                            by_ = "sample", xy_variable = "id", show_help = T)
+  memb = data.frame(id = unique(res$id), plotting_group = letters[1:6])
+  p4 = regionSetPlotScatter(bw_dt = res, x_name = "bw_1", y_name = "bw_1",
+                            plotting_group = memb, show_help = T)
   expect_s3_class(p4, "ggplot")
 })
 
@@ -191,5 +241,9 @@ test_that("centerFixedSizeGRanges size sifts are reversible", {
   expect_true(all(a4 == a4_from5))
   expect_true(all(a4 == a4_from9rev))
 })
+
+# test_that("regionSetPlotHeatmap works with minimal inputs", {
+#
+# })
 
 

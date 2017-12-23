@@ -17,9 +17,9 @@ LazyData: true
 Suggests: testthat,
     covr
 Depends: 
+  ggplot2
 Imports:
     methods,
-    ggplot2,
     GenomicRanges,
     IRanges,
     data.table,

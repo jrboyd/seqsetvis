@@ -1,5 +1,6 @@
-# library(peakvisr)
+library(seqsetvis)
 library(testthat)
+library(GenomicRanges)
 set_a = 1:8
 set_b = 5:9
 set_c = 8:10

@@ -1,8 +1,8 @@
 library(testthat)
-
+library(seqsetvis)
 xs = (0:5-1.5)*5
 fun = function(x)x^2
-test_dt2 = data.table(xvals = c(xs, xs-5, xs - 10), yvals = c(fun(xs) - 100, fun(xs-5)+60 , fun(xs - 10)+150 ), grp = rep(letters[1:3], each = length(xs)))
+test_dt2 = data.table::data.table(xvals = c(xs, xs-5, xs - 10), yvals = c(fun(xs) - 100, fun(xs-5)+60 , fun(xs - 10)+150 ), grp = rep(letters[1:3], each = length(xs)))
 #
 # ggplot(test_dt2, aes(x = xvals, y = yvals)) + geom_point() + stat_summary(fun.y = mean, geom="line")
 # ggplot(test_dt2, aes(x = xvals, y = yvals, col = grp)) + geom_line() + geom_point()

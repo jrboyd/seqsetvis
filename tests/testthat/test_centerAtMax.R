@@ -1,4 +1,4 @@
-# library(peakvisr)
+library(seqsetvis)
 library(testthat)
 
 n = 8
@@ -7,7 +7,7 @@ fun = function(x)(x^2)
 xs = c(xs, xs, xs)
 ys = -c(fun(xs + floor((seq_along(xs)-1) / n)*5)) + floor((seq_along(xs)-1) / n)*50
 #setup data.table of parabolic curves, each transposed on the x-axis
-test_dt = data.table(xvals = xs, yvals = ys, grp = rep(letters[1:3], each = n))
+test_dt = data.table::data.table(xvals = xs, yvals = ys, grp = rep(letters[1:3], each = n))
 ggplot(test_dt, aes(x = xvals, y = yvals, col = grp)) + geom_line() + geom_point()
 
 #should set by

@@ -1,5 +1,6 @@
-# library(peakvisr)
+library(seqsetvis)
 library(testthat)
+library(GenomicRanges)
 a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1))
 b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1))
 c = GRanges("chr1", IRanges(8:10*10+5, 8:10*10+6))

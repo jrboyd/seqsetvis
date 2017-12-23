@@ -37,10 +37,10 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
     # for(td in todo){
 
     dt = bw_dt[get(by_) == td, .(qs = .(.(quantile(get(y_), q2do)))), by = x_]
-    dt = cbind(dt, as.data.table(t(sapply(dt$qs, function(x) x[[1]]))))
+    dt = cbind(dt, data.table::as.data.table(t(sapply(dt$qs, function(x) x[[1]]))))
     dt$qs = NULL
-    dtm = melt(dt, id.vars = x_)
-    setkey(dtm, variable)
+    dtm = data.table::melt(dt, id.vars = x_)
+    data.table::setkey(dtm, variable)
     q2do_str = paste0(q2do * 100, "%")
     dt_low = dtm[q2do_str[-length(q2do_str)], .(get(x_), low_q = variable, low = value)]
     dt_high = dtm[q2do_str[-1], .(get(x_), high_q = variable, high = value)]
@@ -50,13 +50,13 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
     dt_c$q_range = factor(dt_c$q_range, levels = q_o)
 
     dt_c$rn = 1:nrow(dt_c)
-    dt_c[, `:=`(c("q_low", "q_high"), tstrsplit(sub("%", "", q_range), split = "-", keep = 1:2)), by = rn]
+    dt_c[, `:=`(c("q_low", "q_high"), data.table::tstrsplit(sub("%", "", q_range), split = "-", keep = 1:2)), by = rn]
     dt_c[, `:=`(q_num, (as.numeric(q_low) + as.numeric(q_high))/2)]
     dt_c[, `:=`(c("rn", "q_low", "q_high"), NULL)]
     dt_c$facet_group = td
     return(dt_c)
   })
-  plot_dt = rbindlist(all_q)
+  plot_dt = data.table::rbindlist(all_q)
   q_o = unique(plot_dt$q_range)
   if(symm_colors){
     ncol = ceiling(length(q_o) / 2)
@@ -147,15 +147,17 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
       ylim(ylim) + xlim(xlim)
 
     if(show_help){
-      pos1 = .2 * max(lim)
-      pos2 = .8 * max(lim)
-      p = p + annotate("segment", x = 0, xend = 0, y = pos1, yend = pos2, arrow = arrow())
-      p = p + annotate("label", x = 0, y = mean(lim), label = gsub(" ", "\n", paste(y_name, "binding")), hjust = 0)
-      p = p + annotate("segment", x = pos1, xend = pos2, y = 0, yend = 0, arrow = arrow())
-      p = p + annotate("label", x = mean(lim), y = 0, label = paste(x_name, "binding"), vjust = 0)
+      xpos1 = .2 * max(xlim)
+      xpos2 = .8 * max(xlim)
+      ypos1 = .2 * max(ylim)
+      ypos2 = .8 * max(ylim)
+      p = p + annotate("segment", x = 0, xend = 0, y = ypos1, yend = ypos2, arrow = arrow())
+      p = p + annotate("label", x = 0, y = mean(xlim), label = gsub(" ", "\n", paste(y_name, "binding")), hjust = 0)
+      p = p + annotate("segment", x = xpos1, xend = xpos2, y = 0, yend = 0, arrow = arrow())
+      p = p + annotate("label", x = mean(xlim), y = 0, label = paste(x_name, "binding"), vjust = 0)
       p = p + annotate("label", x = 0, y = 0, label = "no\nbinding", hjust = 0, vjust = 0)
-      p = p + annotate("segment", x = pos1, xend = pos2, y = pos1, yend = pos2, arrow = arrow())
-      p = p + annotate("label", x = mean(lim), y = mean(lim), label = gsub(" ", "\n", paste("both binding")))
+      p = p + annotate("segment", x = xpos1, xend = xpos2, y = ypos1, yend = ypos2, arrow = arrow())
+      p = p + annotate("label", x = mean(xlim), y = mean(ylim), label = gsub(" ", "\n", paste("both binding")))
     }
   }else if(plot_type == "volcano"){
     plot_dt[, xvolcano := log2(max(yval, 1) / max(xval, 1)), by = id]
