@@ -25,5 +25,5 @@ merged ranges including metadata describing overlaps per input GRanges
 \examples{
 a = GRanges("chr1", IRanges(1:7*10, 1:7*10))
 b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
-overlapIntervalSets(a, b)
+overlapIntervalSets(list(a, b))
 }
