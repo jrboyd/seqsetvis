@@ -173,6 +173,7 @@ applySpline = function(dt, x_ = "x", y_ = "y", by_ = "", n = 8, ...) {
 #' @details by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')}, splines
 #' will be calculated individually for each gene in each sample. alternatively if \code{by_ = c('gene_id')}
 centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, trim_to_valid = T, check_by_dupes = T) {
+  ymax = xsummit = xnew = N = NULL #reserve data.table variables
   if (!is.data.table(dt)) {
     stop(paste("dt must be of type data.table, was", class(dt)))
   }
