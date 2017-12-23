@@ -1,0 +1,111 @@
+
+R version 3.4.2 (2017-09-28) -- "Short Summer"
+Copyright (C) 2017 The R Foundation for Statistical Computing
+Platform: x86_64-pc-linux-gnu (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "seqsetvis"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('seqsetvis')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("overlapIntervalSets")
+> ### * overlapIntervalSets
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: overlapIntervalSets
+> ### Title: Intersect a list of GRanges to create a single GRanges object of
+> ###   merged ranges including metadata describing overlaps per input
+> ###   GRanges
+> ### Aliases: overlapIntervalSets
+> 
+> ### ** Examples
+> 
+> library(GenomicRanges)
+Loading required package: stats4
+Loading required package: BiocGenerics
+Loading required package: parallel
+
+Attaching package: ‘BiocGenerics’
+
+The following objects are masked from ‘package:parallel’:
+
+    clusterApply, clusterApplyLB, clusterCall, clusterEvalQ,
+    clusterExport, clusterMap, parApply, parCapply, parLapply,
+    parLapplyLB, parRapply, parSapply, parSapplyLB
+
+The following objects are masked from ‘package:stats’:
+
+    IQR, mad, sd, var, xtabs
+
+The following objects are masked from ‘package:base’:
+
+    Filter, Find, Map, Position, Reduce, anyDuplicated, append,
+    as.data.frame, cbind, colMeans, colSums, colnames, do.call,
+    duplicated, eval, evalq, get, grep, grepl, intersect, is.unsorted,
+    lapply, lengths, mapply, match, mget, order, paste, pmax, pmax.int,
+    pmin, pmin.int, rank, rbind, rowMeans, rowSums, rownames, sapply,
+    setdiff, sort, table, tapply, union, unique, unsplit, which,
+    which.max, which.min
+
+Loading required package: S4Vectors
+
+Attaching package: ‘S4Vectors’
+
+The following object is masked from ‘package:base’:
+
+    expand.grid
+
+Loading required package: IRanges
+Loading required package: GenomeInfoDb
+> a = GRanges("chr1", IRanges(1:7*10, 1:7*10))
+> b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
+> overlapIntervalSets(list(a, b))
+GRanges object with 10 ranges and 2 metadata columns:
+     seqnames     ranges strand |     set_A     set_B
+        <Rle>  <IRanges>  <Rle> | <logical> <logical>
+   1     chr1 [ 10,  10]      * |      TRUE     FALSE
+   2     chr1 [ 20,  20]      * |      TRUE     FALSE
+   3     chr1 [ 30,  30]      * |      TRUE     FALSE
+   4     chr1 [ 40,  40]      * |      TRUE     FALSE
+   5     chr1 [ 50,  50]      * |      TRUE      TRUE
+   6     chr1 [ 60,  60]      * |      TRUE      TRUE
+   7     chr1 [ 70,  70]      * |      TRUE      TRUE
+   8     chr1 [ 80,  80]      * |     FALSE      TRUE
+   9     chr1 [ 90,  90]      * |     FALSE      TRUE
+  10     chr1 [100, 100]      * |     FALSE      TRUE
+  -------
+  seqinfo: 1 sequence from an unspecified genome; no seqlengths
+> 
+> 
+> 
+> ### * <FOOTER>
+> ###
+> options(digits = 7L)
+> base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
+Time elapsed:  2.59 0.047 2.641 0 0 
+> grDevices::dev.off()
+null device 
+          1 
+> ###
+> ### Local variables: ***
+> ### mode: outline-minor ***
+> ### outline-regexp: "\\(> \\)?### [*]+" ***
+> ### End: ***
+> quit('no')

@@ -1,0 +1,84 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>R: Interactive Visualizations for User Friendly ChIP-seq Peak
+Comparison and Analysis</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" type="text/css" href="R.css" />
+</head><body>
+<h1> Interactive Visualizations for User Friendly ChIP-seq Peak
+Comparison and Analysis
+<img class="toplogo" src="../../../doc/html/Rlogo.svg" alt="[R logo]" />
+</h1>
+<hr/>
+<div style="text-align: center;">
+<a href="../../../doc/html/packages.html"><img class="arrow" src="../../../doc/html/left.jpg" alt="[Up]" /></a>
+<a href="../../../doc/html/index.html"><img class="arrow" src="../../../doc/html/up.jpg" alt="[Top]" /></a>
+</div><h2>Documentation for package &lsquo;seqsetvis&rsquo; version 0.99.1</h2>
+
+<ul><li><a href="../DESCRIPTION">DESCRIPTION file</a>.</li>
+</ul>
+
+<h2>Help Pages</h2>
+
+
+<table width="100%">
+<tr><td style="width: 25%;"><a href="seqsetvis-package.html">seqsetvis-package</a></td>
+<td>easy awesome peak set vis TESTING seqsetvis allows you to...</td></tr>
+<tr><td style="width: 25%;"><a href="applySpline.html">applySpline</a></td>
+<td>applies a spline smoothing to a tidy data.table containing x and y values.</td></tr>
+<tr><td style="width: 25%;"><a href="centerAtMax.html">centerAtMax</a></td>
+<td>centers profile of x and y.  default is to center by region but across all samples.</td></tr>
+<tr><td style="width: 25%;"><a href="centerFixedSizeGRanges.html">centerFixedSizeGRanges</a></td>
+<td>Transforms set of GRanges to all have the same size.</td></tr>
+<tr><td style="width: 25%;"><a href="clusteringKmeans.html">clusteringKmeans</a></td>
+<td>perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments clusters are sorted using hclust on centers</td></tr>
+<tr><td style="width: 25%;"><a href="clusteringKmeansNestedHclust.html">clusteringKmeansNestedHclust</a></td>
+<td>perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments clusters are sorted using hclust on centers the contents of each cluster are sorted using hclust</td></tr>
+<tr><td style="width: 25%;"><a href="col2hex.html">col2hex</a></td>
+<td>converts a valid r color name ("black", "red", "white", etc.) to a hex value</td></tr>
+<tr><td style="width: 25%;"><a href="fetchWindowedBigwig.html">fetchWindowedBigwig</a></td>
+<td>Fetch values from a bigwig appropriate for heatmaps etc.</td></tr>
+<tr><td style="width: 25%;"><a href="fetchWindowedBigwigList.html">fetchWindowedBigwigList</a></td>
+<td>Iterates a character vector (ideally named) and calls 'fetchWindowedBigwig' on each.  Appends grouping variable to each resulting data.table and uses rbindlist to efficiently combine results</td></tr>
+<tr><td style="width: 25%;"><a href="overlapIntervalSets.html">overlapIntervalSets</a></td>
+<td>Intersect a list of GRanges to create a single GRanges object of merged ranges including metadata describing overlaps per input GRanges</td></tr>
+<tr><td style="width: 25%;"><a href="regionSetPlotBandedQuantiles.html">regionSetPlotBandedQuantiles</a></td>
+<td>plot profiles from bigwigs</td></tr>
+<tr><td style="width: 25%;"><a href="regionSetPlotHeatmap.html">regionSetPlotHeatmap</a></td>
+<td>heatmap</td></tr>
+<tr><td style="width: 25%;"><a href="regionSetPlotScatter.html">regionSetPlotScatter</a></td>
+<td>maps signal from 2 sample profiles to the x and y axis. axes are standard or "volcano" min XY vs fold-change Y/X</td></tr>
+<tr><td style="width: 25%;"><a href="seqsetvis-package.html">seqsetvis</a></td>
+<td>easy awesome peak set vis TESTING seqsetvis allows you to...</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotBars.html">setPlotBars</a></td>
+<td>bar plots of set sizes</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotBars2.html">setPlotBars2</a></td>
+<td>bar plots of set sizes, does fancy facetting</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotEuler.html">setPlotEuler</a></td>
+<td>Try to load a bed-like file and convert it to a GRanges object</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotHeatmap.html">setPlotHeatmap</a></td>
+<td>binary heatmap indicating membership. heatmap is sorted by column left to right.  change column order to reveal patterns</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotMakeMT.html">setPlotMakeMT</a></td>
+<td>generic for methods to convert various objects to a logical matrix indicating membership of items (rows) in sets (columns)</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotMakeMT-DataFrame-method.html">setPlotMakeMT-method</a></td>
+<td>DataFrame input</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotMakeMT-GRanges-method.html">setPlotMakeMT-method</a></td>
+<td>mcols from GRange input</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotMakeMT-GRangesList-method.html">setPlotMakeMT-method</a></td>
+<td>GRangesList input</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotMakeMT-data.frame-method.html">setPlotMakeMT-method</a></td>
+<td>data.frame input, final output The final method for most inputs, checks column names</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotMakeMT-list-method.html">setPlotMakeMT-method</a></td>
+<td>list of character vectors input</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotMakeMT-matrix-method.html">setPlotMakeMT-method</a></td>
+<td>matrix input</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotPie.html">setPlotPie</a></td>
+<td>pie plot of set sizes</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotPie2.html">setPlotPie2</a></td>
+<td>pie plot with facetting</td></tr>
+<tr><td style="width: 25%;"><a href="setPlotVenn.html">setPlotVenn</a></td>
+<td>ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets</td></tr>
+<tr><td style="width: 25%;"><a href="set_list2memb.html">set_list2memb</a></td>
+<td>convert a list of sets, each list item should be a character vector denoting items in sets</td></tr>
+</table>
+</body></html>

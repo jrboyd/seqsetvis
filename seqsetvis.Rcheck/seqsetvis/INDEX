@@ -1,0 +1,67 @@
+applySpline             applies a spline smoothing to a tidy data.table
+                        containing x and y values.
+centerAtMax             centers profile of x and y.  default is to
+                        center by region but across all samples.
+centerFixedSizeGRanges
+                        Transforms set of GRanges to all have the same
+                        size.
+clusteringKmeans        perform kmeans clustering on matrix rows and
+                        return reordered matrix along with order
+                        matched cluster assignments clusters are sorted
+                        using hclust on centers
+clusteringKmeansNestedHclust
+                        perform kmeans clustering on matrix rows and
+                        return reordered matrix along with order
+                        matched cluster assignments clusters are sorted
+                        using hclust on centers the contents of each
+                        cluster are sorted using hclust
+col2hex                 converts a valid r color name ("black", "red",
+                        "white", etc.) to a hex value
+fetchWindowedBigwig     Fetch values from a bigwig appropriate for
+                        heatmaps etc.
+fetchWindowedBigwigList
+                        Iterates a character vector (ideally named) and
+                        calls 'fetchWindowedBigwig' on each.  Appends
+                        grouping variable to each resulting data.table
+                        and uses rbindlist to efficiently combine
+                        results
+overlapIntervalSets     Intersect a list of GRanges to create a single
+                        GRanges object of merged ranges including
+                        metadata describing overlaps per input GRanges
+regionSetPlotBandedQuantiles
+                        plot profiles from bigwigs
+regionSetPlotHeatmap    heatmap
+regionSetPlotScatter    maps signal from 2 sample profiles to the x and
+                        y axis. axes are standard or "volcano" min XY
+                        vs fold-change Y/X
+seqsetvis-package       easy awesome peak set vis TESTING seqsetvis
+                        allows you to...
+setPlotBars             bar plots of set sizes
+setPlotBars2            bar plots of set sizes, does fancy facetting
+setPlotEuler            Try to load a bed-like file and convert it to a
+                        GRanges object
+setPlotHeatmap          binary heatmap indicating membership. heatmap
+                        is sorted by column left to right.  change
+                        column order to reveal patterns
+setPlotMakeMT           generic for methods to convert various objects
+                        to a logical matrix indicating membership of
+                        items (rows) in sets (columns)
+setPlotMakeMT,DataFrame-method
+                        DataFrame input
+setPlotMakeMT,GRanges-method
+                        mcols from GRange input
+setPlotMakeMT,GRangesList-method
+                        GRangesList input
+setPlotMakeMT,data.frame-method
+                        data.frame input, final output The final method
+                        for most inputs, checks column names
+setPlotMakeMT,list-method
+                        list of character vectors input
+setPlotMakeMT,matrix-method
+                        matrix input
+setPlotPie              pie plot of set sizes
+setPlotPie2             pie plot with facetting
+setPlotVenn             ggplot implementation of vennDiagram from limma
+                        package.  currently limited at 3 sets
+set_list2memb           convert a list of sets, each list item should
+                        be a character vector denoting items in sets

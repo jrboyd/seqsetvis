@@ -1,0 +1,26 @@
+Package: seqsetvis
+Type: Package
+Title: Interactive Visualizations for User Friendly ChIP-seq Peak
+        Comparison and Analysis
+Version: 0.99.1
+Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
+                  role = c("aut", "cre"))
+Author: Joseph R Boyd <jrboyd@uvm.edu>
+Maintainer: Joseph R Boyd <jrboyd@uvm.edu>
+Description: Makes the visual analysis of ChIP-seq peak sets and enrichment tracks
+    as easy as possible at all stages.  This assumes you have a set of bed-like files 
+    representing areas of enrichment (peaks) or other biologically relevant regions 
+    (promoters, enhancers) and bigwigs representing enrichment for the same samples 
+    or other relevant samples.
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Suggests: testthat, covr
+Depends:
+Imports: methods, ggplot2, GenomicRanges, IRanges, data.table,
+        rtracklayer, limma, assertthat, venneuler, ggforce,
+        RColorBrewer, magrittr, png
+RoxygenNote: 6.0.1
+NeedsCompilation: no
+Packaged: 2017-12-23 19:09:05 UTC; joeboyd
+Built: R 3.4.2; ; 2017-12-23 19:09:17 UTC; unix
