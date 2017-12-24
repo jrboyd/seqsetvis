@@ -195,13 +195,22 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
 #' heatmap
 #'
 #' @param bw_dt data.table of signals
-#' @param max_disp numeric to sample number of rows down to, default is 2000
+#' @param nclust number of clusters
+#' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
+#' @param column_ varaible mapped to column, likely bp position for ngs data
+#' @param fill_ numeric variable to map to fill
+#' @param facet_ variable name to facet horizontally by
+#' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
+#' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
+#' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
+#' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
 #'
 #' @return ggplot heatmap of signal profiles, facetted by sample
 regionSetPlotHeatmap = function(bw_dt, nclust = 6,
-                                column_ = "x", fill_ = "FE", row_ = "id", facet_ = "sample",
+                                row_ = "id",
+                                column_ = "x", fill_ = "FE", facet_ = "sample",
                                 max_rows = 500, max_cols = 100,
-                                clustering_x_min = -Inf, clustering_x_max = Inf){
+                                clustering_col_min = -Inf, clustering_col_max = Inf){
     id = xbp = x = to_disp = FE = hit = val = y = y_gap = NULL#declare binding for data.table
     plot_dt = data.table::copy(bw_dt)
     raw_nc = length(unique(plot_dt$x))
@@ -212,7 +221,7 @@ regionSetPlotHeatmap = function(bw_dt, nclust = 6,
         row_ids = sample(row_ids, max_rows)
     }
     plot_dt = plot_dt[id %in% row_ids]
-    dc_dt = data.table::dcast(plot_dt[get(column_) > clustering_x_min & get(column_) < clustering_x_max],
+    dc_dt = data.table::dcast(plot_dt[get(column_) > clustering_col_min & get(column_) < clustering_col_max],
                   formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + ")),
                   # formula = as.name(row_) ~ as.name(facet_) + as.name(column_),
                   value.var = fill_)

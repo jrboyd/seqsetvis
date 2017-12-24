@@ -114,7 +114,7 @@ fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files), bw
     print(paste0("finished loading ", nam, "."))
     dt
   })
-  all_bw_dt = rbindlist(bw_list)
+  all_bw_dt = data.table::rbindlist(bw_list)
   return(all_bw_dt)
 }
 
@@ -135,7 +135,7 @@ fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files), bw
 #' will be calculated individually for each gene in each sample. alternatively if \code{by_ = c('gene_id')}
 #' @seealso \code{\link{fetchWindowedBigwig}}
 applySpline = function(dt, x_ = "x", y_ = "y", by_ = "", n = 8, ...) {
-  if (!is.data.table(dt)) {
+  if (!data.table::is.data.table(dt)) {
     stop(paste("dt must be of type data.table, was", class(dt)))
   }
   if (!any(x_ == colnames(dt))) {
@@ -179,7 +179,7 @@ applySpline = function(dt, x_ = "x", y_ = "y", by_ = "", n = 8, ...) {
 #' will be calculated individually for each gene in each sample. alternatively if \code{by_ = c('gene_id')}
 centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, trim_to_valid = T, check_by_dupes = T) {
   ymax = xsummit = xnew = N = NULL #reserve data.table variables
-  if (!is.data.table(dt)) {
+  if (!data.table::is.data.table(dt)) {
     stop(paste("dt must be of type data.table, was", class(dt)))
   }
   if (!any(x_ == colnames(dt))) {
@@ -203,7 +203,7 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
       message(paste0("centerAtMax : duplicate values of x_ (", x_, ") exist within groups defined with by_ (",
                      by_, ").\n    If this is the desired functionality, set check_by_dupes <- F to hide future messages. If no by_ grouping is intended set by_ <- \"\" as well."))
   }
-  dt = copy(dt)
+  dt = data.table::copy(dt)
   if (is.null(view_size)) {
     view_size = range(dt[[x_]])
   } else if (length(view_size) == 1) {
@@ -224,7 +224,7 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
     xcounts = xcounts[N == max(N)]
     dt = dt[xnew %in% xcounts$xnew]
   }
-  set(dt, j = x_, value = dt$xnew)
+  data.table::set(dt, j = x_, value = dt$xnew)
   dt$xnew = NULL
   return(dt)
 }

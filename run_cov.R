@@ -10,6 +10,7 @@ library(seqsetvis)
 #build properly using Rbuildignore
 # devtools::install(local = F)
 
+roxygen2::roxygenise()
 
 a = covr::file_coverage(dir("R", full.names = T, pattern = "R$"), dir("tests/testthat/", full.names = T, pattern = "R$"))
 covr::report(a)

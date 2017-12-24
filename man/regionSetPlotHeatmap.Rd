@@ -4,12 +4,30 @@
 \alias{regionSetPlotHeatmap}
 \title{heatmap}
 \usage{
-regionSetPlotHeatmap(bw_dt, max_disp = 2000)
+regionSetPlotHeatmap(bw_dt, nclust = 6, row_ = "id", column_ = "x",
+  fill_ = "FE", facet_ = "sample", max_rows = 500, max_cols = 100,
+  clustering_col_min = -Inf, clustering_col_max = Inf)
 }
 \arguments{
 \item{bw_dt}{data.table of signals}
 
-\item{max_disp}{numeric to sample number of rows down to, default is 2000}
+\item{nclust}{number of clusters}
+
+\item{row_}{variable name mapped to row, likely peak id or gene name for ngs data}
+
+\item{column_}{varaible mapped to column, likely bp position for ngs data}
+
+\item{fill_}{numeric variable to map to fill}
+
+\item{facet_}{variable name to facet horizontally by}
+
+\item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot full data}
+
+\item{max_cols}{for speed columns are sampled to 100 by default, use Inf to plot full data}
+
+\item{clustering_col_min}{numeric minimum for col range considered when clustering, default in -Inf}
+
+\item{clustering_col_max}{numeric maximum for col range considered when clustering, default in Inf}
 }
 \value{
 ggplot heatmap of signal profiles, facetted by sample
