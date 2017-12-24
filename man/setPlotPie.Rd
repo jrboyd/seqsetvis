@@ -2,16 +2,32 @@
 % Please edit documentation in R/plotFunctions_basicSet.R
 \name{setPlotPie}
 \alias{setPlotPie}
-\title{pie plot of set sizes}
+\title{bar plots of set sizes, does fancy facetting}
 \usage{
 setPlotPie(object)
 }
 \arguments{
+\item{object}{passed to setPlotMakeMT for conversion to membership table}
+
+\item{peak_gr}{peak sets before overlapping}
+
+\item{flip_group_stage}{logical, different facetting.  default is FALSE}
+
+\item{object}{passed to setPlotMakeMT}
+
+\item{peak_gr}{peak sets before overlapping}
+
 \item{object}{object that setPlotMakeMT can convert to logical matrix membership}
 }
 \value{
+ggplot of bar plot of set sizes
+pie plot with facetting
+
+ggplot of pie charts
+pie plot of set sizes
+
 ggplot pie graph of set sizes
 }
 \description{
-pie plot of set sizes
+bar plots of set sizes, does fancy facetting
 }
