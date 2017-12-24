@@ -144,13 +144,13 @@ setPlotBars = function(object) {
 }
 
 
-#' bar plots of set sizes, does fancy facetting
-#'
-#' @param object passed to setPlotMakeMT for conversion to membership table
-#' @param peak_gr peak sets before overlapping
-#' @param flip_group_stage logical, different facetting.  default is FALSE
-#'
-#' @return ggplot of bar plot of set sizes
+# bar plots of set sizes, does fancy facetting
+#
+# @param object passed to setPlotMakeMT for conversion to membership table
+# @param peak_gr peak sets before overlapping
+# @param flip_group_stage logical, different facetting.  default is FALSE
+#
+# @return ggplot of bar plot of set sizes
 # setPlotBars2 = function(object, peak_gr, flip_group_stage = F) {
 #   x = count = group = stage = NULL#declare binding for data.table
 #   object = setPlotMakeMT(object)
@@ -184,11 +184,11 @@ setPlotBars = function(object) {
 #   return(p)
 # }
 
-#' pie plot with facetting
-#' @param object passed to setPlotMakeMT
-#' @param peak_gr peak sets before overlapping
-#'
-#' @return ggplot of pie charts
+# pie plot with facetting
+# @param object passed to setPlotMakeMT
+# @param peak_gr peak sets before overlapping
+#
+# @return ggplot of pie charts
 # setPlotPie2 = function(object, peak_gr) {
 #   stage = count = group = NULL#declare binding for data.table
 #   object = setPlotMakeMT(object)
