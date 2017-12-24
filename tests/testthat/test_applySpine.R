@@ -40,5 +40,10 @@ test_that("applySpline n*length in result", {
   expect_equal(nrow(test_dt2)*10, nrow(sp_dt10))
 })
 
+test_that("applySpline no warning from multiple by_", {
+    test_dt2[, grp2 := grp]
+    expect_failure(expect_warning(applySpline(dt = test_dt2, x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4)))
+})
+
 
 

@@ -144,8 +144,8 @@ applySpline = function(dt, x_ = "x", y_ = "y", by_ = "", n = 8, ...) {
   if (!any(y_ == colnames(dt))) {
     stop(paste("applySpline : y_ (", y_, ") not found in colnames of input data.table"))
   }
-  if (by_ != "")
-    if (!any(by_ == colnames(dt))) {
+  if (by_[1] != "" | length(by_) > 1)
+    if (!all(by_ %in% colnames(dt))) {
       stop(paste("applySpline : by_ (", by_, ") not found in colnames of input data.table"))
     }
 

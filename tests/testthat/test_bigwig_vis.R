@@ -122,6 +122,9 @@ test_that("regionSetPlotBandedQuantiles different hsv setting", {
     p_symmgray = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = T, hsv_grayscale = T)
     expect_s3_class(p_symmgray, "ggplot")
 
+    p_unsymmgray = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = F, hsv_grayscale = T)
+    expect_s3_class(p_unsymmgray, "ggplot")
+
     p_symmrev = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = T, hsv_reverse = T)
     expect_s3_class(p_symmrev, "ggplot")
 
@@ -162,11 +165,18 @@ test_that("regionSetPlotScatter works with other inputs", {
   p4 = regionSetPlotScatter(bw_dt = res, x_name = "bw_1", y_name = "bw_1",
                             plotting_group = memb)
   expect_s3_class(p4, "ggplot")
+
+  p5 = regionSetPlotScatter(bw_dt = res, x_name = "bw_1", y_name = "bw_1", fixed_coords = F,
+                            plotting_group = memb)
+  expect_s3_class(p5, "ggplot")
 })
 
 test_that("regionSetPlotScatter works with help enabled inputs", {
   bw_files = rep(test_bw, 3)
   names(bw_files) = paste0("bw_", 1:3)
+  hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                         win_size = 3,
+                                                         qgr = test_qgr)})
   hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
                                                          win_size = 3,
                                                          qgr = test_qgr)})
@@ -242,8 +252,14 @@ test_that("centerFixedSizeGRanges size sifts are reversible", {
   expect_true(all(a4 == a4_from9rev))
 })
 
-# test_that("regionSetPlotHeatmap works with minimal inputs", {
-#
-# })
+test_that("regionSetPlotHeatmap works with minimal inputs", {
+    bw_files = rep(test_bw, 3)
+    names(bw_files) = paste0("bw_", 1:3)
+    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                           win_size = 3,
+                                                           qgr = test_qgr)})
+    p = regionSetPlotHeatmap(res, nclust = 5)
+    expect_s3_class(p, "ggplot")
+})
 
 

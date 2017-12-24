@@ -1,7 +1,8 @@
 ###load peak sets
 library(magrittr)
 library(GenomicRanges)
-# library(seqsetvis )
+library(seqsetvis )
+library(data.table)
 
 # #Goal, find interesting clustering of histone modifications at gene promoters
 # library(TxDb.Hsapiens.UCSC.hg38.knownGene)
@@ -113,12 +114,12 @@ regionSetPlotBandedQuantiles(all_bw_dt, y_ = "capFE", by_ = "sample", hsv_graysc
 
 
 plot_dt = copy(all_bw_dt[sample == "H3K27ME3"])
-
+plot_dt = copy(all_bw_dt)
 # dc_dt = dcast(plot_dt[abs(x) < 200], id ~ sample + x, value.var = "capFE")
 dc_dt = dcast(plot_dt[abs(x) < 1000], id ~ sample + x, value.var = "lgFE")
 dc_mat = as.matrix(dc_dt[,-1])
 rownames(dc_mat) = dc_dt$id
-rclusters = clustering_kmeans_nested_hclust(dc_mat, nclust = 6)
+rclusters = clusteringKmeansNestedHclust(dc_mat, nclust = 6)
 plot_dt$id = factor(plot_dt$id, levels = rclusters$id)
 
 scale_floor = .1
@@ -143,41 +144,44 @@ scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
 cap = 3
 plot_dt[zFE < -cap, zFE := -cap]
 plot_dt[zFE > cap, zFE := cap]
-ggplot(plot_dt) + geom_raster(aes(x = x, y = id, fill = zFE)) +
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
-  scale_fill_gradient2(low = "black", mid = "black", high = "yellow") + facet_grid(. ~ sample)
 
-pdf("tmp1.pdf", width = 4, height = 40)
-p = ggplot(plot_dt) + geom_raster(aes(x = x, y = id, fill = zFE)) +
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
-  scale_fill_gradient2(low = "black", mid = "black", high = "yellow") + facet_grid(. ~ sample)
-print(p)
-dev.off()
-
-pdf("tmp2.pdf")
-for(grp in unique(rclusters$group)){
-  tp = rclusters[group == grp, id]
-  p = ggplot(plot_dt[id %in% tp]) + geom_raster(aes(x = x, y = id, fill = zFE)) +
-    theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
-    scale_fill_gradient2(low = "black", mid = "black", high = "yellow") + facet_grid(. ~ sample)
-  print(p)
-}
-dev.off()
-
-
-grp = 3
-tp = rclusters[group == grp, id]
-dc_dt = dcast(plot_dt[abs(x) < 1000 & id %in% tp], id ~ sample + x, value.var = "zFE")
-dc_mat = as.matrix(dc_dt[,-1])
-rownames(dc_mat) = dc_dt$id
-rclusters = clustering_kmeans_nested_hclust(dc_mat, nclust = 6)
-plot_dt$id = factor(plot_dt$id, levels = rclusters$id)
-scale_floor = .5
-scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
-cap = 3
-plot_dt[zFE < -cap, zFE := -cap]
-plot_dt[zFE > cap, zFE := cap]
-ggplot(plot_dt[id %in% tp]) + geom_raster(aes(x = x, y = id, fill = zFE)) +
-  theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
-  scale_fill_gradient2(low = "black", mid = "black", high = "yellow") + facet_grid(. ~ sample)
-
+regionSetPlotHeatmap(all_bw_dt)
+regionSetPlotHeatmap(all_bw_dt, y_ = "zFE")
+# ggplot(plot_dt) + geom_raster(aes(x = x, y = id, fill = zFE)) +
+#   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
+#   scale_fill_gradient2(low = "black", mid = "black", high = "yellow") + facet_grid(. ~ sample)
+#
+# pdf("tmp1.pdf", width = 4, height = 40)
+# p = ggplot(plot_dt) + geom_raster(aes(x = x, y = id, fill = zFE)) +
+#   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
+#   scale_fill_gradient2(low = "black", mid = "black", high = "yellow") + facet_grid(. ~ sample)
+# print(p)
+# dev.off()
+#
+# pdf("tmp2.pdf")
+# for(grp in unique(rclusters$group)){
+#   tp = rclusters[group == grp, id]
+#   p = ggplot(plot_dt[id %in% tp]) + geom_raster(aes(x = x, y = id, fill = zFE)) +
+#     theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
+#     scale_fill_gradient2(low = "black", mid = "black", high = "yellow") + facet_grid(. ~ sample)
+#   print(p)
+# }
+# dev.off()
+#
+#
+# grp = 3
+# tp = rclusters[group == grp, id]
+# dc_dt = dcast(plot_dt[abs(x) < 1000 & id %in% tp], id ~ sample + x, value.var = "zFE")
+# dc_mat = as.matrix(dc_dt[,-1])
+# rownames(dc_mat) = dc_dt$id
+# rclusters = clustering_kmeans_nested_hclust(dc_mat, nclust = 6)
+# plot_dt$id = factor(plot_dt$id, levels = rclusters$id)
+# scale_floor = .5
+# scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
+# cap = 3
+# plot_dt[zFE < -cap, zFE := -cap]
+# plot_dt[zFE > cap, zFE := cap]
+# ggplot(plot_dt[id %in% tp]) + geom_raster(aes(x = x, y = id, fill = zFE)) +
+#   theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
+#   scale_fill_gradient2(low = "black", mid = "black", high = "yellow") + facet_grid(. ~ sample)
+#
