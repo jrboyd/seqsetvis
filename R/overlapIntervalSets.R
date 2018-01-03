@@ -29,12 +29,12 @@ overlapIntervalSets = function(grs, ext = 0, use_first = F){
     # grs = grs[-1]
   }else{
     base_gr = lapply(grs, function(x){mcols(x) = NULL; x}) %>% GRangesList %>% unlist %>% reduce
+    start(base_gr) = start(base_gr) - ext
+    end(base_gr) = end(base_gr) + ext
+    base_gr = reduce(base_gr)
+    start(base_gr) = start(base_gr) + ext
+    end(base_gr) = end(base_gr) - ext
   }
-  start(base_gr) = start(base_gr) - ext
-  end(base_gr) = end(base_gr) + ext
-  base_gr = reduce(base_gr)
-  start(base_gr) = start(base_gr) + ext
-  end(base_gr) = end(base_gr) - ext
   suppressWarnings({
     for(i in 1:length(grs)){
       nam = names(grs)[i]

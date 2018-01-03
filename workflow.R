@@ -1,7 +1,7 @@
 ###load peak sets
 library(magrittr)
 library(GenomicRanges)
-# library(peakvisr)
+library(seqsetvis)
 
 peak_files = dir("inst/extdata/peak_calls/full", pattern = "narrowPeak", full.names = T)
 names(peak_files) = peak_files %>% basename %>%

@@ -193,8 +193,8 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
     by_ = ""
     check_by_dupes = T
   }
-  if (by_ != "")
-    if (!any(by_ == colnames(dt))) {
+  if (all(by_ != ""))
+    if (!any(by_ %in% colnames(dt))) {
       stop(paste("centerAtMax : by_ (", by_, ") not found in colnames of input data.table"))
     }
   if (check_by_dupes) {

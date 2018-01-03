@@ -1,0 +1,7 @@
+%\VignetteEngine{knitr::knitr}
+Hi _markdown_!
+```{r foo, echo=TRUE}
+z = 1+1
+plot(cars)
+```
+The value of z is `r z`.
