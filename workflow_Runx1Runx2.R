@@ -68,9 +68,13 @@ qgr = sample(fixed_overlap, length(fixed_overlap) * sample_rate)
 ### fetch profile data from bigwigs for all sites
 bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = qgr, win_size =  50, bw_variable_name = "sample")
 
-cdt = centerAtMax(bw_dt, view_size = 60000, y_ = "FE", by_ = c("id", "sample"), check_by_dupes = F)
-ggplot(cdt[id == "7536"], mapping = aes(x = x, y = FE, color = sample)) + geom_line() +
-    annotate("line", x = c(0,0), y = c(0,10))
+cdt = centerAtMax(bw_dt, view_size = 60000, y_ = "FE", by_ = c("id"), check_by_dupes = F, trim_to_valid = F)
+ggplot(cdt[id == "5588"], mapping = aes(x = x, y = FE, color = sample)) + geom_line() #+
+ggplot(cdt[id == "4619"], mapping = aes(x = x, y = FE, color = sample)) + geom_line() #+
+ggplot(cdt[id == "7828"], mapping = aes(x = x, y = FE, color = sample)) + geom_line() #+
+ggplot(cdt[id == "2447"], mapping = aes(x = x, y = FE, color = sample)) + geom_line() #+
+
+
 
 plot_dt = cdt[abs(x) <= 500]
 
