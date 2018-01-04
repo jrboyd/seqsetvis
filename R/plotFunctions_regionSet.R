@@ -10,7 +10,7 @@
 #' @param hsv_grayscale logical, if TRUE gray() is used instead of rainbow(). default FALSE
 #' @param hsv_hue_min numeric [0, hsv_hue_max) hue min of color scale
 #' @param hsv_hue_max numeric (hsv_hue_min, 1] hue max of color scale
-#' @param symm_colors if TRUE, colorscale is symmetrical, default FALSE.
+#' @param hsv_symmetric if TRUE, colorscale is symmetrical, default FALSE.
 #' @param n_quantile number of evenly size quantile bins
 #' @param quantile_min the lowest quantile start
 #' @param quantile_max the highest quantile end
@@ -20,7 +20,7 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
                                         hsv_reverse = F,
                                         hsv_saturation = 1, hsv_value = 1,
                                         hsv_grayscale = F,
-                                        hsv_hue_min = 0, hsv_hue_max = 0.7, symm_colors = F,
+                                        hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = F,
                                         n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95
 ) {
     variable = value = V1 = low = high = low_q = high_q = q_range = rn = q_num = q_low = q_high = NULL #declare binding for data.table
@@ -58,7 +58,7 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
     })
     plot_dt = data.table::rbindlist(all_q)
     q_o = unique(plot_dt$q_range)
-    if(symm_colors){
+    if(hsv_symmetric){
         ncol = ceiling(length(q_o) / 2)
         if(hsv_grayscale){
             gray_vals = hsv_hue_min + (hsv_hue_max - hsv_hue_min)*((seq_len(ncol) - 1)/(ncol - 1))

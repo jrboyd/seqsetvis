@@ -6,8 +6,8 @@
 \usage{
 regionSetPlotBandedQuantiles(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
   hsv_reverse = F, hsv_saturation = 1, hsv_value = 1, hsv_grayscale = F,
-  hsv_hue_min = 0, hsv_hue_max = 0.7, symm_colors = F, n_quantile = 18,
-  quantile_min = 0.05, quantile_max = 0.95)
+  hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = F,
+  n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95)
 }
 \arguments{
 \item{bw_dt}{data.table of bigwig signal}
@@ -30,7 +30,7 @@ regionSetPlotBandedQuantiles(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
 
 \item{hsv_hue_max}{numeric (hsv_hue_min, 1] hue max of color scale}
 
-\item{symm_colors}{if TRUE, colorscale is symmetrical, default FALSE.}
+\item{hsv_symmetric}{if TRUE, colorscale is symmetrical, default FALSE.}
 
 \item{n_quantile}{number of evenly size quantile bins}
 

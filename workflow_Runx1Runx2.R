@@ -68,18 +68,22 @@ qgr = sample(fixed_overlap, length(fixed_overlap) * sample_rate)
 ### fetch profile data from bigwigs for all sites
 bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = qgr, win_size =  50, bw_variable_name = "sample")
 
-cdt = centerAtMax(bw_dt, view_size = 60000, y_ = "FE", by_ = c("id"), check_by_dupes = F, trim_to_valid = F)
-ggplot(cdt[id == "5588"], mapping = aes(x = x, y = FE, color = sample)) + geom_line() #+
-ggplot(cdt[id == "4619"], mapping = aes(x = x, y = FE, color = sample)) + geom_line() #+
-ggplot(cdt[id == "7828"], mapping = aes(x = x, y = FE, color = sample)) + geom_line() #+
-ggplot(cdt[id == "2447"], mapping = aes(x = x, y = FE, color = sample)) + geom_line() #+
+cdt = centerAtMax(bw_dt, view_size = 28000, y_ = "FE", by_ = c("id"), check_by_dupes = F, trim_to_valid = T)
+cdt[, zscore := (FE - mean(FE)) / sd(FE), by = sample]
+
+ggplot(cdt[id %in% c("5588", "4619", "7828", "2447")], mapping = aes(x = x, y = FE, color = sample)) +
+    geom_line() + facet_grid(id ~ .)
+
+cap = 10
+cdt[zscore < cap, zscore := cap]
+ggplot(cdt[id %in% c("5588", "4619", "7828", "2447")], mapping = aes(x = x, y = zscore, color = sample)) +
+    geom_line() + facet_grid(id ~ .)
 
 
-
-plot_dt = cdt[abs(x) <= 500]
+plot_dt = copy(cdt)
 
 regionSetPlotHeatmap(plot_dt)
-regionSetPlotBandedQuantiles(plot_dt, by_ = "sample")
+regionSetPlotBandedQuantiles(plot_dt, by_ = "sample", hsv_symmetric = T, hsv_reverse = T)
 
 memb = mcols(qgr)
 memb$id = names(qgr)
