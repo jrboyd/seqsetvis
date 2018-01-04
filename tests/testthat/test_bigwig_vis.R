@@ -116,19 +116,19 @@ test_that("regionSetPlotBandedQuantiles different hsv setting", {
     p_rev = regionSetPlotBandedQuantiles(res, by_ = "group", hsv_reverse = T)
     expect_s3_class(p_rev, "ggplot")
 
-    p_symm = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = T)
+    p_symm = regionSetPlotBandedQuantiles(res, by_ = "group", hsv_symmetric = T)
     expect_s3_class(p_symm, "ggplot")
 
-    p_symmgray = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = T, hsv_grayscale = T)
+    p_symmgray = regionSetPlotBandedQuantiles(res, by_ = "group", hsv_symmetric = T, hsv_grayscale = T)
     expect_s3_class(p_symmgray, "ggplot")
 
-    p_unsymmgray = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = F, hsv_grayscale = T)
+    p_unsymmgray = regionSetPlotBandedQuantiles(res, by_ = "group", hsv_symmetric = F, hsv_grayscale = T)
     expect_s3_class(p_unsymmgray, "ggplot")
 
-    p_symmrev = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = T, hsv_reverse = T)
+    p_symmrev = regionSetPlotBandedQuantiles(res, by_ = "group", hsv_symmetric = T, hsv_reverse = T)
     expect_s3_class(p_symmrev, "ggplot")
 
-    p_symmrev = regionSetPlotBandedQuantiles(res, by_ = "group", symm_colors = T, hsv_reverse = T)
+    p_symmrev = regionSetPlotBandedQuantiles(res, by_ = "group", hsv_symmetric = T, hsv_reverse = T)
     expect_s3_class(p_symmrev, "ggplot")
   }
 })

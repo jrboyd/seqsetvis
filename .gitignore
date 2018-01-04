@@ -7,3 +7,4 @@
 tmp.bed
 test_chrSizes.txt
 *.bw
+*.Rcheck

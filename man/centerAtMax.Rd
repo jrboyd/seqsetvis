@@ -5,7 +5,7 @@
 \title{centers profile of x and y.  default is to center by region but across all samples.}
 \usage{
 centerAtMax(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL,
-  trim_to_valid = T, check_by_dupes = T)
+  trim_to_valid = T, check_by_dupes = T, replace_x = T)
 }
 \arguments{
 \item{dt}{data.table}
@@ -17,14 +17,18 @@ centerAtMax(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL,
 \item{by_}{optionally, any variables that provide grouping to the data. default is none.  see details.}
 
 \item{view_size}{the size in \code{x_} to consider for finding the max of \code{y_}.
-default value of NULL uses complete range of x.
 if length(view_size) == 1, range will be c(-view_size, view_size).
-if length(view_size) > 1, range will be range(view_size).}
+if length(view_size) > 1, range will be range(view_size).
+default value of NULL uses complete range of x.}
 
 \item{trim_to_valid}{valid \code{x_} values are those with a set \code{y_} value in all \code{by_} combinations}
 
 \item{check_by_dupes}{default assumption is that there should be on set of x_ for a by_ instance.
 if this is not the case and you want to disable warnings about set this to FALSE.}
+
+\item{replace_x}{logical, default TRUE.
+if TRUE x_ will be replaced with position relative to summit.
+if FALSE x_ will be preserved and x_summitPosition added.}
 }
 \description{
 \code{centerAtMax} locates the coordinate x of the maximum in y and shifts x such that it is zero at max y.

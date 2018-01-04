@@ -93,4 +93,4 @@ memb[memb$MDA231_Runx2,]$plotting_group = "MDA231_Runx2"
 memb[memb$MDA231_Runx1 & memb$MDA231_Runx2,]$plotting_group = "both"
 memb$plotting_group = factor(memb$plotting_group)
 
-regionSetPlotScatter(plot_dt, x_name = "MDA231_Runx1", y_name = "MDA231_Runx2", plotting_group = as.data.table(memb[,3:4]))
+regionSetPlotScatter(plot_dt[x == 0], x_name = "MDA231_Runx1", y_name = "MDA231_Runx2", plotting_group = as.data.table(memb[,c("id", "plotting_group")]))
