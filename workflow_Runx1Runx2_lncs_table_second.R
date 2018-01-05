@@ -27,7 +27,12 @@ ref_extension = function(ext,
     extraCols_narrowPeak <- c(signalValue = "numeric", pValue = "numeric",
                               qValue = "numeric", peak = "integer")
     np_grs <- lapply(np_files, function(f){
-        import(f, format = "BED")
+        if(grepl(pattern = "Peak$", f)){
+            import(f, format = "BED", extraCols = extraCols_narrowPeak)
+        }else{
+            import(f, format = "BED")
+        }
+
     })
 
     ### perform 3-way intersection
@@ -38,21 +43,23 @@ ref_extension = function(ext,
     return(np_overlap)
 }
 
-np_files = c("/slipstream/galaxy/uploads/working/qc_framework/output_MK_MDA231_Runx/MDA231_Runx1_pooled/MDA231_Runx1_pooled_peaks_passIDR.05_FEgt6.bed",
-             "/slipstream/galaxy/uploads/working/qc_framework/output_MK_MDA231_Runx/MDA231_Runx2_pooled/MDA231_Runx2_pooled_peaks_passIDR.05_FEgt6.bed")
+odir = getwd()
+setwd("/slipstream/galaxy/uploads/working/qc_framework")
+np_files = c("output_MK_MDA231_Runx/MDA231_Runx1_pooled/MDA231_Runx1_pooled_peaks_passIDR.05_FEgt6.bed",
+             "output_MK_MDA231_Runx/MDA231_Runx2_pooled/MDA231_Runx2_pooled_peaks_passIDR.05_FEgt6.bed",
+             "output_AF_RUNX1_ChIP/AF-MCF10A_RUNX1_pooled/AF-MCF10A_RUNX1_pooled_peaks_passIDR.05.narrowPeak",
+             "output_AF_RUNX1_ChIP/AF-MCF10AT1_RUNX1_pooled/AF-MCF10AT1_RUNX1_pooled_peaks_passIDR.05.narrowPeak",
+             "output_AF_RUNX1_ChIP/AF-MCF10CA1_RUNX1_pooled/AF-MCF10CA1_RUNX1_pooled_peaks_passIDR.05.narrowPeak",
+             "output_Rasim_RUNX1/MCF7_RUNX1_pooled/MCF7_RUNX1_pooled_peaks_passIDR.05.narrowPeak")
 names(np_files) = np_files %>%
     basename() %>%
     sub("GSE98551_", "", x = .) %>%
-    sub("_pooled_peaks_passIDR.05_FEgt6.bed", "", x = .)
+    sub("_pooled_peaks_passIDR.05_FEgt6.bed", "", x = .) %>%
+    sub("_pooled_peaks_passIDR.05.narrowPeak", "", x = .)
 
-bw_files = c("/slipstream/galaxy/production/galaxy-dist/static/UCSCtracks/breast/MDA231_MK_runx/MDA231_Runx1_pooled_FE.bw",
-             "/slipstream/galaxy/production/galaxy-dist/static/UCSCtracks/breast/MDA231_MK_runx/MDA231_Runx2_pooled_FE.bw")
+names(np_files)[1:2] = paste0("MK-", names(np_files)[1:2])
+names(np_files)[6] = paste0("RB-", names(np_files)[6])
 
-# bw_files = https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE98551&format=file&file=GSE98551%5FMCF10AT1%5FCTCF%5Fpooled%5FFE%2Ebw
-names(bw_files) = bw_files %>%
-    basename() %>%
-    sub("GSE98551_", "", x = .) %>%
-    sub("_pooled_FE.bw", "", x = .)
 
 soi = c("AC013451.2", #"CTD-2207P18.2",
         "MIR503HG",
@@ -64,26 +71,54 @@ soi = c("AC013451.2", #"CTD-2207P18.2",
         "AL512274.1", #"RP11-7k24.3",
         "ZEB1-AS1")
 
-
-
-# goi = c("ENSG00000281202.2", "ENSG00000259932.1", "ENSG00000238012.1",
-#         "ENSG00000250626.2", "ENSG00000224137.1", "ENSG00000251359.4",
-#         "ENSG00000226520.1", "ENSG00000215483.9", "ENSG00000264954.1",
-#         "ENSG00000261114.1", "ENSG00000260737.5", "ENSG00000243485.4",
-#         "ENSG00000279245.1", "ENSG00000272681.2")
-
 ref_dt = parse_gtf.dt("/slipstream/home/joeboyd/gencode.v27.annotation.gtf", additional_attribs = "gene_type")
 # ref_dt = ref_dt[gene_type %in% c("lincRNA", "antisense_RNA", "sense_intronic", "processed_transcript") & seqnames != "chrY"]
 ref_dt[,c("stable_gene_id") := tstrsplit(gene_id, "\\.", keep = 1)]
 
 goi = ref_dt[gene_name %in% soi]$gene_id
 
+goi2 = c("ENSG00000170846.16
+ENSG00000236830.6
+         ENSG00000235123.5
+         ENSG00000197308.9
+         ENSG00000259527.2
+         ENSG00000248663.6
+         ENSG00000230487.7
+         ENSG00000265702.1
+         ENSG00000273270.1
+         ENSG00000223808.1
+         ENSG00000257337.6
+         ENSG00000255310.2
+         ENSG00000261662.1
+         ENSG00000270720.1
+         ENSG00000231028.8
+         ENSG00000244055.1
+         ENSG00000253106.1
+         ENSG00000259673.5
+         ENSG00000271971.1
+         ENSG00000214770.2
+         ENSG00000257167.2
+         ENSG00000267751.5
+         ENSG00000272524.1
+         ENSG00000236256.9
+         ENSG00000237523.1
+         ENSG00000273132.1
+         ENSG00000226808.1
+         ENSG00000234477.1
+         ENSG00000250159.6
+         ENSG00000259070.5
+         ENSG00000268621.5
+         ENSG00000242147.1")
+goi2 = strsplit(goi2, "\n ?")[[1]] %>% gsub(" ", "", .)
+goi = c(goi, goi2)
 ### overlap with different extension sizes
 todo = c(2, 10, 30, 100)*10^3
 names(todo) = paste0(c(2, 10, 30, 100), "kb")
 olaps = lapply(todo, function(ext){
     ref_extension(ext = ext, np_files = np_files, bw_files = bw_files, goi = goi, ref_dt = ref_dt)
 })
+
+setwd(odir)
 
 ### prepare results for merging
 olaps_df = lapply(names(olaps), function(nam){
@@ -104,14 +139,14 @@ olaps_master = as.data.table(olaps_master)
 olaps_master[, c("stable_gene_id", "version_gene_id") := tstrsplit(id, "\\.")]
 olaps_master$id = NULL
 olaps_master$version_gene_id = NULL
-o = order(rep(0:1, length(todo)))
+o = order(rep(seq_along(np_files)-1, length(todo)))
 olaps_master = olaps_master[, c(o, length(o)+1), with = F]
 
-odir = getwd()
+
 setwd("~/zdrive/RNA_seq_data/Breast/")
 DE_files = c("MCF10A_shRunx1/DESeq2/DESeq2_EV_vs_C1shRUNX1_v25.txt",
              "MCF10A_shRunx1/DESeq2/DESeq2_EV_vs_C4shRUNX1_v25.txt",
-             "MCF10A-AT1_CA1_shRUNX2/DESeq2/MCF10A-AT1_shRUNX2/DESeq2_MCF10A-AT1_AT1_vs_EV_v25.txt",
+             "MCF10A-AT1_CA1_shRUNX2/DESeq2/MCF10A-AT1_shRUNX2/DESeq2_MCF10A-AT1_EV_vs_shRUNX2_v25.txt",
              "MCF10A-AT1_CA1_shRUNX2/DESeq2/MCF10A-CA1_shRUNX2/2-way_comparison_EV_and_shRUNX2_only/DESeq2_MCF10A-CA1_EV_vs_shRUNX2_v25.txt",
              "MCF7_shRunx1/DESeq2/DESeq2_EV_vs_C1shRunx1_v25.txt",
              "MCF7_shRunx1/DESeq2/DESeq2_EV_vs_C4shRunx1_v25.txt",
@@ -141,7 +176,7 @@ names(DE_files) = DE_files %>%
     sub("_v25.txt", "", .) %>%
     sub(".txt", "", .) %>%
     sub("_Significant", "", .)
-names(DE_files)[c(1:2, 5:6)] = paste0(c("MCF10A_", "MCF10A_", "MCF7_", ""), names(DE_files)[c(1:2, 5:6)], sep = "_")
+names(DE_files)[c(1:2, 5:6)] = paste0(c("MCF10A_", "MCF10A_", "MCF7_", "MCF7_"), names(DE_files)[c(1:2, 5:6)], sep = "_")
 names(DE_files) = sub("_$", "", names(DE_files))
 names(DE_files)[3] = paste0(names(DE_files)[3], "shRUNX2")
 
@@ -156,11 +191,25 @@ DE_dt[, .N, by = comparison]
 cnts = DE_dt[, .N, by = stable_gene_id]
 hist(cnts$N)
 
+DE_dt$comparison = factor(DE_dt$comparison, levels = names(DE_files))
+
 fc_df = as.data.frame(dcast(DE_dt, stable_gene_id ~ comparison, value.var = "log2FoldChange"))
 padj_dt = dcast(DE_dt, stable_gene_id ~ comparison, value.var = "padj")
 
 is_sig = padj_dt[,-1] < .05
 fc_df[,-1][!as.data.frame(is_sig)] = NA
+
+cn = colnames(fc_df)[-1]
+tos = sapply(cn, function(x)strsplit(x, "_vs_")[[1]][1])
+froms = sapply(cn, function(x)strsplit(x, "_vs_")[[1]][2])
+cn = paste("from",froms, "to", tos)
+
+
+toflip = c(1:7, 8, 10, 12:17)
+cn[toflip] = paste("from",tos, "to", froms)[toflip]
+fc_df[,-1][,toflip] = -fc_df[,-1][,toflip]
+
+colnames(fc_df)[-1] = cn
 
 ###count files
 setwd("~/zdrive/RNA_seq_data/Breast/")
@@ -194,7 +243,6 @@ master = merge(master, ref_dt[, c("stable_gene_id", "gene_type", "gene_name")])
 o = c(ncol(master), ncol(master)-1, 1, 2:(ncol(master) -2 ))
 
 master = master[,o, with = F]
-# fwrite(master, "lnc_table.csv")
 
 library(openxlsx)
 wb = createWorkbook()
@@ -217,12 +265,4 @@ for(i in seq_along(count_df)){
     addStyle(wb, s_name, s_head, rows = 1, cols = 1:(ncol(count_df[[i]])) + 1)
 }
 
-# num_s = createStyle(numFmt = "0.00")
-
-# for(i in seq_along(wb$sheet_names)){
-#
-#     openxlsx::getTables(wb, 1)
-#
-# }
-
-saveWorkbook(wb, file = "Runx1_binding_and_DE_for_selected_lncs_KMT1.xlsx", overwrite = T)
+saveWorkbook(wb, file = "Runx1_binding_and_DE_for_selected_lncs_KMT2.xlsx", overwrite = T)
