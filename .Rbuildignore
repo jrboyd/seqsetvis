@@ -8,4 +8,10 @@
 ^inst/extdata/bigwigs/full$
 ^inst/extdata/peak_calls/grab_peaks\.sh$
 ^R/old_sources$
-
+^MCF10A_CTCF_FE.bw$
+^MCF10AT1_CTCF_FE.bw$
+^MCF10CA1_CTCF_FE.bw$
+^tmp.+pdf$
+^tmp.+xlsx$
+^tmp.+csv$
+^workflow.+R$

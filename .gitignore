@@ -10,3 +10,4 @@ test_chrSizes.txt
 *.Rcheck
 *.xlsx
 *.csv
+inst/doc

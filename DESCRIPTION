@@ -1,6 +1,7 @@
 Package: seqsetvis
 Type: Package
-Title: Interactive Visualizations for User Friendly ChIP-seq Peak Comparison and Analysis
+Title: Interactive Visualizations for User Friendly ChIP-seq Peak
+        Comparison and Analysis
 Version: 0.99.1
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
@@ -14,24 +15,12 @@ Description: Makes the visual analysis of ChIP-seq peak sets and enrichment trac
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Suggests: 
-    testthat,
-    covr,
-    knitr
-Depends: 
-  ggplot2
-Imports:
-    methods,
-    GenomicRanges,
-    IRanges,
-    data.table,
-    rtracklayer,
-    limma, 
-    assertthat, 
-    venneuler,
-    ggforce,
-    RColorBrewer,
-    magrittr,
-    png
+Suggests: testthat, covr, knitr, rmarkdown
+Depends: ggplot2
+Imports: methods, GenomicRanges, IRanges, data.table, rtracklayer,
+        limma, assertthat, venneuler, ggforce, RColorBrewer, magrittr,
+        png
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
+NeedsCompilation: no
+Packaged: 2018-01-08 17:54:19 UTC; joeboyd

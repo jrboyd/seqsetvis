@@ -5,8 +5,7 @@ library(seqsetvis)
    testthat::test_file(f)
  }
 
-# devtools::build()
-# # devtools::check("../seqsetvis_0.99.1.tar.gz")
+devtools::build()
 # system("R CMD check ../seqsetvis_0.99.1.tar.gz")
 
 #build properly using Rbuildignore
