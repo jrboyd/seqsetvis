@@ -18,4 +18,4 @@ a = covr::file_coverage(dir("R", full.names = T, pattern = "R$"), dir("tests/tes
 covr::report(a)
 
 # covr::codecov()
-covr::codecov(token = "ec9fa5ec-1e23-4e3e-82bb-260ed1ee514a")
+# covr::codecov(token = "ec9fa5ec-1e23-4e3e-82bb-260ed1ee514a")
