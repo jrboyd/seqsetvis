@@ -35,8 +35,6 @@ Both stages are supported by several plotting functions.
 library(seqsetvis)
 library(magrittr)
 library(rtracklayer)
-library(grid)
-library(gridExtra)
 library(cowplot)
 ```
 
