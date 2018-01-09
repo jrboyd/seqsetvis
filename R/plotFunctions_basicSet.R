@@ -65,7 +65,7 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
               axis.ticks = element_blank(),
               panel.grid = element_blank(),
               legend.position = "top") +
-        guides(fill = guide_legend(override.aes = list(shape = 21, size = 10)))
+        guides(fill = guide_legend(override.aes = list(shape = 21)))
     p = p + coord_fixed()
     xcentres <- switch(nsets,
                        0,
@@ -139,7 +139,6 @@ setPlotBars = function(object) {
     p <- ggplot(hit_counts_df, aes(x = group, y = count, fill = group)) +
         labs(x = "") +
         geom_bar(width = 1, stat = "identity") +
-        guides(fill = "none") +
         theme_bw() +
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
               panel.grid.major.x = element_blank(),
@@ -295,7 +294,7 @@ setPlotEuler = function(object, line_width = 2) {
     p = p + ggforce::geom_circle() + labs(fill = "", color = "") + scale_size_identity() + scale_shape_identity() + scale_alpha_identity() +
         scale_fill_manual(values = col_scale) + scale_color_manual(values = col_scale) + theme_minimal() + theme(plot.background = element_blank(),
                                                                                                                  axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank(), legend.position = "top") +
-        guides(fill = guide_legend(override.aes = list(shape = 21, size = 10))) + coord_fixed()  #+
+        guides(fill = guide_legend(override.aes = list(shape = 21))) + coord_fixed()  #+
     p
 }
 

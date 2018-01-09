@@ -60,8 +60,24 @@ setPlotPie(np_overlap)
 setPlotVenn(np_overlap)
 setPlotEuler(np_overlap)
 setPlotHeatmap(np_overlap)
+p1 = setPlotVenn(olaps)  +
+    theme(legend.text = element_text(size = 8),
+          legend.position = "left")
+p2 = setPlotEuler(olaps) +
+    theme(legend.text = element_text(size = 8)) +
+    guides(fill = "none", color = "none")
+p3 = setPlotHeatmap(olaps) +
+    theme(axis.text.x = element_text(size = 8)) +
+    labs(title = "")
+ggdraw() +
+    draw_plot(p1 + theme(legend.justification = "bottom"), 0, 0, .46, 1) +
+    draw_plot(p2, 0.43, 0, 0.3, 1) +
+    draw_plot(p3, 0.75, 0, .25, 1) +
+    draw_plot_label(c("CTCF binding in breast cancer cell lines", "A", "B", "C"),
+                    x = c(.04, .12, 0.43, .73),
+                    y = c(.92, .8, .8, .8), size = 15, hjust = 0)
 
-
+cowplot::plot_grid(p1, p2, p3, nrow = 1)
 
 ### prepare overlap sites for retrieving data from bigwigs
 ## determine desired width
@@ -82,6 +98,21 @@ for(i in seq_along(bw_urls)){
 }
 ### fetch profile data from bigwigs for all sites
 bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = qgr, win_size =  50, bw_variable_name = "cell_line")
+
+
+chrSizes = read.table("~/hg38_chrsizes.txt", row.names = 1)
+
+for(cl in unique(bw_dt$sample)){
+    dt = copy(bw_dt[sample == cl])
+    dt$sample = NULL
+    dt$x = NULL
+    dt$id = NULL
+    gr = GRanges(dt)
+    seqlengths(gr) = chrSizes[names(seqlengths(gr)),]
+    colnames(mcols(gr)) = "score"
+    export.bw(gr, con = paste(cl, "_FE.bw"))
+}
+
 
 h1 = regionSetPlotHeatmap(bw_dt[abs(x) <= width_q75/2], facet_ = "cell_line", nclust = 12)
 

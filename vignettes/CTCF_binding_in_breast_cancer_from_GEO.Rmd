@@ -32,11 +32,12 @@ Both stages are supported by several plotting functions.
 ## Loading Libraries
 
 ```{r, message = F}
-    library(seqsetvis)
-    library(magrittr)
-    library(rtracklayer)
-    library(grid)
-    library(gridExtra)
+library(seqsetvis)
+library(magrittr)
+library(rtracklayer)
+library(grid)
+library(gridExtra)
+library(cowplot)
 ```
 
 ## Loading narrowPeak files as GRanges
@@ -53,7 +54,7 @@ np_files = c(
 
 names(np_files) = np_files %>%
     basename() %>%
-    sub(".narrowPeak", "", x = .)
+    sub("_CTCF.narrowPeak", "", x = .)
 
 # load peak calls
 # from: https://charlesjb.github.io/How_to_import_narrowPeak/
@@ -74,34 +75,83 @@ olaps %>% mcols %>% as.data.frame %>% colSums
 ### Subsetting Operations
 ##### bound in all 3
 ```{r}
-subset(olaps, MCF10A_CTCF & MCF10AT1_CTCF & MCF10CA1_CTCF) %>% length
+subset(olaps, MCF10A & MCF10AT1 & MCF10CA1) %>% length
 ```
 ##### bound in all but MCF10CA1
 ```{r}
-subset(olaps, MCF10A_CTCF & MCF10AT1_CTCF & !MCF10CA1_CTCF) %>% length
+subset(olaps, MCF10A & MCF10AT1 & !MCF10CA1) %>% length
 ```
 ##### bound in MCF10CA1 (ignores the other 2)
 ```{r}
-subset(olaps, MCF10CA1_CTCF) %>% length
+subset(olaps, MCF10CA1) %>% length
 ```
 ### Plotting
 
 ##### Total number of hits per sample
-```{r, hold = TRUE, fig.align='center'}
-p1 = setPlotBars(olaps)
-p2 = setPlotPie(olaps)
-grid.arrange(p1, p2, nrow = 1, widths = c(1, 2))
+```{r, hold = TRUE, fig.align='center', fig.height=3}
+p1 = setPlotBars(olaps) +  theme(legend.position = "left")
+p2 = setPlotPie(olaps) + guides(fill = "none")
+cowplot::ggdraw() +
+    draw_plot(p1 + theme(legend.justification = "bottom"), 0, 0, .35, 1) +
+    draw_plot(p2, 0.35, 0, 0.65, .8) +
+    draw_plot_label(c("CTCF binding in breast cancer cell lines", "A", "B"),
+                    x = c(.04, .0, 0.65),
+                    y = c(.92, .8, .8), size = 15, hjust = 0)
 ```
 
 ##### Overlaps between samples
 
-```{r, hold = TRUE, fig.align='center'}
-setPlotVenn(olaps)
-setPlotEuler(olaps)
-setPlotHeatmap(olaps)
+```{r, hold = TRUE, fig.align='center', fig.width=8, fig.height=4}
+p1 = setPlotVenn(olaps)  +
+    theme(legend.text = element_text(size = 8), 
+          legend.position = "left")
+p2 = setPlotEuler(olaps) + 
+    theme(legend.text = element_text(size = 8)) + 
+    guides(fill = "none", color = "none")
+p3 = setPlotHeatmap(olaps) + 
+    theme(axis.text.x = element_text(size = 8)) + 
+    labs(title = "")
+cowplot::ggdraw() +
+    draw_plot(p1 + theme(legend.justification = "bottom"), 0, 0, .47, 1) +
+    draw_plot(p2, 0.43, 0, 0.3, 1) +
+    draw_plot(p3, 0.75, 0, .25, 1) +
+    draw_plot_label(c("CTCF binding in breast cancer cell lines", "A", "B", "C"),
+                    x = c(.04, .12, 0.43, .73),
+                    y = c(.92, .8, .8, .8), size = 15, hjust = 0)
 ```
 
+### Prepare overlap ranges for fetching profiles
+```{r, fig.height=3}
+width_q75 = olaps %>% width() %>% quantile(., .75)
+width_q75 = ceiling(width_q75 / 100) * 100
+hist_res = hist(width(olaps))
+lines(rep(width_q75, 2), c(0, max(hist_res$counts)), col = "red", lwd = 5)
+text(width_q75, max(hist_res$counts), "fixedSize", adj = c(-.1, 1), col = "red")
+## apply width
+olap_fixedSize = centerFixedSizeGRanges(olaps, width_q75)
+```
+
+### Set bigWig paths
+```{r}
+bw_files = sapply(names(np_files), function(x){
+    system.file("extdata", paste0(x, "_CTCF_FE.bw"), package = "seqsetvis")
+})
+```
+
+### Fetch profiles
+```{r}
+bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize, win_size = 100)
+```
 [bw load](#bw_load)
+
+```{r}
+regionSetPlotBandedQuantiles(bw_dt)
+regionSetPlotScatter(bw_dt, x_name = "MCF10A", y_name = "MCF10AT1")
+regionSetPlotHeatmap(bw_dt)
+```
+
+
+
 
 
 
