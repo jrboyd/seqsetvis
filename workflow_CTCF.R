@@ -1,6 +1,7 @@
-library(seqsetvis)
+
+
 library(rtracklayer)
-library(magrittr)
+
 
 ### set file paths
 np_files = c("ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98551/suppl/GSE98551_MCF10A_CTCF_pooled_peaks_passIDR.05.narrowPeak.gz",
@@ -41,13 +42,26 @@ np_grs= lapply(np_grs, function(gr){
 
 ### perform 3-way intersection
 np_overlap = overlapIntervalSets(np_grs)
+# np_overlap = sample(np_overlap, 100)
+
+for(i in seq_along(np_grs)){
+    gr = subsetByOverlaps(np_grs[[i]], np_overlap)
+    df = as.data.frame(gr)
+    df = df[, c("seqnames", "start", "end", "name", "score", "strand", "signalValue", "pValue", "qValue", "peak")]
+    df$strand = "."
+    write.table(df, file = paste0("inst/extdata/ctcf_data/", names(np_grs)[i], ".narrowPeak"), sep = "\t", quote = F, col.names = F, row.names = F)
+}
+
 
 ### plots for 3-way intersection
 setPlotBars(np_overlap)
+setPlotBars(np_grs)
 setPlotPie(np_overlap)
 setPlotVenn(np_overlap)
 setPlotEuler(np_overlap)
 setPlotHeatmap(np_overlap)
+
+
 
 ### prepare overlap sites for retrieving data from bigwigs
 ## determine desired width
@@ -72,19 +86,29 @@ bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = qgr, win_size =  50, 
 h1 = regionSetPlotHeatmap(bw_dt[abs(x) <= width_q75/2], facet_ = "cell_line", nclust = 12)
 
 cbw_dt = centerAtMax(bw_dt, y_ = "FE", by = "id", view_size = width_q75, check_by_dupes = F)
-h2 = regionSetPlotHeatmap(cbw_dt, facet_ = "cell_line", nclust = 12)
+h2 = regionSetPlotHeatmap(cbw_dt[abs(x) <= width_q75/2], facet_ = "cell_line", nclust = 12)
 
 pdf("h.pdf", width = 4, height = 16)
 cowplot::plot_grid(h1, h2, ncol = 1)
 dev.off()
 q98 = function(x)quantile(x, .98)
+
+
+
 p = regionSetPlotScatter(bw_dt = bw_dt,
                          x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF",
                          xy_variable = "cell_line", value_function = q98) +
     labs(title = "98th quantile in regions")
+
+suppressMessages(p +
+                     geom_density_2d(mapping = aes(color = "blue"), show.legend = T) +
+                     scale_alpha_continuous(range = 1) +
+                     scale_size_continuous(range = 2.5) +
+                     scale_color_manual(values = c("black", "red")))
 # p
 # p + scale_alpha_continuous(range = .03)
-p1 = p + geom_density_2d() + scale_alpha_continuous(range = .03)
+p1 = p + geom_density_2d() + scale_alpha_continuous(range = .5) + scale_size_continuous(range = .5)
+p1
 # p + stat_density_2d(aes(fill = ..level..), geom = "polygon") + scale_alpha_continuous(range = .03)
 
 p = regionSetPlotScatter(bw_dt = bw_dt, x_name = "MCF10A_CTCF", y_name = "MCF10CA1_CTCF", xy_variable = "cell_line", value_function = q98) + labs(title = "98th quantile in regions")

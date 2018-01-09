@@ -5,11 +5,12 @@ library(seqsetvis)
    testthat::test_file(f)
  }
 
-devtools::build()
-# system("R CMD check ../seqsetvis_0.99.1.tar.gz")
+devtools::build(vignettes = T)
+system("R CMD check ../seqsetvis_0.99.1.tar.gz")
 
 #build properly using Rbuildignore
-# devtools::install(local = F)
+install.packages()
+# devtools::install(build_vignettes = F)
 
 roxygen2::roxygenise()
 

@@ -142,9 +142,10 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
         }
 
         p = ggplot(plot_dt, aes(x = xval, y = yval)) +
-            geom_point(mapping = aes(alpha = 1, col = plotting_group)) +
-            scale_alpha_identity(guide = "none") +
-            guides(alpha = "none") +
+            geom_point(mapping = aes(alpha = 1, size = 1.5, col = plotting_group)) +
+            scale_alpha_identity() +
+            scale_size_identity() +
+            guides(alpha = "none", size = "none") +
             labs(x = x_name, y = y_name, title = "Max FE in regions") +
             ylim(ylim) + xlim(xlim)
 
@@ -167,9 +168,10 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
         xmax = plot_dt[, max(abs(c(xvolcano)))]
         lim = c(-xmax, xmax)
         p = ggplot(plot_dt, aes(x = xvolcano, y = yvolcano)) +
-            geom_point(mapping = aes(alpha = 1, col = plotting_group)) +
-            scale_alpha_identity(guide = "none") +
-            guides(alpha = "none") +
+            geom_point(mapping = aes(alpha = 1, size = 1.5, col = plotting_group)) +
+            scale_size_identity() +
+            scale_alpha_identity() +
+            guides(alpha = "none", size = "none") +
             labs(x = paste("log2 fold-change of", y_name, "over", x_name),
                  y = paste("log2 min of", y_name, "and", x_name), title = "Max FE in regions") +
             xlim(lim)
