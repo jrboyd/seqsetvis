@@ -138,52 +138,15 @@ bw_files = sapply(names(np_files), function(x){
 
 ### Fetch profiles
 ```{r}
-bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize, win_size = 100)
+# bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize, win_size = 100)
 ```
 [bw load](#bw_load)
 
 ```{r, fig.width=16, fig.height=4}
-p1 = regionSetPlotBandedQuantiles(bw_dt, hsv_symmetric = T, hsv_reverse = T, hsv_grayscale = T)
-p2 = regionSetPlotScatter(bw_dt, x_name = "MCF10A", y_name = "MCF10AT1")
-p3 = regionSetPlotHeatmap(bw_dt)
-cowplot::plot_grid(p1, p2, p3, nrow = 1)
-```
-
-
-
-
-
-
-
-## Vignette Info
-
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
-
-## Styles
-
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
-
-## Figures
-
-The figure sizes have been customised so that you can easily put two images side-by-side. 
-
-```{r, fig.show='hold', fig.cap = "2 random plots."}
-plot(1:10)
-plot(10:1)
-```
-
-You can enable figure captions by `fig_caption: yes` in YAML:
-
-
-
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
-
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
+# p1 = regionSetPlotBandedQuantiles(bw_dt, hsv_symmetric = T, hsv_reverse = T, hsv_grayscale = T)
+# p2 = regionSetPlotScatter(bw_dt, x_name = "MCF10A", y_name = "MCF10AT1")
+# p3 = regionSetPlotHeatmap(bw_dt)
+# cowplot::plot_grid(p1, p2, p3, nrow = 1)
 ```
 
 ### Retrieve narrowPeak data by url {#np_load}
