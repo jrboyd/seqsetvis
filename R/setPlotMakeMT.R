@@ -7,6 +7,10 @@ setGeneric("setPlotMakeMT", function(object){
   standardGeneric("setPlotMakeMT")
 })
 
+
+
+
+
 #' list of character vectors input
 #' @param object a list of items that are valid for as.character
 #' A list of GRanges are a special case and will be handled as a GRangesList
@@ -27,11 +31,17 @@ setMethod("setPlotMakeMT", signature(object = "list"), function(object){
   return(object)
 })
 
+#' @import GRangesList
+# setOldClass("GRangesList")
+
 #' GRangesList input
 #' @param object a list of GRanges, sent to overlapIntervalSets
 setMethod("setPlotMakeMT", signature(object = "GRangesList"), function(object){
   setPlotMakeMT(overlapIntervalSets(object))
 })
+
+#' @import GRanges
+# setOldClass("GRanges")
 
 #' mcols from GRange input
 #' @param object A single GRanges, will use logical metadata columns
@@ -39,6 +49,9 @@ setMethod("setPlotMakeMT", signature(object = "GRanges"), function(object){
   object = mcols(object)
   setPlotMakeMT(object)
 })
+
+#' @import DataFrame
+# setOldClass("DataFrame")
 
 #' DataFrame input
 #' @param object A single DataFrame (typically from GRanges metadata), will use logical columns

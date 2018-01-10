@@ -218,11 +218,21 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL,
     closestToZero = function(x) {
         x[order(abs(x))][1]
     }
-    dt[, `:=`(ymax, max(get(y_)[get(x_) <= max(view_size) & get(x_) >= min(view_size)])), by = by_]
-    dt[, `:=`(xsummit, closestToZero(get(x_)[get(y_) == ymax])), by = by_]
-    dt[, `:=`(xnew, get(x_) - xsummit)]
-    dt[, `:=`(ymax, NULL)]
-    dt[, `:=`(xsummit, NULL)]
+    # dt[, `:=`(ymax, max(get(y_)[get(x_) <= max(view_size) & get(x_) >= min(view_size)])), by = by_]
+    # dt[, `:=`(xsummit, closestToZero(get(x_)[get(y_) == ymax])), by = by_]
+    # dt[, `:=`(xnew, get(x_) - xsummit)]
+    # dt[, `:=`(ymax, NULL)]
+    # dt[, `:=`(xsummit, NULL)]
+    # dt[, data.table::`:=`(ymax, max(get(y_)[get(x_) <= max(view_size) & get(x_) >= min(view_size)])), by = by_]
+    # dt[, data.table::`:=`(xsummit, closestToZero(get(x_)[get(y_) == ymax])), by = by_]
+    # dt[, data.table::`:=`(xnew, get(x_) - xsummit)]
+    # dt[, data.table::`:=`(ymax, NULL)]
+    # dt[, data.table::`:=`(xsummit, NULL)]
+    dt[, ymax := max(get(y_)[get(x_) <= max(view_size) & get(x_) >= min(view_size)]), by = by_]
+    dt[, xsummit := closestToZero(get(x_)[get(y_) == ymax]), by = by_]
+    dt[, xnew := get(x_) - xsummit]
+    dt[, ymax := NULL]
+    dt[, xsummit := NULL]
     if (trim_to_valid) {
         #valid values of x are those with values in all by_ defined grouping
         xcounts = dt[, .N , xnew]
