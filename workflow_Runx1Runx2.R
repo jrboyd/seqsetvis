@@ -80,10 +80,14 @@ ggplot(cdt[id %in% c("5588", "4619", "7828", "2447")], mapping = aes(x = x, y = 
     geom_line() + facet_grid(id ~ .)
 
 
-plot_dt = copy(cdt)
+bw_dt = copy(cdt)
 
-regionSetPlotHeatmap(plot_dt)
-regionSetPlotBandedQuantiles(plot_dt, by_ = "sample", hsv_symmetric = T, hsv_reverse = T)
+clust_dt = regionSetCluster(bw_dt, clustering_col_min = -200, clustering_col_max = 200)
+regionSetPlotHeatmap(clust_dt)
+regionSetPlotBandedQuantiles(bw_dt, by_ = "sample", hsv_symmetric = T, hsv_reverse = T)
+
+mean_dt = clust_dt[x < 100 & x > -100, .(mFE = mean(FE)), by = .(sample, cluster_id, id)]
+ggplot(mean_dt) + geom_boxplot(aes(x = sample, y = mFE)) + facet_grid(cluster_id ~ .) + theme(axis.text.x = element_text(angle = 90))
 
 memb = mcols(qgr)
 memb$id = names(qgr)
@@ -93,4 +97,4 @@ memb[memb$MDA231_Runx2,]$plotting_group = "MDA231_Runx2"
 memb[memb$MDA231_Runx1 & memb$MDA231_Runx2,]$plotting_group = "both"
 memb$plotting_group = factor(memb$plotting_group)
 
-regionSetPlotScatter(plot_dt[x == 0], x_name = "MDA231_Runx1", y_name = "MDA231_Runx2", plotting_group = as.data.table(memb[,c("id", "plotting_group")]))
+regionSetPlotScatter(bw_dt[x == 0], x_name = "MDA231_Runx1", y_name = "MDA231_Runx2", plotting_group = as.data.table(memb[,c("id", "plotting_group")]))

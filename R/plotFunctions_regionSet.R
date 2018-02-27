@@ -198,6 +198,50 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
     p
 }
 
+#' clustering as for a heatmap
+#'
+#' @param bw_dt data.table of signals
+#' @param nclust number of clusters
+#' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
+#' @param column_ varaible mapped to column, likely bp position for ngs data
+#' @param fill_ numeric variable to map to fill
+#' @param facet_ variable name to facet horizontally by
+#' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
+#' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
+#' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
+#' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
+#'
+#' @return data.table of signal profiles, ready for regionSetPlotHeatmap
+regionSetCluster = function(bw_dt, nclust = 6,
+                            row_ = "id",
+                            column_ = "x", fill_ = "FE", facet_ = "sample",
+                            cluster_ = "cluster_id",
+                            max_rows = 500, max_cols = 100,
+                            clustering_col_min = -Inf, clustering_col_max = Inf){
+    id = xbp = x = to_disp = FE = hit = val = y = y_gap = NULL#declare binding for data.table
+    plot_dt = data.table::copy(bw_dt)
+    raw_nc = length(unique(plot_dt$x))
+    plot_dt = applySpline(plot_dt, x_ = column_, y_ = fill_, by_ = c(row_, facet_), n = max_cols/raw_nc)
+    row_ids = unique(plot_dt$id)
+    if(length(row_ids) > max_rows){
+        set.seed(0)
+        row_ids = sample(row_ids, max_rows)
+    }
+    plot_dt = plot_dt[id %in% row_ids]
+    dc_dt = data.table::dcast(plot_dt[get(column_) > clustering_col_min & get(column_) < clustering_col_max],
+                              formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + ")),
+                              # formula = as.name(row_) ~ as.name(facet_) + as.name(column_),
+                              value.var = fill_)
+    dc_mat = as.matrix(dc_dt[,-1])
+    rownames(dc_mat) = dc_dt[[row_]]
+    rclusters = clusteringKmeansNestedHclust(dc_mat, nclust = nclust)
+    rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
+    setkey(rclusters, id)
+    plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[[row_]])
+    plot_dt[[cluster_]] = rclusters[.(plot_dt$id), group]
+    return(plot_dt)
+}
+
 #' heatmap
 #'
 #' @param bw_dt data.table of signals
@@ -212,31 +256,39 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
 #'
 #' @return ggplot heatmap of signal profiles, facetted by sample
-regionSetPlotHeatmap = function(bw_dt, nclust = 6,
+regionSetPlotHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "yes", "no")[1],
                                 row_ = "id",
                                 column_ = "x", fill_ = "FE", facet_ = "sample",
+                                cluster_ = "cluster_id",
                                 max_rows = 500, max_cols = 100,
                                 clustering_col_min = -Inf, clustering_col_max = Inf){
-    id = xbp = x = to_disp = FE = hit = val = y = y_gap = NULL#declare binding for data.table
-    plot_dt = data.table::copy(bw_dt)
-    raw_nc = length(unique(plot_dt$x))
-    plot_dt = applySpline(plot_dt, x_ = column_, y_ = fill_, by_ = c(row_, facet_), n = max_cols/raw_nc)
-    row_ids = unique(plot_dt$id)
-    if(length(row_ids) > max_rows){
-        set.seed(0)
-        row_ids = sample(row_ids, max_rows)
+    id = xbp = x = to_disp = FE = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
+    #determine if user wants clustering
+    do_cluster = perform_clustering == "yes"
+    if(perform_clustering == "auto"){
+        if(is.factor(bw_dt[[row_]]) & is.numeric(bw_dt[[cluster_]])){
+            do_cluster = F
+        }else{
+            do_cluster = T
+        }
     }
-    plot_dt = plot_dt[id %in% row_ids]
-    dc_dt = data.table::dcast(plot_dt[get(column_) > clustering_col_min & get(column_) < clustering_col_max],
-                  formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + ")),
-                  # formula = as.name(row_) ~ as.name(facet_) + as.name(column_),
-                  value.var = fill_)
-    dc_mat = as.matrix(dc_dt[,-1])
-    rownames(dc_mat) = dc_dt[[row_]]
-    rclusters = clusteringKmeansNestedHclust(dc_mat, nclust = nclust)
-    rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
-    plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[[row_]])
-
+    if(do_cluster){
+        print("clustering...")
+        plot_dt = regionSetCluster(bw_dt = bw_dt,
+                                   nclust = nclust,
+                                   row_ = row_,
+                                   column_ = column_,
+                                   fill_ = fill_,
+                                   facet_ = facet_,
+                                   cluster_ = cluster_,
+                                   max_rows = max_rows,
+                                   max_cols = max_cols,
+                                   clustering_col_min = clustering_col_min,
+                                   clustering_col_max = clustering_col_max)
+    }else{
+        plot_dt = bw_dt
+    }
+    print("making plot...")
     scale_floor = .1
     scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
     p = ggplot(plot_dt) +

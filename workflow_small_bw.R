@@ -1,6 +1,7 @@
 library(GenomicRanges)
 library(rtracklayer)
 library(seqsetvis)
+library(magrittr)
 qgr = GRanges("chr19", IRanges(5*10^6, 10*10^6))
 url = "https://www.ncbi.nlm.nih.gov/geo/download/?acc=GSE77772&format=file&file=GSE77772%5FMCF10A%5FH3K27ME3%5FlogFE%2Ebw"
 url = "ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE69nnn/GSE69377/suppl/GSE69377_MCF10A_H3K4AC_logFE.bw"
