@@ -296,9 +296,8 @@ regionSetPlotHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto"
         facet_grid(paste(". ~", facet_)) +
         theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
         scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals)
-
-
-    ends = cumsum(rev(table(rclusters$group)))
+    rclust = plot_dt[, .(cluster_id = unique(cluster_id)), by = get(row_)]
+    ends = cumsum(rev(table(rclust$cluster_id)))
     starts = c(1, ends[-length(ends)] + 1)
     starts = starts - .5
     ends = ends + .5

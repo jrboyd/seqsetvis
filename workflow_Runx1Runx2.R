@@ -82,11 +82,11 @@ ggplot(cdt[id %in% c("5588", "4619", "7828", "2447")], mapping = aes(x = x, y = 
 
 bw_dt = copy(cdt)
 
-clust_dt = regionSetCluster(bw_dt, clustering_col_min = -200, clustering_col_max = 200)
+clust_dt = regionSetCluster(bw_dt, clustering_col_min = -300, clustering_col_max = 300)
 regionSetPlotHeatmap(clust_dt)
 regionSetPlotBandedQuantiles(bw_dt, by_ = "sample", hsv_symmetric = T, hsv_reverse = T)
 
-mean_dt = clust_dt[x < 100 & x > -100, .(mFE = mean(FE)), by = .(sample, cluster_id, id)]
+mean_dt = clust_dt[x < 300 & x > -300, .(mFE = mean(FE)), by = .(sample, cluster_id, id)]
 ggplot(mean_dt) + geom_boxplot(aes(x = sample, y = mFE)) + facet_grid(cluster_id ~ .) + theme(axis.text.x = element_text(angle = 90))
 
 memb = mcols(qgr)
