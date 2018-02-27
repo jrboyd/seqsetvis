@@ -236,8 +236,9 @@ regionSetCluster = function(bw_dt, nclust = 6,
     rownames(dc_mat) = dc_dt[[row_]]
     rclusters = clusteringKmeansNestedHclust(dc_mat, nclust = nclust)
     rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
-    setkey(rclusters, id)
+
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[[row_]])
+    setkey(rclusters, id)
     plot_dt[[cluster_]] = rclusters[.(plot_dt$id), group]
     return(plot_dt)
 }

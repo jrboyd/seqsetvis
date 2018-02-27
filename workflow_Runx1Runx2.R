@@ -84,10 +84,13 @@ bw_dt = copy(cdt)
 
 clust_dt = regionSetCluster(bw_dt, clustering_col_min = -300, clustering_col_max = 300)
 regionSetPlotHeatmap(clust_dt)
+regionSetPlotHeatmap(clust_dt[x < 100 & x > -100])
 regionSetPlotBandedQuantiles(bw_dt, by_ = "sample", hsv_symmetric = T, hsv_reverse = T)
 
-mean_dt = clust_dt[x < 300 & x > -300, .(mFE = mean(FE)), by = .(sample, cluster_id, id)]
-ggplot(mean_dt) + geom_boxplot(aes(x = sample, y = mFE)) + facet_grid(cluster_id ~ .) + theme(axis.text.x = element_text(angle = 90))
+mean_dt = clust_dt[x < 100 & x > -100, .(mFE = mean(FE)), by = .(sample, cluster_id, id)]
+ggplot(mean_dt) +
+    geom_boxplot(aes(x = sample, y = mFE)) +
+    facet_wrap(~cluster_id, ncol = 3) + theme(axis.text.x = element_text(angle = 90))
 
 memb = mcols(qgr)
 memb$id = names(qgr)
