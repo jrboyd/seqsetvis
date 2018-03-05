@@ -44,13 +44,13 @@ np_grs= lapply(np_grs, function(gr){
 np_overlap = overlapIntervalSets(np_grs)
 # np_overlap = sample(np_overlap, 100)
 
-for(i in seq_along(np_grs)){
-    gr = subsetByOverlaps(np_grs[[i]], np_overlap)
-    df = as.data.frame(gr)
-    df = df[, c("seqnames", "start", "end", "name", "score", "strand", "signalValue", "pValue", "qValue", "peak")]
-    df$strand = "."
-    write.table(df, file = paste0("inst/extdata/ctcf_data/", names(np_grs)[i], ".narrowPeak"), sep = "\t", quote = F, col.names = F, row.names = F)
-}
+# for(i in seq_along(np_grs)){
+#     gr = subsetByOverlaps(np_grs[[i]], np_overlap)
+#     df = as.data.frame(gr)
+#     df = df[, c("seqnames", "start", "end", "name", "score", "strand", "signalValue", "pValue", "qValue", "peak")]
+#     df$strand = "."
+#     write.table(df, file = paste0("inst/extdata/ctcf_data/", names(np_grs)[i], ".narrowPeak"), sep = "\t", quote = F, col.names = F, row.names = F)
+# }
 
 
 ### plots for 3-way intersection
@@ -113,13 +113,15 @@ for(cl in unique(bw_dt$sample)){
     export.bw(gr, con = paste(cl, "_FE.bw"))
 }
 
+myClust = regionSetCluster(bw_dt[abs(x) <= width_q75/2], facet_ = "cell_line", nclust = 6, cluster_ = "clustN")
+myH = regionSetPlotHeatmap(myClust, facet_ = "cell_line", cluster_ = "clustN")
 
-h1 = regionSetPlotHeatmap(bw_dt[abs(x) <= width_q75/2], facet_ = "cell_line", nclust = 12)
+h1 = regionSetPlotHeatmap(bw_dt[abs(x) <= width_q75/2], facet_ = "cell_line", nclust = 4)
 
 cbw_dt = centerAtMax(bw_dt, y_ = "FE", by = "id", view_size = width_q75, check_by_dupes = F)
-h2 = regionSetPlotHeatmap(cbw_dt[abs(x) <= width_q75/2], facet_ = "cell_line", nclust = 12)
+h2 = regionSetPlotHeatmap(cbw_dt[abs(x) <= width_q75/2], facet_ = "cell_line", nclust = 4)
 
-pdf("h.pdf", width = 4, height = 16)
+pdf("h.pdf", width = 6, height = 16)
 cowplot::plot_grid(h1, h2, ncol = 1)
 dev.off()
 q98 = function(x)quantile(x, .98)

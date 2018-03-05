@@ -218,10 +218,12 @@ regionSetCluster = function(bw_dt, nclust = 6,
                             cluster_ = "cluster_id",
                             max_rows = 500, max_cols = 100,
                             clustering_col_min = -Inf, clustering_col_max = Inf){
-    id = xbp = x = to_disp = FE = hit = val = y = y_gap = NULL#declare binding for data.table
+    id = xbp = x = to_disp = FE = hit = val = y = y_gap = group =  NULL#declare binding for data.table
     plot_dt = data.table::copy(bw_dt)
     raw_nc = length(unique(plot_dt$x))
-    plot_dt = applySpline(plot_dt, x_ = column_, y_ = fill_, by_ = c(row_, facet_), n = max_cols/raw_nc)
+    if(raw_nc > max_cols){
+        plot_dt = applySpline(plot_dt, x_ = column_, y_ = fill_, by_ = c(row_, facet_), n = max_cols/raw_nc)
+    }
     row_ids = unique(plot_dt$id)
     if(length(row_ids) > max_rows){
         set.seed(0)
@@ -251,6 +253,7 @@ regionSetCluster = function(bw_dt, nclust = 6,
 #' @param column_ varaible mapped to column, likely bp position for ngs data
 #' @param fill_ numeric variable to map to fill
 #' @param facet_ variable name to facet horizontally by
+#' @param cluster_ variable name to use for cluster info
 #' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
@@ -297,7 +300,8 @@ regionSetPlotHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto"
         facet_grid(paste(". ~", facet_)) +
         theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
         scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals)
-    rclust = plot_dt[, .(cluster_id = unique(cluster_id)), by = get(row_)]
+    # rclust = plot_dt[, .(cluster_id = unique(cluster_id)), by = get(row_)]
+    rclust = plot_dt[, .(cluster_id = unique(get(cluster_))), by = get(row_)]
     ends = cumsum(rev(table(rclust$cluster_id)))
     starts = c(1, ends[-length(ends)] + 1)
     starts = starts - .5
