@@ -5,9 +5,9 @@
 \title{ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets}
 \usage{
 setPlotVenn(object, group_names = NULL, counts_txt_size = 5,
-  counts_as_labels = F, show_outside_count = F, lwd = 3,
-  circle_color = NULL, fill_circles = T, fill_alpha = ifelse(fill_circles,
-  0.5, 0), counts_color = NULL)
+  counts_as_labels = FALSE, show_outside_count = FALSE, lwd = 3,
+  circle_color = NULL, fill_circles = TRUE,
+  fill_alpha = ifelse(fill_circles, 0.5, 0), counts_color = NULL)
 }
 \arguments{
 \item{object}{will be passed to \code{\link{setPlotMakeMT}} for conversion to membership matrix}

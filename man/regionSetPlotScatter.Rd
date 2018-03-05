@@ -6,8 +6,8 @@
 \usage{
 regionSetPlotScatter(bw_dt, x_name, y_name, plotting_group = NULL,
   value_variable = "FE", xy_variable = "sample", value_function = max,
-  by_ = "id", plot_type = c("standard", "volcano")[1], show_help = F,
-  fixed_coords = T)
+  by_ = "id", plot_type = c("standard", "volcano")[1], show_help = FALSE,
+  fixed_coords = TRUE)
 }
 \arguments{
 \item{bw_dt}{data.table of sample profiles}

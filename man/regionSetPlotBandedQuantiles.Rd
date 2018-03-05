@@ -5,9 +5,10 @@
 \title{plot profiles from bigwigs}
 \usage{
 regionSetPlotBandedQuantiles(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
-  hsv_reverse = F, hsv_saturation = 1, hsv_value = 1, hsv_grayscale = F,
-  hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = F,
-  n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95)
+  hsv_reverse = FALSE, hsv_saturation = 1, hsv_value = 1,
+  hsv_grayscale = FALSE, hsv_hue_min = 0, hsv_hue_max = 0.7,
+  hsv_symmetric = FALSE, n_quantile = 18, quantile_min = 0.05,
+  quantile_max = 0.95)
 }
 \arguments{
 \item{bw_dt}{data.table of bigwig signal}

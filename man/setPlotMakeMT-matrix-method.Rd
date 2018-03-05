@@ -14,6 +14,6 @@
 matrix input
 }
 \examples{
-memb_mat =  matrix(c(T, T, F, F, T, F, T, F), ncol = 2, byrow = F)
+memb_mat =  matrix(c(TRUE, TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE), ncol = 2, byrow = FALSE)
 setPlotMakeMT(memb_mat)
 }

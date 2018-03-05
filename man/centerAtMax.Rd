@@ -5,7 +5,7 @@
 \title{centers profile of x and y.  default is to center by region but across all samples.}
 \usage{
 centerAtMax(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL,
-  trim_to_valid = T, check_by_dupes = T, replace_x = T)
+  trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE)
 }
 \arguments{
 \item{dt}{data.table}

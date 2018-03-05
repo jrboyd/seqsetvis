@@ -13,7 +13,7 @@ utils::globalVariables(c(".", "%>%"))
 #' a = GRanges("chr1", IRanges(1:7*10, 1:7*10))
 #' b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
 #' overlapIntervalSets(list(a, b))
-overlapIntervalSets = function(grs, ext = 0, use_first = F){
+overlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
   queryHits = NULL
   if(class(grs) == "GRangesList"){
     grs = as.list(grs)
@@ -38,9 +38,9 @@ overlapIntervalSets = function(grs, ext = 0, use_first = F){
   suppressWarnings({
     for(i in 1:length(grs)){
       nam = names(grs)[i]
-      mcols(base_gr)[[nam]] = F
+      mcols(base_gr)[[nam]] = FALSE
       olaps = findOverlaps(base_gr, grs[[i]])
-      mcols(base_gr)[[nam]][queryHits(olaps)] = T
+      mcols(base_gr)[[nam]][queryHits(olaps)] = TRUE
     }
     if(use_first){
       base_gr$no_hit = apply(mcols(base_gr), 1, function(x)all(!x))

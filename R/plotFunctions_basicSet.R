@@ -24,8 +24,8 @@
 #' @param counts_color single color to use for displaying counts
 #' @return ggplot venn diagram
 setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
-                       counts_as_labels = F, show_outside_count = F, lwd = 3,
-                       circle_color = NULL, fill_circles = T,
+                       counts_as_labels = FALSE, show_outside_count = FALSE, lwd = 3,
+                       circle_color = NULL, fill_circles = TRUE,
                        fill_alpha = ifelse(fill_circles, 0.5, 0), counts_color = NULL) {
     size = group = x = y = label = NULL#declare binding for data.table
     object = setPlotMakeMT(object)
@@ -156,7 +156,7 @@ setPlotBars = function(object) {
 # @param flip_group_stage logical, different facetting.  default is FALSE
 #
 # @return ggplot of bar plot of set sizes
-# setPlotBars2 = function(object, peak_gr, flip_group_stage = F) {
+# setPlotBars2 = function(object, peak_gr, flip_group_stage = FALSE) {
 #   x = count = group = stage = NULL#declare binding for data.table
 #   object = setPlotMakeMT(object)
 #   hit_counts = colSums(object)
@@ -286,7 +286,7 @@ setPlotEuler = function(object, line_width = 2) {
     col_scale = RColorBrewer::brewer.pal(nrow(df), "Dark2")
     blank = rep(NA, length(df$labels))
 
-    add_fill = T
+    add_fill = TRUE
     if (add_fill) {
         p = ggplot(df, aes(x0 = x, y0 = y, r = r, fill = labels, col = labels, size = 2, alpha = 0.08))
     } else {
@@ -306,18 +306,18 @@ setPlotEuler = function(object, line_width = 2) {
 #' @param raster_approximation instead of standard plot, write temporary raster image and redraw that as plot background.
 #' @param raster_width_min raster width will be minimun multiple of number of columns over this number
 #' @param raster_height_min raster height will be minimun multiple of number of rows over this number
-setPlotHeatmap = function(object, raster_approximation = T, raster_width_min = 1000, raster_height_min = 1000) {
+setPlotHeatmap = function(object, raster_approximation = TRUE, raster_width_min = 1000, raster_height_min = 1000) {
     groups = bool = value = NULL#declare binding for data.table
     object = setPlotMakeMT(object)
     mat = ifelse(as.matrix(object), 0, 1)
     for (i in rev(1:ncol(mat))) {
-        mat = mat[order(mat[, i], decreasing = T), , drop = F]
+        mat = mat[order(mat[, i], decreasing = TRUE), , drop = FALSE]
     }
     hdt = data.table::as.data.table(cbind(mat, row = 1:nrow(mat)))
     hdt = data.table::melt(hdt, id.vars = "row", variable.name = "groups")
 
     if (raster_approximation) {
-        dmat = as.matrix(data.table::dcast(hdt, value.var = "value", formula = rev(row) ~ groups))[, 1 + seq_len(ncol(object)), drop = F]
+        dmat = as.matrix(data.table::dcast(hdt, value.var = "value", formula = rev(row) ~ groups))[, 1 + seq_len(ncol(object)), drop = FALSE]
         low_v = 0.9372549
         dmat = ifelse(dmat > low_v, low_v, dmat)
         if (raster_width_min >= ncol(dmat)) {
@@ -339,7 +339,7 @@ setPlotHeatmap = function(object, raster_approximation = T, raster_width_min = 1
         # dmat = (dmat * -.95 + .95)
         comp_mat = dmat[comp_row, comp_col]
         png::writePNG(comp_mat, target = "tmp.png")
-        png_grob = grid::rasterGrob(png::readPNG("tmp.png"), width = unit(1, "npc"), height = unit(1, "npc"), interpolate = F)
+        png_grob = grid::rasterGrob(png::readPNG("tmp.png"), width = unit(1, "npc"), height = unit(1, "npc"), interpolate = FALSE)
         file.remove("tmp.png")
         p = ggplot(hdt) + geom_tile(aes(x = groups, y = row, fill = NA, col = NULL)) + scale_fill_manual(values = c(`TRUE` = "black",
                                                                                                                     `FALSE` = "#EFEFEF")) + scale_alpha(0) + labs(fill = "binding", y = "", title = "Marks per region clustering") + theme(axis.text.x = element_text(angle = 90,

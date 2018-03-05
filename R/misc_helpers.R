@@ -13,11 +13,11 @@ set_list2memb = function(set_list) {
   }
   rn = unique(unlist(set_list))
   cn = names(set_list)
-  memb = matrix(F, nrow = length(rn), ncol = length(cn))
+  memb = matrix(FALSE, nrow = length(rn), ncol = length(cn))
   rownames(memb) = rn
   colnames(memb) = cn
   for (column in cn) {
-    memb[set_list[[column]], column] = T
+    memb[set_list[[column]], column] = TRUE
   }
   return(memb)
 }

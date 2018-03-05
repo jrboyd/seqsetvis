@@ -5,7 +5,7 @@
 \title{binary heatmap indicating membership.
 heatmap is sorted by column left to right.  change column order to reveal patterns}
 \usage{
-setPlotHeatmap(object, raster_approximation = T, raster_width_min = 1000,
+setPlotHeatmap(object, raster_approximation = TRUE, raster_width_min = 1000,
   raster_height_min = 1000)
 }
 \arguments{

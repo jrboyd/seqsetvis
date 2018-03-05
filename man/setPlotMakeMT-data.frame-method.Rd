@@ -16,6 +16,6 @@ data.frame input, final output
 The final method for most inputs, checks column names
 }
 \examples{
-memb_df = data.frame(a = c(T, T, F, F), b = c(T, F, T, F))
+memb_df = data.frame(a = c(TRUE, TRUE, FALSE, FALSE), b = c(TRUE, FALSE, TRUE, FALSE))
 setPlotMakeMT(memb_df)
 }

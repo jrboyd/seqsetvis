@@ -1,20 +1,20 @@
 library(seqsetvis)
 library(GenomicRanges)
 library(testthat)
-a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1))
-b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1))
-c = GRanges("chr1", IRanges(8:10*10+5, 8:10*10+6))
+gr_a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1))
+gr_b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1))
+gr_c = GRanges("chr1", IRanges(8:10*10+5, 8:10*10+6))
 
 test_that("overlapIntervalSets grs input are valid", {
-  # expect_warning(overlapIntervalSets(list(a, b))) #unnamed list throws warning
-  expect_error(overlapIntervalSets(a))
+  # expect_warning(overlapIntervalSets(list(gr_a, gr_b))) #unnamed list throws warning
+  expect_error(overlapIntervalSets(gr_a))
   expect_error(overlapIntervalSets(1))
-  expect_s4_class(overlapIntervalSets(GRangesList("a" = a, "b" = b)), class = "GRanges")
-  expect_s4_class(overlapIntervalSets(list("a" = a, "b" = b)), class = "GRanges")
+  expect_s4_class(overlapIntervalSets(GRangesList("gr_a" = gr_a, "gr_b" = gr_b)), class = "GRanges")
+  expect_s4_class(overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b)), class = "GRanges")
 })
 
 test_that("setPlotVenn various other paramters don't throw error", {
-  olap = overlapIntervalSets(list("a" = a, "b" = b, "c" = c))
+  olap = overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c))
   p = setPlotVenn(olap, circle_color = c("red", "blue", "green"), fill_alpha = .1,
              counts_txt_size = 10, show_outside_count = T,
              counts_as_labels = T)

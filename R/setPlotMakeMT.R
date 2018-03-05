@@ -64,7 +64,7 @@ setMethod("setPlotMakeMT", signature(object = "DataFrame"), function(object){
 #' matrix input
 #' @param object A matrix, sent to data.frame to handle column naming
 #' @examples
-#' memb_mat =  matrix(c(T, T, F, F, T, F, T, F), ncol = 2, byrow = F)
+#' memb_mat =  matrix(c(TRUE, TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE), ncol = 2, byrow = FALSE)
 #' setPlotMakeMT(memb_mat)
 setMethod("setPlotMakeMT", signature(object = "matrix"), function(object){
   object = as.data.frame(object)
@@ -75,7 +75,7 @@ setMethod("setPlotMakeMT", signature(object = "matrix"), function(object){
 #' The final method for most inputs, checks column names
 #' @param object a data.frame
 #' @examples
-#' memb_df = data.frame(a = c(T, T, F, F), b = c(T, F, T, F))
+#' memb_df = data.frame(a = c(TRUE, TRUE, FALSE, FALSE), b = c(TRUE, FALSE, TRUE, FALSE))
 #' setPlotMakeMT(memb_df)
 setMethod("setPlotMakeMT", signature(object = "data.frame"), function(object){
   if (is.null(colnames(object))) {

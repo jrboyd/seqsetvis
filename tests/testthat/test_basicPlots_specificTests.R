@@ -1,12 +1,12 @@
 library(seqsetvis)
 library(testthat)
 library(GenomicRanges)
-a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1))
-b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1))
-c = GRanges("chr1", IRanges(8:10*10+5, 8:10*10+6))
+gr_a = GRanges("chr1", IRanges(1:7*10, 1:7*10+1))
+gr_b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1))
+gr_c = GRanges("chr1", IRanges(8:10*10+5, 8:10*10+6))
 
 test_that("setPlotVenn various set sizes, no outside counts.", {
-    setL = list("a" = a, "b" = b, "c" = c)
+    setL = list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c)
     p1 = setPlotVenn(setL[1])
     p1
     expect_s3_class(p1, class = "ggplot")
@@ -21,7 +21,7 @@ test_that("setPlotVenn various set sizes, no outside counts.", {
 })
 
 test_that("setPlotVenn various set sizes, with outside counts.", {
-    setL = list("a" = a, "b" = b, "c" = c)
+    setL = list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c)
     p1 = setPlotVenn(setL[1], show_outside_count = T)
     p1
     expect_s3_class(p1, class = "ggplot")
@@ -36,13 +36,13 @@ test_that("setPlotVenn various set sizes, with outside counts.", {
 })
 
 test_that("setPlotVenn can't plot more than 3 sets.", {
-    setL = list("a" = a, "b" = b, "c" = c, "d" = c, "e" = a)
+    setL = list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c, "gr_d" = gr_c, "gr_e" = gr_a)
     expect_error(setPlotVenn(setL[1:4]))
     expect_error(setPlotVenn(setL[1:5]))
 })
 
 test_that("setPlotVenn circle colors", {
-    setL = list("a" = a, "b" = b, "c" = c)
+    setL = list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c)
     p1 = setPlotVenn(setL, circle_color = "blue")
     expect_s3_class(p1, class = "ggplot")
 })

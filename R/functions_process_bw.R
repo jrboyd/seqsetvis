@@ -181,8 +181,8 @@ applySpline = function(dt, x_ = "x", y_ = "y", by_ = "", n = 8, ...) {
 #' @details by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')}, splines
 #' will be calculated individually for each gene in each sample. alternatively if \code{by_ = c('gene_id')}
 centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL,
-                       view_size = NULL, trim_to_valid = T,
-                       check_by_dupes = T, replace_x = T) {
+                       view_size = NULL, trim_to_valid = TRUE,
+                       check_by_dupes = TRUE, replace_x = TRUE) {
     ymax = xsummit = xnew = N = NULL #reserve data.table variables
     if (!data.table::is.data.table(dt)) {
         stop(paste("dt must be of type data.table, was", class(dt)))
@@ -193,10 +193,10 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL,
     if (!any(y_ == colnames(dt))) {
         stop(paste("centerAtMax : y_ (", y_, ") not found in colnames of input data.table"))
     }
-    # check_by_dupes = F
+    # check_by_dupes = FALSE
     if (is.null(by_)) {
         by_ = ""
-        check_by_dupes = T
+        check_by_dupes = TRUE
     }
     if (all(by_ != ""))
         if (!any(by_ %in% colnames(dt))) {
@@ -206,7 +206,7 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL,
         dupe_x_within_by = suppressWarnings(any(dt[, any(duplicated(get(x_))), by = by_]$V1))
         if (dupe_x_within_by)
             message(paste0("centerAtMax : duplicate values of x_ (", x_, ") exist within groups defined with by_ (",
-                           by_, ").\n    If this is the desired functionality, set check_by_dupes <- F to hide future messages. If no by_ grouping is intended set by_ <- \"\" as well."))
+                           by_, ").\n    If this is the desired functionality, set check_by_dupes <- FALSE to hide future messages. If no by_ grouping is intended set by_ <- \"\" as well."))
     }
     dt = data.table::copy(dt)
     if (is.null(view_size)) {

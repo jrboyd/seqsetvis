@@ -5,7 +5,7 @@
 \title{Intersect a list of GRanges to create a single GRanges object of
 merged ranges including metadata describing overlaps per input GRanges}
 \usage{
-overlapIntervalSets(grs, ext = 0, use_first = F)
+overlapIntervalSets(grs, ext = 0, use_first = FALSE)
 }
 \arguments{
 \item{grs}{A list of Granges}

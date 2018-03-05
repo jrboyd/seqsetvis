@@ -17,10 +17,10 @@
 #'
 #' @return ggplot object using ribbon plots to show quantile distributions
 regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
-                                        hsv_reverse = F,
+                                        hsv_reverse = FALSE,
                                         hsv_saturation = 1, hsv_value = 1,
-                                        hsv_grayscale = F,
-                                        hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = F,
+                                        hsv_grayscale = FALSE,
+                                        hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = FALSE,
                                         n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95
 ) {
     variable = value = V1 = low = high = low_q = high_q = q_range = rn = q_num = q_low = q_high = NULL #declare binding for data.table
@@ -28,8 +28,8 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
     q2do = round(quantile_min + q2do * (quantile_max - quantile_min), digits = 3)
 
     if(by_ == "fake"){
-        bw_dt[[by_]] = T
-        todo = T
+        bw_dt[[by_]] = TRUE
+        todo = TRUE
     }else{
         todo = unique(bw_dt[, get(by_)])
     }
@@ -123,7 +123,7 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
                                 value_function = max,
                                 by_ = "id",
                                 plot_type = c("standard", "volcano")[1],
-                                show_help = F, fixed_coords = T){
+                                show_help = FALSE, fixed_coords = TRUE){
     xval = yval = xvolcano = id = yvolcano = NULL #declare binding for data.table
     plot_dt = merge(bw_dt[get(xy_variable) == x_name, .(xval = value_function(get(value_variable))), by = by_],
                     bw_dt[get(xy_variable) == y_name, .(yval = value_function(get(value_variable))), by = by_])
@@ -268,9 +268,9 @@ regionSetPlotHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto"
     do_cluster = perform_clustering == "yes"
     if(perform_clustering == "auto"){
         if(is.factor(bw_dt[[row_]]) & is.numeric(bw_dt[[cluster_]])){
-            do_cluster = F
+            do_cluster = FALSE
         }else{
-            do_cluster = T
+            do_cluster = TRUE
         }
     }
     if(do_cluster){
@@ -359,7 +359,7 @@ clusteringKmeansNestedHclust = function(mat, nclust) {
     mat_dt = clusteringKmeans(mat, nclust)
     mat_dt$within_o = as.integer(-1)
     for (i in 1:length(nclust)) {
-        cmat = mat[mat_dt[group == i, id], , drop = F]
+        cmat = mat[mat_dt[group == i, id], , drop = FALSE]
         if (nrow(cmat) > 2) {
             mat_dt[group == i, ]$within_o = hclust(dist((cmat)))$order
         } else {
