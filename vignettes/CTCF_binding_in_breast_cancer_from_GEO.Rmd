@@ -7,9 +7,9 @@ rmarkdown::html_vignette:
 fig_caption: yes
 vignette: >
 %\VignetteIndexEntry{CTCF binding in breast cancer cell lines: From GEO}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
-  ---
+%\VignetteEngine{knitr::rmarkdown}
+%\VignetteEncoding{UTF-8}
+---
   
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
