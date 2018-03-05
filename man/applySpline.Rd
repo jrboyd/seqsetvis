@@ -4,18 +4,18 @@
 \alias{applySpline}
 \title{applies a spline smoothing to a tidy data.table containing x and y values.}
 \usage{
-applySpline(dt, x_ = "x", y_ = "y", by_ = "", n = 8, ...)
+applySpline(dt, n, x_ = "x", y_ = "y", by_ = "", ...)
 }
 \arguments{
 \item{dt}{a tidy data.table containing two-dimensional data}
+
+\item{n}{the number of interpolation points to use per input point, see \code{?spline}}
 
 \item{x_}{the variable name of the x-values}
 
 \item{y_}{the variable name of the y-values}
 
 \item{by_}{optionally, any variables that provide grouping to the data. default is none. see details.}
-
-\item{n}{the number of interpolation points to use per input point, see \code{?spline}}
 
 \item{...}{additional arguments to pass to \code{\link{spline}}}
 }
@@ -28,6 +28,18 @@ a newly derived data.table that is \code{n} times longer than original.
 \details{
 by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')}, splines
 will be calculated individually for each gene in each sample. alternatively if \code{by_ = c('gene_id')}
+}
+\examples{
+#data may be blockier than we'd like
+ggplot(CTCF_in_10a_profiles_dt[, .(FE = mean(FE)), by = .(sample, x)]) + geom_line(aes(x = x, y = FE, color = sample))
+splined_up = applySpline(CTCF_in_10a_profiles_dt, n = 2, y_ = "FE", by_ = c("id", "sample"))
+#can be smoothed by applying a spline  (think twice about doing so, it may look prettier but may also be deceptive or misleading)
+ggplot(splined_up[, .(FE = mean(FE)), by = .(sample, x)]) + geom_line(aes(x = x, y = FE, color = sample))
+splined_smooth = applySpline(CTCF_in_10a_profiles_dt, n = 10, y_ = "FE", by_ = c("id", "sample"))
+ggplot(splined_smooth[, .(FE = mean(FE)), by = .(sample, x)]) + geom_line(aes(x = x, y = FE, color = sample))
+#another potential use is to down sample
+splined_down = applySpline(CTCF_in_10a_profiles_dt, n = .5, y_ = "FE", by_ = c("id", "sample"))
+ggplot(splined_down[, .(FE = mean(FE)), by = .(sample, x)]) + geom_line(aes(x = x, y = FE, color = sample))
 }
 \seealso{
 \code{\link{fetchWindowedBigwig}}

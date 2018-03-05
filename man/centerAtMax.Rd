@@ -37,3 +37,11 @@ if FALSE x_ will be preserved and x_summitPosition added.}
 by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')}, splines
 will be calculated individually for each gene in each sample. alternatively if \code{by_ = c('gene_id')}
 }
+\examples{
+centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE")
+centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE", by_ = "id", check_by_dupes = FALSE)
+#it's a bit clearer what's happening with trimming disabled
+centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE", by_ = "id", check_by_dupes = FALSE, trim_to_valid = FALSE)
+#specify view_size to limit range of x values considered, prevents excessive data trimming.
+centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE", view_size = 100, by_ = "id")
+}

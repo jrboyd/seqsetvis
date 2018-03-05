@@ -124,17 +124,28 @@ fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files), bw
 #' \code{applySpline} Is intended for two-dimensional tidy data.tables, as retured by \code{fetchWindowedBigwig}
 #'
 #' @param dt a tidy data.table containing two-dimensional data
+#' @param n the number of interpolation points to use per input point, see \code{?spline}
 #' @param x_ the variable name of the x-values
 #' @param y_ the variable name of the y-values
 #' @param by_ optionally, any variables that provide grouping to the data. default is none. see details.
-#' @param n the number of interpolation points to use per input point, see \code{?spline}
 #' @param ... additional arguments to pass to \code{\link{spline}}
 #' @return a newly derived data.table that is \code{n} times longer than original.
 #'
 #' @details by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')}, splines
 #' will be calculated individually for each gene in each sample. alternatively if \code{by_ = c('gene_id')}
 #' @seealso \code{\link{fetchWindowedBigwig}}
-applySpline = function(dt, x_ = "x", y_ = "y", by_ = "", n = 8, ...) {
+#' @examples
+#' #data may be blockier than we'd like
+#' ggplot(CTCF_in_10a_profiles_dt[, .(FE = mean(FE)), by = .(sample, x)]) + geom_line(aes(x = x, y = FE, color = sample))
+#' splined_up = applySpline(CTCF_in_10a_profiles_dt, n = 2, y_ = "FE", by_ = c("id", "sample"))
+#' #can be smoothed by applying a spline  (think twice about doing so, it may look prettier but may also be deceptive or misleading)
+#' ggplot(splined_up[, .(FE = mean(FE)), by = .(sample, x)]) + geom_line(aes(x = x, y = FE, color = sample))
+#' splined_smooth = applySpline(CTCF_in_10a_profiles_dt, n = 10, y_ = "FE", by_ = c("id", "sample"))
+#' ggplot(splined_smooth[, .(FE = mean(FE)), by = .(sample, x)]) + geom_line(aes(x = x, y = FE, color = sample))
+#' #another potential use is to down sample
+#' splined_down = applySpline(CTCF_in_10a_profiles_dt, n = .5, y_ = "FE", by_ = c("id", "sample"))
+#' ggplot(splined_down[, .(FE = mean(FE)), by = .(sample, x)]) + geom_line(aes(x = x, y = FE, color = sample))
+applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
     if (!data.table::is.data.table(dt)) {
         stop(paste("dt must be of type data.table, was", class(dt)))
     }
@@ -154,7 +165,7 @@ applySpline = function(dt, x_ = "x", y_ = "y", by_ = "", n = 8, ...) {
         warning(paste0("applySpline : Duplicate values of x_ (", x_, ") exist within groups defined with by_ (", by_, ").\n
                                       This Results in splines through the means of yvalues at duplicated xs."))
 
-    sdt = dt[, spline(get(x_), get(y_), n = .N * n, ...), by = by_]
+    sdt = dt[, spline(get(x_), get(y_), n = floor(.N * n), ...), by = by_]
     colnames(sdt)[colnames(sdt) == "x"] = x_
     colnames(sdt)[colnames(sdt) == "y"] = y_
     return(sdt)
@@ -180,6 +191,13 @@ applySpline = function(dt, x_ = "x", y_ = "y", by_ = "", n = 8, ...) {
 #' if this is not the case and you want to disable warnings about set this to FALSE.
 #' @details by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')}, splines
 #' will be calculated individually for each gene in each sample. alternatively if \code{by_ = c('gene_id')}
+#' @examples
+#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE")
+#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE", by_ = "id", check_by_dupes = FALSE)
+#' #it's a bit clearer what's happening with trimming disabled
+#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE", by_ = "id", check_by_dupes = FALSE, trim_to_valid = FALSE)
+#' #specify view_size to limit range of x values considered, prevents excessive data trimming.
+#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE", view_size = 100, by_ = "id")
 centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL,
                        view_size = NULL, trim_to_valid = TRUE,
                        check_by_dupes = TRUE, replace_x = TRUE) {
