@@ -138,15 +138,15 @@ bw_files = sapply(names(np_files), function(x){
 
 ### Fetch profiles
 ```{r}
-# bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize, win_size = 100)
+bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize, win_size = 100)
 ```
 [bw load](#bw_load)
 
 ```{r, fig.width=16, fig.height=4}
-# p1 = regionSetPlotBandedQuantiles(bw_dt, hsv_symmetric = T, hsv_reverse = T, hsv_grayscale = T)
-# p2 = regionSetPlotScatter(bw_dt, x_name = "MCF10A", y_name = "MCF10AT1")
-# p3 = regionSetPlotHeatmap(bw_dt)
-# cowplot::plot_grid(p1, p2, p3, nrow = 1)
+p1 = regionSetPlotBandedQuantiles(bw_dt, hsv_symmetric = T, hsv_reverse = T, hsv_grayscale = T)
+p2 = regionSetPlotScatter(bw_dt, x_name = "MCF10A", y_name = "MCF10AT1")
+p3 = regionSetPlotHeatmap(bw_dt)
+cowplot::plot_grid(p1, p2, p3, nrow = 1)
 ```
 
 ### Retrieve narrowPeak data by url {#np_load}
