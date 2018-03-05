@@ -31,30 +31,31 @@ setMethod("setPlotMakeMT", signature(object = "list"), function(object){
   return(object)
 })
 
-#' @import GRangesList
-# setOldClass("GRangesList")
-
 #' GRangesList input
+#' setOldClass("GRangesList")
 #' @param object a list of GRanges, sent to overlapIntervalSets
+#' @import GRangesList
 setMethod("setPlotMakeMT", signature(object = "GRangesList"), function(object){
   setPlotMakeMT(overlapIntervalSets(object))
 })
 
-#' @import GRanges
-# setOldClass("GRanges")
+
 
 #' mcols from GRange input
+#' setOldClass("GRanges")
 #' @param object A single GRanges, will use logical metadata columns
+#' @import GRanges
 setMethod("setPlotMakeMT", signature(object = "GRanges"), function(object){
   object = mcols(object)
   setPlotMakeMT(object)
 })
 
-#' @import DataFrame
-# setOldClass("DataFrame")
+
 
 #' DataFrame input
+#' setOldClass("DataFrame")
 #' @param object A single DataFrame (typically from GRanges metadata), will use logical columns
+#' @import DataFrame
 setMethod("setPlotMakeMT", signature(object = "DataFrame"), function(object){
   object = as.data.frame(object)
   setPlotMakeMT(object)
@@ -62,6 +63,9 @@ setMethod("setPlotMakeMT", signature(object = "DataFrame"), function(object){
 
 #' matrix input
 #' @param object A matrix, sent to data.frame to handle column naming
+#' @examples
+#' memb_mat =  matrix(c(T, T, F, F, T, F, T, F), ncol = 2, byrow = F)
+#' setPlotMakeMT(memb_mat)
 setMethod("setPlotMakeMT", signature(object = "matrix"), function(object){
   object = as.data.frame(object)
   setPlotMakeMT(object)
@@ -70,6 +74,9 @@ setMethod("setPlotMakeMT", signature(object = "matrix"), function(object){
 #' data.frame input, final output
 #' The final method for most inputs, checks column names
 #' @param object a data.frame
+#' @examples
+#' memb_df = data.frame(a = c(T, T, F, F), b = c(T, F, T, F))
+#' setPlotMakeMT(memb_df)
 setMethod("setPlotMakeMT", signature(object = "data.frame"), function(object){
   if (is.null(colnames(object))) {
     colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])

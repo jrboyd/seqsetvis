@@ -3,7 +3,8 @@
 \docType{methods}
 \name{setPlotMakeMT,GRangesList-method}
 \alias{setPlotMakeMT,GRangesList-method}
-\title{GRangesList input}
+\title{GRangesList input
+setOldClass("GRangesList")}
 \usage{
 \S4method{setPlotMakeMT}{GRangesList}(object)
 }
@@ -12,4 +13,5 @@
 }
 \description{
 GRangesList input
+setOldClass("GRangesList")
 }

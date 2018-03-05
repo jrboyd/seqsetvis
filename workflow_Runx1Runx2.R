@@ -68,7 +68,8 @@ qgr = sample(fixed_overlap, length(fixed_overlap) * sample_rate)
 ### fetch profile data from bigwigs for all sites
 bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = qgr, win_size =  50, bw_variable_name = "sample")
 
-cdt = centerAtMax(bw_dt, view_size = 28000, y_ = "FE", by_ = c("id"), check_by_dupes = F, trim_to_valid = T)
+cdt = centerAtMax(bw_dt, view_size = 28000, y_ = "FE", by_ = c("id"),
+                  check_by_dupes = F, trim_to_valid = T)
 cdt[, zscore := (FE - mean(FE)) / sd(FE), by = sample]
 
 ggplot(cdt[id %in% c("5588", "4619", "7828", "2447")], mapping = aes(x = x, y = FE, color = sample)) +

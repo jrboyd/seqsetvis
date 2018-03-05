@@ -3,7 +3,8 @@
 \docType{methods}
 \name{setPlotMakeMT,GRanges-method}
 \alias{setPlotMakeMT,GRanges-method}
-\title{mcols from GRange input}
+\title{mcols from GRange input
+setOldClass("GRanges")}
 \usage{
 \S4method{setPlotMakeMT}{GRanges}(object)
 }
@@ -12,4 +13,5 @@
 }
 \description{
 mcols from GRange input
+setOldClass("GRanges")
 }

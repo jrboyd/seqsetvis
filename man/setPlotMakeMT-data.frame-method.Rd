@@ -15,3 +15,7 @@ The final method for most inputs, checks column names}
 data.frame input, final output
 The final method for most inputs, checks column names
 }
+\examples{
+memb_df = data.frame(a = c(T, T, F, F), b = c(T, F, T, F))
+setPlotMakeMT(memb_df)
+}

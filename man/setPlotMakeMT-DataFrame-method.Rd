@@ -3,7 +3,8 @@
 \docType{methods}
 \name{setPlotMakeMT,DataFrame-method}
 \alias{setPlotMakeMT,DataFrame-method}
-\title{DataFrame input}
+\title{DataFrame input
+setOldClass("DataFrame")}
 \usage{
 \S4method{setPlotMakeMT}{DataFrame}(object)
 }
@@ -12,4 +13,5 @@
 }
 \description{
 DataFrame input
+setOldClass("DataFrame")
 }

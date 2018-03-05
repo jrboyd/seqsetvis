@@ -13,3 +13,7 @@
 \description{
 matrix input
 }
+\examples{
+memb_mat =  matrix(c(T, T, F, F, T, F, T, F), ncol = 2, byrow = F)
+setPlotMakeMT(memb_mat)
+}
