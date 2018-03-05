@@ -239,6 +239,7 @@ setPlotPie = function(object) {
         geom_bar(width = 1, stat = "identity") +
         guides(x = "none") +
         theme(axis.text.x = element_blank(),
+              axis.line = element_blank(),
               panel.background = element_blank(),
               axis.ticks = element_blank()) +
         coord_polar("y", start = 0) +
