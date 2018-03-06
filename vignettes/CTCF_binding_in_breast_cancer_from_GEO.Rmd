@@ -121,7 +121,7 @@ p3 = setPlotHeatmap(olaps) +
     theme(axis.text.x = element_text(size = 8)) + 
     labs(title = "")
 cowplot::ggdraw() +
-    draw_plot(p1 + theme(legend.justification = "bottom"), 0, 0, .47, 1) +
+    draw_plot(p1 + theme(legend.justification = "center"), 0, 0, .47, 1) +
     draw_plot(p2, 0.43, 0, 0.3, 1) +
     draw_plot(p3, 0.75, 0, .25, 1) +
     draw_plot_label(c("CTCF binding in breast cancer cell lines", "A", "B", "C"),
