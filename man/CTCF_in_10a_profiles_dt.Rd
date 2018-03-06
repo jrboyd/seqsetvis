@@ -5,9 +5,6 @@
 \alias{CTCF_in_10a_profiles_dt}
 \title{100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq}
 \format{A data frame with 53940 rows and 10 variables}
-\usage{
-data(CTCF_in_10a_profiles_dt)
-}
 \description{
 A tidy data.table at window size 100 bp within 300 bp of peak center
  The variables are as follows:

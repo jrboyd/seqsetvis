@@ -5,9 +5,6 @@
 \alias{CTCF_in_10a_bigWig_urls}
 \title{FTP URL path for vignette data.}
 \format{named character vector of length 3}
-\usage{
-data(CTCF_in_10a_bigWig_urls)
-}
 \description{
 FE bigWig tracks for CTCF ChIP-seq in a MCF10A progression model.
 See GEO series GSE98551 for details.

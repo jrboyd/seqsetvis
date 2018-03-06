@@ -14,6 +14,9 @@ regionSetPlotHeatmap(bw_dt, nclust = 6, perform_clustering = c("auto",
 
 \item{nclust}{number of clusters}
 
+\item{perform_clustering}{should clustering be done? default is auto.
+auto considers if row_ has been ordered by being a factor and if cluster_ is a numeric.}
+
 \item{row_}{variable name mapped to row, likely peak id or gene name for ngs data}
 
 \item{column_}{varaible mapped to column, likely bp position for ngs data}
