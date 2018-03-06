@@ -263,7 +263,7 @@ setPlotPie = function(object) {
 #' @return ggplot of venneuler results
 #' @import eulerr
 setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1], n = 200) {
-    x = y = r = NULL#declare binding for data.table
+    x = y = group = NULL#declare binding for data.table
     object = setPlotMakeMT(object)
     cn = colnames(object)
     eu = eulerr::euler(object, shape = shape)
