@@ -2,7 +2,8 @@
 % Please edit documentation in R/functions_process_bw.R
 \name{centerAtMax}
 \alias{centerAtMax}
-\title{centers profile of x and y.  default is to center by region but across all samples.}
+\title{centers profile of x and y.  default is to center by region but across all
+samples.}
 \usage{
 centerAtMax(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL,
   trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE)
@@ -14,34 +15,45 @@ centerAtMax(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL,
 
 \item{y_}{the variable name of the y-values default is 'y'}
 
-\item{by_}{optionally, any variables that provide grouping to the data. default is none.  see details.}
+\item{by_}{optionally, any variables that provide grouping to the data.
+default is none.  see details.}
 
-\item{view_size}{the size in \code{x_} to consider for finding the max of \code{y_}.
+\item{view_size}{the size in \code{x_} to consider for finding the max
+of \code{y_}.
 if length(view_size) == 1, range will be c(-view_size, view_size).
 if length(view_size) > 1, range will be range(view_size).
 default value of NULL uses complete range of x.}
 
-\item{trim_to_valid}{valid \code{x_} values are those with a set \code{y_} value in all \code{by_} combinations}
+\item{trim_to_valid}{valid \code{x_} values are those with a set \code{y_}
+value in all \code{by_} combinations}
 
-\item{check_by_dupes}{default assumption is that there should be on set of x_ for a by_ instance.
-if this is not the case and you want to disable warnings about set this to FALSE.}
+\item{check_by_dupes}{default assumption is that there should be on set of
+x_ for a by_ instance.
+if this is not the case and you want to disable warnings about set this
+to FALSE.}
 
 \item{replace_x}{logical, default TRUE.
 if TRUE x_ will be replaced with position relative to summit.
 if FALSE x_ will be preserved and x_summitPosition added.}
 }
 \description{
-\code{centerAtMax} locates the coordinate x of the maximum in y and shifts x such that it is zero at max y.
+\code{centerAtMax} locates the coordinate x of the maximum in y and shifts x
+such that it is zero at max y.
 }
 \details{
-by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')}, splines
-will be calculated individually for each gene in each sample. alternatively if \code{by_ = c('gene_id')}
+by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')},
+splines
+will be calculated individually for each gene in each sample. alternatively
+if \code{by_ = c('gene_id')}
 }
 \examples{
-centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE")
-centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE", by_ = "id", check_by_dupes = FALSE)
+centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE')
+centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE', by_ = 'id',
+  check_by_dupes = FALSE)
 #it's a bit clearer what's happening with trimming disabled
-centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE", by_ = "id", check_by_dupes = FALSE, trim_to_valid = FALSE)
-#specify view_size to limit range of x values considered, prevents excessive data trimming.
-centerAtMax(CTCF_in_10a_profiles_dt, y_ = "FE", view_size = 100, by_ = "id")
+centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE', by_ = 'id',
+  check_by_dupes = FALSE, trim_to_valid = FALSE)
+#specify view_size to limit range of x values considered, prevents
+xcessive data trimming.
+centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE', view_size = 100, by_ = 'id')
 }

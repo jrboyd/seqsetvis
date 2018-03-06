@@ -204,6 +204,7 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
 #' @param nclust number of clusters
 #' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
 #' @param column_ varaible mapped to column, likely bp position for ngs data
+#' @param cluster_ variable name to use for cluster info
 #' @param fill_ numeric variable to map to fill
 #' @param facet_ variable name to facet horizontally by
 #' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
@@ -249,6 +250,8 @@ regionSetCluster = function(bw_dt, nclust = 6,
 #'
 #' @param bw_dt data.table of signals
 #' @param nclust number of clusters
+#' @param perform_clustering should clustering be done? default is auto.
+#' auto considers if row_ has been ordered by being a factor and if cluster_ is a numeric.
 #' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
 #' @param column_ varaible mapped to column, likely bp position for ngs data
 #' @param fill_ numeric variable to map to fill

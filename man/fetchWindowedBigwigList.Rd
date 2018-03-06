@@ -18,7 +18,7 @@ interval should be identical and evenly divisible by \code{win_size}.}
 \item{bw_names}{names to use in final data.table to designate source bigwig}
 
 \item{bw_variable_name}{The column name where bw_names are stored.
-Default is "sample"}
+Default is 'sample'}
 
 \item{win_size}{The window size that evenly divides widths in \code{qgr}.}
 }

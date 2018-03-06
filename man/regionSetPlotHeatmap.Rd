@@ -22,6 +22,8 @@ regionSetPlotHeatmap(bw_dt, nclust = 6, perform_clustering = c("auto",
 
 \item{facet_}{variable name to facet horizontally by}
 
+\item{cluster_}{variable name to use for cluster info}
+
 \item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot full data}
 
 \item{max_cols}{for speed columns are sampled to 100 by default, use Inf to plot full data}
