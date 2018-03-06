@@ -4,7 +4,9 @@ language: R
 r: bioc-devel
 
 sudo: false
-cache: packages
+cache:
+  - packages
+  - apt
 
 before_install:
   - sudo add-apt-repository ppa:ubuntugis/ubuntugis-unstable --yes
