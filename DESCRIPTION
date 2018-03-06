@@ -16,9 +16,9 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: testthat, covr, knitr, rmarkdown, cowplot
-Depends: ggplot2, R (>= 2.1.0)
+Depends: R (>= 3.3.0), ggplot2
 Imports: methods, GenomicRanges, IRanges, data.table, rtracklayer,
-        limma, assertthat, venneuler, ggforce, RColorBrewer, magrittr,
+        limma, assertthat, eulerr, ggforce, RColorBrewer, magrittr,
         png
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr

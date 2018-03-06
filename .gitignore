@@ -11,3 +11,5 @@ test_chrSizes.txt
 *.xlsx
 *.csv
 inst/doc
+tmp*.R
+tmp_euler_compare.R

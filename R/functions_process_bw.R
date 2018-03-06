@@ -213,15 +213,15 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
 #' will be calculated individually for each gene in each sample. alternatively
 #' if \code{by_ = c('gene_id')}
 #' @examples
-#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE')
 #' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE', by_ = 'id',
 #'   check_by_dupes = FALSE)
 #' #it's a bit clearer what's happening with trimming disabled
 #' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE', by_ = 'id',
 #'   check_by_dupes = FALSE, trim_to_valid = FALSE)
 #' #specify view_size to limit range of x values considered, prevents
-#' xcessive data trimming.
-#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE', view_size = 100, by_ = 'id')
+#' #excessive data trimming.
+#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE', view_size = 100, by_ = 'id',
+#' check_by_dupes = FALSE)
 centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE) {
     ymax = xsummit = xnew = N = NULL  #reserve data.table variables
     if (!data.table::is.data.table(dt)) {

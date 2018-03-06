@@ -251,48 +251,60 @@ setPlotPie = function(object) {
     return(p)
 }
 
+
+
 # from https://gist.github.com/trinker/31edc08d0a4ec4c73935a23040c2f6cb p_load(dplyr, venneuler, ggforce, textshape)
 #' Try to load a bed-like file and convert it to a GRanges object
 #'
 #' @param object A membership table
 #' @param line_width numeric, passed to size aesthetic to control line width
-#'
+#' @param shape shape argument passed to eulerr::euler
+#' @param n number of points to use for drawing ellipses, passed to  eulerr:::ellipse
 #' @return ggplot of venneuler results
-#' @import venneuler
-setPlotEuler = function(object, line_width = 2) {
+#' @import eulerr
+setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1], n = 200) {
     x = y = r = NULL#declare binding for data.table
     object = setPlotMakeMT(object)
     cn = colnames(object)
-    todo = expand.grid(lapply(1:ncol(object), function(x) 0:1))
-    grp_names = apply(todo, 1, function(x) {
-        x = as.logical(x)
-        nam = paste(cn[x], collapse = "&")
-        nam
-    })
-    grp_counts = apply(todo, 1, function(x) {
-        x = as.logical(x)
-        count = sum(apply(object, 1, function(y) {
-            all(x == y)
-        }))
-        count
-    })
-    names(grp_counts) = grp_names
+    eu = eulerr::euler(object, shape = shape)
+    dd = eu$ellipses
 
-    eul = list(placeholder = grp_counts[-1])
+    h <- dd$h
+    k <- dd$k
+    a <- dd$a
+    b <- dd$b
+    phi <- dd$phi
+    # internal function from eulerr
+    eulerr_ellipse = function (h, k, a, b = a, phi = 0, n = 200L) {
+        theta <- seq.int(0, 2 * pi, length.out = n)
+        m <- length(h)
+        out <- vector("list", m)
+        for (i in seq_along(h)) {
+            out[[i]]$x <- h[i] + a[i] * cos(theta) * cos(phi[i]) -
+                b[i] * sin(theta) * sin(phi[i])
+            out[[i]]$y <- k[i] + b[i] * sin(theta) * cos(phi[i]) +
+                a[i] * cos(theta) * sin(phi[i])
+        }
+        out
+    }
 
-    ve = venneuler::venneuler(grp_counts[-1])
-    df = data.frame(ve$centers, diameters = ve$diameters, labels = ve$labels, stringsAsFactors = FALSE)
-    df$r = df$diameters/2
-    col_scale = RColorBrewer::brewer.pal(nrow(df), "Dark2")
-    blank = rep(NA, length(df$labels))
+    e <- eulerr_ellipse(h, k, a, b, phi, n)
+    names(e) = colnames(object)
+    ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x, y = ell$y))
+    ell_dt = data.table::rbindlist(ell_dt, use.names = T, idcol = "group")
+    ggplot(ell_dt) + geom_polygon(aes(x = x, y = y, fill = group), alpha = .3) + theme_void()
+
+
+    col_scale = RColorBrewer::brewer.pal(ncol(object), "Dark2")
+    blank = rep(NA, length(ell_dt$labels))
 
     add_fill = TRUE
     if (add_fill) {
-        p = ggplot(df, aes(x0 = x, y0 = y, r = r, fill = labels, col = labels, size = 2, alpha = 0.08))
+        p = ggplot(ell_dt, aes(x = x, y = y, fill = group, col = group, size = 2, alpha = 0.08))
     } else {
-        p = ggplot(df, aes(x0 = x, y0 = y, r = r, col = labels, size = 2))
+        p = ggplot(ell_dt, aes(x = x, y = y, col = group, size = 2))
     }
-    p = p + ggforce::geom_circle() + labs(fill = "", color = "") + scale_size_identity() + scale_shape_identity() + scale_alpha_identity() +
+    p = p + geom_polygon() + labs(fill = "", color = "") + scale_size_identity() + scale_shape_identity() + scale_alpha_identity() +
         scale_fill_manual(values = col_scale) + scale_color_manual(values = col_scale) + theme_minimal() + theme(plot.background = element_blank(),
                                                                                                                  axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank(), legend.position = "top") +
         guides(fill = guide_legend(override.aes = list(shape = 21))) + coord_fixed()  #+

@@ -4,12 +4,17 @@
 \alias{setPlotEuler}
 \title{Try to load a bed-like file and convert it to a GRanges object}
 \usage{
-setPlotEuler(object, line_width = 2)
+setPlotEuler(object, line_width = 2, shape = c("circle", "ellipse")[1],
+  n = 200)
 }
 \arguments{
 \item{object}{A membership table}
 
 \item{line_width}{numeric, passed to size aesthetic to control line width}
+
+\item{shape}{shape argument passed to eulerr::euler}
+
+\item{n}{number of points to use for drawing ellipses, passed to  eulerr:::ellipse}
 }
 \value{
 ggplot of venneuler results
