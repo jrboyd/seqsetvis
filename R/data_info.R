@@ -16,7 +16,6 @@
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_profiles_dt
-#' @usage data(CTCF_in_10a_profiles_dt)
 #' @format A data frame with 53940 rows and 10 variables
 NULL
 
@@ -28,7 +27,6 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_bigWig_urls
-#' @usage data(CTCF_in_10a_bigWig_urls)
 #' @format named character vector of length 3
 NULL
 
@@ -40,7 +38,6 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_narrowPeak_urls
-#' @usage data(CTCF_in_10a_narrowPeak_urls)
 #' @format named character vector of length 3
 NULL
 
