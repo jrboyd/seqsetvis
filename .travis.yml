@@ -21,6 +21,8 @@ r_packages:
 
 after_success:
   - Rscript -e 'library(covr); codecov()'
+  - Rscript -e 'sessionInfo()'
 
 after_failure:
   - ./travis-tool.sh dump_logs
+  - Rscript -e 'sessionInfo()'
