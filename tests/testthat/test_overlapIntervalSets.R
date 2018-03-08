@@ -13,9 +13,9 @@ test_that("overlapIntervalSets grs input are valid. single numeric fails.", {
     expect_error(overlapIntervalSets(1))
 })
 
-test_that("overlapIntervalSets grs input are valid. GRangesList OK.", {
-    expect_s4_class(overlapIntervalSets(GRangesList("gr_a" = gr_a, "gr_b" = gr_b)), class = "GRanges")
-})
+# test_that("overlapIntervalSets grs input are valid. GRangesList OK.", {
+#     expect_s4_class(overlapIntervalSets(GRangesList("gr_a" = gr_a, "gr_b" = gr_b)), class = "GRanges")
+# })
 
 test_that("overlapIntervalSets grs input are valid. List of Granges OK.", {
     expect_s4_class(overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b)), class = "GRanges")

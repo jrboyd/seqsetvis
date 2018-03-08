@@ -58,26 +58,26 @@ test_that("setPlotMakeMT unnamed data.frame", {
   expect_equal(rownames(mt), rownames(expected_table))
   expect_equal(colnames(mt), colnames(expected_table))
 })
-
-test_that("setPlotMakeMT unnamed list of GRanges", {
-  sets_gr_list = list(gr_a, gr_b, gr_c)
-
-  suppressMessages({mt = setPlotMakeMT(sets_gr_list)})
-  expect_is(mt, "matrix")
-  expect_equal(as.logical(mt), as.logical(expected_table))
-  expect_equal(rownames(mt), rownames(expected_table))
-  expect_equal(colnames(mt), colnames(expected_table))
-})
-
-test_that("setPlotMakeMT NAMED list of GRanges", {
-    sets_gr_list = list("named_set_A" = gr_a, "named_set_B" = gr_b, "named_set_C" = gr_c)
-
-    suppressMessages({mt = setPlotMakeMT(sets_gr_list)})
-    expect_is(mt, "matrix")
-    expect_equal(as.logical(mt), as.logical(expected_table_named))
-    expect_equal(rownames(mt), rownames(expected_table_named))
-    expect_equal(colnames(mt), colnames(expected_table_named))
-})
+#
+# test_that("setPlotMakeMT unnamed list of GRanges", {
+#   sets_gr_list = list(gr_a, gr_b, gr_c)
+#
+#   suppressMessages({mt = setPlotMakeMT(sets_gr_list)})
+#   expect_is(mt, "matrix")
+#   expect_equal(as.logical(mt), as.logical(expected_table))
+#   expect_equal(rownames(mt), rownames(expected_table))
+#   expect_equal(colnames(mt), colnames(expected_table))
+# })
+#
+# test_that("setPlotMakeMT NAMED list of GRanges", {
+#     sets_gr_list = list("named_set_A" = gr_a, "named_set_B" = gr_b, "named_set_C" = gr_c)
+#
+#     suppressMessages({mt = setPlotMakeMT(sets_gr_list)})
+#     expect_is(mt, "matrix")
+#     expect_equal(as.logical(mt), as.logical(expected_table_named))
+#     expect_equal(rownames(mt), rownames(expected_table_named))
+#     expect_equal(colnames(mt), colnames(expected_table_named))
+# })
 
 #
 # sets_list = list(set_a, set_b, set_c)
