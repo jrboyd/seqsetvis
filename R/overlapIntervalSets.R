@@ -18,7 +18,7 @@ overlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
   if(class(grs) == "GRangesList"){
     grs = as.list(grs)
   }
-  assertthat::assert_that(is.list(grs))
+  # assertthat::assert_that(is.list(grs))
   if(is.null(names(grs))){
     # warning("no names set for input grs, assigning arbitrary names.")
     names(grs) = paste0("set_", LETTERS[seq_along(grs)])
