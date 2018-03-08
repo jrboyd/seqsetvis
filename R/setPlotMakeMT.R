@@ -8,12 +8,16 @@ setGeneric("setPlotMakeMT", function(object){
 })
 
 
-
-
-
 #' list of character vectors input
 #' @param object a list of items that are valid for as.character
 #' A list of GRanges are a special case and will be handled as a GRangesList
+#' @import GenomicRanges
+#' @examples
+#' char_list = list(letters[1:3], letters[2:4])
+#' setPlotMakeMT(char_list)
+#' library(GenomicRanges)
+#' gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)), GRanges("chr1", IRanges(2:4*2, 2:4*2)))
+#' setPlotMakeMT(gr_list)
 setMethod("setPlotMakeMT", signature(object = "list"), function(object){
     if (all(sapply(object, class) == "GRanges")) {#GRanges are a special case
         # print("handling list of GRanges like GRangeList.")
@@ -35,7 +39,7 @@ setMethod("setPlotMakeMT", signature(object = "list"), function(object){
 #' GRangesList input
 #' setOldClass("GRangesList")
 #' @param object a list of GRanges, sent to overlapIntervalSets
-#' @import GRangesList
+#' @import GenomicRanges
 setMethod("setPlotMakeMT", signature(object = "GRangesList"), function(object){
     GRlist_object = object
     setPlotMakeMT(overlapIntervalSets(GRlist_object))
@@ -46,7 +50,7 @@ setMethod("setPlotMakeMT", signature(object = "GRangesList"), function(object){
 #' mcols from GRange input
 #' setOldClass("GRanges")
 #' @param object A single GRanges, will use logical metadata columns
-#' @import GRanges
+#' @import GenomicRanges
 setMethod("setPlotMakeMT", signature(object = "GRanges"), function(object){
     gr_object = object
     mc_object = mcols(gr_object)
@@ -58,7 +62,7 @@ setMethod("setPlotMakeMT", signature(object = "GRanges"), function(object){
 #' DataFrame input
 #' setOldClass("DataFrame")
 #' @param object A single DataFrame (typically from GRanges metadata), will use logical columns
-#' @import DataFrame
+#' @import GenomicRanges
 setMethod("setPlotMakeMT", signature(object = "DataFrame"), function(object){
     DF_object = object
     df_object = as.data.frame(DF_object)
