@@ -2,6 +2,8 @@
 #' membership of items (rows) in sets (columns)
 #'
 #' @param object the object to convert
+#' @rdname setPlotMakeMT-methods
+#' @exportMethod setPlotMakeMT
 #' @return a logical matrix indicating membership of items (rows) in sets (columns)
 setGeneric("setPlotMakeMT", function(object){
     standardGeneric("setPlotMakeMT")
@@ -11,6 +13,8 @@ setGeneric("setPlotMakeMT", function(object){
 #' list of character vectors input
 #' @param object a list of items that are valid for as.character
 #' A list of GRanges are a special case and will be handled as a GRangesList
+#' @rdname setPlotMakeMT-methods
+#' @aliases setPlotMakeMT,list-method
 #' @import GenomicRanges
 #' @examples
 #' char_list = list(letters[1:3], letters[2:4])
@@ -39,7 +43,13 @@ setMethod("setPlotMakeMT", signature(object = "list"), function(object){
 #' GRangesList input
 #' setOldClass("GRangesList")
 #' @param object a list of GRanges, sent to overlapIntervalSets
+#' @rdname setPlotMakeMT-methods
+#' @aliases setPlotMakeMT,GRangesList-method
 #' @import GenomicRanges
+#' @examples
+#' library(GenomicRanges)
+#' gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)), GRanges("chr1", IRanges(2:4*2, 2:4*2)))
+#' setPlotMakeMT(GRangesList(gr_list))
 setMethod("setPlotMakeMT", signature(object = "GRangesList"), function(object){
     GRlist_object = object
     setPlotMakeMT(overlapIntervalSets(GRlist_object))
@@ -50,7 +60,14 @@ setMethod("setPlotMakeMT", signature(object = "GRangesList"), function(object){
 #' mcols from GRange input
 #' setOldClass("GRanges")
 #' @param object A single GRanges, will use logical metadata columns
+#' @rdname setPlotMakeMT-methods
+#' @aliases setPlotMakeMT,GRanges-method
 #' @import GenomicRanges
+#' @examples
+#' gr = GRanges("chr1", IRanges(1:3*2, 1:3*2))
+#' gr$set_a = c(TRUE, TRUE, FALSE)
+#' gr$set_b = c(FALSE, TRUE, TRUE)
+#' setPlotMakeMT(gr)
 setMethod("setPlotMakeMT", signature(object = "GRanges"), function(object){
     gr_object = object
     mc_object = mcols(gr_object)
@@ -62,7 +79,14 @@ setMethod("setPlotMakeMT", signature(object = "GRanges"), function(object){
 #' DataFrame input
 #' setOldClass("DataFrame")
 #' @param object A single DataFrame (typically from GRanges metadata), will use logical columns
+#' @rdname setPlotMakeMT-methods
+#' @aliases setPlotMakeMT,DataFrame-method
 #' @import GenomicRanges
+#' @examples
+#' gr = GRanges("chr1", IRanges(1:3*2, 1:3*2))
+#' gr$set_a = c(TRUE, TRUE, FALSE)
+#' gr$set_b = c(FALSE, TRUE, TRUE)
+#' setPlotMakeMT(mcols(gr))
 setMethod("setPlotMakeMT", signature(object = "DataFrame"), function(object){
     DF_object = object
     df_object = as.data.frame(DF_object)
@@ -71,6 +95,8 @@ setMethod("setPlotMakeMT", signature(object = "DataFrame"), function(object){
 
 #' matrix input
 #' @param object A matrix, sent to data.frame to handle column naming
+#' @rdname setPlotMakeMT-methods
+#' @aliases setPlotMakeMT,matrix-method
 #' @examples
 #' memb_mat =  matrix(c(TRUE, TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE), ncol = 2, byrow = FALSE)
 #' setPlotMakeMT(memb_mat)
@@ -83,6 +109,8 @@ setMethod("setPlotMakeMT", signature(object = "matrix"), function(object){
 #' data.frame input, final output
 #' The final method for most inputs, checks column names
 #' @param object a data.frame
+#' @rdname setPlotMakeMT-methods
+#' @aliases setPlotMakeMT,data.frame-method
 #' @examples
 #' memb_df = data.frame(a = c(TRUE, TRUE, FALSE, FALSE), b = c(TRUE, FALSE, TRUE, FALSE))
 #' setPlotMakeMT(memb_df)
