@@ -1,5 +1,5 @@
-exportPattern("^regionSetPlotBanded")
-exportPattern("^setPlotBanded")
+exportPattern("^regionSetPlot")
+exportPattern("^setPlot")
 exportPattern("^fetch")
 export("centerFixedSizeGRanges")
 export("centerAtMax")
