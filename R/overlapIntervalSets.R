@@ -4,15 +4,17 @@ utils::globalVariables(c(".", "%>%"))
 #' merged ranges including metadata describing overlaps per input GRanges
 #'
 #' @param grs A list of Granges
-#' @param ext An integ
+#' @param ext An integer specifying how far to extend ranges before merging.
+#' in effect, ranges withing 2*ext of one another will be joined during the merge
 #' @param use_first A logical.  If True, instead of merging all grs, only use
-#' first
-#' @return GRanges with metadata columns describing overlap overlap of input grs
+#' first and add metadata logicals for others.
+#' @return GRanges with metadata columns describing overlap of input grs
 #' @examples
 #' library(GenomicRanges)
 #' a = GRanges("chr1", IRanges(1:7*10, 1:7*10))
 #' b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
 #' overlapIntervalSets(list(a, b))
+#' @import GenomicRanges
 overlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
   queryHits = NULL
   if(class(grs) == "GRangesList"){

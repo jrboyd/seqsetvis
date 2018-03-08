@@ -10,13 +10,14 @@ overlapIntervalSets(grs, ext = 0, use_first = FALSE)
 \arguments{
 \item{grs}{A list of Granges}
 
-\item{ext}{An integ}
+\item{ext}{An integer specifying how far to extend ranges before merging.
+in effect, ranges withing 2*ext of one another will be joined during the merge}
 
 \item{use_first}{A logical.  If True, instead of merging all grs, only use
-first}
+first and add metadata logicals for others.}
 }
 \value{
-GRanges with metadata columns describing overlap overlap of input grs
+GRanges with metadata columns describing overlap of input grs
 }
 \description{
 Intersect a list of GRanges to create a single GRanges object of
