@@ -90,7 +90,7 @@ setMethod("setPlotMakeMT", signature(object = "DataFrame"), function(object){
     setPlotMakeMT(df_object)
 })
 
-#' matrix input
+#' matrix of logicals, membership table
 #' @rdname setPlotMakeMT-methods
 #' @aliases setPlotMakeMT,matrix-method
 #' @examples
