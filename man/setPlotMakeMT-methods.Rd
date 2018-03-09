@@ -27,20 +27,9 @@ setPlotMakeMT(object)
 \S4method{setPlotMakeMT}{data.frame}(object)
 }
 \arguments{
-\item{object}{the object to convert}
-
-\item{object}{a list of items that are valid for as.character
-A list of GRanges are a special case and will be handled as a GRangesList}
-
-\item{object}{a list of GRanges, sent to overlapIntervalSets}
-
-\item{object}{A single GRanges, will use logical metadata columns}
-
-\item{object}{A single DataFrame (typically from GRanges metadata), will use logical columns}
-
-\item{object}{A matrix, sent to data.frame to handle column naming}
-
-\item{object}{a data.frame}
+\item{object}{the object to convert. Supported types: list (of character or GRanges),
+GRanges with membership table metadata, GrangesList,
+data.frame/matrix/DataFrame of membership table}
 }
 \value{
 a logical matrix indicating membership of items (rows) in sets (columns)

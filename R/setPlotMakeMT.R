@@ -1,7 +1,9 @@
 #' generic for methods to convert various objects to a logical matrix indicating
 #' membership of items (rows) in sets (columns)
 #'
-#' @param object the object to convert
+#' @param object the object to convert. Supported types: list (of character or GRanges),
+#' GRanges with membership table metadata, GrangesList,
+#' data.frame/matrix/DataFrame of membership table
 #' @rdname setPlotMakeMT-methods
 #' @exportMethod setPlotMakeMT
 #' @return a logical matrix indicating membership of items (rows) in sets (columns)
@@ -11,8 +13,6 @@ setGeneric("setPlotMakeMT", function(object){
 
 
 #' list of character vectors input
-#' @param object a list of items that are valid for as.character
-#' A list of GRanges are a special case and will be handled as a GRangesList
 #' @rdname setPlotMakeMT-methods
 #' @aliases setPlotMakeMT,list-method
 #' @import GenomicRanges
@@ -42,7 +42,6 @@ setMethod("setPlotMakeMT", signature(object = "list"), function(object){
 
 #' GRangesList input
 #' setOldClass("GRangesList")
-#' @param object a list of GRanges, sent to overlapIntervalSets
 #' @rdname setPlotMakeMT-methods
 #' @aliases setPlotMakeMT,GRangesList-method
 #' @import GenomicRanges
@@ -59,7 +58,6 @@ setMethod("setPlotMakeMT", signature(object = "GRangesList"), function(object){
 
 #' mcols from GRange input
 #' setOldClass("GRanges")
-#' @param object A single GRanges, will use logical metadata columns
 #' @rdname setPlotMakeMT-methods
 #' @aliases setPlotMakeMT,GRanges-method
 #' @import GenomicRanges
@@ -78,7 +76,6 @@ setMethod("setPlotMakeMT", signature(object = "GRanges"), function(object){
 
 #' DataFrame input
 #' setOldClass("DataFrame")
-#' @param object A single DataFrame (typically from GRanges metadata), will use logical columns
 #' @rdname setPlotMakeMT-methods
 #' @aliases setPlotMakeMT,DataFrame-method
 #' @import GenomicRanges
@@ -94,7 +91,6 @@ setMethod("setPlotMakeMT", signature(object = "DataFrame"), function(object){
 })
 
 #' matrix input
-#' @param object A matrix, sent to data.frame to handle column naming
 #' @rdname setPlotMakeMT-methods
 #' @aliases setPlotMakeMT,matrix-method
 #' @examples
@@ -108,7 +104,6 @@ setMethod("setPlotMakeMT", signature(object = "matrix"), function(object){
 
 #' data.frame input, final output
 #' The final method for most inputs, checks column names
-#' @param object a data.frame
 #' @rdname setPlotMakeMT-methods
 #' @aliases setPlotMakeMT,data.frame-method
 #' @examples
