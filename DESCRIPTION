@@ -18,9 +18,10 @@ LazyData: true
 Suggests: testthat, covr, knitr, rmarkdown, cowplot
 Depends: R (>= 3.3.0), ggplot2
 Imports: methods, GenomicRanges, IRanges, data.table, rtracklayer,
-        limma, eulerr, ggforce, RColorBrewer, magrittr,
+        limma, eulerr, ggforce, RColorBrewer, magrittr, S4Vectors,
         png
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
 NeedsCompilation: no
 Packaged: 2018-01-08 17:54:19 UTC; joeboyd
+biocViews: Software, ChIPSeq, Sequencing, Visualization

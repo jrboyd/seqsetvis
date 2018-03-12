@@ -18,5 +18,5 @@ bar plots of set sizes
 \examples{
 setPlotBars(list(1:3, 2:6))
 setPlotBars(CTCF_in_10a_overlaps_gr)
-setPlotBars(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+setPlotBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 }

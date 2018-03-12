@@ -26,7 +26,7 @@
 #' @examples
 #' setPlotVenn(list(1:3, 2:6))
 #' setPlotVenn(CTCF_in_10a_overlaps_gr)
-#' setPlotVenn(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+#' setPlotVenn(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
                        counts_as_labels = FALSE, show_outside_count = FALSE, lwd = 3,
                        circle_color = NULL, fill_circles = TRUE,
@@ -138,7 +138,7 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
 #' @examples
 #' setPlotBars(list(1:3, 2:6))
 #' setPlotBars(CTCF_in_10a_overlaps_gr)
-#' setPlotBars(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+#' setPlotBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 setPlotBars = function(object) {
     group = count = NULL#declare binding for data.table
     object = setPlotMakeMT(object)
@@ -239,7 +239,7 @@ setPlotBars = function(object) {
 #' @examples
 #' setPlotPie(list(1:3, 2:6))
 #' setPlotPie(CTCF_in_10a_overlaps_gr)
-#' setPlotPie(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+#' setPlotPie(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 setPlotPie = function(object) {
     count = group = NULL#declare binding for data.table
     object = setPlotMakeMT(object)
@@ -301,7 +301,7 @@ safeBrew = function(n, pal = "Dark2"){
 #' @examples
 #' setPlotEuler(list(1:3, 2:6))
 #' setPlotEuler(CTCF_in_10a_overlaps_gr)
-#' setPlotEuler(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+#' setPlotEuler(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1],
                         n = 200, fill_circles = T, alpha = .15,
                         col_scale = NULL) {

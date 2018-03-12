@@ -31,5 +31,5 @@ Try to load a bed-like file and convert it to a GRanges object
 \examples{
 setPlotEuler(list(1:3, 2:6))
 setPlotEuler(CTCF_in_10a_overlaps_gr)
-setPlotEuler(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+setPlotEuler(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 }
