@@ -2,6 +2,7 @@ exportPattern("^regionSetPlot")
 
 exportPattern("^setPlot")
 exportPattern("^fetch")
+export("safeBrew")
 export("regionSetCluster")
 export("centerFixedSizeGRanges")
 export("centerAtMax")

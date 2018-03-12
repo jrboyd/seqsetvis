@@ -293,6 +293,9 @@ safeBrew = function(n, pal = "Dark2"){
 #' @param line_width numeric, passed to size aesthetic to control line width
 #' @param shape shape argument passed to eulerr::euler
 #' @param n number of points to use for drawing ellipses, passed to  eulerr:::ellipse
+#' @param fill_circles logical, should circles be filled or empty?
+#' @param alpha numeric [0,1], alpha value for circle fill
+#' @param col_scale colors to choose from for circles.  passed to ggplot2 color scales.
 #' @return ggplot of venneuler results
 #' @import eulerr
 #' @examples

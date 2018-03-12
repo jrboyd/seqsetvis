@@ -3,7 +3,8 @@
 \docType{data}
 \name{CTCF_in_10a_profiles_dt}
 \alias{CTCF_in_10a_profiles_dt}
-\title{100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq}
+\title{Profiles for 100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq
+Results from CTCF_in_10a_overlaps_gr}
 \format{A data frame with 53940 rows and 10 variables}
 \description{
 A tidy data.table at window size 100 bp within 300 bp of peak center
