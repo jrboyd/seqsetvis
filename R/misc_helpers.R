@@ -1,4 +1,5 @@
 #' converts a valid r color name ("black", "red", "white", etc.) to a hex value
+#' @export
 #' @param color_name character. one or more r color names.
 col2hex = function(color_name) {
   rgb(t(col2rgb(color_name))/255)

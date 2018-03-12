@@ -15,21 +15,18 @@ utils::globalVariables(c(".", "%>%"))
 #' a = GRanges("chr1", IRanges(1:7*10, 1:7*10))
 #' b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
 #' overlapIntervalSets(list(a, b))
-#' @import GenomicRanges
+#' @import GenomicRanges magrittr
 overlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
   queryHits = NULL
   if(class(grs) == "GRangesList"){
     grs = as.list(grs)
   }
-  # assertthat::assert_that(is.list(grs))
   if(is.null(names(grs))){
-    # warning("no names set for input grs, assigning arbitrary names.")
     names(grs) = paste0("set_", LETTERS[seq_along(grs)])
   }
   if(use_first){
     base_gr = grs[[1]]
     mcols(base_gr) = NULL
-    # grs = grs[-1]
   }else{
     base_gr = lapply(grs, function(x){mcols(x) = NULL; x}) %>% GRangesList %>% unlist %>% reduce
     start(base_gr) = start(base_gr) - ext

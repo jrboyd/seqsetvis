@@ -7,11 +7,14 @@
 #' @param fixed_size The final width of each GRange returned.
 #' @return Set of GRanges after resizing all input GRanges, either shortened
 #' or lengthened as required to match \code{fixed_size}
+#' @import GenomicRanges
 centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
     m = floor(start(grs) + width(grs)/2)
     ext = floor(fixed_size/2)
     start(grs) = m - ext
     end(grs) = m + fixed_size - ext - 1
+    # resize isn't ideal - repeated applications accumulate rounding shifts
+    # grs = GenomicRanges::resize(x = grs, width = fixed_size, fix = "center")
     return(grs)
 }
 
@@ -257,11 +260,6 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
     closestToZero = function(x) {
         x[order(abs(x))][1]
     }
-    # dt[, `:=`(ymax, max(get(y_)[get(x_) <= max(view_size) & get(x_) >= min(view_size)])), by = by_] dt[, `:=`(xsummit,
-    # closestToZero(get(x_)[get(y_) == ymax])), by = by_] dt[, `:=`(xnew, get(x_) - xsummit)] dt[, `:=`(ymax, NULL)] dt[, `:=`(xsummit,
-    # NULL)] dt[, data.table::`:=`(ymax, max(get(y_)[get(x_) <= max(view_size) & get(x_) >= min(view_size)])), by = by_] dt[,
-    # data.table::`:=`(xsummit, closestToZero(get(x_)[get(y_) == ymax])), by = by_] dt[, data.table::`:=`(xnew, get(x_) - xsummit)]
-    # dt[, data.table::`:=`(ymax, NULL)] dt[, data.table::`:=`(xsummit, NULL)]
     dt[, `:=`(ymax, max(get(y_)[get(x_) <= max(view_size) & get(x_) >= min(view_size)])), by = by_]
     dt[, `:=`(xsummit, closestToZero(get(x_)[get(y_) == ymax])), by = by_]
     dt[, `:=`(xnew, get(x_) - xsummit)]

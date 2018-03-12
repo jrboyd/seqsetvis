@@ -23,6 +23,8 @@
 #' @param fill_alpha alpha value to use for fill, defaults to .5.
 #' @param counts_color single color to use for displaying counts
 #' @return ggplot venn diagram
+#' @importFrom limma vennCounts
+#' @importFrom ggforce geom_circle
 #' @examples
 #' setPlotVenn(list(1:3, 2:6))
 #' setPlotVenn(CTCF_in_10a_overlaps_gr)
@@ -50,7 +52,7 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
     if (length(circle_color) < nsets)
         circle_color <- rep(circle_color, length.out = nsets)
     if (is.null(counts_color))
-        counts_color <- par("col")
+        counts_color <- rgb(0,0,0)
     col_scale = circle_color
     names(col_scale) = group_names
     ahex = substr(rgb(red = 1, blue = 1, green = 1, alpha = fill_alpha), start = 8, stop = 9)
@@ -361,6 +363,8 @@ setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1
 #' @param raster_approximation instead of standard plot, write temporary raster image and redraw that as plot background.
 #' @param raster_width_min raster width will be minimun multiple of number of columns over this number
 #' @param raster_height_min raster height will be minimun multiple of number of rows over this number
+#' @import data.table png
+#' @importFrom grid rasterGrob
 setPlotHeatmap = function(object, raster_approximation = TRUE, raster_width_min = 1000, raster_height_min = 1000) {
     groups = bool = value = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)

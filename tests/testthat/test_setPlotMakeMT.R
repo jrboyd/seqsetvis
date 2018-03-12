@@ -17,68 +17,68 @@ expected_table_named = as.matrix(data.frame("named_set_A" = 1:10 %in% set_a,
                                             "named_set_B" = 1:10 %in% set_b,
                                             "named_set_C" = 1:10 %in% set_c, row.names = 1:10))
 
-test_that("setPlotMakeMT unnamed numeric set list", {
+test_that("ssvMakeMembTable unnamed numeric set list", {
     sets_list = list(set_a, set_b, set_c)
-    mt = setPlotMakeMT(sets_list)
+    mt = ssvMakeMembTable(sets_list)
     expect_is(mt, "matrix")
     expect_equal(as.logical(mt), as.logical(expected_table))
     expect_equal(rownames(mt), rownames(expected_table))
     expect_equal(colnames(mt), colnames(expected_table))
 })
 
-test_that("setPlotMakeMT unnamed character set list", {
+test_that("ssvMakeMembTable unnamed character set list", {
     sets_list = list(set_a, set_b, set_c)
     sets_list = lapply(sets_list, function(x)letters[x])
-    mt = setPlotMakeMT(sets_list)
+    mt = ssvMakeMembTable(sets_list)
     expect_is(mt, "matrix")
     expect_equal(as.logical(mt), as.logical(expected_table))
     expect_equal(rownames(mt), letters[1:nrow(expected_table)])
     expect_equal(colnames(mt), colnames(expected_table))
 })
 
-test_that("setPlotMakeMT unnamed matrix", {
+test_that("ssvMakeMembTable unnamed matrix", {
     sets_list = list(set_a, set_b, set_c)
-    memb_table = set_list2memb(sets_list)
+    memb_table = ssvMakeMembTable(sets_list)
     colnames(memb_table) = NULL
-    mt = setPlotMakeMT(memb_table)
+    mt = ssvMakeMembTable(memb_table)
     expect_is(mt, "matrix")
     expect_equal(as.logical(mt), as.logical(expected_table))
     expect_equal(rownames(mt), rownames(expected_table))
     expect_equal(colnames(mt), colnames(expected_table))
 })
 
-test_that("setPlotMakeMT unnamed data.frame", {
+test_that("ssvMakeMembTable unnamed data.frame", {
     sets_list = list(set_a, set_b, set_c)
-    memb_table = set_list2memb(sets_list)
+    memb_table = ssvMakeMembTable(sets_list)
     colnames(memb_table) = NULL
     memb_table = as.data.frame(memb_table)
-    mt = setPlotMakeMT(memb_table)
+    mt = ssvMakeMembTable(memb_table)
     expect_is(mt, "matrix")
     expect_equal(as.logical(mt), as.logical(expected_table))
     expect_equal(rownames(mt), rownames(expected_table))
     expect_equal(colnames(mt), colnames(expected_table))
 })
 
-test_that("setPlotMakeMT unnamed list of GRanges", {
+test_that("ssvMakeMembTable unnamed list of GRanges", {
     sets_gr_list = list(gr_a, gr_b, gr_c)
 
-    suppressMessages({mt = setPlotMakeMT(sets_gr_list)})
+    suppressMessages({mt = ssvMakeMembTable(sets_gr_list)})
     expect_is(mt, "matrix")
     expect_equal(as.logical(mt), as.logical(expected_table))
     expect_equal(rownames(mt), rownames(expected_table))
     expect_equal(colnames(mt), colnames(expected_table))
 })
 
-test_that("setPlotMakeMT NAMED list of GRanges", {
+test_that("ssvMakeMembTable NAMED list of GRanges", {
     sets_gr_list = list("named_set_A" = gr_a, "named_set_B" = gr_b, "named_set_C" = gr_c)
 
-    suppressMessages({mt = setPlotMakeMT(sets_gr_list)})
+    suppressMessages({mt = ssvMakeMembTable(sets_gr_list)})
     expect_is(mt, "matrix")
     expect_equal(as.logical(mt), as.logical(expected_table_named))
     expect_equal(rownames(mt), rownames(expected_table_named))
     expect_equal(colnames(mt), colnames(expected_table_named))
 })
 
-test_that("setPlotMakeMT on mixed type list causes error", {
-    expect_error(setPlotMakeMT(list(1, "a")))
+test_that("ssvMakeMembTable on mixed type list causes error", {
+    expect_error(ssvMakeMembTable(list(1, "a")))
 })
