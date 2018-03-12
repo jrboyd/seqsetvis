@@ -7,7 +7,7 @@
 setPlotBars(object)
 }
 \arguments{
-\item{object}{passed to setPlotMakeMT for conversion to membership table}
+\item{object}{passed to ssvMakeMembTable for conversion to membership table}
 }
 \value{
 ggplot of bar plot of set sizes

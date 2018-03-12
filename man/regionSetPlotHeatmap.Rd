@@ -2,7 +2,8 @@
 % Please edit documentation in R/plotFunctions_regionSet.R
 \name{regionSetPlotHeatmap}
 \alias{regionSetPlotHeatmap}
-\title{heatmap}
+\title{heatmap style representation of membership table.
+instead of clustering, each column is sorted starting from the left.}
 \usage{
 regionSetPlotHeatmap(bw_dt, nclust = 6, perform_clustering = c("auto",
   "yes", "no")[1], row_ = "id", column_ = "x", fill_ = "FE",
@@ -39,5 +40,6 @@ auto considers if row_ has been ordered by being a factor and if cluster_ is a n
 ggplot heatmap of signal profiles, facetted by sample
 }
 \description{
-heatmap
+heatmap style representation of membership table.
+instead of clustering, each column is sorted starting from the left.
 }

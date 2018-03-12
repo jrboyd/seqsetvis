@@ -11,7 +11,7 @@
 #   - TODO list of Granges to convert to GRangesOverlapSets
 
 #' ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets
-#'
+#' @export
 #' @param object will be passed to \code{\link{ssvMakeMembTable}} for conversion to membership matrix
 #' @param group_names useful if names weren't provided or were lost in creating membership matrix
 #' @param counts_txt_size font size for count numbers
@@ -131,7 +131,7 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
 }
 
 #' bar plots of set sizes
-#'
+#' @export
 #' @param object passed to ssvMakeMembTable for conversion to membership table
 #'
 #' @return ggplot of bar plot of set sizes
@@ -232,7 +232,7 @@ setPlotBars = function(object) {
 # }
 
 #' pie plot of set sizes
-#'
+#' @export
 #' @param object object that ssvMakeMembTable can convert to logical matrix membership
 #'
 #' @return ggplot pie graph of set sizes
@@ -265,6 +265,7 @@ setPlotPie = function(object) {
 
 #' allows RColorBrew to handle n values less than 3 and greater than 8 without
 #' warnings and return expected number of colors.
+#' @export
 #' @param n integer value of number of colors to make palette for
 #' @param pal palette recognized by RColorBrewer
 #' @importFrom RColorBrewer brewer.pal brewer.pal.info
@@ -288,7 +289,7 @@ safeBrew = function(n, pal = "Dark2"){
 
 # from https://gist.github.com/trinker/31edc08d0a4ec4c73935a23040c2f6cb p_load(dplyr, venneuler, ggforce, textshape)
 #' Try to load a bed-like file and convert it to a GRanges object
-#'
+#' @export
 #' @param object A membership table
 #' @param line_width numeric, passed to size aesthetic to control line width
 #' @param shape shape argument passed to eulerr::euler
@@ -355,7 +356,7 @@ setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1
 
 #' binary heatmap indicating membership.
 #' heatmap is sorted by column left to right.  change column order to reveal patterns
-#'
+#' @export
 #' @param object passed to ssvMakeMembTable
 #' @param raster_approximation instead of standard plot, write temporary raster image and redraw that as plot background.
 #' @param raster_width_min raster width will be minimun multiple of number of columns over this number

@@ -1,8 +1,9 @@
+## necessary for magrittr to not throw errors
 utils::globalVariables(c(".", "%>%"))
 
 #' Intersect a list of GRanges to create a single GRanges object of
 #' merged ranges including metadata describing overlaps per input GRanges
-#'
+#' @export
 #' @param grs A list of Granges
 #' @param ext An integer specifying how far to extend ranges before merging.
 #' in effect, ranges withing 2*ext of one another will be joined during the merge

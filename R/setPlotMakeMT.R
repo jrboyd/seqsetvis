@@ -1,6 +1,6 @@
 #' generic for methods to convert various objects to a logical matrix indicating
 #' membership of items (rows) in sets (columns)
-#'
+#' @export
 #' @param object the object to convert. Supported types: list (of character or GRanges),
 #' GRanges with membership table metadata, GrangesList,
 #' data.frame/matrix/DataFrame of membership table
@@ -13,6 +13,7 @@ setGeneric("ssvMakeMembTable", function(object){
 
 
 #' list of character vectors input
+#' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,list-method
 #' @import GenomicRanges
@@ -42,6 +43,7 @@ setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
 
 #' GRangesList input
 #' setOldClass("GRangesList")
+#' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,GRangesList-method
 #' @import GenomicRanges
@@ -58,6 +60,7 @@ setMethod("ssvMakeMembTable", signature(object = "GRangesList"), function(object
 
 #' mcols from GRange input
 #' setOldClass("GRanges")
+#' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,GRanges-method
 #' @import GenomicRanges
@@ -76,6 +79,7 @@ setMethod("ssvMakeMembTable", signature(object = "GRanges"), function(object){
 
 #' DataFrame input
 #' setOldClass("DataFrame")
+#' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,DataFrame-method
 #' @import GenomicRanges
@@ -91,6 +95,7 @@ setMethod("ssvMakeMembTable", signature(object = "DataFrame"), function(object){
 })
 
 #' matrix of logicals, membership table
+#' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,matrix-method
 #' @examples
@@ -104,6 +109,7 @@ setMethod("ssvMakeMembTable", signature(object = "matrix"), function(object){
 
 #' data.frame input, final output
 #' The final method for most inputs, checks column names
+#' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,data.frame-method
 #' @examples

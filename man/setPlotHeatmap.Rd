@@ -9,7 +9,7 @@ setPlotHeatmap(object, raster_approximation = TRUE, raster_width_min = 1000,
   raster_height_min = 1000)
 }
 \arguments{
-\item{object}{passed to setPlotMakeMT}
+\item{object}{passed to ssvMakeMembTable}
 
 \item{raster_approximation}{instead of standard plot, write temporary raster image and redraw that as plot background.}
 

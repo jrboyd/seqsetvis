@@ -2,7 +2,7 @@
 #'
 #' \code{centerFixedSizeGranges} First calculates the central coordinate of each
 #' GRange in \code{grs} and extends in both direction by half of \code{fixed_size}
-#'
+#' @export
 #' @param grs Set of GRanges with incosistent and/or incorrect size
 #' @param fixed_size The final width of each GRange returned.
 #' @return Set of GRanges after resizing all input GRanges, either shortened
@@ -20,7 +20,7 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #' \code{fetchWindowedBigwig} Gets values for each region of the query GRanges (\code{qgr}).
 #' Values correspond to the center of each window of size \code{win_size}.  A tidy formatted data.table
 #' object is returned suitable for plotting using ggplots.
-#'
+#' @export
 #' @param bw_file The character vector path to bigwig files to read from.
 #' @param qgr Set of GRanges to query.  For valid results the width of each
 #' interval should be identical and evenly divisible by \code{win_size}.
@@ -85,7 +85,7 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
 #'
 #' \code{fetchWindowedBigwigList} iteratively calls \code{fetchWindowedBigwig}.
 #' See \code{\link{fetchWindowedBigwig}} for more info.
-#'
+#' @export
 #' @param bw_files The character vector paths to bigwig files to read from.
 #' @param qgr Set of GRanges to query.  For valid results the width of each
 #' interval should be identical and evenly divisible by \code{win_size}.
@@ -121,7 +121,7 @@ fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files), bw
 #'
 #' \code{applySpline} Is intended for two-dimensional tidy data.tables, as
 #' retured by \code{fetchWindowedBigwig}
-#'
+#' @export
 #' @param dt a tidy data.table containing two-dimensional data
 #' @param n the number of interpolation points to use per input point, see
 #' \code{?spline}
@@ -188,7 +188,7 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
 #'
 #' \code{centerAtMax} locates the coordinate x of the maximum in y and shifts x
 #' such that it is zero at max y.
-#'
+#' @export
 #' @param dt data.table
 #' @param x_ the variable name of the x-values. default is 'x'
 #' @param y_ the variable name of the y-values default is 'y'

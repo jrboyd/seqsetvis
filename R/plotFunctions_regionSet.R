@@ -1,5 +1,5 @@
 #' plot profiles from bigwigs
-#'
+#' @export
 #' @param bw_dt data.table of bigwig signal
 #' @param y_ the variable name in bw_dt for y axis in plot
 #' @param x_ the variable name in bw_dt for x axis in plot
@@ -103,7 +103,7 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
 }
 
 #' maps signal from 2 sample profiles to the x and y axis. axes are standard or "volcano" min XY vs fold-change Y/X
-#'
+#' @export
 #' @param bw_dt data.table of sample profiles
 #' @param x_name sample name to map to x-axis, must be stored in variable specified in \code{xy_variable}
 #' @param y_name sample name to map to y-axis, must be stored in variable specified in \code{xy_variable}
@@ -199,7 +199,7 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
 }
 
 #' clustering as for a heatmap
-#'
+#' @export
 #' @param bw_dt data.table of signals
 #' @param nclust number of clusters
 #' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
@@ -246,8 +246,9 @@ regionSetCluster = function(bw_dt, nclust = 6,
     return(plot_dt)
 }
 
-#' heatmap
-#'
+#' heatmap style representation of membership table.
+#' instead of clustering, each column is sorted starting from the left.
+#' @export
 #' @param bw_dt data.table of signals
 #' @param nclust number of clusters
 #' @param perform_clustering should clustering be done? default is auto.
@@ -378,7 +379,3 @@ clusteringKmeansNestedHclust = function(mat, nclust) {
     mat_dt$within_o = NULL
     return(mat_dt)
 }
-
-# clusteringKmeansNestedHclust.dt = function(dt, nclust, rownames_ = "id", colnames_ = "") {
-#
-# }

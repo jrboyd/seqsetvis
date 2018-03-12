@@ -7,7 +7,7 @@
 setPlotPie(object)
 }
 \arguments{
-\item{object}{object that setPlotMakeMT can convert to logical matrix membership}
+\item{object}{object that ssvMakeMembTable can convert to logical matrix membership}
 }
 \value{
 ggplot pie graph of set sizes
