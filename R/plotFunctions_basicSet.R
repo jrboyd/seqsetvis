@@ -23,6 +23,10 @@
 #' @param fill_alpha alpha value to use for fill, defaults to .5.
 #' @param counts_color single color to use for displaying counts
 #' @return ggplot venn diagram
+#' @examples
+#' setPlotVenn(list(1:3, 2:6))
+#' setPlotVenn(CTCF_in_10a_overlaps_gr)
+#' setPlotVenn(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
                        counts_as_labels = FALSE, show_outside_count = FALSE, lwd = 3,
                        circle_color = NULL, fill_circles = TRUE,
@@ -38,7 +42,7 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
     if (is.null(group_names))
         group_names <- factor(colnames(object)[1:nsets], levels = colnames(object)[1:nsets])
     if (is.null(circle_color)) {
-        circle_color = suppressWarnings(RColorBrewer::brewer.pal(8, "Dark2"))[seq_len(nsets)]
+        circle_color = safeBrew(nsets, "Dark2")
     } else {
         not_hex = substr(circle_color, 0, 1) != "#"
         circle_color[not_hex] = col2hex(circle_color[not_hex])
@@ -131,6 +135,10 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
 #' @param object passed to setPlotMakeMT for conversion to membership table
 #'
 #' @return ggplot of bar plot of set sizes
+#' @examples
+#' setPlotBars(list(1:3, 2:6))
+#' setPlotBars(CTCF_in_10a_overlaps_gr)
+#' setPlotBars(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 setPlotBars = function(object) {
     group = count = NULL#declare binding for data.table
     object = setPlotMakeMT(object)
@@ -228,6 +236,10 @@ setPlotBars = function(object) {
 #' @param object object that setPlotMakeMT can convert to logical matrix membership
 #'
 #' @return ggplot pie graph of set sizes
+#' @examples
+#' setPlotPie(list(1:3, 2:6))
+#' setPlotPie(CTCF_in_10a_overlaps_gr)
+#' setPlotPie(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 setPlotPie = function(object) {
     count = group = NULL#declare binding for data.table
     object = setPlotMakeMT(object)
@@ -251,7 +263,28 @@ setPlotPie = function(object) {
     return(p)
 }
 
-
+#' allows RColorBrew to handle n values less than 3 and greater than 8 without
+#' warnings and return expected number of colors.
+#' @param n integer value of number of colors to make palette for
+#' @param pal palette recognized by RColorBrewer
+#' @importFrom RColorBrewer brewer.pal brewer.pal.info
+#' @examples
+#' plot(1:2, rep(0, 2),  col = safeBrew(2, "dark2"), pch = 16, cex = 6)
+#' plot(1:12, rep(0, 12),  col = safeBrew(12, "set1"), pch = 16, cex = 6)
+#' plot(1:12, rep(0, 12),  col = safeBrew(12, "set2"), pch = 16, cex = 6)
+#' plot(1:12, rep(0, 12),  col = safeBrew(12, "set3"), pch = 16, cex = 6)
+safeBrew = function(n, pal = "Dark2"){
+    if(n < 1) stop("n must be at least 1")
+    pal_info = RColorBrewer::brewer.pal.info
+    pal_info$brewName = rownames(pal_info)
+    rownames(pal_info) = tolower(rownames(pal_info))
+    pal = tolower(pal)
+    if(!any(pal == rownames(pal_info)))
+        stop(paste("Palette", pal, "not a valid RColorBrewer palette, see RColorBrewer::brewer.pal.info"))
+    maxColors = pal_info[pal,]$maxcolors
+    nbrew = max(n, 3) %>% min(., maxColors)
+    RColorBrewer::brewer.pal(n = nbrew, name = pal_info[pal,]$brewName)[(seq_len(n)-1) %% maxColors + 1]
+}
 
 # from https://gist.github.com/trinker/31edc08d0a4ec4c73935a23040c2f6cb p_load(dplyr, venneuler, ggforce, textshape)
 #' Try to load a bed-like file and convert it to a GRanges object
@@ -262,7 +295,13 @@ setPlotPie = function(object) {
 #' @param n number of points to use for drawing ellipses, passed to  eulerr:::ellipse
 #' @return ggplot of venneuler results
 #' @import eulerr
-setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1], n = 200) {
+#' @examples
+#' setPlotEuler(list(1:3, 2:6))
+#' setPlotEuler(CTCF_in_10a_overlaps_gr)
+#' setPlotEuler(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1],
+                        n = 200, fill_circles = T, alpha = .15,
+                        col_scale = NULL) {
     x = y = group = NULL#declare binding for data.table
     object = setPlotMakeMT(object)
     cn = colnames(object)
@@ -295,14 +334,14 @@ setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1
     ggplot(ell_dt) + geom_polygon(aes(x = x, y = y, fill = group), alpha = .3) + theme_void()
 
 
-    col_scale = RColorBrewer::brewer.pal(ncol(object), "Dark2")
-    blank = rep(NA, length(ell_dt$labels))
+    if(is.null(col_scale)){
+        col_scale = safeBrew(ncol(object), "Dark2")
+    }
 
-    add_fill = TRUE
-    if (add_fill) {
-        p = ggplot(ell_dt, aes(x = x, y = y, fill = group, col = group, size = 2, alpha = 0.08))
+    if (fill_circles) {
+        p = ggplot(ell_dt, aes(x = x, y = y, fill = group, col = group, size = 2, alpha = alpha))
     } else {
-        p = ggplot(ell_dt, aes(x = x, y = y, col = group, size = 2))
+        p = ggplot(ell_dt, aes(x = x, y = y, fill = NA, col = group, size = 2))
     }
     p = p + geom_polygon() + labs(fill = "", color = "") + scale_size_identity() + scale_shape_identity() + scale_alpha_identity() +
         scale_fill_manual(values = col_scale) + scale_color_manual(values = col_scale) + theme_minimal() + theme(plot.background = element_blank(),

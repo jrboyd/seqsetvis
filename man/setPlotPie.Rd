@@ -15,3 +15,8 @@ ggplot pie graph of set sizes
 \description{
 pie plot of set sizes
 }
+\examples{
+setPlotPie(list(1:3, 2:6))
+setPlotPie(CTCF_in_10a_overlaps_gr)
+setPlotPie(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+}

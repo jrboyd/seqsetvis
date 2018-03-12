@@ -5,7 +5,7 @@
 \title{Try to load a bed-like file and convert it to a GRanges object}
 \usage{
 setPlotEuler(object, line_width = 2, shape = c("circle", "ellipse")[1],
-  n = 200)
+  n = 200, fill_circles = T, alpha = 0.15, col_scale = NULL)
 }
 \arguments{
 \item{object}{A membership table}
@@ -21,4 +21,9 @@ ggplot of venneuler results
 }
 \description{
 Try to load a bed-like file and convert it to a GRanges object
+}
+\examples{
+setPlotEuler(list(1:3, 2:6))
+setPlotEuler(CTCF_in_10a_overlaps_gr)
+setPlotEuler(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 }

@@ -52,3 +52,19 @@ test_that("setPlotVenn circle colors", {
     p1 = setPlotVenn(setL, circle_color = "blue")
     expect_s3_class(p1, class = "ggplot")
 })
+
+test_that("setPlotEuler fill, no fill", {
+    p1 = setPlotEuler(setL)
+    expect_s3_class(p1, class = "ggplot")
+
+    p2 = setPlotEuler(setL, fill_circles = F)
+    expect_s3_class(p2, class = "ggplot")
+})
+
+test_that("setPlotHeatmap raster options", {
+    p1 = setPlotHeatmap(setL)
+    expect_s3_class(p1, class = "ggplot")
+
+    p2 = setPlotEuler(setL, fill_circles = F)
+    expect_s3_class(p2, class = "ggplot")
+})

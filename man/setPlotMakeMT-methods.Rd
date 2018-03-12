@@ -49,7 +49,7 @@ setOldClass("GRanges")
 DataFrame input
 setOldClass("DataFrame")
 
-matrix input
+matrix of logicals, membership table
 
 data.frame input, final output
 The final method for most inputs, checks column names

@@ -36,3 +36,8 @@ ggplot venn diagram
 \description{
 ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets
 }
+\examples{
+setPlotVenn(list(1:3, 2:6))
+setPlotVenn(CTCF_in_10a_overlaps_gr)
+setPlotVenn(mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+}
