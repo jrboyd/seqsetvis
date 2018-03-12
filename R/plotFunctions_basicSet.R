@@ -1,7 +1,7 @@
 # plotting functions for set comparison go here
 # all plotting functions accept a variety of objects as first argument and
-# handle them via the S4  generic setPlotMakeMT
-# setPlotMakeMT has implemented methods for:
+# handle them via the S4  generic ssvMakeMembTable
+# ssvMakeMembTable has implemented methods for:
 #   - membership table
 #       columns are sets
 #       rows are members
@@ -12,7 +12,7 @@
 
 #' ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets
 #'
-#' @param object will be passed to \code{\link{setPlotMakeMT}} for conversion to membership matrix
+#' @param object will be passed to \code{\link{ssvMakeMembTable}} for conversion to membership matrix
 #' @param group_names useful if names weren't provided or were lost in creating membership matrix
 #' @param counts_txt_size font size for count numbers
 #' @param counts_as_labels if TRUE, geom_label is used instead of geom_text.  can be easier to read.
@@ -32,7 +32,7 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
                        circle_color = NULL, fill_circles = TRUE,
                        fill_alpha = ifelse(fill_circles, 0.5, 0), counts_color = NULL) {
     size = group = x = y = label = NULL#declare binding for data.table
-    object = setPlotMakeMT(object)
+    object = ssvMakeMembTable(object)
     all(apply(object, 2, class) == "logical")
     object <- limma::vennCounts(object)
     set_counts <- object[, "Counts"]
@@ -132,7 +132,7 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
 
 #' bar plots of set sizes
 #'
-#' @param object passed to setPlotMakeMT for conversion to membership table
+#' @param object passed to ssvMakeMembTable for conversion to membership table
 #'
 #' @return ggplot of bar plot of set sizes
 #' @examples
@@ -141,7 +141,7 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
 #' setPlotBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 setPlotBars = function(object) {
     group = count = NULL#declare binding for data.table
-    object = setPlotMakeMT(object)
+    object = ssvMakeMembTable(object)
     hit_counts = colSums(object)
     hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)))
     p <- ggplot(hit_counts_df, aes(x = group, y = count, fill = group)) +
@@ -159,14 +159,14 @@ setPlotBars = function(object) {
 
 # bar plots of set sizes, does fancy facetting
 #
-# @param object passed to setPlotMakeMT for conversion to membership table
+# @param object passed to ssvMakeMembTable for conversion to membership table
 # @param peak_gr peak sets before overlapping
 # @param flip_group_stage logical, different facetting.  default is FALSE
 #
 # @return ggplot of bar plot of set sizes
 # setPlotBars2 = function(object, peak_gr, flip_group_stage = FALSE) {
 #   x = count = group = stage = NULL#declare binding for data.table
-#   object = setPlotMakeMT(object)
+#   object = ssvMakeMembTable(object)
 #   hit_counts = colSums(object)
 #   hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)), stage = "merged")
 #   raw_counts = sapply(peak_gr, length)
@@ -198,13 +198,13 @@ setPlotBars = function(object) {
 # }
 
 # pie plot with facetting
-# @param object passed to setPlotMakeMT
+# @param object passed to ssvMakeMembTable
 # @param peak_gr peak sets before overlapping
 #
 # @return ggplot of pie charts
 # setPlotPie2 = function(object, peak_gr) {
 #   stage = count = group = NULL#declare binding for data.table
-#   object = setPlotMakeMT(object)
+#   object = ssvMakeMembTable(object)
 #   hit_counts = colSums(object)
 #   hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)), stage = "merged")
 #   raw_counts = sapply(peak_gr, length)
@@ -233,7 +233,7 @@ setPlotBars = function(object) {
 
 #' pie plot of set sizes
 #'
-#' @param object object that setPlotMakeMT can convert to logical matrix membership
+#' @param object object that ssvMakeMembTable can convert to logical matrix membership
 #'
 #' @return ggplot pie graph of set sizes
 #' @examples
@@ -242,7 +242,7 @@ setPlotBars = function(object) {
 #' setPlotPie(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 setPlotPie = function(object) {
     count = group = NULL#declare binding for data.table
-    object = setPlotMakeMT(object)
+    object = ssvMakeMembTable(object)
     hit_counts = colSums(object)
     hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)))
 
@@ -306,7 +306,7 @@ setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1
                         n = 200, fill_circles = T, alpha = .15,
                         col_scale = NULL) {
     x = y = group = NULL#declare binding for data.table
-    object = setPlotMakeMT(object)
+    object = ssvMakeMembTable(object)
     cn = colnames(object)
     eu = eulerr::euler(object, shape = shape)
     dd = eu$ellipses
@@ -356,13 +356,13 @@ setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1
 #' binary heatmap indicating membership.
 #' heatmap is sorted by column left to right.  change column order to reveal patterns
 #'
-#' @param object passed to setPlotMakeMT
+#' @param object passed to ssvMakeMembTable
 #' @param raster_approximation instead of standard plot, write temporary raster image and redraw that as plot background.
 #' @param raster_width_min raster width will be minimun multiple of number of columns over this number
 #' @param raster_height_min raster height will be minimun multiple of number of rows over this number
 setPlotHeatmap = function(object, raster_approximation = TRUE, raster_width_min = 1000, raster_height_min = 1000) {
     groups = bool = value = NULL#declare binding for data.table
-    object = setPlotMakeMT(object)
+    object = ssvMakeMembTable(object)
     mat = ifelse(as.matrix(object), 0, 1)
     for (i in rev(1:ncol(mat))) {
         mat = mat[order(mat[, i], decreasing = TRUE), , drop = FALSE]
