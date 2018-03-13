@@ -16,7 +16,7 @@
 #' @param quantile_max the highest quantile end
 #'
 #' @return ggplot object using ribbon plots to show quantile distributions
-#' @import ggplot
+#' @import ggplot2
 #' @rawNamespace import(data.table, except = shift)
 ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
                                         hsv_reverse = FALSE,
@@ -119,7 +119,7 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
 #' @param show_help if TRUE overlay labels to aid plot interpretation, default is FALSE
 #' @param fixed_coords if TRUE coordinate system is 1:1 ratio, default is TRUE
 #'
-#' @import ggplot
+#' @import ggplot2
 #' @return ggplot of points comparing signal from 2 samples
 ssvSignalScatterplot = function(bw_dt, x_name, y_name,
                                 plotting_group = NULL,
@@ -267,7 +267,7 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
 #'
-#' @import ggplot
+#' @import ggplot2
 #' @return ggplot heatmap of signal profiles, facetted by sample
 ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "yes", "no")[1],
                                 row_ = "id",

@@ -23,7 +23,7 @@
 #' @param fill_alpha alpha value to use for fill, defaults to .5.
 #' @param counts_color single color to use for displaying counts
 #' @return ggplot venn diagram
-#' @import ggplot
+#' @import ggplot2
 #' @importFrom limma vennCounts
 #' @importFrom ggforce geom_circle
 #' @examples
@@ -138,7 +138,7 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
 #' @param object passed to ssvMakeMembTable for conversion to membership table
 #'
 #' @return ggplot of bar plot of set sizes
-#' @import ggplot
+#' @import ggplot2
 #' @examples
 #' ssvFeatureBars(list(1:3, 2:6))
 #' ssvFeatureBars(CTCF_in_10a_overlaps_gr)
@@ -238,7 +238,7 @@ ssvFeatureBars = function(object) {
 #' pie plot of set sizes
 #' @export
 #' @param object object that ssvMakeMembTable can convert to logical matrix membership
-#' @import ggplot
+#' @import ggplot2
 #' @return ggplot pie graph of set sizes
 #' @examples
 #' ssvFeaturePie(list(1:3, 2:6))
@@ -278,7 +278,7 @@ ssvFeaturePie = function(object) {
 #' @param alpha numeric [0,1], alpha value for circle fill
 #' @param col_scale colors to choose from for circles.  passed to ggplot2 color scales.
 #' @return ggplot of venneuler results
-#' @import ggplot
+#' @import ggplot2
 #' @import eulerr
 #' @examples
 #' ssvFeatureEuler(list(1:3, 2:6))
@@ -344,7 +344,7 @@ ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse"
 #' @param raster_height_min raster height will be minimun multiple of number of rows over this number
 #' @rawNamespace import(data.table, except = shift)
 #' @import png
-#' @import ggplot
+#' @import ggplot2
 #' @importFrom grid rasterGrob
 ssvFeatureBinaryHeatmap = function(object, raster_approximation = TRUE, raster_width_min = 1000, raster_height_min = 1000) {
     groups = bool = value = NULL#declare binding for data.table
