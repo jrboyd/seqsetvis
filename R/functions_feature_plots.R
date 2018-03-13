@@ -25,7 +25,6 @@
 #' @return ggplot venn diagram
 #' @import ggplot2
 #' @importFrom limma vennCounts
-#' @importFrom ggforce geom_circle
 #' @examples
 #' ssvFeatureVenn(list(1:3, 2:6))
 #' ssvFeatureVenn(CTCF_in_10a_overlaps_gr)
@@ -60,20 +59,7 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
     fill_scale = paste0(col_scale, ahex)
     names(fill_scale) = names(col_scale)
 
-    p = ggplot() +
-        labs(fill = "", color = "") +
-        scale_color_manual(values = col_scale) +
-        scale_size_identity() +
-        scale_fill_manual(values = fill_scale) +
-        theme_minimal() +
-        theme(plot.background = element_blank(),
-              axis.title = element_blank(),
-              axis.text = element_blank(),
-              axis.ticks = element_blank(),
-              panel.grid = element_blank(),
-              legend.position = "top") +
-        guides(fill = guide_legend(override.aes = list(shape = 21)))
-    p = p + coord_fixed()
+
     xcentres <- switch(nsets,
                        0,
                        c(-1, 1),
@@ -97,9 +83,53 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
 
     df_circles = data.frame(xcentres, ycentres, r, size = lwd, col = circle_color, group = group_names)
 
+    # internal function from eulerr
+    eulerr_ellipse = function (h, k, a, b = a, phi = 0, n = 200L) {
+        theta <- seq.int(0, 2 * pi, length.out = n)
+        m <- length(h)
+        out <- vector("list", m)
+        for (i in seq_along(h)) {
+            out[[i]]$x <- h[i] + a[i] * cos(theta) * cos(phi[i]) -
+                b[i] * sin(theta) * sin(phi[i])
+            out[[i]]$y <- k[i] + b[i] * sin(theta) * cos(phi[i]) +
+                a[i] * cos(theta) * sin(phi[i])
+        }
+        out
+    }
 
-    p = p + ggforce::geom_circle(data = df_circles, mapping = aes(x0 = xcentres, y0 = ycentres, r = r, size = size, col = group,
-                                                                  fill = group))
+    e <- eulerr_ellipse(xcentres, ycentres, rep(r, length(xcentres)), rep(r, length(ycentres)), rep(0,length(xcentres)), 200)
+    names(e) = group_names
+    ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x, y = ell$y))
+    ell_dt = data.table::rbindlist(ell_dt, use.names = T, idcol = "group")
+
+    # if(is.null(col_scale)){
+    #     col_scale = safeBrew(ncol(object), "Dark2")
+    # }
+
+    # if (fill_circles) {
+    #
+    # } else {
+    #     p = ggplot(ell_dt, aes(x = x, y = y, fill = NA, col = group, size = 2))
+    # }
+    p = ggplot() +
+        labs(fill = "", color = "") +
+        scale_color_manual(values = col_scale) +
+        scale_size_identity() +
+        scale_fill_manual(values = fill_scale) +
+        theme_minimal() +
+        theme(plot.background = element_blank(),
+              axis.title = element_blank(),
+              axis.text = element_blank(),
+              axis.ticks = element_blank(),
+              panel.grid = element_blank(),
+              legend.position = "top") +
+        # guides(fill = guide_legend(override.aes = list(shape = 21))) +
+        coord_fixed()
+    p = p + geom_polygon(data = ell_dt, aes(x = x, y = y, fill = group, col = group, size = 2, alpha = fill_alpha)) +
+        scale_alpha_identity() + guides(alpha = "none")
+
+    # p = p + ggforce::geom_circle(data = df_circles, mapping = aes(x0 = xcentres, y0 = ycentres, r = r, size = size, col = group,
+                                                                  # fill = group))
     df_text <- switch(nsets,
                       {
                           df = data.frame(x = 0,
@@ -316,8 +346,6 @@ ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse"
     names(e) = colnames(object)
     ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x, y = ell$y))
     ell_dt = data.table::rbindlist(ell_dt, use.names = T, idcol = "group")
-    ggplot(ell_dt) + geom_polygon(aes(x = x, y = y, fill = group), alpha = .3) + theme_void()
-
 
     if(is.null(col_scale)){
         col_scale = safeBrew(ncol(object), "Dark2")
