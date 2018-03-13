@@ -39,7 +39,6 @@ if \code{by_ = c('gene_id')}
 #data may be blockier than we'd like
 ggplot(CTCF_in_10a_profiles_dt[, .(FE = mean(FE)), by = .(sample, x)]) +
 geom_line(aes(x = x, y = FE, color = sample))
-splined_up = applySpline(CTCF_in_10a_profiles_dt, n = 2, y_ = 'FE',
 by_ = c('id', 'sample'))
 #can be smoothed by applying a spline  (think twice about doing so,
 #it may look prettier but may also be deceptive or misleading)

@@ -16,8 +16,9 @@
 #' @param quantile_max the highest quantile end
 #'
 #' @return ggplot object using ribbon plots to show quantile distributions
+#' @import ggplot
 #' @rawNamespace import(data.table, except = shift)
-regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
+ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
                                         hsv_reverse = FALSE,
                                         hsv_saturation = 1, hsv_value = 1,
                                         hsv_grayscale = FALSE,
@@ -34,9 +35,8 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
     }else{
         todo = unique(bw_dt[, get(by_)])
     }
-    all_q = lapply(todo, function(td){
-        # for(td in todo){
 
+    calc_quantiles = function(td){
         dt = bw_dt[get(by_) == td, .(qs = .(.(quantile(get(y_), q2do)))), by = x_]
         dt = cbind(dt, data.table::as.data.table(t(sapply(dt$qs, function(x) x[[1]]))))
         dt$qs = NULL
@@ -56,7 +56,9 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
         dt_c[, `:=`(c("rn", "q_low", "q_high"), NULL)]
         dt_c$facet_group = td
         return(dt_c)
-    })
+    }
+
+    all_q = lapply(todo, calc_quantiles)
     plot_dt = data.table::rbindlist(all_q)
     q_o = unique(plot_dt$q_range)
     if(hsv_symmetric){
@@ -117,8 +119,9 @@ regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake"
 #' @param show_help if TRUE overlay labels to aid plot interpretation, default is FALSE
 #' @param fixed_coords if TRUE coordinate system is 1:1 ratio, default is TRUE
 #'
+#' @import ggplot
 #' @return ggplot of points comparing signal from 2 samples
-regionSetPlotScatter = function(bw_dt, x_name, y_name,
+ssvSignalScatterplot = function(bw_dt, x_name, y_name,
                                 plotting_group = NULL,
                                 value_variable = "FE", xy_variable = "sample",
                                 value_function = max,
@@ -213,8 +216,8 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
 #' @rawNamespace import(data.table, except = shift)
-#' @return data.table of signal profiles, ready for regionSetPlotHeatmap
-regionSetCluster = function(bw_dt, nclust = 6,
+#' @return data.table of signal profiles, ready for ssvSignalHeatmap
+ssvSignalClustering = function(bw_dt, nclust = 6,
                             row_ = "id",
                             column_ = "x", fill_ = "FE", facet_ = "sample",
                             cluster_ = "cluster_id",
@@ -264,8 +267,9 @@ regionSetCluster = function(bw_dt, nclust = 6,
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
 #'
+#' @import ggplot
 #' @return ggplot heatmap of signal profiles, facetted by sample
-regionSetPlotHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "yes", "no")[1],
+ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "yes", "no")[1],
                                 row_ = "id",
                                 column_ = "x", fill_ = "FE", facet_ = "sample",
                                 cluster_ = "cluster_id",
@@ -283,7 +287,7 @@ regionSetPlotHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto"
     }
     if(do_cluster){
         print("clustering...")
-        plot_dt = regionSetCluster(bw_dt = bw_dt,
+        plot_dt = ssvSignalClustering(bw_dt = bw_dt,
                                    nclust = nclust,
                                    row_ = row_,
                                    column_ = column_,
@@ -336,47 +340,3 @@ regionSetPlotHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto"
 }
 
 
-
-#' perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments
-#' clusters are sorted using hclust on centers
-#'
-#' @param mat numeric matrix to clutser
-#' @param nclust the number of clusters
-#' @param seed passed to set.seed() to allow reproducibility
-clusteringKmeans = function(mat, nclust, seed = 0) {
-    cluster_ordered = mat_name = NULL#declare binding for data.table
-
-    set.seed(seed)
-    mat_kmclust = kmeans(mat, centers = nclust, iter.max = 30)
-    center_o = hclust(dist(mat_kmclust$centers))$order
-    center_reo = 1:length(center_o)
-    names(center_reo) = center_o
-    center_reo[as.character(mat_kmclust$cluster)]
-    mat_dt = data.table::data.table(mat_name = names(mat_kmclust$cluster), cluster = mat_kmclust$cluster, cluster_ordered = center_reo[as.character(mat_kmclust$cluster)])
-    mat_dt = mat_dt[order(cluster_ordered), list(id = mat_name, group = cluster_ordered)]
-    return(mat_dt)
-}
-
-
-#' perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments
-#' clusters are sorted using hclust on centers
-#' the contents of each cluster are sorted using hclust
-#' @param mat A wide format matrix
-#' @param nclust the number of clusters
-clusteringKmeansNestedHclust = function(mat, nclust) {
-    group = id = within_o = NULL#declare binding for data.table
-    mat_dt = clusteringKmeans(mat, nclust)
-    mat_dt$within_o = as.integer(-1)
-    for (i in 1:length(nclust)) {
-        cmat = mat[mat_dt[group == i, id], , drop = FALSE]
-        if (nrow(cmat) > 2) {
-            mat_dt[group == i, ]$within_o = hclust(dist((cmat)))$order
-        } else {
-            mat_dt[group == i, ]$within_o = 1:nrow(cmat)
-        }
-
-    }
-    mat_dt = mat_dt[order(within_o), ][order(group), ]
-    mat_dt$within_o = NULL
-    return(mat_dt)
-}

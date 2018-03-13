@@ -23,16 +23,17 @@
 #' @param fill_alpha alpha value to use for fill, defaults to .5.
 #' @param counts_color single color to use for displaying counts
 #' @return ggplot venn diagram
+#' @import ggplot
 #' @importFrom limma vennCounts
 #' @importFrom ggforce geom_circle
 #' @examples
-#' setPlotVenn(list(1:3, 2:6))
-#' setPlotVenn(CTCF_in_10a_overlaps_gr)
-#' setPlotVenn(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
-setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
-                       counts_as_labels = FALSE, show_outside_count = FALSE, lwd = 3,
-                       circle_color = NULL, fill_circles = TRUE,
-                       fill_alpha = ifelse(fill_circles, 0.5, 0), counts_color = NULL) {
+#' ssvFeatureVenn(list(1:3, 2:6))
+#' ssvFeatureVenn(CTCF_in_10a_overlaps_gr)
+#' ssvFeatureVenn(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
+                          counts_as_labels = FALSE, show_outside_count = FALSE, lwd = 3,
+                          circle_color = NULL, fill_circles = TRUE,
+                          fill_alpha = ifelse(fill_circles, 0.5, 0), counts_color = NULL) {
     size = group = x = y = label = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     all(apply(object, 2, class) == "logical")
@@ -137,11 +138,12 @@ setPlotVenn = function(object, group_names = NULL, counts_txt_size = 5,
 #' @param object passed to ssvMakeMembTable for conversion to membership table
 #'
 #' @return ggplot of bar plot of set sizes
+#' @import ggplot
 #' @examples
-#' setPlotBars(list(1:3, 2:6))
-#' setPlotBars(CTCF_in_10a_overlaps_gr)
-#' setPlotBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
-setPlotBars = function(object) {
+#' ssvFeatureBars(list(1:3, 2:6))
+#' ssvFeatureBars(CTCF_in_10a_overlaps_gr)
+#' ssvFeatureBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+ssvFeatureBars = function(object) {
     group = count = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     hit_counts = colSums(object)
@@ -166,7 +168,7 @@ setPlotBars = function(object) {
 # @param flip_group_stage logical, different facetting.  default is FALSE
 #
 # @return ggplot of bar plot of set sizes
-# setPlotBars2 = function(object, peak_gr, flip_group_stage = FALSE) {
+# ssvFeatureBars2 = function(object, peak_gr, flip_group_stage = FALSE) {
 #   x = count = group = stage = NULL#declare binding for data.table
 #   object = ssvMakeMembTable(object)
 #   hit_counts = colSums(object)
@@ -204,7 +206,7 @@ setPlotBars = function(object) {
 # @param peak_gr peak sets before overlapping
 #
 # @return ggplot of pie charts
-# setPlotPie2 = function(object, peak_gr) {
+# ssvFeaturePie2 = function(object, peak_gr) {
 #   stage = count = group = NULL#declare binding for data.table
 #   object = ssvMakeMembTable(object)
 #   hit_counts = colSums(object)
@@ -236,13 +238,13 @@ setPlotBars = function(object) {
 #' pie plot of set sizes
 #' @export
 #' @param object object that ssvMakeMembTable can convert to logical matrix membership
-#'
+#' @import ggplot
 #' @return ggplot pie graph of set sizes
 #' @examples
-#' setPlotPie(list(1:3, 2:6))
-#' setPlotPie(CTCF_in_10a_overlaps_gr)
-#' setPlotPie(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
-setPlotPie = function(object) {
+#' ssvFeaturePie(list(1:3, 2:6))
+#' ssvFeaturePie(CTCF_in_10a_overlaps_gr)
+#' ssvFeaturePie(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+ssvFeaturePie = function(object) {
     count = group = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     hit_counts = colSums(object)
@@ -265,30 +267,6 @@ setPlotPie = function(object) {
     return(p)
 }
 
-#' allows RColorBrew to handle n values less than 3 and greater than 8 without
-#' warnings and return expected number of colors.
-#' @export
-#' @param n integer value of number of colors to make palette for
-#' @param pal palette recognized by RColorBrewer
-#' @importFrom RColorBrewer brewer.pal brewer.pal.info
-#' @examples
-#' plot(1:2, rep(0, 2),  col = safeBrew(2, "dark2"), pch = 16, cex = 6)
-#' plot(1:12, rep(0, 12),  col = safeBrew(12, "set1"), pch = 16, cex = 6)
-#' plot(1:12, rep(0, 12),  col = safeBrew(12, "set2"), pch = 16, cex = 6)
-#' plot(1:12, rep(0, 12),  col = safeBrew(12, "set3"), pch = 16, cex = 6)
-safeBrew = function(n, pal = "Dark2"){
-    if(n < 1) stop("n must be at least 1")
-    pal_info = RColorBrewer::brewer.pal.info
-    pal_info$brewName = rownames(pal_info)
-    rownames(pal_info) = tolower(rownames(pal_info))
-    pal = tolower(pal)
-    if(!any(pal == rownames(pal_info)))
-        stop(paste("Palette", pal, "not a valid RColorBrewer palette, see RColorBrewer::brewer.pal.info"))
-    maxColors = pal_info[pal,]$maxcolors
-    nbrew = max(n, 3) %>% min(., maxColors)
-    RColorBrewer::brewer.pal(n = nbrew, name = pal_info[pal,]$brewName)[(seq_len(n)-1) %% maxColors + 1]
-}
-
 # from https://gist.github.com/trinker/31edc08d0a4ec4c73935a23040c2f6cb p_load(dplyr, venneuler, ggforce, textshape)
 #' Try to load a bed-like file and convert it to a GRanges object
 #' @export
@@ -300,14 +278,15 @@ safeBrew = function(n, pal = "Dark2"){
 #' @param alpha numeric [0,1], alpha value for circle fill
 #' @param col_scale colors to choose from for circles.  passed to ggplot2 color scales.
 #' @return ggplot of venneuler results
+#' @import ggplot
 #' @import eulerr
 #' @examples
-#' setPlotEuler(list(1:3, 2:6))
-#' setPlotEuler(CTCF_in_10a_overlaps_gr)
-#' setPlotEuler(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
-setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1],
-                        n = 200, fill_circles = T, alpha = .15,
-                        col_scale = NULL) {
+#' ssvFeatureEuler(list(1:3, 2:6))
+#' ssvFeatureEuler(CTCF_in_10a_overlaps_gr)
+#' ssvFeatureEuler(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1],
+                           n = 200, fill_circles = T, alpha = .15,
+                           col_scale = NULL) {
     x = y = group = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     cn = colnames(object)
@@ -365,8 +344,9 @@ setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1
 #' @param raster_height_min raster height will be minimun multiple of number of rows over this number
 #' @rawNamespace import(data.table, except = shift)
 #' @import png
+#' @import ggplot
 #' @importFrom grid rasterGrob
-setPlotHeatmap = function(object, raster_approximation = TRUE, raster_width_min = 1000, raster_height_min = 1000) {
+ssvFeatureBinaryHeatmap = function(object, raster_approximation = TRUE, raster_width_min = 1000, raster_height_min = 1000) {
     groups = bool = value = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     mat = ifelse(as.matrix(object), 0, 1)
@@ -399,23 +379,54 @@ setPlotHeatmap = function(object, raster_approximation = TRUE, raster_width_min 
         # dmat = (dmat * -.95 + .95)
         comp_mat = dmat[comp_row, comp_col]
         png::writePNG(comp_mat, target = "tmp.png")
-        png_grob = grid::rasterGrob(png::readPNG("tmp.png"), width = unit(1, "npc"), height = unit(1, "npc"), interpolate = FALSE)
+        png_grob = grid::rasterGrob(png::readPNG("tmp.png"),
+                                    width = unit(1, "npc"),
+                                    height = unit(1, "npc"),
+                                    interpolate = FALSE)
         file.remove("tmp.png")
-        p = ggplot(hdt) + geom_tile(aes(x = groups, y = row, fill = NA, col = NULL)) + scale_fill_manual(values = c(`TRUE` = "black",
-                                                                                                                    `FALSE` = "#EFEFEF")) + scale_alpha(0) + labs(fill = "binding", y = "", title = "Marks per region clustering") + theme(axis.text.x = element_text(angle = 90,
-                                                                                                                                                                                                                                                                      hjust = 1, vjust = 0.5), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), plot.background = element_blank(),
-                                                                                                                                                                                                                                           panel.background = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), axis.ticks.x = element_blank(),
-                                                                                                                                                                                                                                           axis.text = element_text(size = rel(1.5)), legend.key.size = unit(0.12, units = "npc"), legend.text = element_text(size = rel(2)),
-                                                                                                                                                                                                                                           legend.title = element_text(size = rel(3)), axis.title = element_blank()) + annotation_custom(png_grob, xmin = 0.5,
-                                                                                                                                                                                                                                                                                                                                         xmax = ncol(dmat) + 0.5, ymin = 0.5, ymax = nrow(dmat) + 0.5)
+        p = ggplot(hdt) +
+            geom_tile(aes(x = groups, y = row, fill = NA, col = NULL)) +
+            scale_fill_manual(values = c(`TRUE` = "black", `FALSE` = "#EFEFEF")) +
+            scale_alpha(0) +
+            labs(fill = "binding", y = "", title = "Marks per region clustering") +
+            theme(
+                axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+                panel.grid.major.x = element_blank(),
+                panel.grid.minor.x = element_blank(),
+                plot.background = element_blank(),
+                panel.background = element_blank(),
+                axis.text.y = element_blank(),
+                axis.ticks.y = element_blank(),
+                axis.ticks.x = element_blank(),
+                axis.text = element_text(size = rel(1.5)),
+                legend.key.size = unit(0.12, units = "npc"),
+                legend.text = element_text(size = rel(2)),
+                legend.title = element_text(size = rel(3)),
+                axis.title = element_blank()
+            ) +
+            annotation_custom(png_grob, xmin = 0.5, xmax = ncol(dmat) + 0.5,
+                              ymin = 0.5, ymax = nrow(dmat) + 0.5)
     } else {
         hdt[, `:=`(bool, value == 1)]
-        p = ggplot(hdt) + geom_tile(aes(x = groups, y = row, fill = bool, col = NULL)) + scale_fill_manual(values = c(`FALSE` = "black",
-                                                                                                                      `TRUE` = "#EFEFEF")) + labs(fill = "binding", y = "", title = "Marks per region clustering") + theme(axis.text.x = element_text(angle = 90,
-                                                                                                                                                                                                                                                      hjust = 1, vjust = 0.5), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank(), plot.background = element_blank(),
-                                                                                                                                                                                                                           panel.background = element_blank(), axis.text.y = element_blank(), axis.ticks.y = element_blank(), axis.ticks.x = element_blank(),
-                                                                                                                                                                                                                           axis.text = element_text(size = rel(1.5)), legend.key.size = unit(0.12, units = "npc"), legend.text = element_text(size = rel(2)),
-                                                                                                                                                                                                                           legend.title = element_text(size = rel(3)), axis.title = element_blank())
+        p = ggplot(hdt) +
+            geom_tile(aes(x = groups, y = row, fill = bool, col = NULL)) +
+            scale_fill_manual(values = c(`FALSE` = "black", `TRUE` = "#EFEFEF")) +
+            labs(fill = "binding", y = "", title = "Marks per region clustering") +
+            theme(
+                axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
+                panel.grid.major.x = element_blank(),
+                panel.grid.minor.x = element_blank(),
+                plot.background = element_blank(),
+                panel.background = element_blank(),
+                axis.text.y = element_blank(),
+                axis.ticks.y = element_blank(),
+                axis.ticks.x = element_blank(),
+                axis.text = element_text(size = rel(1.5)),
+                legend.key.size = unit(0.12, units = "npc"),
+                legend.text = element_text(size = rel(2)),
+                legend.title = element_text(size = rel(3)),
+                axis.title = element_blank()
+            )
     }
     return(p)
 }
