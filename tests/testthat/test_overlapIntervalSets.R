@@ -23,11 +23,11 @@ test_that("overlapIntervalSets grs input are valid. List of Granges OK.", {
 
 test_that("ssvFeatureVenn various other paramters don't throw error", {
   olap = overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c))
-  p = ssvFeatureVenn(olap, circle_color = c("red", "blue", "green"), fill_alpha = .1,
+  p = ssvFeatureVenn(olap, circle_colors = c("red", "blue", "green"), fill_alpha = .1,
              counts_txt_size = 10, show_outside_count = T,
              counts_as_labels = T)
   expect_s3_class(p, class = "ggplot")
-  p = ssvFeatureVenn(olap, circle_color = c("red", "blue", "green"), fill_circles = F,
+  p = ssvFeatureVenn(olap, circle_colors = c("red", "blue", "green"), fill_circles = F,
              counts_txt_size = 10, show_outside_count = T,
              counts_as_labels = T)
   expect_s3_class(p, class = "ggplot")

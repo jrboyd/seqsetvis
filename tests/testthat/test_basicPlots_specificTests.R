@@ -49,7 +49,7 @@ test_that("ssvFeatureVenn can't plot more than 3 sets.", {
 })
 
 test_that("ssvFeatureVenn circle colors", {
-    p1 = ssvFeatureVenn(setL, circle_color = "blue")
+    p1 = ssvFeatureVenn(setL, circle_colors = "blue")
     expect_s3_class(p1, class = "ggplot")
 })
 

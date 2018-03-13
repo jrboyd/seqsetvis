@@ -18,7 +18,7 @@
 #' @param counts_as_labels if TRUE, geom_label is used instead of geom_text.  can be easier to read.
 #' @param show_outside_count if TRUE, items outside of all sets are counted outside. can be confusing.
 #' @param lwd uses size aesthetic to control line width of circles.
-#' @param circle_color colors to use for circle line colors. Uses Dark2 set from RColorBrewer by default.
+#' @param circle_colors colors to use for circle line colors. Uses Dark2 set from RColorBrewer by default.
 #' @param fill_circles if TRUE, fill circles
 #' @param fill_alpha alpha value to use for fill, defaults to .5.
 #' @param counts_color single color to use for displaying counts
@@ -31,7 +31,7 @@
 #' ssvFeatureVenn(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
                           counts_as_labels = FALSE, show_outside_count = FALSE, lwd = 3,
-                          circle_color = NULL, fill_circles = TRUE,
+                          circle_colors = NULL, fill_circles = TRUE,
                           fill_alpha = ifelse(fill_circles, 0.5, 0), counts_color = NULL) {
     size = group = x = y = label = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
@@ -43,21 +43,20 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
         stop("Can't plot Venn diagram for more than 3 sets")
     if (is.null(group_names))
         group_names <- factor(colnames(object)[1:nsets], levels = colnames(object)[1:nsets])
-    if (is.null(circle_color)) {
-        circle_color = safeBrew(nsets, "Dark2")
+    if (is.null(circle_colors)) {
+        circle_colors = safeBrew(nsets, "Dark2")
     } else {
-        not_hex = substr(circle_color, 0, 1) != "#"
-        circle_color[not_hex] = col2hex(circle_color[not_hex])
+        not_hex = substr(circle_colors, 0, 1) != "#"
+        circle_colors[not_hex] = col2hex(circle_colors[not_hex])
     }
-    if (length(circle_color) < nsets)
-        circle_color <- rep(circle_color, length.out = nsets)
+    if (length(circle_colors) < nsets)
+        circle_colors <- rep(circle_colors, length.out = nsets)
     if (is.null(counts_color))
         counts_color <- grDevices::rgb(0,0,0)
-    col_scale = circle_color
-    names(col_scale) = group_names
+    names(circle_colors) = group_names
     ahex = substr(grDevices::rgb(red = 1, blue = 1, green = 1, alpha = fill_alpha), start = 8, stop = 9)
-    fill_scale = paste0(col_scale, ahex)
-    names(fill_scale) = names(col_scale)
+    fill_scale = paste0(circle_colors, ahex)
+    names(fill_scale) = names(circle_colors)
 
 
     xcentres <- switch(nsets,
@@ -81,7 +80,7 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
     #                 c(1.8, 1.8),
     #                 c(2.4, 2.4, -3))
 
-    df_circles = data.frame(xcentres, ycentres, r, size = lwd, col = circle_color, group = group_names)
+    df_circles = data.frame(xcentres, ycentres, r, size = lwd, col = circle_colors, group = group_names)
 
     # internal function from eulerr
     eulerr_ellipse = function (h, k, a, b = a, phi = 0, n = 200L) {
@@ -102,10 +101,6 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
     ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x, y = ell$y))
     ell_dt = data.table::rbindlist(ell_dt, use.names = T, idcol = "group")
 
-    # if(is.null(col_scale)){
-    #     col_scale = safeBrew(ncol(object), "Dark2")
-    # }
-
     # if (fill_circles) {
     #
     # } else {
@@ -113,7 +108,7 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
     # }
     p = ggplot() +
         labs(fill = "", color = "") +
-        scale_color_manual(values = col_scale) +
+        scale_color_manual(values = circle_colors) +
         scale_size_identity() +
         scale_fill_manual(values = fill_scale) +
         theme_minimal() +
@@ -123,13 +118,10 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
               axis.ticks = element_blank(),
               panel.grid = element_blank(),
               legend.position = "top") +
-        # guides(fill = guide_legend(override.aes = list(shape = 21))) +
         coord_fixed()
     p = p + geom_polygon(data = ell_dt, aes(x = x, y = y, fill = group, col = group, size = 2, alpha = fill_alpha)) +
         scale_alpha_identity() + guides(alpha = "none")
 
-    # p = p + ggforce::geom_circle(data = df_circles, mapping = aes(x0 = xcentres, y0 = ycentres, r = r, size = size, col = group,
-                                                                  # fill = group))
     df_text <- switch(nsets,
                       {
                           df = data.frame(x = 0,
@@ -306,7 +298,7 @@ ssvFeaturePie = function(object) {
 #' @param n number of points to use for drawing ellipses, passed to  eulerr:::ellipse
 #' @param fill_circles logical, should circles be filled or empty?
 #' @param alpha numeric [0,1], alpha value for circle fill
-#' @param col_scale colors to choose from for circles.  passed to ggplot2 color scales.
+#' @param circle_colors colors to choose from for circles.  passed to ggplot2 color scales.
 #' @return ggplot of venneuler results
 #' @import ggplot2
 #' @import eulerr
@@ -316,7 +308,7 @@ ssvFeaturePie = function(object) {
 #' ssvFeatureEuler(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1],
                            n = 200, fill_circles = T, alpha = .15,
-                           col_scale = NULL) {
+                           circle_colors = NULL) {
     x = y = group = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     cn = colnames(object)
@@ -347,8 +339,8 @@ ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse"
     ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x, y = ell$y))
     ell_dt = data.table::rbindlist(ell_dt, use.names = T, idcol = "group")
 
-    if(is.null(col_scale)){
-        col_scale = safeBrew(ncol(object), "Dark2")
+    if(is.null(circle_colors)){
+        circle_colors = safeBrew(ncol(object), "Dark2")
     }
 
     if (fill_circles) {
@@ -357,7 +349,7 @@ ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse"
         p = ggplot(ell_dt, aes(x = x, y = y, fill = NA, col = group, size = 2))
     }
     p = p + geom_polygon() + labs(fill = "", color = "") + scale_size_identity() + scale_shape_identity() + scale_alpha_identity() +
-        scale_fill_manual(values = col_scale) + scale_color_manual(values = col_scale) + theme_minimal() + theme(plot.background = element_blank(),
+        scale_fill_manual(values = circle_colors) + scale_color_manual(values = circle_colors) + theme_minimal() + theme(plot.background = element_blank(),
                                                                                                                  axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank(), legend.position = "top") +
         guides(fill = guide_legend(override.aes = list(shape = 21))) + coord_fixed()  #+
     p
