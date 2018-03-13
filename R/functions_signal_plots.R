@@ -16,7 +16,7 @@
 #' @param quantile_max the highest quantile end
 #'
 #' @return ggplot object using ribbon plots to show quantile distributions
-#' @import data.table
+#' @rawNamespace import(data.table, except = shift)
 regionSetPlotBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
                                         hsv_reverse = FALSE,
                                         hsv_saturation = 1, hsv_value = 1,
@@ -212,7 +212,7 @@ regionSetPlotScatter = function(bw_dt, x_name, y_name,
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
-#' @import data.table
+#' @rawNamespace import(data.table, except = shift)
 #' @return data.table of signal profiles, ready for regionSetPlotHeatmap
 regionSetCluster = function(bw_dt, nclust = 6,
                             row_ = "id",

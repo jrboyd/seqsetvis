@@ -363,7 +363,8 @@ setPlotEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1
 #' @param raster_approximation instead of standard plot, write temporary raster image and redraw that as plot background.
 #' @param raster_width_min raster width will be minimun multiple of number of columns over this number
 #' @param raster_height_min raster height will be minimun multiple of number of rows over this number
-#' @import data.table png
+#' @rawNamespace import(data.table, except = shift)
+#' @import png
 #' @importFrom grid rasterGrob
 setPlotHeatmap = function(object, raster_approximation = TRUE, raster_width_min = 1000, raster_height_min = 1000) {
     groups = bool = value = NULL#declare binding for data.table
