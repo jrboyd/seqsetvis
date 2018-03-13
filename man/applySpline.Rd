@@ -38,21 +38,21 @@ if \code{by_ = c('gene_id')}
 \examples{
 #data may be blockier than we'd like
 ggplot(CTCF_in_10a_profiles_dt[, .(FE = mean(FE)), by = .(sample, x)]) +
-geom_line(aes(x = x, y = FE, color = sample))
-by_ = c('id', 'sample'))
+    geom_line(aes(x = x, y = FE, color = sample))
+
 #can be smoothed by applying a spline  (think twice about doing so,
 #it may look prettier but may also be deceptive or misleading)
-ggplot(splined_up[, .(FE = mean(FE)), by = .(sample, x)]) +
-geom_line(aes(x = x, y = FE, color = sample))
+
 splined_smooth = applySpline(CTCF_in_10a_profiles_dt, n = 10,
-y_ = 'FE', by_ = c('id', 'sample'))
+    y_ = 'FE', by_ = c('id', 'sample'))
 ggplot(splined_smooth[, .(FE = mean(FE)), by = .(sample, x)]) +
-geom_line(aes(x = x, y = FE, color = sample))
+    geom_line(aes(x = x, y = FE, color = sample))
+
 #another potential use is to down sample
 splined_down = applySpline(CTCF_in_10a_profiles_dt, n = .5,
-y_ = 'FE', by_ = c('id', 'sample'))
+    y_ = 'FE', by_ = c('id', 'sample'))
 ggplot(splined_down[, .(FE = mean(FE)), by = .(sample, x)]) +
-geom_line(aes(x = x, y = FE, color = sample))
+    geom_line(aes(x = x, y = FE, color = sample))
 }
 \seealso{
 \code{\link{fetchWindowedBigwig}}

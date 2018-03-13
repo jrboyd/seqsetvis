@@ -40,24 +40,25 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #' will be calculated individually for each gene in each sample. alternatively
 #' if \code{by_ = c('gene_id')}
 #' @seealso \code{\link{fetchWindowedBigwig}}
+#' @importFrom stats spline
 #' @examples
 #' #data may be blockier than we'd like
 #' ggplot(CTCF_in_10a_profiles_dt[, .(FE = mean(FE)), by = .(sample, x)]) +
-#' geom_line(aes(x = x, y = FE, color = sample))
-#' by_ = c('id', 'sample'))
+#'     geom_line(aes(x = x, y = FE, color = sample))
+#'
 #' #can be smoothed by applying a spline  (think twice about doing so,
 #' #it may look prettier but may also be deceptive or misleading)
-#' ggplot(splined_up[, .(FE = mean(FE)), by = .(sample, x)]) +
-#' geom_line(aes(x = x, y = FE, color = sample))
+#'
 #' splined_smooth = applySpline(CTCF_in_10a_profiles_dt, n = 10,
-#' y_ = 'FE', by_ = c('id', 'sample'))
+#'     y_ = 'FE', by_ = c('id', 'sample'))
 #' ggplot(splined_smooth[, .(FE = mean(FE)), by = .(sample, x)]) +
-#' geom_line(aes(x = x, y = FE, color = sample))
+#'     geom_line(aes(x = x, y = FE, color = sample))
+#'
 #' #another potential use is to down sample
 #' splined_down = applySpline(CTCF_in_10a_profiles_dt, n = .5,
-#' y_ = 'FE', by_ = c('id', 'sample'))
+#'     y_ = 'FE', by_ = c('id', 'sample'))
 #' ggplot(splined_down[, .(FE = mean(FE)), by = .(sample, x)]) +
-#' geom_line(aes(x = x, y = FE, color = sample))
+#'     geom_line(aes(x = x, y = FE, color = sample))
 applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
     if (!data.table::is.data.table(dt)) {
         stop(paste("dt must be of type data.table, was", class(dt)))
@@ -78,7 +79,7 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
         warning(paste0("applySpline : Duplicate values of x_ (", x_, ") exist within groups defined with by_ (", by_, ").\n
                        This Results in splines through the means of yvalues at duplicated xs."))
 
-    sdt = dt[, spline(get(x_), get(y_), n = floor(.N * n), ...), by = by_]
+    sdt = dt[, stats::spline(get(x_), get(y_), n = floor(.N * n), ...), by = by_]
     colnames(sdt)[colnames(sdt) == "x"] = x_
     colnames(sdt)[colnames(sdt) == "y"] = y_
     return(sdt)
@@ -189,9 +190,10 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
 #' @return data.table with group variable indicating cluster membership and id
 #' variable that is a factor indicating order based on within cluster similarity
 #' @export
+#' @importFrom stats kmeans hclust dist
 #' @examples
 #' dt = data.table::copy(CTCF_in_10a_profiles_dt)
-#' mat = dcast(dt, id ~ sample + x, value.var = "FE" )
+#' mat = data.table::dcast(dt, id ~ sample + x, value.var = "FE" )
 #' rn = mat$id
 #' mat = as.matrix(mat[,-1])
 #' rownames(mat) = rn
@@ -203,12 +205,14 @@ clusteringKmeans = function(mat, nclust, seed = 0) {
     cluster_ordered = mat_name = NULL#declare binding for data.table
 
     set.seed(seed)
-    mat_kmclust = kmeans(mat, centers = nclust, iter.max = 30)
-    center_o = hclust(dist(mat_kmclust$centers))$order
+    mat_kmclust = stats::kmeans(mat, centers = nclust, iter.max = 30)
+    center_o = stats::hclust(stats::dist(mat_kmclust$centers))$order
     center_reo = 1:length(center_o)
     names(center_reo) = center_o
     center_reo[as.character(mat_kmclust$cluster)]
-    mat_dt = data.table::data.table(mat_name = names(mat_kmclust$cluster), cluster = mat_kmclust$cluster, cluster_ordered = center_reo[as.character(mat_kmclust$cluster)])
+    mat_dt = data.table::data.table(mat_name = names(mat_kmclust$cluster),
+                                    cluster = mat_kmclust$cluster,
+                                    cluster_ordered = center_reo[as.character(mat_kmclust$cluster)])
     mat_dt = mat_dt[order(cluster_ordered), list(id = mat_name, group = cluster_ordered)]
     return(mat_dt)
 }
@@ -221,9 +225,10 @@ clusteringKmeans = function(mat, nclust, seed = 0) {
 #' @param nclust the number of clusters
 #' @param seed passed to set.seed() to allow reproducibility
 #' @export
+#' @importFrom stats  hclust dist
 #' @examples
 #' dt = data.table::copy(CTCF_in_10a_profiles_dt)
-#' mat = dcast(dt, id ~ sample + x, value.var = "FE" )
+#' mat = data.table::dcast(dt, id ~ sample + x, value.var = "FE" )
 #' rn = mat$id
 #' mat = as.matrix(mat[,-1])
 #' rownames(mat) = rn
@@ -238,7 +243,7 @@ clusteringKmeansNestedHclust = function(mat, nclust, seed = 0) {
     for (i in 1:length(nclust)) {
         cmat = mat[mat_dt[group == i, id], , drop = FALSE]
         if (nrow(cmat) > 2) {
-            mat_dt[group == i, ]$within_o = hclust(dist((cmat)))$order
+            mat_dt[group == i, ]$within_o = stats::hclust(stats::dist((cmat)))$order
         } else {
             mat_dt[group == i, ]$within_o = 1:nrow(cmat)
         }

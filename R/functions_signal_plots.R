@@ -17,6 +17,8 @@
 #'
 #' @return ggplot object using ribbon plots to show quantile distributions
 #' @import ggplot2
+#' @importFrom grDevices gray rainbow
+#' @importFrom stats quantile
 #' @rawNamespace import(data.table, except = shift)
 ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
                                         hsv_reverse = FALSE,
@@ -37,7 +39,7 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
     }
 
     calc_quantiles = function(td){
-        dt = bw_dt[get(by_) == td, .(qs = .(.(quantile(get(y_), q2do)))), by = x_]
+        dt = bw_dt[get(by_) == td, .(qs = .(.(stats::quantile(get(y_), q2do)))), by = x_]
         dt = cbind(dt, data.table::as.data.table(t(sapply(dt$qs, function(x) x[[1]]))))
         dt$qs = NULL
         dtm = data.table::melt(dt, id.vars = x_)
@@ -65,9 +67,9 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
         ncol = ceiling(length(q_o) / 2)
         if(hsv_grayscale){
             gray_vals = hsv_hue_min + (hsv_hue_max - hsv_hue_min)*((seq_len(ncol) - 1)/(ncol - 1))
-            cols = gray(gray_vals)
+            cols = grDevices::gray(gray_vals)
         }else{
-            cols = rainbow(ncol, start = hsv_hue_min, end = hsv_hue_max, s = hsv_saturation, v = hsv_value)
+            cols = grDevices::rainbow(ncol, start = hsv_hue_min, end = hsv_hue_max, s = hsv_saturation, v = hsv_value)
         }
         if(hsv_reverse) cols = rev(cols)
         ci = c(seq_len(ncol), rev(seq_len(ncol) - ifelse(length(q_o) %% 2 == 0, 0, 1)))
@@ -76,9 +78,9 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
         ncol = length(q_o)
         if(hsv_grayscale){
             gray_vals = hsv_hue_min + (hsv_hue_max - hsv_hue_min)*((seq_len(ncol) - 1)/(ncol - 1))
-            cols = gray(gray_vals)
+            cols = grDevices::gray(gray_vals)
         }else{
-            cols = rainbow(ncol, start = hsv_hue_min, end = hsv_hue_max, s = hsv_saturation, v = hsv_value)
+            cols = grDevices::rainbow(ncol, start = hsv_hue_min, end = hsv_hue_max, s = hsv_saturation, v = hsv_value)
         }
 
         if(hsv_reverse) cols = rev(cols)

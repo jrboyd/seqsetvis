@@ -1,8 +1,9 @@
 #' converts a valid r color name ("black", "red", "white", etc.) to a hex value
 #' @export
 #' @param color_name character. one or more r color names.
+#' @importFrom grDevices col2rgb rgb
 col2hex = function(color_name) {
-  rgb(t(col2rgb(color_name))/255)
+  grDevices::rgb(t(grDevices::col2rgb(color_name))/255)
 }
 
 #' convert a list of sets, each list item should be a character vector

@@ -53,10 +53,10 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
     if (length(circle_color) < nsets)
         circle_color <- rep(circle_color, length.out = nsets)
     if (is.null(counts_color))
-        counts_color <- rgb(0,0,0)
+        counts_color <- grDevices::rgb(0,0,0)
     col_scale = circle_color
     names(col_scale) = group_names
-    ahex = substr(rgb(red = 1, blue = 1, green = 1, alpha = fill_alpha), start = 8, stop = 9)
+    ahex = substr(grDevices::rgb(red = 1, blue = 1, green = 1, alpha = fill_alpha), start = 8, stop = 9)
     fill_scale = paste0(col_scale, ahex)
     names(fill_scale) = names(col_scale)
 

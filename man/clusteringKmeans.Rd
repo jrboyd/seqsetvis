@@ -26,7 +26,7 @@ clusters are sorted using hclust on centers
 }
 \examples{
 dt = data.table::copy(CTCF_in_10a_profiles_dt)
-mat = dcast(dt, id ~ sample + x, value.var = "FE" )
+mat = data.table::dcast(dt, id ~ sample + x, value.var = "FE" )
 rn = mat$id
 mat = as.matrix(mat[,-1])
 rownames(mat) = rn
