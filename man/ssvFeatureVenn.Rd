@@ -6,7 +6,7 @@
 \usage{
 ssvFeatureVenn(object, group_names = NULL, counts_txt_size = 5,
   counts_as_labels = FALSE, show_outside_count = FALSE, lwd = 3,
-  circle_color = NULL, fill_circles = TRUE,
+  circle_colors = NULL, fill_circles = TRUE,
   fill_alpha = ifelse(fill_circles, 0.5, 0), counts_color = NULL)
 }
 \arguments{
@@ -22,7 +22,7 @@ ssvFeatureVenn(object, group_names = NULL, counts_txt_size = 5,
 
 \item{lwd}{uses size aesthetic to control line width of circles.}
 
-\item{circle_color}{colors to use for circle line colors. Uses Dark2 set from RColorBrewer by default.}
+\item{circle_colors}{colors to use for circle line colors. Uses Dark2 set from RColorBrewer by default.}
 
 \item{fill_circles}{if TRUE, fill circles}
 

@@ -5,7 +5,7 @@
 \title{Try to load a bed-like file and convert it to a GRanges object}
 \usage{
 ssvFeatureEuler(object, line_width = 2, shape = c("circle", "ellipse")[1],
-  n = 200, fill_circles = T, alpha = 0.15, col_scale = NULL)
+  n = 200, fill_circles = T, alpha = 0.15, circle_colors = NULL)
 }
 \arguments{
 \item{object}{A membership table}
@@ -20,7 +20,7 @@ ssvFeatureEuler(object, line_width = 2, shape = c("circle", "ellipse")[1],
 
 \item{alpha}{numeric [0,1], alpha value for circle fill}
 
-\item{col_scale}{colors to choose from for circles.  passed to ggplot2 color scales.}
+\item{circle_colors}{colors to choose from for circles.  passed to ggplot2 color scales.}
 }
 \value{
 ggplot of venneuler results
