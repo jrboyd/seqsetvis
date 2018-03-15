@@ -54,8 +54,8 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
         olaps = rbind(olaps, data.table::data.table(queryHits = missing_idx, subjectHits = length(bw_gr) + 1))[order(queryHits)]
         bw_gr = c(bw_gr, GRanges(seqnames(bw_gr)[length(bw_gr)], IRanges::IRanges(1, 1), score = 0))
     }
-    # set FE and output windows = windows[olaps$queryHits]
-    windows$FE = bw_gr[olaps$subjectHits]$score
+    # set y and output windows = windows[olaps$queryHits]
+    windows$y = bw_gr[olaps$subjectHits]$score
     bw_dt = data.table::as.data.table(windows)
     bw_dt[, `:=`(x, start - min(start) + win_size/2), by = id]
     bw_dt[, `:=`(x, x - round(mean(x))), by = id]

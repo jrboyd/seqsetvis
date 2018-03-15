@@ -20,7 +20,7 @@
 #' @importFrom grDevices gray rainbow
 #' @importFrom stats quantile
 #' @rawNamespace import(data.table, except = shift)
-ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
+ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
                                         hsv_reverse = FALSE,
                                         hsv_saturation = 1, hsv_value = 1,
                                         hsv_grayscale = FALSE,
@@ -38,7 +38,7 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
         todo = unique(bw_dt[, get(by_)])
     }
 
-    calc_quantiles = function(td){
+    calc_quantiles = function(td){#, x_, y_, by_, q2do){
         dt = bw_dt[get(by_) == td, .(qs = .(.(stats::quantile(get(y_), q2do)))), by = x_]
         dt = cbind(dt, data.table::as.data.table(t(sapply(dt$qs, function(x) x[[1]]))))
         dt$qs = NULL
@@ -113,7 +113,7 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
 #' @param x_name sample name to map to x-axis, must be stored in variable specified in \code{xy_variable}
 #' @param y_name sample name to map to y-axis, must be stored in variable specified in \code{xy_variable}
 #' @param plotting_group work in progress, data.table that specifies groups for color scale
-#' @param value_variable variable name that stores numeric values for plotting, default is "FE"
+#' @param value_variable variable name that stores numeric values for plotting, default is "y"
 #' @param xy_variable variable name that stores sample, must contain entires for \code{x_name} and \code{y_name}
 #' @param value_function a function to apply to \code{value_variable} in all combintations of \code{by_} per \code{x_name} and \code{y_name}
 #' @param by_ variables that store individual measurement ids
@@ -125,7 +125,7 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "FE", x_ = "x", by_ = "fake",
 #' @return ggplot of points comparing signal from 2 samples
 ssvSignalScatterplot = function(bw_dt, x_name, y_name,
                                 plotting_group = NULL,
-                                value_variable = "FE", xy_variable = "sample",
+                                value_variable = "y", xy_variable = "sample",
                                 value_function = max,
                                 by_ = "id",
                                 plot_type = c("standard", "volcano")[1],
@@ -221,11 +221,11 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
 #' @return data.table of signal profiles, ready for ssvSignalHeatmap
 ssvSignalClustering = function(bw_dt, nclust = 6,
                             row_ = "id",
-                            column_ = "x", fill_ = "FE", facet_ = "sample",
+                            column_ = "x", fill_ = "y", facet_ = "sample",
                             cluster_ = "cluster_id",
                             max_rows = 500, max_cols = 100,
                             clustering_col_min = -Inf, clustering_col_max = Inf){
-    id = xbp = x = to_disp = FE = hit = val = y = y_gap = group =  NULL#declare binding for data.table
+    id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
     plot_dt = data.table::copy(bw_dt)
     raw_nc = length(unique(plot_dt$x))
     if(raw_nc > max_cols){
@@ -273,11 +273,11 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
 #' @return ggplot heatmap of signal profiles, facetted by sample
 ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "yes", "no")[1],
                                 row_ = "id",
-                                column_ = "x", fill_ = "FE", facet_ = "sample",
+                                column_ = "x", fill_ = "y", facet_ = "sample",
                                 cluster_ = "cluster_id",
                                 max_rows = 500, max_cols = 100,
                                 clustering_col_min = -Inf, clustering_col_max = Inf){
-    id = xbp = x = to_disp = FE = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
+    id = xbp = x = to_disp = y = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
     #determine if user wants clustering
     do_cluster = perform_clustering == "yes"
     if(perform_clustering == "auto"){
@@ -341,4 +341,21 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
     p
 }
 
+ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample", sample_ = "sample", region_ = "id"){
+    group_ = "grp"
+    bw_dt[,grp := paste(get(sample_), get(region_))]
+    ggplot(bw_dt[id %in% 1:3]) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_)) + facet_wrap(sample_, ncol = 1)
+    ggplot(bw_dt[id %in% 1:3]) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_)) + facet_grid(paste(sample_, "~", region_))
+    ggplot(bw_dt[id %in% 1:3]) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_)) + facet_wrap(group_)
+    ggplot(bw_dt[id %in% 1:3]) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_)) + facet_wrap(region_)
+}
 
+ssvSignalTrackplotAgg = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample", sample_ = "sample", region_ = "id", spline_n = NULL){
+    group_ = "grp"
+    bw_dt[,grp := paste(get(sample_), get(region_))]
+    agg_dt = bw_dt[, .(y = mean(get(y_))), by = .(get(sample_), get(x_))]
+    colnames(agg_dt) = c(sample_, x_, y_)
+    ggplot(agg_dt) + geom_path(aes_string(x = x_, y = y_, col = color_, group = color_))
+    sp_dt = applySpline(agg_dt, y_ = "y", by_ = sample_, n = 10)
+    ggplot(sp_dt) + geom_path(aes_string(x = x_, y = y_, col = color_, group = color_))
+}

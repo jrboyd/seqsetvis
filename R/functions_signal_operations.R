@@ -43,22 +43,22 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #' @importFrom stats spline
 #' @examples
 #' #data may be blockier than we'd like
-#' ggplot(CTCF_in_10a_profiles_dt[, .(FE = mean(FE)), by = .(sample, x)]) +
-#'     geom_line(aes(x = x, y = FE, color = sample))
+#' ggplot(CTCF_in_10a_profiles_dt[, .(y = mean(y)), by = .(sample, x)]) +
+#'     geom_line(aes(x = x, y = y, color = sample))
 #'
 #' #can be smoothed by applying a spline  (think twice about doing so,
 #' #it may look prettier but may also be deceptive or misleading)
 #'
 #' splined_smooth = applySpline(CTCF_in_10a_profiles_dt, n = 10,
-#'     y_ = 'FE', by_ = c('id', 'sample'))
-#' ggplot(splined_smooth[, .(FE = mean(FE)), by = .(sample, x)]) +
-#'     geom_line(aes(x = x, y = FE, color = sample))
+#'     y_ = 'y', by_ = c('id', 'sample'))
+#' ggplot(splined_smooth[, .(y = mean(y)), by = .(sample, x)]) +
+#'     geom_line(aes(x = x, y = y, color = sample))
 #'
 #' #another potential use is to down sample
 #' splined_down = applySpline(CTCF_in_10a_profiles_dt, n = .5,
-#'     y_ = 'FE', by_ = c('id', 'sample'))
-#' ggplot(splined_down[, .(FE = mean(FE)), by = .(sample, x)]) +
-#'     geom_line(aes(x = x, y = FE, color = sample))
+#'     y_ = 'y', by_ = c('id', 'sample'))
+#' ggplot(splined_down[, .(y = mean(y)), by = .(sample, x)]) +
+#'     geom_line(aes(x = x, y = y, color = sample))
 applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
     if (!data.table::is.data.table(dt)) {
         stop(paste("dt must be of type data.table, was", class(dt)))
@@ -115,14 +115,14 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
 #' will be calculated individually for each gene in each sample. alternatively
 #' if \code{by_ = c('gene_id')}
 #' @examples
-#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE', by_ = 'id',
+#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', by_ = 'id',
 #'   check_by_dupes = FALSE)
 #' #it's a bit clearer what's happening with trimming disabled
-#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE', by_ = 'id',
+#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', by_ = 'id',
 #'   check_by_dupes = FALSE, trim_to_valid = FALSE)
 #' #specify view_size to limit range of x values considered, prevents
 #' #excessive data trimming.
-#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'FE', view_size = 100, by_ = 'id',
+#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', view_size = 100, by_ = 'id',
 #' check_by_dupes = FALSE)
 centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE) {
     ymax = xsummit = xnew = N = NULL  #reserve data.table variables
@@ -193,7 +193,7 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
 #' @importFrom stats kmeans hclust dist
 #' @examples
 #' dt = data.table::copy(CTCF_in_10a_profiles_dt)
-#' mat = data.table::dcast(dt, id ~ sample + x, value.var = "FE" )
+#' mat = data.table::dcast(dt, id ~ sample + x, value.var = "y" )
 #' rn = mat$id
 #' mat = as.matrix(mat[,-1])
 #' rownames(mat) = rn
@@ -228,7 +228,7 @@ clusteringKmeans = function(mat, nclust, seed = 0) {
 #' @importFrom stats  hclust dist
 #' @examples
 #' dt = data.table::copy(CTCF_in_10a_profiles_dt)
-#' mat = data.table::dcast(dt, id ~ sample + x, value.var = "FE" )
+#' mat = data.table::dcast(dt, id ~ sample + x, value.var = "y" )
 #' rn = mat$id
 #' mat = as.matrix(mat[,-1])
 #' rownames(mat) = rn
