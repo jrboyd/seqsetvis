@@ -9,6 +9,9 @@ ssvSignalTrackplotAgg(bw_dt, x_ = "x", y_ = "y", sample_ = "sample",
   spline_n = NULL)
 }
 \arguments{
+\item{bw_dt}{tidy data.table containing track type profile data, see
+seqsetvis::fetchWindowedBigwig and seqsetvis::fetchWindowedBigwigList}
+
 \item{x_}{variable name mapped to x aesthetic, x by default.}
 
 \item{y_}{variable name mapped to y aesthetic, y by default.}
@@ -32,11 +35,13 @@ aggregate track signals in line plot
 }
 \examples{
 ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt) +
-labs(title = "agg regions by sample.")
+    labs(title = "agg regions by sample.")
 ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt, spline_n = 10) +
     labs(title = "agg regions by sample, with spline smoothing.")
-ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id \%in\% 1:10], sample_ = "id", color_ = "id") +
+ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id \%in\% 1:10],
+    sample_ = "id", color_ = "id") +
     labs(title = "agg samples by region id (weird)")
-ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id \%in\% 1:10], sample_ = "id", color_ = "id", spline_n = 10) +
+ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id \%in\% 1:10], sample_ = "id",
+    color_ = "id", spline_n = 10) +
     labs(title = "agg samples by region id (weird), with spline smoothing")
 }

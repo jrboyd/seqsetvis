@@ -343,6 +343,8 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
 
 #' construct track type plots where each region in each sample is represented
 #' @export
+#' @param bw_dt tidy data.table containing track type profile data, see
+#' seqsetvis::fetchWindowedBigwig and seqsetvis::fetchWindowedBigwigList
 #' @param x_ variable name mapped to x aesthetic, x by default.
 #' @param y_ variable name mapped to y aesthetic, y by default.
 #' @param color_ variable name mapped to color aesthetic, sample by default.
@@ -364,15 +366,20 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
 #' @import ggplot2
 #' @examples
 #' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "sample")
-#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "sample~.", facet_method = facet_grid)
-#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = paste("sample", "~", "id"), facet_method = facet_grid)
+#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
+#'     facet_ = "sample~.",
+#'     facet_method = facet_grid)
+#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
+#'     facet_ = paste("sample", "~", "id"), facet_method = facet_grid)
 #' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3])
 #' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "id")
-#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "id", spline_n = 10)
+#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
+#'     facet_ = "id", spline_n = 10)
 ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
                               sample_ = "sample", region_ = "id",
                               group_ = "auto_grp", facet_ = "auto_facet",
                               facet_method = facet_wrap, spline_n = NULL){
+    auto_grp = auto_facet = NULL
     bw_dt[,auto_grp := paste(get(sample_), get(region_))]
     bw_dt[,auto_facet := paste(get(sample_), get(region_))]
     if(!is.null(spline_n)){
@@ -385,6 +392,8 @@ ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
 
 #' aggregate track signals in line plot
 #' @export
+#' @param bw_dt tidy data.table containing track type profile data, see
+#' seqsetvis::fetchWindowedBigwig and seqsetvis::fetchWindowedBigwigList
 #' @param x_ variable name mapped to x aesthetic, x by default.
 #' @param y_ variable name mapped to y aesthetic, y by default.
 #' @param sample_ variable name, along with region_ used to group by default,
@@ -399,18 +408,21 @@ ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
 #' @import ggplot2
 #' @examples
 #' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt) +
-#' labs(title = "agg regions by sample.")
+#'     labs(title = "agg regions by sample.")
 #' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt, spline_n = 10) +
 #'     labs(title = "agg regions by sample, with spline smoothing.")
-#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10], sample_ = "id", color_ = "id") +
+#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10],
+#'     sample_ = "id", color_ = "id") +
 #'     labs(title = "agg samples by region id (weird)")
-#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10], sample_ = "id", color_ = "id", spline_n = 10) +
+#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10], sample_ = "id",
+#'     color_ = "id", spline_n = 10) +
 #'     labs(title = "agg samples by region id (weird), with spline smoothing")
 ssvSignalTrackplotAgg = function(bw_dt, x_ = "x", y_ = "y",
                                  sample_ = "sample",
                                  color_ = sample_,
                                  group_ = "auto_grp", agg_fun = mean,
                                  spline_n = NULL){
+    auto_grp = NULL
     bw_dt[, auto_grp := paste(get(sample_))]
     agg_dt = bw_dt[, .(y = agg_fun(get(y_))), by = c(unique(c(group_, color_, sample_, x_)))]
 

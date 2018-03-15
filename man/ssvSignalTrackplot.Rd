@@ -9,6 +9,9 @@ ssvSignalTrackplot(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
   facet_ = "auto_facet", facet_method = facet_wrap, spline_n = NULL)
 }
 \arguments{
+\item{bw_dt}{tidy data.table containing track type profile data, see
+seqsetvis::fetchWindowedBigwig and seqsetvis::fetchWindowedBigwigList}
+
 \item{x_}{variable name mapped to x aesthetic, x by default.}
 
 \item{y_}{variable name mapped to y aesthetic, y by default.}
@@ -41,9 +44,13 @@ construct track type plots where each region in each sample is represented
 }
 \examples{
 ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3], facet_ = "sample")
-ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3], facet_ = "sample~.", facet_method = facet_grid)
-ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3], facet_ = paste("sample", "~", "id"), facet_method = facet_grid)
+ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3],
+    facet_ = "sample~.",
+    facet_method = facet_grid)
+ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3],
+    facet_ = paste("sample", "~", "id"), facet_method = facet_grid)
 ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3])
 ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3], facet_ = "id")
-ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3], facet_ = "id", spline_n = 10)
+ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3],
+    facet_ = "id", spline_n = 10)
 }
