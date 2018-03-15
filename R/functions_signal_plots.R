@@ -21,11 +21,11 @@
 #' @importFrom stats quantile
 #' @rawNamespace import(data.table, except = shift)
 ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
-                                        hsv_reverse = FALSE,
-                                        hsv_saturation = 1, hsv_value = 1,
-                                        hsv_grayscale = FALSE,
-                                        hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = FALSE,
-                                        n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95
+                                    hsv_reverse = FALSE,
+                                    hsv_saturation = 1, hsv_value = 1,
+                                    hsv_grayscale = FALSE,
+                                    hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = FALSE,
+                                    n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95
 ) {
     variable = value = V1 = low = high = low_q = high_q = q_range = rn = q_num = q_low = q_high = NULL #declare binding for data.table
     q2do = 0:n_quantile/n_quantile
@@ -220,11 +220,11 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
 #' @rawNamespace import(data.table, except = shift)
 #' @return data.table of signal profiles, ready for ssvSignalHeatmap
 ssvSignalClustering = function(bw_dt, nclust = 6,
-                            row_ = "id",
-                            column_ = "x", fill_ = "y", facet_ = "sample",
-                            cluster_ = "cluster_id",
-                            max_rows = 500, max_cols = 100,
-                            clustering_col_min = -Inf, clustering_col_max = Inf){
+                               row_ = "id",
+                               column_ = "x", fill_ = "y", facet_ = "sample",
+                               cluster_ = "cluster_id",
+                               max_rows = 500, max_cols = 100,
+                               clustering_col_min = -Inf, clustering_col_max = Inf){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
     plot_dt = data.table::copy(bw_dt)
     raw_nc = length(unique(plot_dt$x))
@@ -272,11 +272,11 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
 #' @import ggplot2
 #' @return ggplot heatmap of signal profiles, facetted by sample
 ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "yes", "no")[1],
-                                row_ = "id",
-                                column_ = "x", fill_ = "y", facet_ = "sample",
-                                cluster_ = "cluster_id",
-                                max_rows = 500, max_cols = 100,
-                                clustering_col_min = -Inf, clustering_col_max = Inf){
+                            row_ = "id",
+                            column_ = "x", fill_ = "y", facet_ = "sample",
+                            cluster_ = "cluster_id",
+                            max_rows = 500, max_cols = 100,
+                            clustering_col_min = -Inf, clustering_col_max = Inf){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
     #determine if user wants clustering
     do_cluster = perform_clustering == "yes"
@@ -290,16 +290,16 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
     if(do_cluster){
         print("clustering...")
         plot_dt = ssvSignalClustering(bw_dt = bw_dt,
-                                   nclust = nclust,
-                                   row_ = row_,
-                                   column_ = column_,
-                                   fill_ = fill_,
-                                   facet_ = facet_,
-                                   cluster_ = cluster_,
-                                   max_rows = max_rows,
-                                   max_cols = max_cols,
-                                   clustering_col_min = clustering_col_min,
-                                   clustering_col_max = clustering_col_max)
+                                      nclust = nclust,
+                                      row_ = row_,
+                                      column_ = column_,
+                                      fill_ = fill_,
+                                      facet_ = facet_,
+                                      cluster_ = cluster_,
+                                      max_rows = max_rows,
+                                      max_cols = max_cols,
+                                      clustering_col_min = clustering_col_min,
+                                      clustering_col_max = clustering_col_max)
     }else{
         plot_dt = bw_dt
     }
@@ -341,21 +341,87 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
     p
 }
 
-ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample", sample_ = "sample", region_ = "id"){
-    group_ = "grp"
-    bw_dt[,grp := paste(get(sample_), get(region_))]
-    ggplot(bw_dt[id %in% 1:3]) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_)) + facet_wrap(sample_, ncol = 1)
-    ggplot(bw_dt[id %in% 1:3]) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_)) + facet_grid(paste(sample_, "~", region_))
-    ggplot(bw_dt[id %in% 1:3]) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_)) + facet_wrap(group_)
-    ggplot(bw_dt[id %in% 1:3]) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_)) + facet_wrap(region_)
+#' construct track type plots where each region in each sample is represented
+#' @export
+#' @param x_ variable name mapped to x aesthetic, x by default.
+#' @param y_ variable name mapped to y aesthetic, y by default.
+#' @param color_ variable name mapped to color aesthetic, sample by default.
+#' @param sample_ variable name, along with region_ used to group and
+#' facet by default, change group_ or facet_ to override.
+#' @param region_ variable name, along with sample_ used to group and facet
+#' by default, change group_ or facet_ to override.
+#' @param group_ group aesthetic keeps lines of geom_path from mis-connecting.
+#' auto_grp by default which combines sample_ and region_.
+#' probably shouldn't change.
+#' @param facet_ facetting divides up plots.
+#' auto_facet by default which combines sample_ and region_.
+#' if overriding facet_method with facet_grid, make sure to include ~ between
+#' two variables, ie. "a~b", ".~b", "a~."
+#' @param facet_method ggplot2 facetting method or wrapper for same,
+#' facet_wrap by default.
+#' @param spline_n if not NULL, applySpline will be called with n = spline_n.
+#' default is NULL.
+#' @import ggplot2
+#' @examples
+#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "sample")
+#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "sample~.", facet_method = facet_grid)
+#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = paste("sample", "~", "id"), facet_method = facet_grid)
+#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3])
+#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "id")
+#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "id", spline_n = 10)
+ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
+                              sample_ = "sample", region_ = "id",
+                              group_ = "auto_grp", facet_ = "auto_facet",
+                              facet_method = facet_wrap, spline_n = NULL){
+    bw_dt[,auto_grp := paste(get(sample_), get(region_))]
+    bw_dt[,auto_facet := paste(get(sample_), get(region_))]
+    if(!is.null(spline_n)){
+        p_dt = applySpline(bw_dt, n = spline_n, x_ = x_, y_ = y_, by_ = c(group_, sample_, region_, facet_))
+    }else{
+        p_dt = bw_dt
+    }
+    ggplot(p_dt) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_)) + facet_method(facet_)
 }
 
-ssvSignalTrackplotAgg = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample", sample_ = "sample", region_ = "id", spline_n = NULL){
-    group_ = "grp"
-    bw_dt[,grp := paste(get(sample_), get(region_))]
-    agg_dt = bw_dt[, .(y = mean(get(y_))), by = .(get(sample_), get(x_))]
-    colnames(agg_dt) = c(sample_, x_, y_)
-    ggplot(agg_dt) + geom_path(aes_string(x = x_, y = y_, col = color_, group = color_))
-    sp_dt = applySpline(agg_dt, y_ = "y", by_ = sample_, n = 10)
-    ggplot(sp_dt) + geom_path(aes_string(x = x_, y = y_, col = color_, group = color_))
+#' aggregate track signals in line plot
+#' @export
+#' @param x_ variable name mapped to x aesthetic, x by default.
+#' @param y_ variable name mapped to y aesthetic, y by default.
+#' @param sample_ variable name, along with region_ used to group by default,
+#' @param color_ variable name mapped to color aesthetic, sample_ by default.
+#' change group_ to override.
+#' @param group_ group aesthetic keeps lines of geom_path from mis-connecting.
+#' auto_grp by default uses sample_. probably shouldn't change.
+#' @param agg_fun the aggregation function to apply by sample_ and x_,
+#' default is mean
+#' @param spline_n if not NULL, applySpline will be called with n = spline_n.
+#' default is NULL.
+#' @import ggplot2
+#' @examples
+#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt) +
+#' labs(title = "agg regions by sample.")
+#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt, spline_n = 10) +
+#'     labs(title = "agg regions by sample, with spline smoothing.")
+#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10], sample_ = "id", color_ = "id") +
+#'     labs(title = "agg samples by region id (weird)")
+#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10], sample_ = "id", color_ = "id", spline_n = 10) +
+#'     labs(title = "agg samples by region id (weird), with spline smoothing")
+ssvSignalTrackplotAgg = function(bw_dt, x_ = "x", y_ = "y",
+                                 sample_ = "sample",
+                                 color_ = sample_,
+                                 group_ = "auto_grp", agg_fun = mean,
+                                 spline_n = NULL){
+    bw_dt[, auto_grp := paste(get(sample_))]
+    agg_dt = bw_dt[, .(y = agg_fun(get(y_))), by = c(unique(c(group_, color_, sample_, x_)))]
+
+    if(!is.null(spline_n)){
+        p_dt = applySpline(agg_dt, n = spline_n, x_ = x_, y_ = y_,
+                           by_ = c(group_, sample_))
+    }else{
+        p_dt = agg_dt
+    }
+    ggplot(p_dt) +
+        geom_path(aes_string(x = x_, y = y_, col = color_, group = group_))
 }
+
+
