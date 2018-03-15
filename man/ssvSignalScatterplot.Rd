@@ -5,7 +5,7 @@
 \title{maps signal from 2 sample profiles to the x and y axis. axes are standard or "volcano" min XY vs fold-change Y/X}
 \usage{
 ssvSignalScatterplot(bw_dt, x_name, y_name, plotting_group = NULL,
-  value_variable = "FE", xy_variable = "sample", value_function = max,
+  value_variable = "y", xy_variable = "sample", value_function = max,
   by_ = "id", plot_type = c("standard", "volcano")[1], show_help = FALSE,
   fixed_coords = TRUE)
 }
@@ -18,7 +18,7 @@ ssvSignalScatterplot(bw_dt, x_name, y_name, plotting_group = NULL,
 
 \item{plotting_group}{work in progress, data.table that specifies groups for color scale}
 
-\item{value_variable}{variable name that stores numeric values for plotting, default is "FE"}
+\item{value_variable}{variable name that stores numeric values for plotting, default is "y"}
 
 \item{xy_variable}{variable name that stores sample, must contain entires for \code{x_name} and \code{y_name}}
 

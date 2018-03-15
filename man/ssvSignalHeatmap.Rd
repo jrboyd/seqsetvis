@@ -6,7 +6,7 @@
 instead of clustering, each column is sorted starting from the left.}
 \usage{
 ssvSignalHeatmap(bw_dt, nclust = 6, perform_clustering = c("auto", "yes",
-  "no")[1], row_ = "id", column_ = "x", fill_ = "FE", facet_ = "sample",
+  "no")[1], row_ = "id", column_ = "x", fill_ = "y", facet_ = "sample",
   cluster_ = "cluster_id", max_rows = 500, max_cols = 100,
   clustering_col_min = -Inf, clustering_col_max = Inf)
 }

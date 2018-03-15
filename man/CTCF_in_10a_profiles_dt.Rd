@@ -16,7 +16,7 @@ A tidy data.table at window size 100 bp within 300 bp of peak center
   \item start. start of interval
   \item end. end of interval
   \item id. unique identifier
-  \item FE. fold-enrichment over input.
+  \item y. fold-enrichment over input.
   \item x. bp relative to center
   \item sample. name of originating sample
 }

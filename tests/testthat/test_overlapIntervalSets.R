@@ -41,3 +41,4 @@ test_that("col2hex", {
   expect_error(col2hex(rgb_colors))
   expect_error(col2hex("asdf"))
 })
+

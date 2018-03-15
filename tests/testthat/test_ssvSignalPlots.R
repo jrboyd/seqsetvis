@@ -6,7 +6,7 @@ test_bw = system.file("extdata/test_bigwigs/test_loading.bw", package = "seqsetv
 pos = c(20, 180, 210, 440, 520, 521)
 region_size = 30
 test_qgr = GRanges("chrTest", IRanges(pos+1, pos + region_size))
-exp_colnames = c("seqnames", "start", "end", "width", "strand", "id", "FE", "x")
+exp_colnames = c("seqnames", "start", "end", "width", "strand", "id", "y", "x")
 
 test_that("fetchWindowedBigwig return expected for valid even win_size", {
     #these should all work cleanly
