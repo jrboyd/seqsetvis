@@ -111,3 +111,23 @@ test_that("centerAtMax locus by_ argument", {
     expect_true(all(maxpos == 0))
 })
 
+test_that("centerAtMax input must be data.table", {
+    expect_error(centerAtMax(dt = data.frame(1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2")), regexp = "must be of type data.table")
+    expect_error(centerAtMax(dt = matrix(1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2")), regexp = "must be of type data.table")
+    expect_error(centerAtMax(dt = (1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2")), regexp = "must be of type data.table")
+    expect_error(centerAtMax(dt = "(1:3)", x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2")), regexp = "must be of type data.table")
+})
+
+test_that("centerAtMax viewSize", {
+    dt1 = centerAtMax(dt = test_dt2, x_ = "xvals", y_ = "yvals", by_ = c("locus"), view_size = 5, trim_to_valid = F, check_by_dupes = F)
+    dt2 = centerAtMax(dt = test_dt2, x_ = "xvals", y_ = "yvals", by_ = c("locus"), view_size = 10, trim_to_valid = F, check_by_dupes = F)
+    expect_equal(nrow(dt1), nrow(dt2))
+    expect_true(!all(dt2$xvals == dt1$xvals))
+})
+
+test_that("centerAtMax viewSize", {
+    dt1 = centerAtMax(dt = test_dt2, x_ = "xvals", y_ = "yvals", by_ = c("locus"), check_by_dupes = F, replace_x = F)
+    dt2 = centerAtMax(dt = test_dt2, x_ = "xvals", y_ = "yvals", by_ = c("locus"), check_by_dupes = F, replace_x = T)
+    expect_equal(colnames(dt1)[5], "xvals_summitPosition")
+    expect_equal(ncol(dt1), ncol(dt2)+1)
+})

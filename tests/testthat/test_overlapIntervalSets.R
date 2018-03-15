@@ -21,24 +21,19 @@ test_that("overlapIntervalSets grs input are valid. List of Granges OK.", {
     expect_s4_class(overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b)), class = "GRanges")
 })
 
-test_that("ssvFeatureVenn various other paramters don't throw error", {
-  olap = overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c))
-  p = ssvFeatureVenn(olap, circle_colors = c("red", "blue", "green"), fill_alpha = .1,
-             counts_txt_size = 10, show_outside_count = T,
-             counts_as_labels = T)
-  expect_s3_class(p, class = "ggplot")
-  p = ssvFeatureVenn(olap, circle_colors = c("red", "blue", "green"), fill_circles = F,
-             counts_txt_size = 10, show_outside_count = T,
-             counts_as_labels = T)
-  expect_s3_class(p, class = "ggplot")
+test_that("overlapIntervalSets grs input are valid. GrangesList OK.", {
+    expect_s4_class(overlapIntervalSets(GRangesList(list("gr_a" = gr_a, "gr_b" = gr_b))), class = "GRanges")
 })
 
-test_that("col2hex", {
-  string_colors = c("red", "blue", "green")
-  rgb_colors = col2rgb(string_colors)
-  hex_colors = c("#FF0000", "#0000FF", "#00FF00")
-  expect_equal(col2hex(string_colors), hex_colors)
-  expect_error(col2hex(rgb_colors))
-  expect_error(col2hex("asdf"))
+test_that("overlapIntervalSets useFirst.", {
+    ol = overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b), use_first = T)
+    expect_s4_class(ol, class = "GRanges")
+    expect_equal(length(ol), length(gr_a))
 })
 
+test_that("overlapIntervalSets ext reduces number of results", {
+    ol_ext1 = overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b), ext = 1)
+    ol_ext10 = overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b), ext = 10)
+    expect_equal(length(ol_ext1), 10)
+    expect_equal(length(ol_ext10), 1)
+})

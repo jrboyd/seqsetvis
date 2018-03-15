@@ -37,6 +37,32 @@ test_that("fetchWindowedBigwig return expected for valid odd win_size", {
     }
 })
 
+test_that("fetchWindowedBigwig use GRanges names as id", {
+    for(win in c(1, 3, 5, 15)){
+        qgr = test_qgr
+        names(qgr) = paste0("myNames_", seq_along(qgr))
+        bw_dt = fetchWindowedBigwig(bw_file = test_bw, win_size = win, qgr = qgr)
+        expect_is(bw_dt, "data.table")
+        expect_equal(colnames(bw_dt), exp_colnames)
+        expect_true(all(grepl("myNames", bw_dt$id)))
+        for(tid in unique(bw_dt$id)){
+            test_dt = bw_dt[id == tid]
+            expect_equal(nrow(test_dt), region_size / win) #expected number of regions
+            bw_gr = GRanges(test_dt)
+            expect_equal(length(findOverlaps(bw_gr, bw_gr)), region_size / win, info = "each returned GRange should only intersect itself.")
+        }
+    }
+})
+
+test_that("fetchWindowedBigwig patches missing values", {
+    for(win in c(1, 5, 20)){
+        qgr = GRanges("chrTest", IRanges(1, 2000))
+        bw_dt = fetchWindowedBigwig(bw_file = test_bw, win_size = win, qgr = qgr)
+        expect_is(bw_dt, "data.table")
+        expect_equal(colnames(bw_dt), exp_colnames)
+    }
+})
+
 test_that("fetchWindowedBigwig throws error if widths aren't divisble by win_size", {
     mix_width_gr = test_qgr
     end(mix_width_gr) =  end(mix_width_gr) + seq_along(mix_width_gr)
@@ -46,6 +72,8 @@ test_that("fetchWindowedBigwig throws error if widths aren't divisble by win_siz
         })
     }
 })
+
+
 
 test_that("fetchWindowedBigwig throws warning if widths vary", {
     mix_width_gr = test_qgr
@@ -185,7 +213,7 @@ test_that("ssvSignalScatterplot works with help enabled inputs", {
     expect_s3_class(p1, "ggplot")
 
     p1v = ssvSignalScatterplot(res, x_name = "bw_1", y_name = "bw_2",
-                              value_variable = "x", show_help = T, plot_type = "volcano")
+                               value_variable = "x", show_help = T, plot_type = "volcano")
     expect_s3_class(p1v, "ggplot")
 
     p2 = ssvSignalScatterplot(res, x_name = "bw_1", y_name = "bw_3",
@@ -307,4 +335,42 @@ test_that("ssvSignalHeatmap works with manual clustering", {
     })
     expect_s3_class(p1, "ggplot")
     expect_s3_class(p2, "ggplot")
+})
+
+test_that("ssvSignalTrackplot", {
+    #from examples
+    test_plots = list(
+        ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "sample"),
+        ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
+                           facet_ = "sample~.",
+                           facet_method = facet_grid),
+        ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
+                           facet_ = paste("sample", "~", "id"), facet_method = facet_grid),
+        ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3]),
+        ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "id"),
+        ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
+                           facet_ = "id", spline_n = 10)
+    )
+    lapply(test_plots, function(p1){
+        expect_s3_class(p1, "ggplot")
+    })
+})
+
+test_that("ssvSignalTrackplotAgg", {
+    #from examples
+    test_plots = list(
+        ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt) +
+            labs(title = "agg regions by sample."),
+        ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt, spline_n = 10) +
+            labs(title = "agg regions by sample, with spline smoothing."),
+        ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10],
+                              sample_ = "id", color_ = "id") +
+            labs(title = "agg samples by region id (weird)"),
+        ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10], sample_ = "id",
+                              color_ = "id", spline_n = 10) +
+            labs(title = "agg samples by region id (weird), with spline smoothing")
+    )
+    lapply(test_plots, function(p1){
+        expect_s3_class(p1, "ggplot")
+    })
 })

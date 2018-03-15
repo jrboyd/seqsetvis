@@ -45,5 +45,12 @@ test_that("applySpline no warning from multiple by_", {
     expect_failure(expect_warning(applySpline(dt = test_dt2, x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4)))
 })
 
+test_that("applySpline error if not data.table", {
+    expect_error(applySpline(dt = data.frame(1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "must be of type data.table")
+    expect_error(applySpline(dt = matrix(1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "must be of type data.table")
+    expect_error(applySpline(dt = (1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "must be of type data.table")
+    expect_error(applySpline(dt = "(1:3)", x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "must be of type data.table")
+})
+
 
 
