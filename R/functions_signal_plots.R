@@ -166,6 +166,12 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
                                 plot_type = c("standard", "volcano")[1],
                                 show_help = FALSE, fixed_coords = TRUE){
     xval = yval = xvolcano = id = yvolcano = NULL #declare binding for data.table
+    if(!any(x_name == bw_dt[[xy_variable]])){
+        stop(paste(x_name, "not found in", xy_variable, "variable of data.table"))
+    }
+    if(!any(y_name == bw_dt[[xy_variable]])){
+        stop(paste(y_name, "not found in", xy_variable, "variable of data.table"))
+    }
     plot_dt = merge(bw_dt[get(xy_variable) == x_name, .(xval = value_function(get(value_variable))), by = by_],
                     bw_dt[get(xy_variable) == y_name, .(yval = value_function(get(value_variable))), by = by_])
     if(is.null(plotting_group)){
