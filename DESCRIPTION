@@ -1,17 +1,21 @@
 Package: seqsetvis
 Type: Package
-Title: Interactive Visualizations for User Friendly ChIP-seq Peak
-        Comparison and Analysis
-Version: 0.99.1
+Title: Visualizations for User Friendly ChIP-seq Peak Comparison and Analysis
+Version: 0.99.0
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
 Author: Joseph R Boyd <jrboyd@uvm.edu>
 Maintainer: Joseph R Boyd <jrboyd@uvm.edu>
-Description: Makes the visual analysis of ChIP-seq peak sets and enrichment tracks
-    as easy as possible at all stages.  This assumes you have a set of bed-like files 
-    representing areas of enrichment (peaks) or other biologically relevant regions 
-    (promoters, enhancers) and bigwigs representing enrichment for the same samples 
-    or other relevant samples.
+Description: seqsetvis makes the visualization and analysis of ChIP-seq peak sets and 
+    enrichment tracks as easy as possible at all stages.  This assumes you have 
+    a set of bed-like files representing areas of enrichment (peaks) or other 
+    biologically relevant regions (promoters, enhancers) and bigwigs 
+    representing enrichment for the same samples or other relevant samples.
+    
+    This package makes heavy use of the data.table and ggplot2 packages and should
+    be straightforward to understand and hihgly customizable if users are familiar 
+    with these packages. If not, it should also "just work" and familiarity with 
+    these packages is not required.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -24,4 +28,4 @@ RoxygenNote: 6.0.1
 VignetteBuilder: knitr
 NeedsCompilation: no
 Packaged: 2018-01-08 17:54:19 UTC; joeboyd
-biocViews: Software, ChIPSeq, Sequencing, Visualization, GeneSetEnrichment
+biocViews: Software, ChIPSeq, Sequencing, Visualization

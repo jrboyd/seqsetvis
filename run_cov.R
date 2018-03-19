@@ -5,6 +5,8 @@ library(seqsetvis)
    testthat::test_file(f)
  }
 
+
+roxygen2::roxygenise()
 devtools::build(vignettes = T)
 system("R CMD check ../seqsetvis_0.99.1.tar.gz")
 
@@ -12,7 +14,6 @@ system("R CMD check ../seqsetvis_0.99.1.tar.gz")
 install.packages()
 # devtools::install(build_vignettes = F)
 
-roxygen2::roxygenise()
 
 a = covr::file_coverage(dir("R", full.names = T, pattern = "R$"), dir("tests/testthat/", full.names = T, pattern = "R$"))
 covr::report(a)
