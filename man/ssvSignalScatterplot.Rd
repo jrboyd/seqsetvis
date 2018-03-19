@@ -38,3 +38,21 @@ ggplot of points comparing signal from 2 samples
 \description{
 maps signal from 2 sample profiles to the x and y axis. axes are standard or "volcano" min XY vs fold-change Y/X
 }
+\examples{
+ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
+    x_name = "MCF10A", y_name = "MCF10AT1")
+ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
+    x_name = "MCF10A", y_name = "MCF10CA1")
+
+ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
+    x_name = "MCF10A", y_name = "MCF10AT1",
+    value_function = median) + labs(title = "median FE in regions")
+
+ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
+    x_name = "MCF10A", y_name = "MCF10AT1",
+    plot_type = "volcano")
+
+ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
+    x_name = "MCF10A", y_name = "MCF10AT1",
+    plot_type = "volcano", show_help = TRUE)
+}

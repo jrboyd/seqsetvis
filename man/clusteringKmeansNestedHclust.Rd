@@ -15,6 +15,12 @@ clusteringKmeansNestedHclust(mat, nclust, seed = 0)
 
 \item{seed}{passed to set.seed() to allow reproducibility}
 }
+\value{
+data.table with 2 columns of cluster info.
+id column corresponds with input matrix rownames and is sorted within
+each cluster using hierarchical clusering
+group column indicates cluster assignment
+}
 \description{
 perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments
 clusters are sorted using hclust on centers

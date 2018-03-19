@@ -100,7 +100,7 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
     e <- eulerr_ellipse(xcentres, ycentres, rep(r, length(xcentres)), rep(r, length(ycentres)), rep(0,length(xcentres)), 200)
     names(e) = group_names
     ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x, y = ell$y))
-    ell_dt = data.table::rbindlist(ell_dt, use.names = T, idcol = "group")
+    ell_dt = data.table::rbindlist(ell_dt, use.names = TRUE, idcol = "group")
 
     # if (fill_circles) {
     #
@@ -311,7 +311,7 @@ ssvFeaturePie = function(object) {
 #' ssvFeatureEuler(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureEuler(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse")[1],
-                           n = 200, fill_circles = T, alpha = .15,
+                           n = 200, fill_circles = TRUE, alpha = .15,
                            circle_colors = NULL) {
     x = y = group = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
@@ -341,7 +341,7 @@ ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse"
     e <- eulerr_ellipse(h, k, a, b, phi, n)
     names(e) = colnames(object)
     ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x, y = ell$y))
-    ell_dt = data.table::rbindlist(ell_dt, use.names = T, idcol = "group")
+    ell_dt = data.table::rbindlist(ell_dt, use.names = TRUE, idcol = "group")
 
     if(is.null(circle_colors)){
         circle_colors = safeBrew(ncol(object), "Dark2")
@@ -354,22 +354,32 @@ ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse"
     }
     p = p + geom_polygon() + labs(fill = "", color = "") + scale_size_identity() + scale_shape_identity() + scale_alpha_identity() +
         scale_fill_manual(values = circle_colors) + scale_color_manual(values = circle_colors) + theme_minimal() + theme(plot.background = element_blank(),
-                                                                                                                 axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank(), legend.position = "top") +
+                                                                                                                         axis.title = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(), panel.grid = element_blank(), legend.position = "top") +
         guides(fill = guide_legend(override.aes = list(shape = 21))) + coord_fixed()  #+
     p
 }
 
 #' binary heatmap indicating membership.
-#' heatmap is sorted by column left to right.  change column order to reveal patterns
+#' heatmap is sorted by column left to right.
+#' change column order to reveal patterns
 #' @export
 #' @param object passed to ssvMakeMembTable
-#' @param raster_approximation instead of standard plot, write temporary raster image and redraw that as plot background.
-#' @param raster_width_min raster width will be minimun multiple of number of columns over this number
-#' @param raster_height_min raster height will be minimun multiple of number of rows over this number
+#' @param raster_approximation instead of standard plot, write temporary raster
+#' image and redraw that as plot background.
+#' @param raster_width_min raster width will be minimun multiple of number of
+#' columns over this number
+#' @param raster_height_min raster height will be minimun multiple of number of
+#' rows over this number
 #' @rawNamespace import(data.table, except = c(shift, first, second))
+#' @return ggplot using geom_tile of membership table sorted from left to right.
 #' @import png
 #' @import ggplot2
 #' @importFrom grid rasterGrob
+#' @examples
+#' ssvFeatureBinaryHeatmap(list(1:3, 2:6))
+#' ssvFeatureBinaryHeatmap(CTCF_in_10a_overlaps_gr)
+#' ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+#' ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,3:2])
 ssvFeatureBinaryHeatmap = function(object, raster_approximation = TRUE, raster_width_min = 1000, raster_height_min = 1000) {
     groups = bool = value = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)

@@ -9,6 +9,13 @@ col2hex(color_name)
 \arguments{
 \item{color_name}{character. one or more r color names.}
 }
+\value{
+hex value of colors coded by colors()
+}
 \description{
 converts a valid r color name ("black", "red", "white", etc.) to a hex value
+}
+\examples{
+col2hex(c("red", "green", "blue"))
+col2hex(c("lightgray", "gray", "darkgray"))
 }

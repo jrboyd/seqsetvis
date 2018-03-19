@@ -38,3 +38,18 @@ data.table of signal profiles, ready for ssvSignalHeatmap
 \description{
 clustering as for a heatmap
 }
+\examples{
+clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt)
+ssvSignalHeatmap(clust_dt)
+
+clust_dt2 = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 2)
+ssvSignalHeatmap(clust_dt2)
+
+#clustering can be targetted to a specific part of the region
+clust_dt3 = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 2,
+    clustering_col_min = -250, clustering_col_max = -150)
+ssvSignalHeatmap(clust_dt3)
+clust_dt4 = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 2,
+    clustering_col_min = 150, clustering_col_max = 250)
+ssvSignalHeatmap(clust_dt4)
+}

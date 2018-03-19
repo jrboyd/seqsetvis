@@ -36,6 +36,10 @@ to FALSE.}
 if TRUE x_ will be replaced with position relative to summit.
 if FALSE x_ will be preserved and x_summitPosition added.}
 }
+\value{
+data.table with x (or xnew if replace_x is FALSE) shifted such that
+x = 0 matches the maximum y-value define by by_ grouping
+}
 \description{
 \code{centerAtMax} locates the coordinate x of the maximum in y and shifts x
 such that it is zero at max y.

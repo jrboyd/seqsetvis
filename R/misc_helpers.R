@@ -2,13 +2,19 @@
 #' @export
 #' @param color_name character. one or more r color names.
 #' @importFrom grDevices col2rgb rgb
+#' @return hex value of colors coded by colors()
+#' @examples
+#' col2hex(c("red", "green", "blue"))
+#' col2hex(c("lightgray", "gray", "darkgray"))
 col2hex = function(color_name) {
   grDevices::rgb(t(grDevices::col2rgb(color_name))/255)
 }
 
 #' convert a list of sets, each list item should be a character vector
 #' denoting items in sets
-#' @param set_list a list of character vectors.  default names will be added if missing
+#' @param set_list a list of character vectors.  default names will be added if
+#' missing
+#' @return converts list of characters/numeric to membership table matrix
 set_list2memb = function(set_list) {
   if (is.null(names(set_list))) {
     names(set_list) = paste0("set_", LETTERS[seq_along(set_list)])
@@ -30,6 +36,8 @@ set_list2memb = function(set_list) {
 #' @param n integer value of number of colors to make palette for
 #' @param pal palette recognized by RColorBrewer
 #' @importFrom RColorBrewer brewer.pal brewer.pal.info
+#' @return a character vector of hex coded colors o flength n from the color
+#' brewer palette pal
 #' @examples
 #' plot(1:2, rep(0, 2),  col = safeBrew(2, "dark2"), pch = 16, cex = 6)
 #' plot(1:12, rep(0, 12),  col = safeBrew(12, "set1"), pch = 16, cex = 6)

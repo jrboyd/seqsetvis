@@ -8,7 +8,11 @@ denoting items in sets}
 set_list2memb(set_list)
 }
 \arguments{
-\item{set_list}{a list of character vectors.  default names will be added if missing}
+\item{set_list}{a list of character vectors.  default names will be added if
+missing}
+}
+\value{
+converts list of characters/numeric to membership table matrix
 }
 \description{
 convert a list of sets, each list item should be a character vector

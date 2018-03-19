@@ -16,12 +16,12 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: testthat, covr, knitr, rmarkdown, cowplot
-Depends: R (>= 3.3.0), ggplot2
+Depends: R (>= 3.4), ggplot2
 Imports: GenomicRanges, IRanges, data.table, rtracklayer,
         limma, eulerr, RColorBrewer, magrittr, methods, S4Vectors,
-        png
+        png, grDevices, grid, stats
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr
 NeedsCompilation: no
 Packaged: 2018-01-08 17:54:19 UTC; joeboyd
-biocViews: Software, ChIPSeq, Sequencing, Visualization
+biocViews: Software, ChIPSeq, Sequencing, Visualization, GeneSetEnrichment

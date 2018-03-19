@@ -3,7 +3,8 @@
 \name{ssvFeatureBinaryHeatmap}
 \alias{ssvFeatureBinaryHeatmap}
 \title{binary heatmap indicating membership.
-heatmap is sorted by column left to right.  change column order to reveal patterns}
+heatmap is sorted by column left to right.
+change column order to reveal patterns}
 \usage{
 ssvFeatureBinaryHeatmap(object, raster_approximation = TRUE,
   raster_width_min = 1000, raster_height_min = 1000)
@@ -11,13 +12,26 @@ ssvFeatureBinaryHeatmap(object, raster_approximation = TRUE,
 \arguments{
 \item{object}{passed to ssvMakeMembTable}
 
-\item{raster_approximation}{instead of standard plot, write temporary raster image and redraw that as plot background.}
+\item{raster_approximation}{instead of standard plot, write temporary raster
+image and redraw that as plot background.}
 
-\item{raster_width_min}{raster width will be minimun multiple of number of columns over this number}
+\item{raster_width_min}{raster width will be minimun multiple of number of
+columns over this number}
 
-\item{raster_height_min}{raster height will be minimun multiple of number of rows over this number}
+\item{raster_height_min}{raster height will be minimun multiple of number of
+rows over this number}
+}
+\value{
+ggplot using geom_tile of membership table sorted from left to right.
 }
 \description{
 binary heatmap indicating membership.
-heatmap is sorted by column left to right.  change column order to reveal patterns
+heatmap is sorted by column left to right.
+change column order to reveal patterns
+}
+\examples{
+ssvFeatureBinaryHeatmap(list(1:3, 2:6))
+ssvFeatureBinaryHeatmap(CTCF_in_10a_overlaps_gr)
+ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,3:2])
 }

@@ -30,6 +30,9 @@ default is mean}
 \item{spline_n}{if not NULL, applySpline will be called with n = spline_n.
 default is NULL.}
 }
+\value{
+ggplot of signal aggregated with agg_fun() by sample.
+}
 \description{
 aggregate track signals in line plot
 }

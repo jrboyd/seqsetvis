@@ -12,6 +12,10 @@ safeBrew(n, pal = "Dark2")
 
 \item{pal}{palette recognized by RColorBrewer}
 }
+\value{
+a character vector of hex coded colors o flength n from the color
+brewer palette pal
+}
 \description{
 allows RColorBrew to handle n values less than 3 and greater than 8 without
 warnings and return expected number of colors.

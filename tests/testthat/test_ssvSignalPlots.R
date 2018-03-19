@@ -2,7 +2,7 @@ library(seqsetvis)
 library(testthat)
 library(GenomicRanges)
 # library(rtracklayer)
-test_bw = system.file("extdata/test_bigwigs/test_loading.bw", package = "seqsetvis", mustWork = T)
+test_bw = system.file("extdata/test_bigwigs/test_loading.bw", package = "seqsetvis", mustWork = TRUE)
 pos = c(20, 180, 210, 440, 520, 521)
 region_size = 30
 test_qgr = GRanges("chrTest", IRanges(pos+1, pos + region_size))
@@ -85,9 +85,20 @@ test_that("fetchWindowedBigwig throws warning if widths vary", {
     }
 })
 
-test_that("fetchWindowedBigwigList works with proper inputs", {
+test_that("fetchWindowedBigwigList works with character vector bw_files", {
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
+    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+                                                           win_size = 3,
+                                                           qgr = test_qgr)})
+    expect_s3_class(res, "data.table")
+    expect_equal(colnames(res), c(exp_colnames, "sample"))
+})
+
+test_that("fetchWindowedBigwigList works with list bw_files", {
+    bw_files = rep(test_bw, 3)
+    names(bw_files) = paste0("bw_", 1:3)
+    bw_files = as.list(bw_files)
     hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
                                                            win_size = 3,
                                                            qgr = test_qgr)})

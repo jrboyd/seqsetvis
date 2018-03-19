@@ -39,6 +39,9 @@ facet_wrap by default.}
 \item{spline_n}{if not NULL, applySpline will be called with n = spline_n.
 default is NULL.}
 }
+\value{
+ggplot of signal potentially facetted by region and sample
+}
 \description{
 construct track type plots where each region in each sample is represented
 }

@@ -5,7 +5,7 @@
 \title{Try to load a bed-like file and convert it to a GRanges object}
 \usage{
 ssvFeatureEuler(object, line_width = 2, shape = c("circle", "ellipse")[1],
-  n = 200, fill_circles = T, alpha = 0.15, circle_colors = NULL)
+  n = 200, fill_circles = TRUE, alpha = 0.15, circle_colors = NULL)
 }
 \arguments{
 \item{object}{A membership table}

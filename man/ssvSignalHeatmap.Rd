@@ -43,3 +43,11 @@ ggplot heatmap of signal profiles, facetted by sample
 heatmap style representation of membership table.
 instead of clustering, each column is sorted starting from the left.
 }
+\examples{
+#the simplest use
+ssvSignalHeatmap(CTCF_in_10a_profiles_dt)
+
+#clustering can be done manually beforehand
+clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
+ssvSignalHeatmap(clust_dt)
+}

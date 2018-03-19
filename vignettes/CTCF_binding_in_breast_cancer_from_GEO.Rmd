@@ -24,14 +24,15 @@ cancer cell lines.
 
 This consists of 2 stages:
 
-1. 3-way overlap of CTCF peaks in 3 cell lines to create a single merged regions set with 3 logical attributes.
+1. 3-way overlap of CTCF peaks in 3 cell lines to create a single merged regions 
+set with 3 logical attributes.
 2. Retrieval of binding profiles around merged regions set.
 
 Both stages are supported by several plotting functions.
 
 ## Loading Libraries
 
-```{r, message = F}
+```{r, message = FALSE}
 library(seqsetvis)
 library(magrittr)
 library(rtracklayer)
@@ -40,15 +41,20 @@ library(cowplot)
 
 ## Loading narrowPeak files as GRanges
 
-This vignette runs using a small subset of datasets that are publicly available via [GEO](https://www.ncbi.nlm.nih.gov/geo/).  To download the full dataset see: [narrowPeak from GEO](#np_load)
+This vignette runs using a small subset of datasets that are publicly available 
+via [GEO](https://www.ncbi.nlm.nih.gov/geo/).  
+To download the full dataset see: [narrowPeak from GEO](#np_load)
 
 ```{r}
 # load 
 # set filepaths
 np_files = c(
-    system.file("extdata", "MCF10A_CTCF_random100.narrowPeak", package = "seqsetvis"),
-    system.file("extdata", "MCF10AT1_CTCF_random100.narrowPeak", package = "seqsetvis"),
-    system.file("extdata", "MCF10CA1_CTCF_random100.narrowPeak", package = "seqsetvis")
+    system.file("extdata", "MCF10A_CTCF_random100.narrowPeak", 
+                package = "seqsetvis"),
+    system.file("extdata", "MCF10AT1_CTCF_random100.narrowPeak", 
+                package = "seqsetvis"),
+    system.file("extdata", "MCF10CA1_CTCF_random100.narrowPeak", 
+                package = "seqsetvis")
 )
 
 names(np_files) = np_files %>%
@@ -150,15 +156,18 @@ bw_dt = CTCF_in_10a_profiles_dt
 # bw_files = sapply(names(CTCF_in_10a_bigWig_urls), function(x){
 #     system.file("extdata", paste0(x, "_FE_random100.bw"), package = "seqsetvis")
 # })
-# bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize, win_size = 100)
+# bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize, 
+#   win_size = 100)
 
 # # alternative (2) access the complete data from GEO.  has a tendency to timeout.
-# bw_dt = fetchWindowedBigwigList(bw_files = CTCF_in_10a_bigWig_urls, qgr = olap_fixedSize, win_size = 100)
+# bw_dt = fetchWindowedBigwigList(bw_files = CTCF_in_10a_bigWig_urls, 
+#     qgr = olap_fixedSize, win_size = 100)
 ```
 [bw load](#bw_load)
 
 ```{r, fig.width=16, fig.height=4}
-p1 = ssvSignalBandedQuantiles(bw_dt, hsv_symmetric = T, hsv_reverse = T, hsv_grayscale = T)
+p1 = ssvSignalBandedQuantiles(bw_dt, hsv_symmetric = TRUE, hsv_reverse = TRUE, 
+                              hsv_grayscale = TRUE)
 p2 = ssvSignalScatterplot(bw_dt, x_name = "MCF10A", y_name = "MCF10AT1")
 p3 = ssvSignalHeatmap(bw_dt)
 cowplot::plot_grid(p1, p2, p3, nrow = 1)

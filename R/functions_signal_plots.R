@@ -20,6 +20,24 @@
 #' @importFrom grDevices gray rainbow
 #' @importFrom stats quantile
 #' @rawNamespace import(data.table, except = c(shift, first, second))
+#' @examples
+#' #rainbow colors
+#' ssvSignalBandedQuantiles(CTCF_in_10a_profiles_dt)
+#' ssvSignalBandedQuantiles(CTCF_in_10a_profiles_dt, hsv_symmetric = TRUE,
+#'     hsv_reverse = TRUE)
+#' #grayscale
+#' ssvSignalBandedQuantiles(CTCF_in_10a_profiles_dt, hsv_grayscale = TRUE)
+#' ssvSignalBandedQuantiles(CTCF_in_10a_profiles_dt, hsv_grayscale = TRUE,
+#'     hsv_symmetric = TRUE, hsv_reverse = TRUE)
+#' #using "by_" per sample
+#' ssvSignalBandedQuantiles(CTCF_in_10a_profiles_dt, hsv_grayscale = TRUE,
+#'     hsv_symmetric = TRUE, hsv_reverse = TRUE, by_ = "sample")
+#' #adding spline smoothing
+#' splined = applySpline(CTCF_in_10a_profiles_dt, n = 10,
+#'     by_ = c("id", "sample"))
+#' ssvSignalBandedQuantiles(splined, n_quantile = 50,
+#'     quantile_min = .25, quantile_max = .75,
+#'     hsv_symmetric = TRUE, hsv_reverse = TRUE, by_ = "sample")
 ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
                                     hsv_reverse = FALSE,
                                     hsv_saturation = 1, hsv_value = 1,
@@ -123,6 +141,23 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
 #'
 #' @import ggplot2
 #' @return ggplot of points comparing signal from 2 samples
+#' @examples
+#' ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
+#'     x_name = "MCF10A", y_name = "MCF10AT1")
+#' ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
+#'     x_name = "MCF10A", y_name = "MCF10CA1")
+#'
+#' ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
+#'     x_name = "MCF10A", y_name = "MCF10AT1",
+#'     value_function = median) + labs(title = "median FE in regions")
+#'
+#' ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
+#'     x_name = "MCF10A", y_name = "MCF10AT1",
+#'     plot_type = "volcano")
+#'
+#' ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
+#'     x_name = "MCF10A", y_name = "MCF10AT1",
+#'     plot_type = "volcano", show_help = TRUE)
 ssvSignalScatterplot = function(bw_dt, x_name, y_name,
                                 plotting_group = NULL,
                                 value_variable = "y", xy_variable = "sample",
@@ -219,6 +254,20 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
 #' @rawNamespace import(data.table, except = c(shift, first, second))
 #' @return data.table of signal profiles, ready for ssvSignalHeatmap
+#' @examples
+#' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt)
+#' ssvSignalHeatmap(clust_dt)
+#'
+#' clust_dt2 = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 2)
+#' ssvSignalHeatmap(clust_dt2)
+#'
+#' #clustering can be targetted to a specific part of the region
+#' clust_dt3 = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 2,
+#'     clustering_col_min = -250, clustering_col_max = -150)
+#' ssvSignalHeatmap(clust_dt3)
+#' clust_dt4 = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 2,
+#'     clustering_col_min = 150, clustering_col_max = 250)
+#' ssvSignalHeatmap(clust_dt4)
 ssvSignalClustering = function(bw_dt, nclust = 6,
                                row_ = "id",
                                column_ = "x", fill_ = "y", facet_ = "sample",
@@ -271,6 +320,13 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
 #'
 #' @import ggplot2
 #' @return ggplot heatmap of signal profiles, facetted by sample
+#' @examples
+#' #the simplest use
+#' ssvSignalHeatmap(CTCF_in_10a_profiles_dt)
+#'
+#' #clustering can be done manually beforehand
+#' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
+#' ssvSignalHeatmap(clust_dt)
 ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "yes", "no")[1],
                             row_ = "id",
                             column_ = "x", fill_ = "y", facet_ = "sample",
@@ -364,6 +420,7 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
 #' @param spline_n if not NULL, applySpline will be called with n = spline_n.
 #' default is NULL.
 #' @import ggplot2
+#' @return ggplot of signal potentially facetted by region and sample
 #' @examples
 #' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "sample")
 #' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
@@ -406,6 +463,7 @@ ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
 #' @param spline_n if not NULL, applySpline will be called with n = spline_n.
 #' default is NULL.
 #' @import ggplot2
+#' @return ggplot of signal aggregated with agg_fun() by sample.
 #' @examples
 #' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt) +
 #'     labs(title = "agg regions by sample.")

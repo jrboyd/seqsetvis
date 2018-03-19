@@ -8,6 +8,11 @@
 #' @return Set of GRanges after resizing all input GRanges, either shortened
 #' or lengthened as required to match \code{fixed_size}
 #' @import GenomicRanges
+#' @examples
+#' library(GenomicRanges)
+#' grs = GRanges("chr1", IRanges(1:10+100, 1:10*3+100))
+#' centered_grs = centerFixedSizeGRanges(grs, 10)
+#' width(centered_grs)
 centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
     m = floor(start(grs) + width(grs)/2)
     ext = floor(fixed_size/2)
@@ -114,6 +119,9 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
 #' splines
 #' will be calculated individually for each gene in each sample. alternatively
 #' if \code{by_ = c('gene_id')}
+#' @return
+#' data.table with x (or xnew if replace_x is FALSE) shifted such that
+#' x = 0 matches the maximum y-value define by by_ grouping
 #' @examples
 #' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', by_ = 'id',
 #'   check_by_dupes = FALSE)
@@ -226,6 +234,10 @@ clusteringKmeans = function(mat, nclust, seed = 0) {
 #' @param seed passed to set.seed() to allow reproducibility
 #' @export
 #' @importFrom stats  hclust dist
+#' @return data.table with 2 columns of cluster info.
+#' id column corresponds with input matrix rownames and is sorted within
+#' each cluster using hierarchical clusering
+#' group column indicates cluster assignment
 #' @examples
 #' dt = data.table::copy(CTCF_in_10a_profiles_dt)
 #' mat = data.table::dcast(dt, id ~ sample + x, value.var = "y" )

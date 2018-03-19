@@ -10,7 +10,8 @@ fetchWindowedBigwigList(bw_files, qgr, bw_names = names(bw_files),
   bw_variable_name = "sample", win_size = 50)
 }
 \arguments{
-\item{bw_files}{The character vector paths to bigwig files to read from.}
+\item{bw_files}{The character vector or list of paths to bigwig files to
+read from.}
 
 \item{qgr}{Set of GRanges to query.  For valid results the width of each
 interval should be identical and evenly divisible by \code{win_size}.}
@@ -31,5 +32,15 @@ See \code{\link{fetchWindowedBigwig}} for more info.
 }
 \details{
 if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
-10, values from positions chr1 5,15,25...85, and 95 will be retrieved from \code{bw_file}
+10, values from positions chr1 5,15,25...85, and 95 will be
+retrieved from \code{bw_file}
+}
+\examples{
+library(GenomicRanges)
+bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+    package = "seqsetvis", mustWork = TRUE)
+bw_files = c("a" = bw_f, "b" = bw_f)
+qgr = GRanges("chrTest", IRanges(1, 30))
+bw_dt = fetchWindowedBigwigList(bw_files, qgr, win_size = 10)
+bw_dt2 = fetchWindowedBigwigList(as.list(bw_files), qgr, win_size = 10)
 }

@@ -14,7 +14,12 @@
 #' @rawNamespace import(data.table, except = c(shift, first, second))
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
 #' 10, values from positions chr1 5,15,25...85, and 95 will be retrieved from \code{bw_file}
-#'
+#' @examples
+#' library(GenomicRanges)
+#' bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' qgr = GRanges("chrTest", IRanges(1, 30))
+#' bw_dt = fetchWindowedBigwig(bw_f, qgr, win_size = 10)
 fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
     queryHits = id = x = NULL
     if (!all(width(qgr)%%win_size == 0)) {
@@ -22,8 +27,8 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
     }
     if (!all(width(qgr) == width(qgr)[1])) {
         warning(paste("Widths vary between GRanges.  Before aggregating or co-plotting, recommend one of:
-                  1) modifying input qgr such that all GRanges have same width
-                  2) filtering output so that the same values of x are present for every region"))
+            1) modifying input qgr such that all GRanges have same width
+            2) filtering output so that the same values of x are present for every region"))
     }
     # suppressWarnings({
     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
@@ -72,7 +77,8 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
 #' \code{fetchWindowedBigwigList} iteratively calls \code{fetchWindowedBigwig}.
 #' See \code{\link{fetchWindowedBigwig}} for more info.
 #' @export
-#' @param bw_files The character vector paths to bigwig files to read from.
+#' @param bw_files The character vector or list of paths to bigwig files to
+#'  read from.
 #' @param qgr Set of GRanges to query.  For valid results the width of each
 #' interval should be identical and evenly divisible by \code{win_size}.
 #' @param bw_names names to use in final data.table to designate source bigwig
@@ -82,8 +88,20 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
 #' @return A tidy formatted data.table containing fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second))
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
-#' 10, values from positions chr1 5,15,25...85, and 95 will be retrieved from \code{bw_file}
+#' 10, values from positions chr1 5,15,25...85, and 95 will be
+#' retrieved from \code{bw_file}
+#' @examples
+#' library(GenomicRanges)
+#' bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' bw_files = c("a" = bw_f, "b" = bw_f)
+#' qgr = GRanges("chrTest", IRanges(1, 30))
+#' bw_dt = fetchWindowedBigwigList(bw_files, qgr, win_size = 10)
+#' bw_dt2 = fetchWindowedBigwigList(as.list(bw_files), qgr, win_size = 10)
 fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files), bw_variable_name = "sample", win_size = 50) {
+    if(is.list(bw_files)){
+        bw_files = unlist(bw_files)
+    }
     if (is.null(bw_names)) {
         bw_names = basename(bw_files)
     }
