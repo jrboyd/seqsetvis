@@ -11,7 +11,6 @@ Description: seqsetvis makes the visualization and analysis of ChIP-seq peak set
     a set of bed-like files representing areas of enrichment (peaks) or other 
     biologically relevant regions (promoters, enhancers) and bigwigs 
     representing enrichment for the same samples or other relevant samples.
-    
     This package makes heavy use of the data.table and ggplot2 packages and should
     be straightforward to understand and hihgly customizable if users are familiar 
     with these packages. If not, it should also "just work" and familiarity with 
