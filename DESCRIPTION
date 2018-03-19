@@ -15,7 +15,7 @@ Description: Makes the visual analysis of ChIP-seq peak sets and enrichment trac
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Suggests: testthat, covr, knitr, rmarkdown, cowplot
+Suggests: testthat, covr, knitr, rmarkdown
 Depends: R (>= 3.3.0), ggplot2
 Imports: methods, GenomicRanges, IRanges, data.table, rtracklayer,
         limma, eulerr, ggforce, RColorBrewer, magrittr, S4Vectors,
