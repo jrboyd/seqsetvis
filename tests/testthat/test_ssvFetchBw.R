@@ -104,6 +104,7 @@ test_that("fetchWindowedBigwigList works with character vector bw_files", {
 })
 
 test_that("fetchWindowedBigwigList works with list bw_files", {
+    skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
     bw_files = as.list(bw_files)
