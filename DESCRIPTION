@@ -19,7 +19,7 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: testthat, covr, knitr, rmarkdown, cowplot
-Depends: R (>= 3.4), ggplot2
+Depends: R (>= 3.5), ggplot2
 Imports: GenomicRanges, IRanges, data.table, rtracklayer,
         limma, eulerr, RColorBrewer, magrittr, methods, S4Vectors,
         png, grDevices, grid, stats
