@@ -11,7 +11,7 @@
 #' interval should be identical and evenly divisible by \code{win_size}.
 #' @param win_size The window size that evenly divides widths in \code{qgr}.
 #' @return A tidy formatted data.table containing fetched values.
-#'
+#' @rawNamespace import(data.table, except = c(shift, first, second))
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
 #' 10, values from positions chr1 5,15,25...85, and 95 will be retrieved from \code{bw_file}
 #'
@@ -80,7 +80,7 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
 #' Default is 'sample'
 #' @param win_size The window size that evenly divides widths in \code{qgr}.
 #' @return A tidy formatted data.table containing fetched values.
-#'
+#' @rawNamespace import(data.table, except = c(shift, first, second))
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
 #' 10, values from positions chr1 5,15,25...85, and 95 will be retrieved from \code{bw_file}
 fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files), bw_variable_name = "sample", win_size = 50) {

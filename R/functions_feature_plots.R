@@ -24,6 +24,7 @@
 #' @param counts_color single color to use for displaying counts
 #' @return ggplot venn diagram
 #' @import ggplot2
+#' @import S4Vectors
 #' @importFrom limma vennCounts
 #' @examples
 #' ssvFeatureVenn(list(1:3, 2:6))
@@ -161,6 +162,7 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
 #'
 #' @return ggplot of bar plot of set sizes
 #' @import ggplot2
+#' @import S4Vectors
 #' @examples
 #' ssvFeatureBars(list(1:3, 2:6))
 #' ssvFeatureBars(CTCF_in_10a_overlaps_gr)
@@ -261,6 +263,7 @@ ssvFeatureBars = function(object) {
 #' @export
 #' @param object object that ssvMakeMembTable can convert to logical matrix membership
 #' @import ggplot2
+#' @import S4Vectors
 #' @return ggplot pie graph of set sizes
 #' @examples
 #' ssvFeaturePie(list(1:3, 2:6))
@@ -302,6 +305,7 @@ ssvFeaturePie = function(object) {
 #' @return ggplot of venneuler results
 #' @import ggplot2
 #' @import eulerr
+#' @import S4Vectors
 #' @examples
 #' ssvFeatureEuler(list(1:3, 2:6))
 #' ssvFeatureEuler(CTCF_in_10a_overlaps_gr)
@@ -362,7 +366,7 @@ ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse"
 #' @param raster_approximation instead of standard plot, write temporary raster image and redraw that as plot background.
 #' @param raster_width_min raster width will be minimun multiple of number of columns over this number
 #' @param raster_height_min raster height will be minimun multiple of number of rows over this number
-#' @rawNamespace import(data.table, except = shift)
+#' @rawNamespace import(data.table, except = c(shift, first, second))
 #' @import png
 #' @import ggplot2
 #' @importFrom grid rasterGrob

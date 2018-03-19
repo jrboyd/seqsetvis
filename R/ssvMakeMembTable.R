@@ -6,6 +6,7 @@
 #' data.frame/matrix/DataFrame of membership table
 #' @rdname ssvMakeMembTable-methods
 #' @exportMethod ssvMakeMembTable
+#' @import methods
 #' @return a logical matrix indicating membership of items (rows) in sets (columns)
 setGeneric("ssvMakeMembTable", function(object){
     standardGeneric("ssvMakeMembTable")
@@ -17,6 +18,7 @@ setGeneric("ssvMakeMembTable", function(object){
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,list-method
 #' @import GenomicRanges
+#' @import methods
 #' @examples
 #' char_list = list(letters[1:3], letters[2:4])
 #' ssvMakeMembTable(char_list)
