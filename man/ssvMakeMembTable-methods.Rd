@@ -28,7 +28,7 @@ ssvMakeMembTable(object)
 }
 \arguments{
 \item{object}{the object to convert. Supported types: list (of character or GRanges),
-GRanges with membership table metadata, GrangesList,
+GRanges with membership table metadata, GRangesList,
 data.frame/matrix/DataFrame of membership table}
 }
 \value{

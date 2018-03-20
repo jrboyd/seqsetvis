@@ -2,7 +2,7 @@
 
 #' Fetch values from a bigwig appropriate for heatmaps etc.
 #'
-#' \code{fetchWindowedBigwig} Gets values for each region of the query GRanges (\code{qgr}).
+#' \code{fetchWindowedBigwig_dt} Gets values for each region of the query GRanges (\code{qgr}).
 #' Values correspond to the center of each window of size \code{win_size}.  A tidy formatted data.table
 #' object is returned suitable for plotting using ggplots.
 #' @export
@@ -20,7 +20,7 @@
 #' bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' qgr = GRanges("chrTest", IRanges(1, 30))
-#' bw_dt = fetchWindowedBigwig(bw_f, qgr, win_size = 10)
+#' bw_dt = fetchWindowedBigwig_dt(bw_f, qgr, win_size = 10)
 #' }
 fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
     queryHits = id = x = NULL
@@ -182,7 +182,7 @@ fetchWindowedBigwigList_dt = function(bw_files, qgr, bw_names = names(bw_files),
     load_bw = function(nam) {
         print(paste0("loading ", nam, " ..."))
         f = bw_files[nam]
-        dt = fetchWindowedBigwig(bw_file = f, win_size = win_size, qgr = qgr)
+        dt = fetchWindowedBigwig_dt(bw_file = f, win_size = win_size, qgr = qgr)
         dt[[bw_variable_name]] = nam
         print(paste0("finished loading ", nam, "."))
         dt

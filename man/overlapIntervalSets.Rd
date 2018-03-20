@@ -8,7 +8,7 @@ merged ranges including metadata describing overlaps per input GRanges}
 overlapIntervalSets(grs, ext = 0, use_first = FALSE)
 }
 \arguments{
-\item{grs}{A list of Granges}
+\item{grs}{A list of GRanges}
 
 \item{ext}{An integer specifying how far to extend ranges before merging.
 in effect, ranges withing 2*ext of one another will be joined during the merge}

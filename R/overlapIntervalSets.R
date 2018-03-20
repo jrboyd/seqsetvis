@@ -28,7 +28,8 @@ overlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
     base_gr = grs[[1]]
     mcols(base_gr) = NULL
   }else{
-    base_gr = reduce(unlist(GRangesList(grs)))
+    grs_nometa = lapply(grs, function(x){mcols(x) = NULL; x})
+    base_gr = reduce(unlist(GRangesList(grs_nometa)))
     start(base_gr) = start(base_gr) - ext
     end(base_gr) = end(base_gr) + ext
     base_gr = reduce(base_gr)

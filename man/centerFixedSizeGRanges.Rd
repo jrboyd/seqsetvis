@@ -16,7 +16,7 @@ Set of GRanges after resizing all input GRanges, either shortened
 or lengthened as required to match \code{fixed_size}
 }
 \description{
-\code{centerFixedSizeGranges} First calculates the central coordinate of each
+\code{centerFixedSizeGRanges} First calculates the central coordinate of each
 GRange in \code{grs} and extends in both direction by half of \code{fixed_size}
 }
 \examples{

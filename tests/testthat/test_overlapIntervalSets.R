@@ -17,12 +17,18 @@ test_that("overlapIntervalSets grs input are valid. GRangesList OK.", {
     expect_s4_class(overlapIntervalSets(GRangesList("gr_a" = gr_a, "gr_b" = gr_b)), class = "GRanges")
 })
 
-test_that("overlapIntervalSets grs input are valid. List of Granges OK.", {
+test_that("overlapIntervalSets grs input are valid. List of GRanges OK.", {
     expect_s4_class(overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b)), class = "GRanges")
 })
 
-test_that("overlapIntervalSets grs input are valid. GrangesList OK.", {
+test_that("overlapIntervalSets grs input are valid. GRangesList OK.", {
     expect_s4_class(overlapIntervalSets(GRangesList(list("gr_a" = gr_a, "gr_b" = gr_b))), class = "GRanges")
+})
+
+test_that("overlapIntervalSets grs input are valid. List of GRanges with non-matching mcols OK.", {
+    gr_amod = gr_a
+    gr_amod$score = "scored"
+    expect_s4_class(overlapIntervalSets(list("gr_a" = gr_amod, "gr_b" = gr_b)), class = "GRanges")
 })
 
 test_that("overlapIntervalSets useFirst.", {
