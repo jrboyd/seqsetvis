@@ -180,11 +180,11 @@ fetchWindowedBigwigList_dt = function(bw_files, qgr, bw_names = names(bw_files),
     }
 
     load_bw = function(nam) {
-        print(paste0("loading ", nam, " ..."))
+        message("loading ", nam, " ...")
         f = bw_files[nam]
         dt = fetchWindowedBigwig_dt(bw_file = f, win_size = win_size, qgr = qgr)
         dt[[bw_variable_name]] = nam
-        print(paste0("finished loading ", nam, "."))
+        message("finished loading ", nam, ".")
         dt
     }
 

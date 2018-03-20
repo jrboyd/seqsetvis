@@ -350,7 +350,7 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
         }
     }
     if(do_cluster){
-        print("clustering...")
+        message("clustering...")
         plot_dt = ssvSignalClustering(bw_dt = bw_dt,
                                       nclust = nclust,
                                       row_ = row_,
@@ -365,7 +365,7 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
     }else{
         plot_dt = bw_dt
     }
-    print("making plot...")
+    message("making plot...")
     scale_floor = .1
     scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
     p = ggplot(plot_dt) +

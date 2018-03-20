@@ -27,8 +27,6 @@ setGeneric("ssvMakeMembTable", function(object){
 #' ssvMakeMembTable(gr_list)
 setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
     if (all(sapply(object, class) == "GRanges")) {#GRanges are a special case
-        # print("handling list of GRanges like GRangeList.")
-        # object = overlapIntervalSets(object)
         return(ssvMakeMembTable(GRangesList(object)))
     }
     if (all(sapply(object, class) != "character")) {
