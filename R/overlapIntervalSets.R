@@ -36,7 +36,7 @@ overlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
     end(base_gr) = end(base_gr) - ext
   }
   suppressWarnings({
-    for(i in 1:length(grs)){
+    for(i in seq_along(grs)){
       nam = names(grs)[i]
       mcols(base_gr)[[nam]] = FALSE
       olaps = findOverlaps(base_gr, grs[[i]])
@@ -52,7 +52,7 @@ overlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
     #   base_gr[queryHits(olaps)]$group = names(grs)  [i]
     # }
   })
-  names(base_gr) = 1:length(base_gr)
+  names(base_gr) = seq_along(base_gr)
   return(base_gr)
 }
 

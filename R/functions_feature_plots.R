@@ -180,7 +180,7 @@ ssvFeatureBars = function(object) {
               panel.grid.major.x = element_blank(),
               panel.grid.minor.x = element_blank()) +
         scale_fill_brewer(palette = "Dark2")
-    p = p + annotate("text", y = hit_counts/2, x = 1:length(hit_counts), label = hit_counts)
+    p = p + annotate("text", y = hit_counts/2, x = seq_along(hit_counts), label = hit_counts)
     return(p)
 }
 

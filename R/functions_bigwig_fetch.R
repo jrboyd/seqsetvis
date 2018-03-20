@@ -56,7 +56,7 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
     windows = resize(windows, width = 1, fix = "center")
     olaps = suppressWarnings(data.table::as.data.table(findOverlaps(query = windows, subject = bw_gr)))
     # patch up missing/out of bound data with 0
-    missing_idx = setdiff(1:length(windows), olaps$queryHits)
+    missing_idx = setdiff(seq_along(windows), olaps$queryHits)
     if (length(missing_idx) > 0) {
         olaps = rbind(olaps, data.table::data.table(queryHits = missing_idx, subjectHits = length(bw_gr) + 1))[order(queryHits)]
         bw_gr = c(bw_gr, GRanges(seqnames(bw_gr)[length(bw_gr)], IRanges::IRanges(1, 1), score = 0))
@@ -102,7 +102,8 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
 #' bw_dt = fetchWindowedBigwigList(bw_files, qgr, win_size = 10)
 #' bw_dt2 = fetchWindowedBigwigList(as.list(bw_files), qgr, win_size = 10)
 #' }
-fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files), bw_variable_name = "sample", win_size = 50) {
+fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files),
+                                   bw_variable_name = "sample", win_size = 50) {
     if(is.list(bw_files)){
         bw_files = unlist(bw_files)
     }
@@ -110,7 +111,8 @@ fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files), bw
         bw_names = basename(bw_files)
     }
     if (any(duplicated(bw_names))) {
-        stop(paste0("some bw_names are duplicated:\n", paste(collapse = "\n", unique(bw_names[duplicated(bw_names)]))))
+        stop(paste0("some bw_names are duplicated:\n",
+                    paste(collapse = "\n", unique(bw_names[duplicated(bw_names)]))))
     }
 
     load_bw = function(nam) {

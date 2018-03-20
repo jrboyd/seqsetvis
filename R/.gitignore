@@ -1,5 +1,1 @@
-tmp.R
-seqsetvis.Rcheck
-*.bu
-functions_annotation.R
-old_sources
+function_bam_fetch.R

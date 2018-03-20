@@ -15,3 +15,12 @@ tmp*.R
 tmp_euler_compare.R
 workflow*
 run_cov.R
+
+R/tmp.R
+R/seqsetvis.Rcheck
+R/*.bu
+R/functions_annotation.R
+R/old_sources
+
+tests/testthat/*.bu
+

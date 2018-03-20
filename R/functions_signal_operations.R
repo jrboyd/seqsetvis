@@ -215,7 +215,7 @@ clusteringKmeans = function(mat, nclust, seed = 0) {
     set.seed(seed)
     mat_kmclust = stats::kmeans(mat, centers = nclust, iter.max = 30)
     center_o = stats::hclust(stats::dist(mat_kmclust$centers))$order
-    center_reo = 1:length(center_o)
+    center_reo = seq_along(center_o)
     names(center_reo) = center_o
     center_reo[as.character(mat_kmclust$cluster)]
     mat_dt = data.table::data.table(mat_name = names(mat_kmclust$cluster),
@@ -252,7 +252,7 @@ clusteringKmeansNestedHclust = function(mat, nclust, seed = 0) {
     group = id = within_o = NULL#declare binding for data.table
     mat_dt = clusteringKmeans(mat, nclust, seed = seed)
     mat_dt$within_o = as.integer(-1)
-    for (i in 1:length(nclust)) {
+    for (i in seq_along(nclust)) {
         cmat = mat[mat_dt[group == i, id], , drop = FALSE]
         if (nrow(cmat) > 2) {
             mat_dt[group == i, ]$within_o = stats::hclust(stats::dist((cmat)))$order
