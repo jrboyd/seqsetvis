@@ -1,6 +1,6 @@
 #' Transforms set of GRanges to all have the same size.
 #'
-#' \code{centerFixedSizeGranges} First calculates the central coordinate of each
+#' \code{centerFixedSizeGRanges} First calculates the central coordinate of each
 #' GRange in \code{grs} and extends in both direction by half of \code{fixed_size}
 #' @export
 #' @param grs Set of GRanges with incosistent and/or incorrect size

@@ -22,7 +22,7 @@
 #' qgr = GRanges("chrTest", IRanges(1, 30))
 #' bw_dt = fetchWindowedBigwig(bw_f, qgr, win_size = 10)
 #' }
-fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
+fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
     queryHits = id = x = NULL
     if (!all(width(qgr)%%win_size == 0)) {
         stop(paste("all widths of qgr are not evenly divisible by win_size,", win_size))
@@ -72,6 +72,70 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
     return(bw_dt)
 }
 
+
+#' Fetch values from a bigwig appropriate for heatmaps etc.
+#'
+#' \code{fetchWindowedBigwig} Gets values for each region of the query GRanges (\code{qgr}).
+#' Values correspond to the center of each window of size \code{win_size}.  A tidy formatted data.table
+#' object is returned suitable for plotting using ggplots.
+#' @export
+#' @param bw_file The character vector path to bigwig files to read from.
+#' @param qgr Set of GRanges to query.  For valid results the width of each
+#' interval should be identical and evenly divisible by \code{win_size}.
+#' @param win_size The window size that evenly divides widths in \code{qgr}.
+#' @return A GRanges containing fetched values.
+#' @rawNamespace import(data.table, except = c(shift, first, second))
+#' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
+#' 10, values from positions chr1 5,15,25...85, and 95 will be retrieved from \code{bw_file}
+#' @examples
+#' if(Sys.info()['sysname'] != "Windows"){
+#' library(GenomicRanges)
+#' bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' qgr = GRanges("chrTest", IRanges(1, 30))
+#' bw_dt = fetchWindowedBigwig(bw_f, qgr, win_size = 10)
+#' }
+fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
+    GRanges(fetchWindowedBigwig_dt(bw_file, qgr, win_size))
+}
+
+#' Iterates a character vector (ideally named) and calls \code{fetchWindowedBigwig}
+#' on each.  Appends grouping variable to each resulting data.table and uses rbindlist to
+#' efficiently combine results
+#'
+#' \code{fetchWindowedBigwigList} iteratively calls \code{fetchWindowedBigwig}.
+#' See \code{\link{fetchWindowedBigwig}} for more info.
+#' @export
+#' @param bw_files The character vector or list of paths to bigwig files to
+#'  read from.
+#' @param qgr Set of GRanges to query.  For valid results the width of each
+#' interval should be identical and evenly divisible by \code{win_size}.
+#' @param bw_names names to use in final data.table to designate source bigwig
+#' @param bw_variable_name The column name where bw_names are stored.
+#' Default is 'sample'
+#' @param win_size The window size that evenly divides widths in \code{qgr}.
+#' @return A GRanges containing fetched values.
+#' @rawNamespace import(data.table, except = c(shift, first, second))
+#' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
+#' 10, values from positions chr1 5,15,25...85, and 95 will be
+#' retrieved from \code{bw_file}
+#' @examples
+#' if(Sys.info()['sysname'] != "Windows"){
+#' library(GenomicRanges)
+#' bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' bw_files = c("a" = bw_f, "b" = bw_f)
+#' qgr = GRanges("chrTest", IRanges(1, 30))
+#' bw_dt = fetchWindowedBigwigList(bw_files, qgr, win_size = 10)
+#' bw_dt2 = fetchWindowedBigwigList(as.list(bw_files), qgr, win_size = 10)
+#' }
+fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files),
+                                   bw_variable_name = "sample", win_size = 50) {
+    all_bw_gr = GRanges(fetchWindowedBigwigList_dt(bw_files, qgr, bw_names, bw_variable_name, win_size))
+    return(all_bw_gr)
+}
+
+
 #' Iterates a character vector (ideally named) and calls \code{fetchWindowedBigwig}
 #' on each.  Appends grouping variable to each resulting data.table and uses rbindlist to
 #' efficiently combine results
@@ -102,7 +166,7 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
 #' bw_dt = fetchWindowedBigwigList(bw_files, qgr, win_size = 10)
 #' bw_dt2 = fetchWindowedBigwigList(as.list(bw_files), qgr, win_size = 10)
 #' }
-fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files),
+fetchWindowedBigwigList_dt = function(bw_files, qgr, bw_names = names(bw_files),
                                    bw_variable_name = "sample", win_size = 50) {
     if(is.list(bw_files)){
         bw_files = unlist(bw_files)
@@ -128,6 +192,5 @@ fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files),
     all_bw_dt = data.table::rbindlist(bw_list)
     return(all_bw_dt)
 }
-
 
 

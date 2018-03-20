@@ -1,4 +1,4 @@
-# plotting functions for set comparison go here
+# plotting functions for region/feature set comparison go here
 # all plotting functions accept a variety of objects as first argument and
 # handle them via the S4  generic ssvMakeMembTable
 # ssvMakeMembTable has implemented methods for:
@@ -7,8 +7,7 @@
 #       rows are members
 #       values are logicals indicating membership
 #   - list containing character vectors of set members
-#   - TODO GrangesOverlapSets object
-#   - TODO list of Granges to convert to GRangesOverlapSets
+#   - list of GRanges
 
 #' ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets
 #' @export

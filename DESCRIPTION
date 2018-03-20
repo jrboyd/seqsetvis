@@ -16,10 +16,10 @@ Description: seqsetvis makes the visualization and analysis of ChIP-seq peak set
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
-Suggests: testthat, covr, knitr, rmarkdown, cowplot
+Suggests: testthat, covr, knitr, rmarkdown, cowplot, magrittr
 Depends: R (>= 3.4), ggplot2
 Imports: GenomicRanges, IRanges, data.table, rtracklayer,
-        limma, eulerr, RColorBrewer, magrittr, methods, S4Vectors,
+        limma, eulerr, RColorBrewer, methods, S4Vectors,
         png, grDevices, grid, stats
 RoxygenNote: 6.0.1
 VignetteBuilder: knitr

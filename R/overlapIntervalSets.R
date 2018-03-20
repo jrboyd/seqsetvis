@@ -1,10 +1,10 @@
 ## necessary for magrittr to not throw errors
-utils::globalVariables(c(".", "%>%"))
+# utils::globalVariables(c(".", "%>%"))
 
 #' Intersect a list of GRanges to create a single GRanges object of
 #' merged ranges including metadata describing overlaps per input GRanges
 #' @export
-#' @param grs A list of Granges
+#' @param grs A list of GRanges
 #' @param ext An integer specifying how far to extend ranges before merging.
 #' in effect, ranges withing 2*ext of one another will be joined during the merge
 #' @param use_first A logical.  If True, instead of merging all grs, only use
@@ -28,7 +28,7 @@ overlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
     base_gr = grs[[1]]
     mcols(base_gr) = NULL
   }else{
-    base_gr = lapply(grs, function(x){mcols(x) = NULL; x}) %>% GRangesList %>% unlist %>% reduce
+    base_gr = reduce(unlist(GRangesList(grs)))
     start(base_gr) = start(base_gr) - ext
     end(base_gr) = end(base_gr) + ext
     base_gr = reduce(base_gr)

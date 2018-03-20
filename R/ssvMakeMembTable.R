@@ -2,7 +2,7 @@
 #' membership of items (rows) in sets (columns)
 #' @export
 #' @param object the object to convert. Supported types: list (of character or GRanges),
-#' GRanges with membership table metadata, GrangesList,
+#' GRanges with membership table metadata, GRangesList,
 #' data.frame/matrix/DataFrame of membership table
 #' @rdname ssvMakeMembTable-methods
 #' @exportMethod ssvMakeMembTable
