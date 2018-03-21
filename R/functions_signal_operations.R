@@ -31,12 +31,16 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #' @export
 #' @param dt a tidy data.table containing two-dimensional data
 #' @param n the number of interpolation points to use per input point, see
-#' \code{?spline}
+#' \code{?spline}.  n must be > 1.
 #' @param x_ the variable name of the x-values
 #' @param y_ the variable name of the y-values
 #' @param by_ optionally, any variables that provide grouping to the data.
 #' default is none. see details.
-#' @param ... additional arguments to pass to \code{\link{spline}}
+#' @param splineFun a function that accepts x, y, and n as arguments and
+#' returns a list of length 2 with named elements x and y.
+#' \code{stats::spline} by default.
+#' see \code{stats::spline} for details.
+#'
 #' @return a newly derived data.table that is \code{n} times longer than
 #' original.
 #'
@@ -64,29 +68,66 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #'     y_ = 'y', by_ = c('id', 'sample'))
 #' ggplot(splined_down[, .(y = mean(y)), by = .(sample, x)]) +
 #'     geom_line(aes(x = x, y = y, color = sample))
-applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
+applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::spline) {
+    output_GRanges = FALSE
+    if(class(dt)[1] == "GRanges"){
+        dt = as.data.table(dt)
+        output_GRanges = TRUE
+    }
+
+
     if (!data.table::is.data.table(dt)) {
-        stop(paste("dt must be of type data.table, was", class(dt)))
+        stop("dt must be of type data.table, was", class(dt))
     }
     if (!any(x_ == colnames(dt))) {
-        stop(paste("applySpline : x_ (", x_, ") not found in colnames of input data.table"))
+        stop("applySpline : x_ (", x_, ") not found in colnames of input data.table")
     }
     if (!any(y_ == colnames(dt))) {
-        stop(paste("applySpline : y_ (", y_, ") not found in colnames of input data.table"))
+        stop("applySpline : y_ (", y_, ") not found in colnames of input data.table")
     }
     if (by_[1] != "" | length(by_) > 1)
         if (!all(by_ %in% colnames(dt))) {
-            stop(paste("applySpline : by_ (", by_, ") not found in colnames of input data.table"))
+            stop("applySpline : by_ (", by_, ") not found in colnames of input data.table")
         }
+    dt = dt[order(get(x_))]
+    if(by_[1] != ""){
+        dt = dt[order(get(by_))]
+    }
 
+    stopifnot(n > 1)
     dupe_x_within_by = suppressWarnings(any(dt[, any(duplicated(get(x_))), by = by_]$V1))
     if (dupe_x_within_by)
-        warning(paste0("applySpline : Duplicate values of x_ (", x_, ") exist within groups defined with by_ (", by_, ").\n
-                       This Results in splines through the means of yvalues at duplicated xs."))
-
-    sdt = dt[, stats::spline(get(x_), get(y_), n = floor(.N * n), ...), by = by_]
+        warning("applySpline : Duplicate values of x_ (\"", x_, "\") exist within groups defined with by_ (\"", by_, "\").
+                       This Results in splines through the means of yvalues at duplicated xs.")
+    extra_cols = setdiff(colnames(dt), c(x_, y_, by_))
+    # sdt = dt[, .(n = floor(.N * n)), by = by_]
+    sdt = dt[, splineFun(x = get(x_), y = get(y_), n = floor(.N * n)), by = by_]
     colnames(sdt)[colnames(sdt) == "x"] = x_
     colnames(sdt)[colnames(sdt) == "y"] = y_
+
+    #repair with columns dropped in by_ apply spline
+    #each row will be duplicated n times
+    if(length(extra_cols) > 0){
+        if(n > 1){
+            repair = dt[rep(seq_len(nrow(dt)), each = n), c(extra_cols, by_[by_ != ""]), with = FALSE]
+            sdt = cbind(sdt, repair)
+        }else{
+            # warning("")
+            # repair = unique(dt[, c(extra_cols, by_, x_), with = FALSE])
+            # repair = dt
+            # sdt
+            # merge(sdt, repair, by = by_)
+            # unique(sdt[, by_, with = FALSE])
+            # merge(sdt, repair, by = by_)
+        }
+
+    }
+
+    k = colnames(dt) %in% colnames(sdt)
+    sdt = sdt[, colnames(dt)[k], with = FALSE]
+    if(output_GRanges){
+        sdt = GRanges(sdt)
+    }
     return(sdt)
 }
 
@@ -126,6 +167,7 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
 #' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', by_ = 'id',
 #'   check_by_dupes = FALSE)
 #' #it's a bit clearer what's happening with trimming disabled
+#' #but results are less useful for heatmaps etc.
 #' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', by_ = 'id',
 #'   check_by_dupes = FALSE, trim_to_valid = FALSE)
 #' #specify view_size to limit range of x values considered, prevents
@@ -134,14 +176,19 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", ...) {
 #' check_by_dupes = FALSE)
 centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE) {
     ymax = xsummit = xnew = N = NULL  #reserve data.table variables
+    output_GRanges = FALSE
+    if(class(dt)[1] == "GRanges"){
+        dt = data.table::as.data.table(dt)
+        output_GRanges = TRUE
+    }
     if (!data.table::is.data.table(dt)) {
-        stop(paste("dt must be of type data.table, was", class(dt)))
+        stop("dt must be of type data.table, was ", class(dt))
     }
     if (!any(x_ == colnames(dt))) {
-        stop(paste("centerAtMax : x_ (", x_, ") not found in colnames of input data.table"))
+        stop("centerAtMax : x_ (", x_, ") not found in colnames of input data.table")
     }
     if (!any(y_ == colnames(dt))) {
-        stop(paste("centerAtMax : y_ (", y_, ") not found in colnames of input data.table"))
+        stop("centerAtMax : y_ (", y_, ") not found in colnames of input data.table")
     }
     # check_by_dupes = FALSE
     if (is.null(by_)) {
@@ -150,7 +197,7 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
     }
     if (all(by_ != ""))
         if (!any(by_ %in% colnames(dt))) {
-            stop(paste("centerAtMax : by_ (", by_, ") not found in colnames of input data.table"))
+            stop("centerAtMax : by_ (", by_, ") not found in colnames of input data.table")
         }
     if (check_by_dupes) {
         dupe_x_within_by = suppressWarnings(any(dt[, any(duplicated(get(x_))), by = by_]$V1))
@@ -184,6 +231,10 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
     } else {
         colnames(dt)[colnames(dt) == "xnew"] = paste0(x_, "_summitPosition")
     }
+    if(output_GRanges){
+        dt = GRanges(dt)
+    }
+
     return(dt)
 }
 

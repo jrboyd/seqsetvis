@@ -25,12 +25,12 @@
 fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
     queryHits = id = x = NULL
     if (!all(width(qgr)%%win_size == 0)) {
-        stop(paste("all widths of qgr are not evenly divisible by win_size,", win_size))
+        stop("all widths of qgr are not evenly divisible by win_size, ", win_size)
     }
     if (!all(width(qgr) == width(qgr)[1])) {
-        warning(paste("Widths vary between GRanges.  Before aggregating or co-plotting, recommend one of:
+        warning("Widths vary between GRanges.  Before aggregating or co-plotting, recommend one of:
             1) modifying input qgr such that all GRanges have same width
-            2) filtering output so that the same values of x are present for every region"))
+            2) filtering output so that the same values of x are present for every region")
     }
     # suppressWarnings({
     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
@@ -44,15 +44,8 @@ fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
         }
     }
     names(windows) = qgr$id
-    # print(object.size(windows), units = 'GB')
     windows = unlist(windows)
     windows$id = names(windows)
-    # mid_gr = function(gr) {
-    #     start(gr) + floor((width(gr) - 1)/2)
-    # }
-    # mids = mid_gr(windows)
-    # start(windows) = mids
-    # end(windows) = mids
     windows = resize(windows, width = 1, fix = "center")
     olaps = suppressWarnings(data.table::as.data.table(findOverlaps(query = windows, subject = bw_gr)))
     # patch up missing/out of bound data with 0
@@ -175,8 +168,8 @@ fetchWindowedBigwigList_dt = function(bw_files, qgr, bw_names = names(bw_files),
         bw_names = basename(bw_files)
     }
     if (any(duplicated(bw_names))) {
-        stop(paste0("some bw_names are duplicated:\n",
-                    paste(collapse = "\n", unique(bw_names[duplicated(bw_names)]))))
+        stop("some bw_names are duplicated:\n",
+                    paste(collapse = "\n", unique(bw_names[duplicated(bw_names)])))
     }
 
     load_bw = function(nam) {

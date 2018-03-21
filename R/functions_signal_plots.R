@@ -45,6 +45,9 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
                                     hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = FALSE,
                                     n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95
 ) {
+    if(class(bw_dt)[1] == "GRanges"){
+        bw_dt = data.table::as.data.table(bw_dt)
+    }
     variable = value = V1 = low = high = low_q = high_q = q_range = rn = q_num = q_low = q_high = NULL #declare binding for data.table
     q2do = 0:n_quantile/n_quantile
     q2do = round(quantile_min + q2do * (quantile_max - quantile_min), digits = 3)
@@ -166,11 +169,14 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
                                 plot_type = c("standard", "volcano")[1],
                                 show_help = FALSE, fixed_coords = TRUE){
     xval = yval = xvolcano = id = yvolcano = NULL #declare binding for data.table
+    if(class(bw_dt)[1] == "GRanges"){
+        bw_dt = data.table::as.data.table(bw_dt)
+    }
     if(!any(x_name == bw_dt[[xy_variable]])){
-        stop(paste(x_name, "not found in", xy_variable, "variable of data.table"))
+        stop(x_name, "not found in", xy_variable, "variable of data.table")
     }
     if(!any(y_name == bw_dt[[xy_variable]])){
-        stop(paste(y_name, "not found in", xy_variable, "variable of data.table"))
+        stop(y_name, "not found in", xy_variable, "variable of data.table")
     }
     plot_dt = merge(bw_dt[get(xy_variable) == x_name, .(xval = value_function(get(value_variable))), by = by_],
                     bw_dt[get(xy_variable) == y_name, .(yval = value_function(get(value_variable))), by = by_])
@@ -281,17 +287,30 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
                                max_rows = 500, max_cols = 100,
                                clustering_col_min = -Inf, clustering_col_max = Inf){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
-    plot_dt = data.table::copy(bw_dt)
-    raw_nc = length(unique(plot_dt$x))
-    if(raw_nc > max_cols){
-        plot_dt = applySpline(plot_dt, x_ = column_, y_ = fill_, by_ = c(row_, facet_), n = max_cols/raw_nc)
+    if(class(bw_dt)[1] == "GRanges"){
+        bw_dt = data.table::as.data.table(bw_dt)
     }
-    row_ids = unique(plot_dt$id)
-    if(length(row_ids) > max_rows){
+    plot_dt = data.table::copy(bw_dt)
+    raw_nc = length(unique(plot_dt[[column_]]))
+    if(raw_nc > max_cols){
+        new_scale = (seq_len(max_cols)-1) / (max_cols - 1)
+        old_scale = (seq_len(raw_nc)-1) / (raw_nc - 1)
+        kept = sapply(new_scale, function(v){
+            which.min(abs(v - old_scale))
+        })
+        kept = sort(unique(plot_dt[[column_]]))[kept]
+        plot_dt = plot_dt[x %in% kept]
+        warning(raw_nc - max_cols, " columns were discarded according to max_cols: ", max_cols)
+    }
+    row_ids = unique(plot_dt[[row_]])
+    raw_nr = length(row_ids)
+    if(raw_nr > max_rows){
         set.seed(0)
         row_ids = sample(row_ids, max_rows)
+        plot_dt = plot_dt[id %in% row_ids]
+        warning(raw_nr - max_rows, " rows were discarded according to max_cols: ", max_rows)
     }
-    plot_dt = plot_dt[id %in% row_ids]
+
     dc_dt = data.table::dcast(plot_dt[get(column_) > clustering_col_min & get(column_) < clustering_col_max],
                               formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + ")),
                               # formula = as.name(row_) ~ as.name(facet_) + as.name(column_),
@@ -302,7 +321,7 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
     rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
 
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[[row_]])
-    setkey(rclusters, id)
+    data.table::setkey(rclusters, id)
     plot_dt[[cluster_]] = rclusters[.(plot_dt$id), group]
     return(plot_dt)
 }
@@ -340,6 +359,9 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
                             max_rows = 500, max_cols = 100,
                             clustering_col_min = -Inf, clustering_col_max = Inf){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
+    if(class(bw_dt)[1] == "GRanges"){
+        bw_dt = data.table::as.data.table(bw_dt)
+    }
     #determine if user wants clustering
     do_cluster = perform_clustering == "yes"
     if(perform_clustering == "auto"){
@@ -443,6 +465,9 @@ ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
                               group_ = "auto_grp", facet_ = "auto_facet",
                               facet_method = facet_wrap, spline_n = NULL){
     auto_grp = auto_facet = NULL
+    if(class(bw_dt)[1] == "GRanges"){
+        bw_dt = data.table::as.data.table(bw_dt)
+    }
     bw_dt[,auto_grp := paste(get(sample_), get(region_))]
     bw_dt[,auto_facet := paste(get(sample_), get(region_))]
     if(!is.null(spline_n)){
@@ -487,6 +512,9 @@ ssvSignalTrackplotAgg = function(bw_dt, x_ = "x", y_ = "y",
                                  group_ = "auto_grp", agg_fun = mean,
                                  spline_n = NULL){
     auto_grp = NULL
+    if(class(bw_dt)[1] == "GRanges"){
+        bw_dt = data.table::as.data.table(bw_dt)
+    }
     bw_dt[, auto_grp := paste(get(sample_))]
     agg_dt = bw_dt[, .(y = agg_fun(get(y_))), by = c(unique(c(group_, color_, sample_, x_)))]
 

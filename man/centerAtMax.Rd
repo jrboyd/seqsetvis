@@ -54,6 +54,7 @@ if \code{by_ = c('gene_id')}
 centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', by_ = 'id',
   check_by_dupes = FALSE)
 #it's a bit clearer what's happening with trimming disabled
+#but results are less useful for heatmaps etc.
 centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', by_ = 'id',
   check_by_dupes = FALSE, trim_to_valid = FALSE)
 #specify view_size to limit range of x values considered, prevents

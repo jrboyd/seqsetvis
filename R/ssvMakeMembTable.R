@@ -36,7 +36,7 @@ setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
         char_object = object
         object = set_list2memb(char_object)
     } else {
-        stop(paste("can't handle list of non-character classes: ", paste(sapply(object, class), collapse = ", ")))
+        stop("can't handle list of non-character classes as object: ", paste(sapply(object, class), collapse = ", "))
     }
     return(object)
 })

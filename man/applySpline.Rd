@@ -4,13 +4,14 @@
 \alias{applySpline}
 \title{applies a spline smoothing to a tidy data.table containing x and y values.}
 \usage{
-applySpline(dt, n, x_ = "x", y_ = "y", by_ = "", ...)
+applySpline(dt, n, x_ = "x", y_ = "y", by_ = "",
+  splineFun = stats::spline)
 }
 \arguments{
 \item{dt}{a tidy data.table containing two-dimensional data}
 
 \item{n}{the number of interpolation points to use per input point, see
-\code{?spline}}
+\code{?spline}.  n must be > 1.}
 
 \item{x_}{the variable name of the x-values}
 
@@ -19,7 +20,10 @@ applySpline(dt, n, x_ = "x", y_ = "y", by_ = "", ...)
 \item{by_}{optionally, any variables that provide grouping to the data.
 default is none. see details.}
 
-\item{...}{additional arguments to pass to \code{\link{spline}}}
+\item{splineFun}{a function that accepts x, y, and n as arguments and
+returns a list of length 2 with named elements x and y.
+\code{stats::spline} by default.
+see \code{stats::spline} for details.}
 }
 \value{
 a newly derived data.table that is \code{n} times longer than

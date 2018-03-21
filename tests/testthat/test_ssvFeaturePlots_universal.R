@@ -9,12 +9,12 @@ c = GRanges("chr1", IRanges(8:10*10+5, 8:10*10+6))
 method_names = c("ssvFeatureVenn", "ssvFeatureEuler", "ssvFeatureBars", "ssvFeaturePie", "ssvFeatureBinaryHeatmap")
 for(met_name in method_names){
   if(!exists(met_name)){
-    warning(paste("function", met_name, "couldn't be found! not tested."))
+    warning("function", met_name, "couldn't be found! not tested.")
     next
   }
   met = get(met_name)
   if(!is.function(met)){
-    warning(paste("function", met_name, "wasn't a function! not tested."))
+    warning("function", met_name, "wasn't a function! not tested.")
     next
   }
 
