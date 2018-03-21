@@ -1,6 +1,3 @@
-## necessary for magrittr to not throw errors
-# utils::globalVariables(c(".", "%>%"))
-
 #' Intersect a list of GRanges to create a single GRanges object of
 #' merged ranges including metadata describing overlaps per input GRanges
 #' @export
@@ -15,7 +12,7 @@
 #' a = GRanges("chr1", IRanges(1:7*10, 1:7*10))
 #' b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
 #' overlapIntervalSets(list(a, b))
-#' @import GenomicRanges magrittr
+#' @import GenomicRanges
 overlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
   queryHits = NULL
   if(class(grs) == "GRangesList"){
