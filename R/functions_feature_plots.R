@@ -34,7 +34,12 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
                           circle_colors = NULL, fill_circles = TRUE,
                           fill_alpha = ifelse(fill_circles, 0.5, 0), counts_color = NULL) {
     size = group = x = y = label = NULL#declare binding for data.table
+
     object = ssvMakeMembTable(object)
+    stopifnot(is.numeric(counts_txt_size), is.numeric(lwd),
+              is.numeric(fill_alpha))
+    stopifnot(is.logical(counts_as_labels), is.logical(show_outside_count),
+              is.logical(fill_circles))
     all(apply(object, 2, class) == "logical")
     object <- limma::vennCounts(object)
     set_counts <- object[, "Counts"]
@@ -314,6 +319,10 @@ ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse"
                            circle_colors = NULL) {
     x = y = group = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
+    stopifnot(is.numeric(line_width), is.numeric(n), is.numeric(alpha))
+    stopifnot(is.character(shape))
+    stopifnot(shape %in% c("circle", "ellipse"))
+    stopifnot(is.logical(fill_circles))
     cn = colnames(object)
     eu = eulerr::euler(object, shape = shape)
     dd = eu$ellipses
@@ -323,6 +332,7 @@ ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse"
     a <- dd$a
     b <- dd$b
     phi <- dd$phi
+
     # internal function from eulerr
     eulerr_ellipse = function (h, k, a, b = a, phi = 0, n = 200L) {
         theta <- seq.int(0, 2 * pi, length.out = n)
@@ -379,9 +389,12 @@ ssvFeatureEuler = function(object, line_width = 2, shape = c("circle", "ellipse"
 #' ssvFeatureBinaryHeatmap(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 #' ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,3:2])
-ssvFeatureBinaryHeatmap = function(object, raster_approximation = TRUE, raster_width_min = 1000, raster_height_min = 1000) {
+ssvFeatureBinaryHeatmap = function(object, raster_approximation = TRUE,
+                                   raster_width_min = 1000, raster_height_min = 1000) {
     groups = bool = value = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
+    stopifnot(is.logical(raster_approximation))
+    stopifnot(is.numeric(raster_width_min), is.numeric(raster_height_min))
     mat = ifelse(as.matrix(object), 0, 1)
     for (i in rev(1:ncol(mat))) {
         mat = mat[order(mat[, i], decreasing = TRUE), , drop = FALSE]

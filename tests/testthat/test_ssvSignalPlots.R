@@ -132,7 +132,7 @@ doTest_ssvSignalPlots = function(test_object){
                                facet_ = paste("sample", "~", "id"), facet_method = facet_grid),
             ssvSignalTrackplot(sub_to),
             ssvSignalTrackplot(sub_to, facet_ = "id"),
-            ssvSignalTrackplot(test_object,
+            ssvSignalTrackplot(sub_to,
                                facet_ = "id", spline_n = 10)
         )
         lapply(test_plots, function(p1){

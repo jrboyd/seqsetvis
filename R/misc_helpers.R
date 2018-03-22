@@ -7,7 +7,8 @@
 #' col2hex(c("red", "green", "blue"))
 #' col2hex(c("lightgray", "gray", "darkgray"))
 col2hex = function(color_name) {
-  grDevices::rgb(t(grDevices::col2rgb(color_name))/255)
+    stopifnot(is.character(color_name))
+    grDevices::rgb(t(grDevices::col2rgb(color_name))/255)
 }
 
 #' convert a list of sets, each list item should be a character vector
@@ -16,18 +17,19 @@ col2hex = function(color_name) {
 #' missing
 #' @return converts list of characters/numeric to membership table matrix
 set_list2memb = function(set_list) {
-  if (is.null(names(set_list))) {
-    names(set_list) = paste0("set_", LETTERS[seq_along(set_list)])
-  }
-  rn = unique(unlist(set_list))
-  cn = names(set_list)
-  memb = matrix(FALSE, nrow = length(rn), ncol = length(cn))
-  rownames(memb) = rn
-  colnames(memb) = cn
-  for (column in cn) {
-    memb[set_list[[column]], column] = TRUE
-  }
-  return(memb)
+    stopifnot(is.list(set_list))
+    if (is.null(names(set_list))) {
+        names(set_list) = paste0("set_", LETTERS[seq_along(set_list)])
+    }
+    rn = unique(unlist(set_list))
+    cn = names(set_list)
+    memb = matrix(FALSE, nrow = length(rn), ncol = length(cn))
+    rownames(memb) = rn
+    colnames(memb) = cn
+    for (column in cn) {
+        memb[set_list[[column]], column] = TRUE
+    }
+    return(memb)
 }
 
 #' allows RColorBrew to handle n values less than 3 and greater than 8 without
@@ -44,6 +46,8 @@ set_list2memb = function(set_list) {
 #' plot(1:12, rep(0, 12),  col = safeBrew(12, "set2"), pch = 16, cex = 6)
 #' plot(1:12, rep(0, 12),  col = safeBrew(12, "set3"), pch = 16, cex = 6)
 safeBrew = function(n, pal = "Dark2"){
+    stopifnot(is.numeric(n))
+    stopifnot(is.character(pal))
     if(n < 1) stop("n must be at least 1")
     pal_info = RColorBrewer::brewer.pal.info
     pal_info$brewName = rownames(pal_info)

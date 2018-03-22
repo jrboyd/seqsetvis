@@ -24,6 +24,9 @@
 #' }
 fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
     queryHits = id = x = NULL
+    stopifnot(is.character(bw_file))
+    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is.numeric(win_size))
     if (!all(width(qgr)%%win_size == 0)) {
         stop("all widths of qgr are not evenly divisible by win_size, ", win_size)
     }
@@ -167,6 +170,12 @@ fetchWindowedBigwigList_dt = function(bw_files, qgr, bw_names = names(bw_files),
     if (is.null(bw_names)) {
         bw_names = basename(bw_files)
     }
+    stopifnot(is.character(bw_files))
+    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is.character(bw_names))
+    stopifnot(is.character(bw_variable_name))
+    stopifnot(is.numeric(win_size))
+
     if (any(duplicated(bw_names))) {
         stop("some bw_names are duplicated:\n",
                     paste(collapse = "\n", unique(bw_names[duplicated(bw_names)])))

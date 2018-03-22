@@ -48,6 +48,18 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
     if(class(bw_dt)[1] == "GRanges"){
         bw_dt = data.table::as.data.table(bw_dt)
     }
+    stopifnot(data.table::is.data.table(bw_dt))
+    stopifnot(is.character(x_), is.character(y_), is.character(by_))
+    stopifnot(x_ %in% colnames(bw_dt), y_ %in% colnames(bw_dt))
+    stopifnot(by_ %in% colnames(bw_dt) || by_ == "fake")
+    stopifnot(is.logical(hsv_reverse), is.logical(hsv_grayscale),
+              is.logical(hsv_symmetric))
+    num_args = c(hsv_saturation, hsv_value, hsv_hue_min,
+                 hsv_hue_max, quantile_min, quantile_max)
+    stopifnot(all(is.numeric(num_args)))
+    stopifnot(all(num_args >= 0), all(num_args <= 1))
+    stopifnot(n_quantile > 2)
+
     variable = value = V1 = low = high = low_q = high_q = q_range = rn = q_num = q_low = q_high = NULL #declare binding for data.table
     q2do = 0:n_quantile/n_quantile
     q2do = round(quantile_min + q2do * (quantile_max - quantile_min), digits = 3)
@@ -172,12 +184,21 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
     if(class(bw_dt)[1] == "GRanges"){
         bw_dt = data.table::as.data.table(bw_dt)
     }
+    stopifnot(data.table::is.data.table(bw_dt))
+    stopifnot(xy_variable %in% colnames(bw_dt))
     if(!any(x_name == bw_dt[[xy_variable]])){
         stop(x_name, "not found in", xy_variable, "variable of data.table")
     }
     if(!any(y_name == bw_dt[[xy_variable]])){
         stop(y_name, "not found in", xy_variable, "variable of data.table")
     }
+    stopifnot(is.character(x_name), is.character(y_name),
+              is.character(xy_variable), is.character(by_),
+              is.character(plot_type))
+    stopifnot(plot_type %in% c("standard", "volcano"))
+    stopifnot(is.logical(show_help), is.logical(fixed_coords))
+    stopifnot(is.function(value_function))
+
     plot_dt = merge(bw_dt[get(xy_variable) == x_name, list(xval = value_function(get(value_variable))), by = by_],
                     bw_dt[get(xy_variable) == y_name, list(yval = value_function(get(value_variable))), by = by_])
     if(is.null(plotting_group)){
@@ -290,6 +311,15 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
     if(class(bw_dt)[1] == "GRanges"){
         bw_dt = data.table::as.data.table(bw_dt)
     }
+    stopifnot(is.data.table(bw_dt))
+    stopifnot(is.numeric(nclust) || nclust < 2)
+    stopifnot(is.character(row_), is.character(column_), is.character(fill_),
+              is.character(facet_), is.character(cluster_))
+    stopifnot(row_ %in% colnames(bw_dt), column_ %in% colnames(bw_dt),
+              fill_ %in% colnames(bw_dt), facet_ %in% colnames(bw_dt))
+    stopifnot(is.numeric(max_rows), is.numeric(max_cols),
+              is.numeric(clustering_col_min), is.numeric(clustering_col_max))
+
     plot_dt = data.table::copy(bw_dt)
     raw_nc = length(unique(plot_dt[[column_]]))
     if(raw_nc > max_cols){
@@ -362,6 +392,14 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
     if(class(bw_dt)[1] == "GRanges"){
         bw_dt = data.table::as.data.table(bw_dt)
     }
+    stopifnot(is.data.table(bw_dt))
+    stopifnot(is.numeric(nclust) || nclust < 2)
+    stopifnot(is.character(row_), is.character(column_), is.character(fill_),
+              is.character(facet_), is.character(cluster_))
+    stopifnot(row_ %in% colnames(bw_dt), column_ %in% colnames(bw_dt),
+              fill_ %in% colnames(bw_dt), facet_ %in% colnames(bw_dt))
+    stopifnot(is.numeric(max_rows), is.numeric(max_cols),
+              is.numeric(clustering_col_min), is.numeric(clustering_col_max))
     #determine if user wants clustering
     do_cluster = perform_clustering == "yes"
     if(perform_clustering == "auto"){
@@ -468,6 +506,20 @@ ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
     if(class(bw_dt)[1] == "GRanges"){
         bw_dt = data.table::as.data.table(bw_dt)
     }
+    stopifnot(is.data.table(bw_dt))
+    stopifnot(is.character(x_), is.character(y_), is.character(color_),
+              is.character(sample_), is.character(region_),
+              is.character(group_), is.character(facet_))
+    stopifnot(x_ %in% colnames(bw_dt), y_ %in% colnames(bw_dt),
+              color_ %in% colnames(bw_dt), sample_ %in% colnames(bw_dt),
+              region_ %in% colnames(bw_dt))
+    stopifnot(group_ %in% colnames(bw_dt) || group_ == "auto_grp")
+    facet_names = strsplit(facet_, " ?[~+] ?")[[1]]
+    facet_names = facet_names[facet_names != "."]
+    stopifnot(all(facet_names %in% colnames(bw_dt)) || facet_ == "auto_facet")
+
+    stopifnot(is.function(facet_method))
+    stopifnot(is.numeric(spline_n) || is.null(spline_n))
     bw_dt[,auto_grp := paste(get(sample_), get(region_))]
     bw_dt[,auto_facet := paste(get(sample_), get(region_))]
     if(!is.null(spline_n)){
@@ -515,6 +567,17 @@ ssvSignalTrackplotAgg = function(bw_dt, x_ = "x", y_ = "y",
     if(class(bw_dt)[1] == "GRanges"){
         bw_dt = data.table::as.data.table(bw_dt)
     }
+    stopifnot(is.data.table(bw_dt))
+    stopifnot(is.character(x_), is.character(y_),
+              is.character(sample_), is.character(color_),
+              is.character(group_))
+    stopifnot(x_ %in% colnames(bw_dt), y_ %in% colnames(bw_dt),
+              color_ %in% colnames(bw_dt), sample_ %in% colnames(bw_dt))
+    stopifnot(group_ %in% colnames(bw_dt) || group_ == "auto_grp")
+
+    stopifnot(is.function(agg_fun))
+    stopifnot(is.numeric(spline_n) || is.null(spline_n))
+
     bw_dt[, auto_grp := paste(get(sample_))]
     agg_dt = bw_dt[, list(y = agg_fun(get(y_))), by = c(unique(c(group_, color_, sample_, x_)))]
 

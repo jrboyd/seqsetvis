@@ -17,6 +17,7 @@
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_profiles_dt
+#' @rdname CTCF_in_10a_data
 #' @format A data frame with 53940 rows and 10 variables
 NULL
 
@@ -28,6 +29,7 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_overlaps_gr
+#' @rdname CTCF_in_10a_data
 #' @format GenomicRanges with 3 metadata columns of membership table
 NULL
 
@@ -39,6 +41,7 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_bigWig_urls
+#' @rdname CTCF_in_10a_data
 #' @format named character vector of length 3
 NULL
 
@@ -50,6 +53,7 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_narrowPeak_urls
+#' @rdname CTCF_in_10a_data
 #' @format named character vector of length 3
 NULL
 
