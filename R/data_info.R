@@ -3,9 +3,7 @@
 #'
 #' A tidy data.table at window size 100 bp within 300 bp of peak center
 #'  The variables are as follows:
-#' @details \code{\link{CTCF_in_10a_overlaps_gr CTCF_in_10a_narrowPeak_urls}}
-#' @details \link{CTCF_in_10a_narrowPeak_urls}
-#' @details \link{CTCF_in_10a_bigWig_urls}
+#' @details these are related \code{\link{CTCF_in_10a_overlaps_gr}} and this \link{CTCF_in_10a_narrowPeak_urls}
 #' \enumerate{
 #'   \item seqnames. chromosome for GRanges compatibility
 #'   \item start. start of interval
