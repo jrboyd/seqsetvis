@@ -65,10 +65,10 @@ doTest_applySpline = function(test_object){
     })
 
     test_that("applySpline error if not data.table or GRanges", {
-        expect_error(applySpline(dt = data.frame(1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "must be of type data.table")
-        expect_error(applySpline(dt = matrix(1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "must be of type data.table")
-        expect_error(applySpline(dt = (1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "must be of type data.table")
-        expect_error(applySpline(dt = "(1:3)", x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "must be of type data.table")
+        expect_error(applySpline(dt = data.frame(1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "data.table::is.data.table\\(dt\\) is not TRUE")
+        expect_error(applySpline(dt = matrix(1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "data.table::is.data.table\\(dt\\) is not TRUE")
+        expect_error(applySpline(dt = (1:3), x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "data.table::is.data.table\\(dt\\) is not TRUE")
+        expect_error(applySpline(dt = "(1:3)", x_ = "xvals", y_ = "yvals", by_ = c("grp", "grp2"), n = 4), regexp = "data.table::is.data.table\\(dt\\) is not TRUE")
     })
 
     test_that("applySpline n < 1 throws caught error", {

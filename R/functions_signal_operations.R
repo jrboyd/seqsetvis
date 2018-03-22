@@ -14,6 +14,9 @@
 #' centered_grs = centerFixedSizeGRanges(grs, 10)
 #' width(centered_grs)
 centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
+    stopifnot(class(grs) == "GRanges")
+    stopifnot(class(fixed_size) == "numeric")
+    stopifnot(fixed_size > 0)
     m = floor(start(grs) + width(grs)/2)
     ext = floor(fixed_size/2)
     start(grs) = m - ext
@@ -62,18 +65,15 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #'     y_ = 'y', by_ = c('id', 'sample'))
 #' ggplot(splined_smooth[, list(y = mean(y)), by = list(sample, x)]) +
 #'     geom_line(aes(x = x, y = y, color = sample))
-#'
 applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::spline) {
     output_GRanges = FALSE
     if(class(dt)[1] == "GRanges"){
         dt = as.data.table(dt)
         output_GRanges = TRUE
     }
-
-
-    if (!data.table::is.data.table(dt)) {
-        stop("dt must be of type data.table, was", class(dt))
-    }
+    stopifnot(data.table::is.data.table(dt))
+    stopifnot(is.character(x_), is.character(y_), is.character(by_))
+    stopifnot(is.function(splineFun))
     if (!any(x_ == colnames(dt))) {
         stop("applySpline : x_ (", x_, ") not found in colnames of input data.table")
     }
