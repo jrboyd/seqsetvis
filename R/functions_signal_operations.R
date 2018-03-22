@@ -63,11 +63,6 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #' ggplot(splined_smooth[, list(y = mean(y)), by = list(sample, x)]) +
 #'     geom_line(aes(x = x, y = y, color = sample))
 #'
-#' #another potential use is to down sample
-#' splined_down = applySpline(CTCF_in_10a_profiles_dt, n = .5,
-#'     y_ = 'y', by_ = c('id', 'sample'))
-#' ggplot(splined_down[, list(y = mean(y)), by = list(sample, x)]) +
-#'     geom_line(aes(x = x, y = y, color = sample))
 applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::spline) {
     output_GRanges = FALSE
     if(class(dt)[1] == "GRanges"){
