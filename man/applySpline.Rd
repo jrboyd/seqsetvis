@@ -41,7 +41,7 @@ if \code{by_ = c('gene_id')}
 }
 \examples{
 #data may be blockier than we'd like
-ggplot(CTCF_in_10a_profiles_dt[, .(y = mean(y)), by = .(sample, x)]) +
+ggplot(CTCF_in_10a_profiles_dt[, list(y = mean(y)), by = list(sample, x)]) +
     geom_line(aes(x = x, y = y, color = sample))
 
 #can be smoothed by applying a spline  (think twice about doing so,
@@ -49,13 +49,7 @@ ggplot(CTCF_in_10a_profiles_dt[, .(y = mean(y)), by = .(sample, x)]) +
 
 splined_smooth = applySpline(CTCF_in_10a_profiles_dt, n = 10,
     y_ = 'y', by_ = c('id', 'sample'))
-ggplot(splined_smooth[, .(y = mean(y)), by = .(sample, x)]) +
-    geom_line(aes(x = x, y = y, color = sample))
-
-#another potential use is to down sample
-splined_down = applySpline(CTCF_in_10a_profiles_dt, n = .5,
-    y_ = 'y', by_ = c('id', 'sample'))
-ggplot(splined_down[, .(y = mean(y)), by = .(sample, x)]) +
+ggplot(splined_smooth[, list(y = mean(y)), by = list(sample, x)]) +
     geom_line(aes(x = x, y = y, color = sample))
 }
 \seealso{

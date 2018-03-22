@@ -179,6 +179,9 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
     if (!data.table::is.data.table(dt)) {
         stop("dt must be of type data.table, was ", class(dt))
     }
+    stopifnot(is.character(x_), is.character(y_), is.character(by_) || is.null(by_))
+    stopifnot(is.numeric(view_size) || is.null(view_size))
+    stopifnot(is.logical(trim_to_valid), is.logical(check_by_dupes), is.logical(replace_x))
     if (!any(x_ == colnames(dt))) {
         stop("centerAtMax : x_ (", x_, ") not found in colnames of input data.table")
     }
@@ -256,6 +259,8 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, tri
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
 clusteringKmeans = function(mat, nclust, seed = 0) {
+    stopifnot(is.numeric(nclust) && nclust > 1)
+    stopifnot(is.numeric(seed))
     cluster_ordered = mat_name = NULL#declare binding for data.table
 
     set.seed(seed)
@@ -295,6 +300,8 @@ clusteringKmeans = function(mat, nclust, seed = 0) {
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
 clusteringKmeansNestedHclust = function(mat, nclust, seed = 0) {
+    stopifnot(is.numeric(nclust) && nclust > 1)
+    stopifnot(is.numeric(seed))
     group = id = within_o = NULL#declare binding for data.table
     mat_dt = clusteringKmeans(mat, nclust, seed = seed)
     mat_dt$within_o = as.integer(-1)
