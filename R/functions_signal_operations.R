@@ -52,7 +52,7 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #' @importFrom stats spline
 #' @examples
 #' #data may be blockier than we'd like
-#' ggplot(CTCF_in_10a_profiles_dt[, .(y = mean(y)), by = .(sample, x)]) +
+#' ggplot(CTCF_in_10a_profiles_dt[, list(y = mean(y)), by = list(sample, x)]) +
 #'     geom_line(aes(x = x, y = y, color = sample))
 #'
 #' #can be smoothed by applying a spline  (think twice about doing so,
@@ -60,13 +60,13 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #'
 #' splined_smooth = applySpline(CTCF_in_10a_profiles_dt, n = 10,
 #'     y_ = 'y', by_ = c('id', 'sample'))
-#' ggplot(splined_smooth[, .(y = mean(y)), by = .(sample, x)]) +
+#' ggplot(splined_smooth[, list(y = mean(y)), by = list(sample, x)]) +
 #'     geom_line(aes(x = x, y = y, color = sample))
 #'
 #' #another potential use is to down sample
 #' splined_down = applySpline(CTCF_in_10a_profiles_dt, n = .5,
 #'     y_ = 'y', by_ = c('id', 'sample'))
-#' ggplot(splined_down[, .(y = mean(y)), by = .(sample, x)]) +
+#' ggplot(splined_down[, list(y = mean(y)), by = list(sample, x)]) +
 #'     geom_line(aes(x = x, y = y, color = sample))
 applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::spline) {
     output_GRanges = FALSE
@@ -100,7 +100,7 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::s
         warning("applySpline : Duplicate values of x_ (\"", x_, "\") exist within groups defined with by_ (\"", by_, "\").
                        This Results in splines through the means of yvalues at duplicated xs.")
     extra_cols = setdiff(colnames(dt), c(x_, y_, by_))
-    # sdt = dt[, .(n = floor(.N * n)), by = by_]
+    # sdt = dt[, list(n = floor(.N * n)), by = by_]
     sdt = dt[, splineFun(x = get(x_), y = get(y_), n = floor(.N * n)), by = by_]
     colnames(sdt)[colnames(sdt) == "x"] = x_
     colnames(sdt)[colnames(sdt) == "y"] = y_

@@ -60,16 +60,16 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
     }
 
     calc_quantiles = function(td){#, x_, y_, by_, q2do){
-        dt = bw_dt[get(by_) == td, .(qs = .(.(stats::quantile(get(y_), q2do)))), by = x_]
+        dt = bw_dt[get(by_) == td, list(qs = list(list(stats::quantile(get(y_), q2do)))), by = x_]
         dt = cbind(dt, data.table::as.data.table(t(sapply(dt$qs, function(x) x[[1]]))))
         dt$qs = NULL
         dtm = data.table::melt(dt, id.vars = x_)
         data.table::setkey(dtm, variable)
         q2do_str = paste0(q2do * 100, "%")
-        dt_low = dtm[q2do_str[-length(q2do_str)], .(get(x_), low_q = variable, low = value)]
-        dt_high = dtm[q2do_str[-1], .(get(x_), high_q = variable, high = value)]
+        dt_low = dtm[q2do_str[-length(q2do_str)], list(get(x_), low_q = variable, low = value)]
+        dt_high = dtm[q2do_str[-1], list(get(x_), high_q = variable, high = value)]
         dt_c = cbind(dt_low, dt_high[, -1])
-        dt_c = dt_c[, .(V1, low, high, q_range = paste0(sub("%", "", low_q), "-", high_q))]
+        dt_c = dt_c[, list(V1, low, high, q_range = paste0(sub("%", "", low_q), "-", high_q))]
         q_o = unique(dt_c$q_range)
         dt_c$q_range = factor(dt_c$q_range, levels = q_o)
 
@@ -178,8 +178,8 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
     if(!any(y_name == bw_dt[[xy_variable]])){
         stop(y_name, "not found in", xy_variable, "variable of data.table")
     }
-    plot_dt = merge(bw_dt[get(xy_variable) == x_name, .(xval = value_function(get(value_variable))), by = by_],
-                    bw_dt[get(xy_variable) == y_name, .(yval = value_function(get(value_variable))), by = by_])
+    plot_dt = merge(bw_dt[get(xy_variable) == x_name, list(xval = value_function(get(value_variable))), by = by_],
+                    bw_dt[get(xy_variable) == y_name, list(yval = value_function(get(value_variable))), by = by_])
     if(is.null(plotting_group)){
         plot_dt$plotting_group = factor("none")
     }else{
@@ -322,7 +322,7 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
 
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[[row_]])
     data.table::setkey(rclusters, id)
-    plot_dt[[cluster_]] = rclusters[.(plot_dt$id), group]
+    plot_dt[[cluster_]] = rclusters[list(plot_dt$id), group]
     return(plot_dt)
 }
 
@@ -395,8 +395,8 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
         facet_grid(paste(". ~", facet_)) +
         theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
         scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals)
-    # rclust = plot_dt[, .(cluster_id = unique(cluster_id)), by = get(row_)]
-    rclust = plot_dt[, .(cluster_id = unique(get(cluster_))), by = get(row_)]
+    # rclust = plot_dt[, list(cluster_id = unique(cluster_id)), by = get(row_)]
+    rclust = plot_dt[, list(cluster_id = unique(get(cluster_))), by = get(row_)]
     ends = cumsum(rev(table(rclust$cluster_id)))
     starts = c(1, ends[-length(ends)] + 1)
     starts = starts - .5
@@ -516,7 +516,7 @@ ssvSignalTrackplotAgg = function(bw_dt, x_ = "x", y_ = "y",
         bw_dt = data.table::as.data.table(bw_dt)
     }
     bw_dt[, auto_grp := paste(get(sample_))]
-    agg_dt = bw_dt[, .(y = agg_fun(get(y_))), by = c(unique(c(group_, color_, sample_, x_)))]
+    agg_dt = bw_dt[, list(y = agg_fun(get(y_))), by = c(unique(c(group_, color_, sample_, x_)))]
 
     if(!is.null(spline_n)){
         p_dt = applySpline(agg_dt, n = spline_n, x_ = x_, y_ = y_,
