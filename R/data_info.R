@@ -3,11 +3,15 @@
 #'
 #' A tidy data.table at window size 100 bp within 300 bp of peak center
 #'  The variables are as follows:
-#'
-#' \itemize{
+#' @details \code{\link{CTCF_in_10a_overlaps_gr CTCF_in_10a_narrowPeak_urls}}
+#' @details \link{CTCF_in_10a_narrowPeak_urls}
+#' @details \link{CTCF_in_10a_bigWig_urls}
+#' \enumerate{
 #'   \item seqnames. chromosome for GRanges compatibility
 #'   \item start. start of interval
 #'   \item end. end of interval
+#'   \item width. width of interval
+#'   \item strand. leftover from GRanges.
 #'   \item id. unique identifier
 #'   \item y. fold-enrichment over input.
 #'   \item x. bp relative to center
@@ -17,8 +21,7 @@
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_profiles_dt
-#' @rdname CTCF_in_10a_data
-#' @format A data frame with 53940 rows and 10 variables
+#' @format A tidy data.table of 2100 rows and 9 columns
 NULL
 
 #' 100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq
@@ -29,7 +32,6 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_overlaps_gr
-#' @rdname CTCF_in_10a_data
 #' @format GenomicRanges with 3 metadata columns of membership table
 NULL
 
@@ -41,7 +43,6 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_bigWig_urls
-#' @rdname CTCF_in_10a_data
 #' @format named character vector of length 3
 NULL
 
@@ -53,7 +54,6 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_narrowPeak_urls
-#' @rdname CTCF_in_10a_data
 #' @format named character vector of length 3
 NULL
 
