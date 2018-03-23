@@ -1,3 +1,21 @@
+#' CTCF ChIP-seq in breast cancer cell lines
+#'
+#' @description Vignette data for seqsetvis was dowloaded directly from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}.
+#' This data is CTCF ChIP-seq from a model of breast cancer progression derived from the MCF10A cell line.
+#'
+#' @description Data from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}
+#' is from the publication \href{https://www.ncbi.nlm.nih.gov/pubmed/28504305}{Fritz AJ et al. 2018}
+#' @details Contains: \itemize{
+#' \item \code{\link{CTCF_in_10a_overlaps_gr}}
+#' \item \code{\link{CTCF_in_10a_profiles_dt}}
+#' \item \code{\link{CTCF_in_10a_bigWig_urls}}
+#' \item \code{\link{CTCF_in_10a_narrowPeak_urls}}
+#' }
+#' @docType data
+#' @keywords datasets
+#' @name CTCF_in_10a_data
+NULL
+
 #' Profiles for 100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq
 #' Results from CTCF_in_10a_overlaps_gr
 #'
@@ -58,15 +76,4 @@ NULL
 #' @format named character vector of length 3
 NULL
 
-#' Data from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}
-#' which is from the publication \href{https://www.ncbi.nlm.nih.gov/pubmed/28504305}{Fritz et al. 2017}
-#' @details Contains: \itemize{
-#' \item \code{\link{CTCF_in_10a_overlaps_gr}}
-#' \item \code{\link{CTCF_in_10a_profiles_dt}}
-#' \item \code{\link{CTCF_in_10a_bigWig_urls}}
-#' \item \code{\link{CTCF_in_10a_narrowPeak_urls}}
-#' }
-#' @docType data
-#' @keywords datasets
-#' @name CTCF_in_10a_data
-NULL
+
