@@ -6,7 +6,12 @@
 \title{100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq}
 \format{GenomicRanges with 3 metadata columns of membership table}
 \description{
-macs2 peak calls for CTCF ChIP-seq in a MCF10A progression model.
+MACS2 narrowPeak calls on pooled biological replicates at pval 1e-5 and then 0.05 IDR filtered
+IDR cutoffs determined  by comparing top 150,000 pvalue sorted peak in replicates.
+}
+\details{
 See  GEO series GSE98551 for details.
+
+part of \code{\link{CTCF_in_10a_data}}
 }
 \keyword{datasets}

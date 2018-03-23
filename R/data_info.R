@@ -3,7 +3,7 @@
 #'
 #' A tidy data.table at window size 100 bp within 300 bp of peak center
 #'  The variables are as follows:
-#' @details these are related \code{\link{CTCF_in_10a_overlaps_gr}} and this \link{CTCF_in_10a_narrowPeak_urls}
+#' @details part of \code{\link{CTCF_in_10a_data}}
 #' \enumerate{
 #'   \item seqnames. chromosome for GRanges compatibility
 #'   \item start. start of interval
@@ -24,9 +24,11 @@ NULL
 
 #' 100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq
 #'
-#' macs2 peak calls for CTCF ChIP-seq in a MCF10A progression model.
-#' See  GEO series GSE98551 for details.
+#' MACS2 narrowPeak calls on pooled biological replicates at pval 1e-5 and then 0.05 IDR filtered
+#' IDR cutoffs determined  by comparing top 150,000 pvalue sorted peak in replicates.
 #'
+#' See  GEO series GSE98551 for details.
+#' @details part of \code{\link{CTCF_in_10a_data}}
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_overlaps_gr
@@ -37,7 +39,7 @@ NULL
 #'
 #' FE bigWig tracks for CTCF ChIP-seq in a MCF10A progression model.
 #' See GEO series GSE98551 for details.
-#'
+#' @details part of \code{\link{CTCF_in_10a_data}}
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_bigWig_urls
@@ -45,13 +47,26 @@ NULL
 NULL
 
 #' FTP URL path for vignette data.
+#' from
 #'
 #' macs2 peak calls for CTCF ChIP-seq in a MCF10A progression model.
 #' See  GEO series GSE98551 for details.
-#'
+#' @details part of \code{\link{CTCF_in_10a_data}}
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_narrowPeak_urls
 #' @format named character vector of length 3
 NULL
 
+#' Data from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}
+#' which is from the publication \href{https://www.ncbi.nlm.nih.gov/pubmed/28504305}{Fritz et al. 2017}
+#' @details Contains: \itemize{
+#' \item \code{\link{CTCF_in_10a_overlaps_gr}}
+#' \item \code{\link{CTCF_in_10a_profiles_dt}}
+#' \item \code{\link{CTCF_in_10a_bigWig_urls}}
+#' \item \code{\link{CTCF_in_10a_narrowPeak_urls}}
+#' }
+#' @docType data
+#' @keywords datasets
+#' @name CTCF_in_10a_data
+NULL

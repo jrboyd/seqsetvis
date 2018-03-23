@@ -9,4 +9,7 @@
 FE bigWig tracks for CTCF ChIP-seq in a MCF10A progression model.
 See GEO series GSE98551 for details.
 }
+\details{
+part of \code{\link{CTCF_in_10a_data}}
+}
 \keyword{datasets}
