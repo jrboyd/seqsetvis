@@ -1,3 +1,15 @@
+# seqsetvis 0.99.4
+
+* improved documentation for CTCF datasets used by vignette
+* expanded vignette to include more explanation and interpretation as well as downstream analysis
+
+# seqsetvis 0.99.3
+
+* all fetch functions that previously returned data.table now return GRanges by default
+* all functions that accepted data.table now also accept GRanges and return the matching class where appropriate
+* magrittr pipes removed from all package code and magrittr moved to suggests from imports
+* misc minor changes to address reviewer comments (message instead of print, stopifnot to verify inputs, etc.)
+
 # seqsetvis 0.99.2
 
 * Added a `NEWS.md` file to track changes to the package.

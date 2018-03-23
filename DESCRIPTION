@@ -23,7 +23,7 @@ Suggests:
     magrittr,
     rmarkdown, 
     testthat 
-Depends: R (>= 3.5), ggplot2
+Depends: R (>= 3.4), ggplot2
 Imports: 
     data.table, 
     eulerr, 
