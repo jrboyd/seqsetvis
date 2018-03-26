@@ -18,9 +18,17 @@ comment = "#>"
 )
 ```
 
-A demonstration of the use of the [seqsetvis](https://github.com/jrboyd/seqsetvis)
-package to compare the binding of the transcription factor CTCF across 3 breast 
-cancer cell lines.  
+# Abstract
+[seqsetvis](https://github.com/jrboyd/seqsetvis) is an R package for the visual
+comparison of sets of genomic regions.  This covers straightforward overlaps 
+suitable for something like a venn diagram and extends to more sophisticated 
+visualization of continous signal data via clustered heatmaps and track-like 
+line plots.  All plots produced by seqsetvis are ggplot2 objects and so can be 
+easily tweaked according to user requirements.
+
+Although initially designed to focus on peak call sets, seqsetvis accepts any 
+data in GRanges format and is therefore flexible enough to work dowstream of 
+many genomics tools.  intended to be used after initial data processing and c
 
 This consists of 2 stages:
 
@@ -30,10 +38,47 @@ set with 3 logical attributes.
 
 Both stages are supported by several plotting functions.
 
+# Functionality Overview
+
+## Installation and Loading
+
+### From github
+One dependency from bioconductor isn't getting installed automatically
+```{r, eval=FALSE}
+source("https://bioconductor.org/biocLite.R")
+biocLite("GenomeInfoDbData")
+```
+
+Install devtools if needed
+```{r, eval=FALSE}
+install.packages("devtools")
+```
+
+```{r, eval=FALSE}
+devtools::install_github("jrboyd/seqsetvis", build_vignettes = TRUE)
+```
+
+### Load the library
+```{r}
+# library(seqsetvis)
+```
+
+## Overlap a list of GRanges
+Many plotting functions in \code{seqsetvis} require some kind of sets definition.
+Sets can be defined in one of several ways.  \code{overlapIntervalSets} creates 
+a single GRanges from a list of GRanges
+with a membership table as metadata columns defining sets.
+```{r}
+olaps = overlapIntervalSets(CTCF_in_10a_narrowPeak_grs)
+```
+
+```{r}
+olaps = overlapIntervalSets(GRangesList(CTCF_in_10a_narrowPeak_grs))
+```
 ## Loading Libraries
 
 ```{r, message = FALSE}
-library(seqsetvis)
+# library(seqsetvis)
 library(magrittr)
 library(rtracklayer)
 library(cowplot)
@@ -149,15 +194,15 @@ olap_fixedSize = centerFixedSizeGRanges(olaps, width_q75)
 ### Fetch profiles
 ```{r}
 bw_dt = CTCF_in_10a_profiles_dt
-
+bw_gr = GRanges(bw_dt)
 # reading bigWigs will not work at all on windows. if you are able to read
 # bigwigs on your system, consider the following for loading as bigwigs:
 # # alternative (1) accessing the subsetted bigwigs included with this package
 # bw_files = sapply(names(CTCF_in_10a_bigWig_urls), function(x){
 #     system.file("extdata", paste0(x, "_FE_random100.bw"), package = "seqsetvis")
 # })
-# bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize, 
-#   win_size = 100)
+bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize,
+  win_size = 100)
 
 # # alternative (2) access the complete data from GEO.  has a tendency to timeout.
 # bw_dt = fetchWindowedBigwigList(bw_files = CTCF_in_10a_bigWig_urls, 
@@ -176,16 +221,7 @@ cowplot::plot_grid(p1, p2, p3, nrow = 1)
 ### Retrieve narrowPeak data by url {#np_load}
 ```{r, eval=FALSE}
 # set file urls
-url_root = "ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98551/suppl/"
-np_files = paste0(url_root, c("GSE98551_MCF10A_CTCF_pooled_peaks_passIDR.05.narrowPeak.gz",
-                              "GSE98551_MCF10AT1_CTCF_pooled_peaks_passIDR.05.narrowPeak.gz",
-                              "GSE98551_MCF10CA1_CTCF_pooled_peaks_passIDR.05.narrowPeak.gz")
-)
-# cleanup names
-names(np_files) = np_files %>%
-    basename() %>%
-    sub("GSE98551_", "", x = .) %>%
-    sub("_pooled_peaks_passIDR.05.narrowPeak.gz", "", x = .)
+np_files = CTCF_in_10a_narrowPeak_urls
 
 # load peak calls
 # from: https://charlesjb.github.io/How_to_import_narrowPeak/
@@ -195,31 +231,26 @@ np_grs <- lapply(np_files, function(f){
     import(f, format = "BED",
            extraCols = extraCols_narrowPeak)
 })
+np_grs
 #np_grs is now a valid input for overlapIntervalSets()
 ```
 
 ### Retrieve bigwig data by url {#bw_load}
 ```{r, eval=FALSE}
 # set bigwig urls
-url_root = "ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE98nnn/GSE98551/suppl/"
-bw_urls = paste0(url_root, c("GSE98551_MCF10A_CTCF_pooled_FE.bw",
-                             "GSE98551_MCF10AT1_CTCF_pooled_FE.bw",
-                             "GSE98551_MCF10CA1_CTCF_pooled_FE.bw")
-)
-# cleanup bigwig names
-names(bw_urls) = bw_urls %>%
-    basename() %>%
-    sub("GSE98551_", "", x = .) %>%
-    sub("_pooled_FE.bw", "", x = .)
+bw_urls = CTCF_in_10a_bigWig_urls
+system.file("extdata", package = "seqsetvis")
 # set bigwig filenames
 bw_files = paste0(names(bw_urls), "_FE.bw")
+save_dir = system.file("extdata", package = "seqsetvis")
+bw_files = paste(save_dir, bw_files, sep = "/")
 names(bw_files) = names(bw_urls)
-
 # download bigwigs from url to local filename
 for(i in seq_along(bw_urls)){
     if(!file.exists(bw_files[i])){
-        curl::curl_download(bw_urls[i], destfile = bw_files[i])
+        curl::curl_download(url = bw_urls[i], destfile = bw_files[i], quiet = F)
     }
 }
+bw_files
 #bw_files is now a valid input for fetchWindowedBigwigList()
 ```

@@ -308,8 +308,10 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
                                max_rows = 500, max_cols = 100,
                                clustering_col_min = -Inf, clustering_col_max = Inf){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
+    output_GRanges = FALSE
     if(class(bw_dt)[1] == "GRanges"){
         bw_dt = data.table::as.data.table(bw_dt)
+        output_GRanges = TRUE
     }
     stopifnot(is.data.table(bw_dt))
     stopifnot(is.numeric(nclust) || nclust < 2)
@@ -353,6 +355,9 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[[row_]])
     data.table::setkey(rclusters, id)
     plot_dt[[cluster_]] = rclusters[list(plot_dt$id), group]
+    if(output_GRanges){
+        plot_dt = GRanges(plot_dt)
+    }
     return(plot_dt)
 }
 

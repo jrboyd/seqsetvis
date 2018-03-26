@@ -170,6 +170,7 @@ fetchWindowedBigwigList_dt = function(bw_files, qgr, bw_names = names(bw_files),
     if (is.null(bw_names)) {
         bw_names = basename(bw_files)
     }
+    names(bw_files) = bw_names
     stopifnot(is.character(bw_files))
     stopifnot(class(qgr) == "GRanges")
     stopifnot(is.character(bw_names))
