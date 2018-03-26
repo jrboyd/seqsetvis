@@ -76,4 +76,11 @@ NULL
 #' @format named character vector of length 3
 NULL
 
-
+#' list of GRanges that results in 100 random subset when overlapped
+#'
+#' @details part of \code{\link{CTCF_in_10a_data}}
+#' @docType data
+#' @keywords datasets
+#' @name CTCF_in_10a_narrowPeak_grs
+#' @format named character vector of length 3
+NULL

@@ -1,24 +1,22 @@
 ---
 title: "CTCF binding in breast cancer cell lines: From GEO"
 author: "Joseph R Boyd"
-date: "`r Sys.Date()`"
 output:
-rmarkdown::html_vignette:
-fig_caption: yes
+    BiocStyle::html_document
 vignette: >
-  %\VignetteIndexEntry{CTCF binding in breast cancer cell lines: From GEO}
-  %\VignetteEngine{knitr::rmarkdown}
-  %\VignetteEncoding{UTF-8}
+    %\VignetteIndexEntry{CTCF binding in breast cancer cell lines: From GEO}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
 ---
   
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-collapse = TRUE,
-comment = "#>"
+    collapse = TRUE
 )
 ```
 
 # Abstract
+Githubpkg("jrboyd/seqsetvis")
 [seqsetvis](https://github.com/jrboyd/seqsetvis) is an R package for the visual
 comparison of sets of genomic regions.  This covers straightforward overlaps 
 suitable for something like a venn diagram and extends to more sophisticated 
@@ -51,29 +49,34 @@ biocLite("GenomeInfoDbData")
 
 Install devtools if needed
 ```{r, eval=FALSE}
-install.packages("devtools")
+if(!require(devtools)){
+    install.packages("devtools")    
+}
 ```
 
+Install seqsetvis from github
 ```{r, eval=FALSE}
 devtools::install_github("jrboyd/seqsetvis", build_vignettes = TRUE)
 ```
 
 ### Load the library
 ```{r}
-# library(seqsetvis)
+library(seqsetvis)
 ```
 
 ## Overlap a list of GRanges
-Many plotting functions in \code{seqsetvis} require some kind of sets definition.
-Sets can be defined in one of several ways.  \code{overlapIntervalSets} creates 
+Many plotting functions in \code{seqsetvis} require some kind of sets definition
+as input.  Sets can be defined in one of several ways.  \code{overlapIntervalSets} creates 
 a single GRanges from a list of GRanges
-with a membership table as metadata columns defining sets.
+with a logical membership table as metadata columns defining sets.
 ```{r}
 olaps = overlapIntervalSets(CTCF_in_10a_narrowPeak_grs)
+head(olaps)
 ```
 
+\code{overlapIntervalSets} also accepts a GRangesList if that's more natural.
 ```{r}
-olaps = overlapIntervalSets(GRangesList(CTCF_in_10a_narrowPeak_grs))
+olaps_fromGRangesList = overlapIntervalSets(GenomicRanges::GRangesList(CTCF_in_10a_narrowPeak_grs))
 ```
 ## Loading Libraries
 
@@ -176,8 +179,8 @@ cowplot::ggdraw() +
     cowplot::draw_plot(p2, 0.43, 0, 0.3, 1) +
     cowplot::draw_plot(p3, 0.75, 0, .25, 1) +
     cowplot::draw_plot_label(c("CTCF binding in breast cancer cell lines", "A", "B", "C"),
-                    x = c(.04, .12, 0.43, .73),
-                    y = c(.92, .8, .8, .8), size = 15, hjust = 0)
+                             x = c(.04, .12, 0.43, .73),
+                             y = c(.92, .8, .8, .8), size = 15, hjust = 0)
 ```
 
 ### Prepare overlap ranges for fetching profiles
@@ -201,8 +204,8 @@ bw_gr = GRanges(bw_dt)
 # bw_files = sapply(names(CTCF_in_10a_bigWig_urls), function(x){
 #     system.file("extdata", paste0(x, "_FE_random100.bw"), package = "seqsetvis")
 # })
-bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize,
-  win_size = 100)
+# bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize,
+#   win_size = 100)
 
 # # alternative (2) access the complete data from GEO.  has a tendency to timeout.
 # bw_dt = fetchWindowedBigwigList(bw_files = CTCF_in_10a_bigWig_urls, 
