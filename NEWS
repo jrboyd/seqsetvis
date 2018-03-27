@@ -1,5 +1,6 @@
 # seqsetvis 0.99.4
 
+* rename overlapIntervalSets to ssvOverlapIntervalSets
 * improved documentation for CTCF datasets used by vignette
 * expanded vignette to include more explanation and interpretation as well as downstream analysis
 

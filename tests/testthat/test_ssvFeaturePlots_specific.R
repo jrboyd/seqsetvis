@@ -79,7 +79,7 @@ test_that("ssvFeatureBinaryHeatmap downsample", {
 })
 
 test_that("ssvFeatureVenn various other paramters don't throw error", {
-    olap = overlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c))
+    olap = ssvOverlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c))
     p = ssvFeatureVenn(olap, circle_colors = c("red", "blue", "green"), fill_alpha = .1,
                        counts_txt_size = 10, show_outside_count = T,
                        counts_as_labels = T)

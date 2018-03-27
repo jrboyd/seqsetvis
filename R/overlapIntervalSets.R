@@ -11,9 +11,9 @@
 #' library(GenomicRanges)
 #' a = GRanges("chr1", IRanges(1:7*10, 1:7*10))
 #' b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
-#' overlapIntervalSets(list(a, b))
+#' ssvOverlapIntervalSets(list(a, b))
 #' @import GenomicRanges
-overlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
+ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
   queryHits = NULL
   if(class(grs) == "GRangesList"){
     grs = as.list(grs)

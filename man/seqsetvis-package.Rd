@@ -9,7 +9,7 @@ TESTING
 seqsetvis allows you to...}
 \description{
 2 steps
-\code{\link{overlapIntervalSets}}.
+\code{\link{ssvOverlapIntervalSets}}.
 \code{\link{fetchWindowedBigwig}}.
 Otherwise refer to the vignettes to see
 }

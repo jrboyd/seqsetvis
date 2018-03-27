@@ -19,16 +19,16 @@ for(met_name in method_names){
   }
 
 
-  test_that(paste(met_name, "accepts overlapIntervalSets output."), {
+  test_that(paste(met_name, "accepts ssvOverlapIntervalSets output."), {
 
-    olap = overlapIntervalSets(list("a" = a, "b" = b, "c" = c))
+    olap = ssvOverlapIntervalSets(list("a" = a, "b" = b, "c" = c))
     p = met(olap)
     p
     expect_s3_class(p, class = "ggplot")
   })
 
   test_that(paste(met_name, "accepts various membership table types."), {
-    olap = overlapIntervalSets(list("a" = a, "b" = b, "c" = c))
+    olap = ssvOverlapIntervalSets(list("a" = a, "b" = b, "c" = c))
     DF = mcols(olap) #DataFrame
     p = met(DF)
     p
@@ -44,7 +44,7 @@ for(met_name in method_names){
   })
 
   test_that(paste(met_name, "accepts various membership table types. missing names."), {
-    olap = overlapIntervalSets(list("a" = a, "b" = b, "c" = c))
+    olap = ssvOverlapIntervalSets(list("a" = a, "b" = b, "c" = c))
     DF = mcols(olap) #DataFrame
 
     df = as.data.frame(DF) #data.frame
@@ -59,7 +59,7 @@ for(met_name in method_names){
   })
 
   test_that(paste(met_name, "accepts set lists. names present and missing"), {
-    olap = overlapIntervalSets(list("a" = a, "b" = b, "c" = c))
+    olap = ssvOverlapIntervalSets(list("a" = a, "b" = b, "c" = c))
     DF = mcols(olap) #DataFrame
     df = as.data.frame(DF) #data.frame
     rownames(df) = 1:nrow(df)

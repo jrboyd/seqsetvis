@@ -67,17 +67,17 @@ library(seqsetvis)
 
 ## Overlap a list of GRanges
 Many plotting functions in \code{seqsetvis} require some kind of sets definition
-as input.  Sets can be defined in one of several ways.  \code{ssvOverlapIntervalSets} creates 
+as input.  Sets can be defined in one of several ways.  \code{overlapIntervalSets} creates 
 a single GRanges from a list of GRanges
 with a logical membership table as metadata columns defining sets.
 ```{r}
-olaps = ssvOverlapIntervalSets(CTCF_in_10a_narrowPeak_grs)
+olaps = overlapIntervalSets(CTCF_in_10a_narrowPeak_grs)
 head(olaps)
 ```
 
-\code{ssvOverlapIntervalSets} also accepts a GRangesList if that's more natural.
+\code{overlapIntervalSets} also accepts a GRangesList if that's more natural.
 ```{r}
-olaps_fromGRangesList = ssvOverlapIntervalSets(GenomicRanges::GRangesList(CTCF_in_10a_narrowPeak_grs))
+olaps_fromGRangesList = overlapIntervalSets(GenomicRanges::GRangesList(CTCF_in_10a_narrowPeak_grs))
 ```
 ## Loading Libraries
 
@@ -125,12 +125,12 @@ np_grs <- lapply(np_files, function(f){
 #            extraCols = extraCols_narrowPeak)
 # })
 
-#np_grs is now a valid input for ssvOverlapIntervalSets()
+#np_grs is now a valid input for overlapIntervalSets()
 #any list (ideally with names set) of GRanges would be fine.
 ```
 
 ```{r}
-olaps = ssvOverlapIntervalSets(np_grs)
+olaps = overlapIntervalSets(np_grs)
 olaps %>% mcols %>% as.data.frame %>% colSums
 ```
 ### Subsetting Operations
@@ -236,7 +236,7 @@ np_grs <- lapply(np_files, function(f){
            extraCols = extraCols_narrowPeak)
 })
 np_grs
-#np_grs is now a valid input for ssvOverlapIntervalSets()
+#np_grs is now a valid input for overlapIntervalSets()
 ```
 
 ### Retrieve bigwig data by url {#bw_load}

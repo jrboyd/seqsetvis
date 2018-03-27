@@ -53,7 +53,7 @@ setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
 #' ssvMakeMembTable(GRangesList(gr_list))
 setMethod("ssvMakeMembTable", signature(object = "GRangesList"), function(object){
     GRlist_object = object
-    ssvMakeMembTable(overlapIntervalSets(GRlist_object))
+    ssvMakeMembTable(ssvOverlapIntervalSets(GRlist_object))
 })
 
 
