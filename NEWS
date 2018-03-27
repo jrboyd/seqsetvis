@@ -3,6 +3,10 @@
 * improved documentation for CTCF datasets used by vignette
 * expanded vignette to include more explanation and interpretation as well as downstream analysis
 
+minor changes
+
+* added show_counts param to ssvFeatureBars
+
 # seqsetvis 0.99.3
 
 * all fetch functions that previously returned data.table now return GRanges by default

@@ -4,10 +4,13 @@
 \alias{ssvFeatureBars}
 \title{bar plots of set sizes}
 \usage{
-ssvFeatureBars(object)
+ssvFeatureBars(object, show_counts = TRUE)
 }
 \arguments{
 \item{object}{passed to ssvMakeMembTable for conversion to membership table}
+
+\item{show_counts}{logical.  should counts be displayed at the center of each
+bar? default is TRUE}
 }
 \value{
 ggplot of bar plot of set sizes

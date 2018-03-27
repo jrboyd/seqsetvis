@@ -2,7 +2,9 @@
 title: "CTCF binding in breast cancer cell lines: From GEO"
 author: "Joseph R Boyd"
 output:
-    BiocStyle::html_document
+  BiocStyle::html_document:
+    toc_float: true
+  BiocStyle::pdf_document: default
 vignette: >
     %\VignetteIndexEntry{CTCF binding in breast cancer cell lines: From GEO}
     %\VignetteEngine{knitr::rmarkdown}
@@ -16,12 +18,11 @@ knitr::opts_chunk$set(
 ```
 
 # Abstract
-Githubpkg("jrboyd/seqsetvis")
-[seqsetvis](https://github.com/jrboyd/seqsetvis) is an R package for the visual
+`r Githubpkg("jrboyd/seqsetvis")` is an R package for the visual
 comparison of sets of genomic regions.  This covers straightforward overlaps 
 suitable for something like a venn diagram and extends to more sophisticated 
 visualization of continous signal data via clustered heatmaps and track-like 
-line plots.  All plots produced by seqsetvis are ggplot2 objects and so can be 
+line plots.  All plots produced by seqsetvis are `r CRANpkg("ggplot2")` objects and so can be 
 easily tweaked according to user requirements.
 
 Although initially designed to focus on peak call sets, seqsetvis accepts any 

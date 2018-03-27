@@ -163,7 +163,8 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
 #' bar plots of set sizes
 #' @export
 #' @param object passed to ssvMakeMembTable for conversion to membership table
-#'
+#' @param show_counts logical.  should counts be displayed at the center of each
+#' bar? default is TRUE
 #' @return ggplot of bar plot of set sizes
 #' @import ggplot2
 #' @import S4Vectors
@@ -171,20 +172,21 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
 #' ssvFeatureBars(list(1:3, 2:6))
 #' ssvFeatureBars(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
-ssvFeatureBars = function(object) {
+ssvFeatureBars = function(object, show_counts = TRUE) {
     group = count = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     hit_counts = colSums(object)
     hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)))
     p <- ggplot(hit_counts_df, aes(x = group, y = count, fill = group)) +
         labs(x = "") +
-        geom_bar(width = 1, stat = "identity") +
+        geom_bar(stat = "identity") +
         theme_bw() +
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
               panel.grid.major.x = element_blank(),
               panel.grid.minor.x = element_blank()) +
         scale_fill_brewer(palette = "Dark2")
-    p = p + annotate("text", y = hit_counts/2, x = seq_along(hit_counts), label = hit_counts)
+    if(show_counts)
+        p = p + annotate("text", y = hit_counts/2, x = seq_along(hit_counts), label = hit_counts)
     return(p)
 }
 
