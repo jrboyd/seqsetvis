@@ -20,14 +20,29 @@ knitr::opts_chunk$set(
 # Abstract
 `r Githubpkg("jrboyd/seqsetvis")` is an R package for the visual
 comparison of sets of genomic regions.  This covers straightforward overlaps 
-suitable for something like a venn diagram and extends to more sophisticated 
+suitable for something like a Venn diagram and extends to more sophisticated 
 visualization of continous signal data via clustered heatmaps and track-like 
-line plots.  All plots produced by seqsetvis are `r CRANpkg("ggplot2")` objects and so can be 
-easily tweaked according to user requirements.
+line plots.  
 
-Although initially designed to focus on peak call sets, seqsetvis accepts any 
-data in GRanges format and is therefore flexible enough to work dowstream of 
-many genomics tools.  intended to be used after initial data processing and c
+Key Features
+
+* Mostly it "just works" with minimal assumed knowledge of R or other 
+Bioconductor packages.
+* All plots produced are `r CRANpkg("ggplot2")` objects. 
+    + easily customized according to user preferences by appending ggplot2 functions.
+    + powerful plot arrangement with with `r CRANpkg("cowplot")`, `r CRANpkg("gridExtra")`, etc.
+* Although various plots are implemented, the underlying data are simple in 
+structure and easily accessible so **you** can do what **you** want with them.
+    + membership table for feature overlaps is just a logical matrix.
+    + signal data is stored in a tidy formatted `r CRANpkg("data.table")`, ideal for `r CRANpkg("ggplot2")` visualization.
+    
+
+Although initially designed to focus on peak call sets, seqsetvis is flexile and 
+accepts any data in GRanges format and is therefore flexible enough to work dowstream of 
+many genomics tools.  Indeed, set comparison visualizations are genomics 
+agnostic and also accept generic data types defining sets.  
+
+
 
 This consists of 2 stages:
 
@@ -85,6 +100,18 @@ head(olaps)
 olaps_fromGRangesList = ssvOverlapIntervalSets(GenomicRanges::GRangesList(CTCF_in_10a_narrowPeak_grs))
 ```
 
+The membership data contained in the metadata columns of \code{olaps} is  
+the data structure seqsetvis functions use internally.  The S4 method
+\code{ssvMakeMembTable} handles the necessary conversions and can be extended 
+to accept a new class of data as long as it converts to an already accepted 
+data type and calls ssvMakeMembTable again.
+
+For instance, \code{ssvMakeMembTable(olaps)} extracts the membership table from
+the mcols of a single GRanges object.
+```{r}
+head(ssvMakeMembTable(olaps))
+```
+
 ### Overlapping a list of sets containing items enumerated in vectors
 ```{r}
 my_set_list = list(1:3, 2:3, 3:6)
@@ -92,9 +119,16 @@ ssvMakeMembTable(my_set_list)
 ```
 Supplying a named list is recommended
 ```{r}
-names(my_set_list)
+names(my_set_list) = c("first", "second", "third")
 ssvMakeMembTable(my_set_list)
 ```
+
+A list of character vectors works just as well.
+```{r}
+my_set_list_char = lapply(my_set_list, function(x)letters[x])
+ssvMakeMembTable(my_set_list_char)
+```
+Notice the rownames changed too.
 
 
 

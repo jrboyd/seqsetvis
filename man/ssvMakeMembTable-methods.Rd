@@ -41,18 +41,15 @@ membership of items (rows) in sets (columns)
 list of character vectors input
 
 GRangesList input
-setOldClass("GRangesList")
 
-mcols from GRange input
-setOldClass("GRanges")
+GRanges with mcols input
 
 DataFrame input
-setOldClass("DataFrame")
 
 matrix of logicals, membership table
 
 data.frame input, final output
-The final method for most inputs, checks column names
+The final method for all inputs, checks column names and returns logical matrix
 }
 \examples{
 char_list = list(letters[1:3], letters[2:4])

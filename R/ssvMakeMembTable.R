@@ -42,7 +42,6 @@ setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
 })
 
 #' GRangesList input
-#' setOldClass("GRangesList")
 #' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,GRangesList-method
@@ -58,8 +57,7 @@ setMethod("ssvMakeMembTable", signature(object = "GRangesList"), function(object
 
 
 
-#' mcols from GRange input
-#' setOldClass("GRanges")
+#' GRanges with mcols input
 #' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,GRanges-method
@@ -76,9 +74,7 @@ setMethod("ssvMakeMembTable", signature(object = "GRanges"), function(object){
 })
 
 
-
 #' DataFrame input
-#' setOldClass("DataFrame")
 #' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,DataFrame-method
@@ -108,7 +104,7 @@ setMethod("ssvMakeMembTable", signature(object = "matrix"), function(object){
 })
 
 #' data.frame input, final output
-#' The final method for most inputs, checks column names
+#' The final method for all inputs, checks column names and returns logical matrix
 #' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,data.frame-method
