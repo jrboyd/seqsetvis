@@ -1,7 +1,7 @@
 Package: seqsetvis
 Type: Package
 Title: Visualizations for User Friendly ChIP-seq Peak Comparison and Analysis
-Version: 0.99.3
+Version: 0.99.4
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
 Description: seqsetvis makes the visualization and analysis of ChIP-seq peak sets and 
@@ -24,7 +24,7 @@ Suggests:
     magrittr,
     rmarkdown, 
     testthat 
-Depends: R (>= 3.4), ggplot2
+Depends: R (>= 3.5), ggplot2
 Imports: 
     data.table, 
     eulerr, 
