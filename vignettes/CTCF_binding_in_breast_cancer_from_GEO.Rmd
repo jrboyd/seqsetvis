@@ -37,8 +37,8 @@ structure and easily accessible so **you** can do what **you** want with them.
     + signal data is stored in a tidy formatted `r CRANpkg("data.table")`, ideal for `r CRANpkg("ggplot2")` visualization.
     
 
-Although initially designed to focus on peak call sets, seqsetvis is flexile and 
-accepts any data in GRanges format and is therefore flexible enough to work dowstream of 
+Although initially designed to focus on peak call sets, *seqsetvis* is flexile and 
+accepts any data in *GRanges* format and is therefore flexible enough to work dowstream of 
 many genomics tools.  Indeed, set comparison visualizations are genomics 
 agnostic and also accept generic data types defining sets.  
 
@@ -54,9 +54,9 @@ Both stages are supported by several plotting functions.
 
 # Functionality Overview
 
-## Installation and Loading
+# Installation and Loading
 
-### From github
+## From github
 One dependency from bioconductor isn't getting installed automatically
 ```{r, eval=FALSE}
 source("https://bioconductor.org/biocLite.R")
@@ -70,49 +70,49 @@ if(!require(devtools)){
 }
 ```
 
-Install seqsetvis from github
+Install *seqsetvis* from github
 ```{r, eval=FALSE}
 devtools::install_github("jrboyd/seqsetvis", build_vignettes = TRUE)
 ```
 
-### Load the library
+## Load the library
 ```{r}
 library(seqsetvis)
 ```
 
-## Defining sets
-seqsetvis has several ways of accepting set information.  Since seqsetvis was 
+# Defining sets
+*seqsetvis* has several ways of accepting set information.  Since *seqsetvis* was 
 originally intended to focus on comparing sets of peak calls, a list of 
-GRanges or a GRangesList is directly supported but there are several alternatives.
+*GRanges* or a *GRangesList* is directly supported but there are several alternatives.
 
-### Overlapping a list of GRanges
+## Overlapping a list of *GRanges*
 Many functions in \code{seqsetvis} require some kind of sets definition
 as input.  Sets can be defined in one of several ways.  \code{ssvOverlapIntervalSets} creates 
-a single GRanges from a list of GRanges
+a single *GRanges* from a list of *GRanges*
 with a logical membership table as metadata columns defining sets.
 ```{r}
 olaps = ssvOverlapIntervalSets(CTCF_in_10a_narrowPeak_grs)
 head(olaps)
 ```
 
-\code{ssvOverlapIntervalSets} also accepts a GRangesList if that's more natural.
+\code{ssvOverlapIntervalSets} also accepts a *GRangesList* if that's more natural.
 ```{r}
 olaps_fromGRangesList = ssvOverlapIntervalSets(GenomicRanges::GRangesList(CTCF_in_10a_narrowPeak_grs))
 ```
 
 The membership data contained in the metadata columns of \code{olaps} is  
-the data structure seqsetvis functions use internally.  The S4 method
+the data structure *seqsetvis* functions use internally.  The S4 method
 \code{ssvMakeMembTable} handles the necessary conversions and can be extended 
 to accept a new class of data as long as it converts to an already accepted 
 data type and calls ssvMakeMembTable again.
 
 For instance, \code{ssvMakeMembTable(olaps)} extracts the membership table from
-the mcols of a single GRanges object.
+the mcols of a single *GRanges* object.
 ```{r}
 head(ssvMakeMembTable(olaps))
 ```
 
-### Overlapping a list of sets containing items enumerated in vectors
+## Overlapping a list of sets containing items enumerated in vectors
 ```{r}
 my_set_list = list(1:3, 2:3, 3:6)
 ssvMakeMembTable(my_set_list)
@@ -133,35 +133,35 @@ Notice the rownames changed too.
 
 
 
-## Visualization of Overlaps, ssvFeature
+# Visualization of Overlaps, ssvFeature
 The ssvFeature* family of functions all accept a valid set definition and output
 a ggplot.  
 
-### Barplot
+## Barplot
 Barplots are useful for for conveying the size of each set/group.  
 ```{r}
 ssvFeatureBars(olaps)
 ```
-### Pie chart
+## Pie chart
 Pie charts are an alternative to barplots but are generally more difficult to 
 interpret.
 ```{r}
 ssvFeaturePie(olaps)
 ```
 
-### Venn diagram
+## Venn diagram
 Venn diagrams show the number of items falling into each overlap category.
-At release, seqsetvis is limited to displaying 3 sets via venn diagram. This
+At release, *seqsetvis* is limited to displaying 3 sets via venn diagram. This
 will be increased in a future update.
 ```{r}
 ssvFeatureVenn(olaps)
 ```
-### Euler diagram
+## Euler diagram
 Often confused with Venn diagrams, Euler diagrams attempt to convey the size
 of each set and the degree to which the overlap with circles or ellipses of
 varying sizes.  For data of any appreciable complexity, Euler diagrams are 
 approximations by neccessity.
-There is no limit to the number of sets seqsetvis can show in an Euler diagram
+There is no limit to the number of sets *seqsetvis* can show in an Euler diagram
 but computation time increases rapidly along with the amount of approximation.
 ```{r}
 ssvFeatureEuler(olaps)
@@ -171,7 +171,7 @@ Ellipse variant of Euler diagram
 ```{r}
 ssvFeatureEuler(olaps, shape = "ellipse")
 ```
-### Binary Heatmap 
+## Binary Heatmap 
 An alternative to Venn/Euler diagrams, this "heatmap" contains one column per 
 set and one row per item with item membership per set mapped to color.
 In this example black indicates TRUE for membership hence the top 2/3 is black
@@ -184,13 +184,11 @@ ssvFeatureBinaryHeatmap(olaps, raster_approximation = FALSE)
 ## Loading Libraries
 
 ```{r, message = FALSE}
-# library(seqsetvis)
-library(magrittr)
 library(rtracklayer)
 library(cowplot)
 ```
 
-## Loading narrowPeak files as GRanges
+## Loading narrowPeak files as *GRanges*
 
 This vignette runs using a small subset of datasets that are publicly available 
 via [GEO](https://www.ncbi.nlm.nih.gov/geo/).  
@@ -208,18 +206,10 @@ np_files = c(
                 package = "seqsetvis")
 )
 
-names(np_files) = np_files %>%
-    basename() %>%
-    sub("_CTCF_random100.narrowPeak", "", x = .)
+names(np_files) = sub("_CTCF_random100.narrowPeak", "", x = basename(np_files))
 
 # load peak calls
-# from: https://charlesjb.github.io/How_to_import_narrowPeak/
-extraCols_narrowPeak <- c(signalValue = "numeric", pValue = "numeric",
-                          qValue = "numeric", peak = "integer")
-np_grs <- lapply(np_files, function(f){
-    import(f, format = "BED",
-           extraCols = extraCols_narrowPeak)
-})
+np_grs = easyLoad_narrowPeak(np_files)
 
 # # Alternatively, accesss the full datasets by url.
 # np_grs <- lapply(CTCF_in_10a_narrowPeak_urls, function(f){
@@ -233,20 +223,20 @@ np_grs <- lapply(np_files, function(f){
 
 ```{r}
 olaps = ssvOverlapIntervalSets(np_grs)
-olaps %>% mcols %>% as.data.frame %>% colSums
+colSums(ssvMakeMembTable(olaps))
 ```
 ### Subsetting Operations
 ##### bound in all 3
 ```{r}
-subset(olaps, MCF10A & MCF10AT1 & MCF10CA1) %>% length
+length(subset(olaps, MCF10A & MCF10AT1 & MCF10CA1))
 ```
 ##### bound in all but MCF10CA1
 ```{r}
-subset(olaps, MCF10A & MCF10AT1 & !MCF10CA1) %>% length
+length(subset(olaps, MCF10A & MCF10AT1 & !MCF10CA1))
 ```
 ##### bound in MCF10CA1 (ignores the other 2)
 ```{r}
-subset(olaps, MCF10CA1) %>% length
+length(subset(olaps, MCF10CA1))
 ```
 ### Plotting
 
@@ -288,7 +278,7 @@ cowplot::ggdraw() +
 
 ### Prepare overlap ranges for fetching profiles
 ```{r, fig.height=3}
-width_q75 = olaps %>% width() %>% quantile(., .75)
+width_q75 = quantile(width(olaps), .75)
 width_q75 = ceiling(width_q75 / 100) * 100
 hist_res = hist(width(olaps))
 lines(rep(width_q75, 2), c(0, max(hist_res$counts)), col = "red", lwd = 5)

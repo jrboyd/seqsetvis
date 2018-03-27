@@ -1,3 +1,7 @@
+# setsetvis 0.99.5
+
+* added easyLoad_narrowPeak and easyLoad_broadPeak
+
 # seqsetvis 0.99.4
 
 * rename overlapIntervalSets to ssvOverlapIntervalSets
