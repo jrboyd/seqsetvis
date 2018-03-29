@@ -122,3 +122,32 @@ setMethod("ssvMakeMembTable", signature(object = "data.frame"), function(object)
     rownames(mat) = rownames(object)
     return(mat)
 })
+
+#' Convert any object accepted by ssvMakeMembTable to a factor
+#'
+#' see \code{\link{ssvMakeMembTable}}
+#'
+#' @param object a valid object for conversion to a membership table and then factor
+#' @return a factor representation of object
+#' @export
+#' ssvMakeMembTable
+ssvFactorizeMembTable = function(object){
+    memb = ssvMakeMembTable(object)
+    keys = expand.grid(lapply(seq_len(ncol(memb)), function(x)0:1))
+    keys = keys == 1
+    for(i in rev(seq_len(ncol(keys)))){
+        keys = keys[order(keys[,i], decreasing = TRUE),]
+    }
+    keys = keys[order(rowSums(keys), decreasing = TRUE),]
+    keys_rn = apply(keys, 1, function(k){
+        paste(colnames(memb)[k], collapse = " & ")
+    })
+    keys_rn[keys_rn == ""] = "none"
+
+    grps = apply(memb, 1, function(x){
+        keys_rn[apply(keys, 1, function(y){
+            all(x == y)
+        })]
+    })
+    return(factor(grps, levels = keys_rn))
+}
