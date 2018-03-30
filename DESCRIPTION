@@ -1,11 +1,14 @@
 Package: seqsetvis
 Type: Package
 Title: Visualizations for User Friendly ChIP-seq Peak Comparison and Analysis
-Version: 0.99.5
+Version: 0.99.6
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
-Description: seqsetvis makes the visualization and analysis of ChIP-seq peak sets and 
-    enrichment tracks as easy as possible at all stages.  This assumes you have 
+Description: seqsetvis enables the visualization and analysis of ChIP-seq peak sets and 
+    enrichment tracks.  Unlike most existing packages and genome browsers, seqsetvis
+    is focused on the ability to simultaneously compare many sites that have been
+    divided into sets.  
+    This assumes you have 
     a set of bed-like files representing areas of enrichment (peaks) or other 
     biologically relevant regions (promoters, enhancers) and bigwigs 
     representing enrichment for the same samples or other relevant samples.

@@ -49,14 +49,14 @@ ggplot of signal potentially facetted by region and sample
 construct line type plots where each region in each sample is represented
 }
 \examples{
-ssvSignalLineplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3], facet_ = "sample")
-ssvSignalLineplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3],
+ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id \%in\% 1:3), facet_ = "sample")
+ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id \%in\% 1:3),
     facet_ = "sample~.",
     facet_method = facet_grid)
-ssvSignalLineplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3],
+ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id \%in\% 1:3),
     facet_ = paste("sample", "~", "id"), facet_method = facet_grid)
-ssvSignalLineplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3])
-ssvSignalLineplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3], facet_ = "id")
-ssvSignalLineplot(CTCF_in_10a_profiles_dt[id \%in\% 1:3],
+ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id \%in\% 1:3))
+ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id \%in\% 1:3), facet_ = "id")
+ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id \%in\% 1:3),
     facet_ = "id", spline_n = 10)
 }

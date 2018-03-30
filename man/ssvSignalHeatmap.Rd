@@ -46,9 +46,9 @@ instead of clustering, each column is sorted starting from the left.
 }
 \examples{
 #the simplest use
-ssvSignalHeatmap(CTCF_in_10a_profiles_dt)
+ssvSignalHeatmap(CTCF_in_10a_profiles_gr)
 
 #clustering can be done manually beforehand
-clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
+clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 3)
 ssvSignalHeatmap(clust_dt)
 }

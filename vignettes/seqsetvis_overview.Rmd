@@ -241,7 +241,7 @@ bw_gr = CTCF_in_10a_profiles_gr
 
 Overlap information must be transformed into a factor tied to id to be useful.
 ```{r factorize}
-olap_groups = ssvFactorizeMembTable(olap_gr)
+olap_groups = ssvFactorizeMembTable(mcols(olap_gr))
 ```
 
 ## Line plots

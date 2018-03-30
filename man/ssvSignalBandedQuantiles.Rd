@@ -48,18 +48,18 @@ plot profiles from bigwigs
 }
 \examples{
 #rainbow colors
-ssvSignalBandedQuantiles(CTCF_in_10a_profiles_dt)
-ssvSignalBandedQuantiles(CTCF_in_10a_profiles_dt, hsv_symmetric = TRUE,
+ssvSignalBandedQuantiles(CTCF_in_10a_profiles_gr)
+ssvSignalBandedQuantiles(CTCF_in_10a_profiles_gr, hsv_symmetric = TRUE,
     hsv_reverse = TRUE)
 #grayscale
-ssvSignalBandedQuantiles(CTCF_in_10a_profiles_dt, hsv_grayscale = TRUE)
-ssvSignalBandedQuantiles(CTCF_in_10a_profiles_dt, hsv_grayscale = TRUE,
+ssvSignalBandedQuantiles(CTCF_in_10a_profiles_gr, hsv_grayscale = TRUE)
+ssvSignalBandedQuantiles(CTCF_in_10a_profiles_gr, hsv_grayscale = TRUE,
     hsv_symmetric = TRUE, hsv_reverse = TRUE)
 #using "by_" per sample
-ssvSignalBandedQuantiles(CTCF_in_10a_profiles_dt, hsv_grayscale = TRUE,
+ssvSignalBandedQuantiles(CTCF_in_10a_profiles_gr, hsv_grayscale = TRUE,
     hsv_symmetric = TRUE, hsv_reverse = TRUE, by_ = "sample")
 #adding spline smoothing
-splined = applySpline(CTCF_in_10a_profiles_dt, n = 10,
+splined = applySpline(CTCF_in_10a_profiles_gr, n = 10,
     by_ = c("id", "sample"))
 ssvSignalBandedQuantiles(splined, n_quantile = 50,
     quantile_min = .25, quantile_max = .75,

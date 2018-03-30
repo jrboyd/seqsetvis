@@ -37,14 +37,14 @@ ggplot of signal aggregated with agg_fun() by sample.
 aggregate line signals in a single line plot
 }
 \examples{
-ssvSignalLineplotAgg(CTCF_in_10a_profiles_dt) +
+ssvSignalLineplotAgg(CTCF_in_10a_profiles_gr) +
     labs(title = "agg regions by sample.")
-ssvSignalLineplotAgg(CTCF_in_10a_profiles_dt, spline_n = 10) +
+ssvSignalLineplotAgg(CTCF_in_10a_profiles_gr, spline_n = 10) +
     labs(title = "agg regions by sample, with spline smoothing.")
-ssvSignalLineplotAgg(CTCF_in_10a_profiles_dt[id \%in\% 1:10],
+ssvSignalLineplotAgg(subset(CTCF_in_10a_profiles_gr, id \%in\% 1:10),
     sample_ = "id", color_ = "id") +
     labs(title = "agg samples by region id (weird)")
-ssvSignalLineplotAgg(CTCF_in_10a_profiles_dt[id \%in\% 1:10], sample_ = "id",
+ssvSignalLineplotAgg(subset(CTCF_in_10a_profiles_gr, id \%in\% 1:10), sample_ = "id",
     color_ = "id", spline_n = 10) +
     labs(title = "agg samples by region id (weird), with spline smoothing")
 }

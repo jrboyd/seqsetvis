@@ -159,15 +159,15 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::s
 #' data.table with x (or xnew if replace_x is FALSE) shifted such that
 #' x = 0 matches the maximum y-value define by by_ grouping
 #' @examples
-#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', by_ = 'id',
+#' centerAtMax(CTCF_in_10a_profiles_gr, y_ = 'y', by_ = 'id',
 #'   check_by_dupes = FALSE)
 #' #it's a bit clearer what's happening with trimming disabled
 #' #but results are less useful for heatmaps etc.
-#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', by_ = 'id',
+#' centerAtMax(CTCF_in_10a_profiles_gr, y_ = 'y', by_ = 'id',
 #'   check_by_dupes = FALSE, trim_to_valid = FALSE)
 #' #specify view_size to limit range of x values considered, prevents
 #' #excessive data trimming.
-#' centerAtMax(CTCF_in_10a_profiles_dt, y_ = 'y', view_size = 100, by_ = 'id',
+#' centerAtMax(CTCF_in_10a_profiles_gr, y_ = 'y', view_size = 100, by_ = 'id',
 #' check_by_dupes = FALSE)
 centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE) {
     ymax = xsummit = xnew = N = NULL  #reserve data.table variables
