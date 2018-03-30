@@ -223,7 +223,7 @@ bigwig_files = c(
                 package = "seqsetvis")
 )
 names(bigwig_files) = sub("_FE_random100.bw", "", basename(bigwig_files))
-names(bigwig_files) = letters[1:3]
+# names(bigwig_files) = letters[1:3]
 olap_gr = CTCF_in_10a_overlaps_gr
 target_size = quantile(width(olap_gr), .75)
 window_size = 50
@@ -235,6 +235,7 @@ bw_gr
 ```
 
 ```{r}
+olap_gr = CTCF_in_10a_overlaps_gr
 bw_gr = GRanges(CTCF_in_10a_profiles_dt)
 ```
 
@@ -500,7 +501,7 @@ bw_gr = GRanges(bw_dt)
 ```{r, fig.width=16, fig.height=4}
 p1 = ssvSignalBandedQuantiles(bw_dt, hsv_symmetric = TRUE, hsv_reverse = TRUE, 
                               hsv_grayscale = TRUE)
-p2 = ssvSignalScatterplot(bw_dt, x_name = "MCF10A", y_name = "MCF10AT1")
+p2 = ssvSignalScatterplot(bw_dt, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF")
 p3 = ssvSignalHeatmap(bw_dt)
 cowplot::plot_grid(p1, p2, p3, nrow = 1)
 ```
