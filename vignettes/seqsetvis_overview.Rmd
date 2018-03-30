@@ -223,7 +223,7 @@ bigwig_files = c(
                 package = "seqsetvis")
 )
 names(bigwig_files) = sub("_FE_random100.bw", "", basename(bigwig_files))
-
+names(bigwig_files) = letters[1:3]
 olap_gr = CTCF_in_10a_overlaps_gr
 target_size = quantile(width(olap_gr), .75)
 window_size = 50
