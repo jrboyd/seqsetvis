@@ -32,6 +32,6 @@ library(GenomicRanges)
 bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
     package = "seqsetvis", mustWork = TRUE)
 qgr = GRanges("chrTest", IRanges(1, 30))
-bw_dt = fetchWindowedBigwig(bw_f, qgr, win_size = 10)
+bw_gr = fetchWindowedBigwig(bw_f, qgr, win_size = 10)
 }
 }

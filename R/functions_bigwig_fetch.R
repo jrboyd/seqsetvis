@@ -119,7 +119,7 @@ fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
 #' bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' qgr = GRanges("chrTest", IRanges(1, 30))
-#' bw_dt = fetchWindowedBigwig(bw_f, qgr, win_size = 10)
+#' bw_gr = fetchWindowedBigwig(bw_f, qgr, win_size = 10)
 #' }
 fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
     GRanges(fetchWindowedBigwig_dt(bw_file, qgr, win_size))
@@ -152,8 +152,8 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bw_files = c("a" = bw_f, "b" = bw_f)
 #' qgr = GRanges("chrTest", IRanges(1, 30))
-#' bw_dt = fetchWindowedBigwigList(bw_files, qgr, win_size = 10)
-#' bw_dt2 = fetchWindowedBigwigList(as.list(bw_files), qgr, win_size = 10)
+#' bw_gr = fetchWindowedBigwigList(bw_files, qgr, win_size = 10)
+#' bw_gr2 = fetchWindowedBigwigList(as.list(bw_files), qgr, win_size = 10)
 #' }
 fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files),
                                    bw_variable_name = "sample", win_size = 50) {

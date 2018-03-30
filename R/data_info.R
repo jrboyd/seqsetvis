@@ -19,7 +19,26 @@ NULL
 #' Profiles for 100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq
 #' Results from CTCF_in_10a_overlaps_gr
 #'
-#' A tidy data.table at window size 100 bp within 300 bp of peak center
+#' A tidy GRanges at window size 50 bp within 350 bp of peak center
+#'  The variables are as follows:
+#' @details part of \code{\link{CTCF_in_10a_data}}
+#' \enumerate{
+#'   \item id. unique identifier
+#'   \item y. fold-enrichment over input.
+#'   \item x. bp relative to center
+#'   \item sample. name of originating sample
+#' }
+#'
+#' @docType data
+#' @keywords datasets
+#' @name CTCF_in_10a_profiles_gr
+#' @format A tidy GRanges of 2100 rows and 4 metadata columns
+NULL
+
+#' Profiles for 100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq
+#' Results from fetching bigwigs with CTCF_in_10a_overlaps_gr.
+#'
+#' A tidy data.table at window size 50 bp within 350 bp of peak center
 #'  The variables are as follows:
 #' @details part of \code{\link{CTCF_in_10a_data}}
 #' \enumerate{

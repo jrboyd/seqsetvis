@@ -1,9 +1,10 @@
 #' plot profiles from bigwigs
 #' @export
-#' @param bw_dt data.table of bigwig signal
-#' @param y_ the variable name in bw_dt for y axis in plot
-#' @param x_ the variable name in bw_dt for x axis in plot
-#' @param by_ the variable name in bw_dt to facet on
+#' @param bw_data a GRanges or data.table of bigwig signal.
+#' As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}
+#' @param y_ the variable name in bw_data for y axis in plot
+#' @param x_ the variable name in bw_data for x axis in plot
+#' @param by_ the variable name in bw_data to facet on
 #' @param hsv_reverse logical, should color scale be reversed? default FALSE
 #' @param hsv_saturation numeric [0, 1] saturation for color scale. default 1
 #' @param hsv_value numeric [0, 1] value for color scale. default 1
@@ -38,20 +39,20 @@
 #' ssvSignalBandedQuantiles(splined, n_quantile = 50,
 #'     quantile_min = .25, quantile_max = .75,
 #'     hsv_symmetric = TRUE, hsv_reverse = TRUE, by_ = "sample")
-ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
+ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
                                     hsv_reverse = FALSE,
                                     hsv_saturation = 1, hsv_value = 1,
                                     hsv_grayscale = FALSE,
                                     hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = FALSE,
                                     n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95
 ) {
-    if(class(bw_dt)[1] == "GRanges"){
-        bw_dt = data.table::as.data.table(bw_dt)
+    if(class(bw_data)[1] == "GRanges"){
+        bw_data = data.table::as.data.table(bw_data)
     }
-    stopifnot(data.table::is.data.table(bw_dt))
+    stopifnot(data.table::is.data.table(bw_data))
     stopifnot(is.character(x_), is.character(y_), is.character(by_))
-    stopifnot(x_ %in% colnames(bw_dt), y_ %in% colnames(bw_dt))
-    stopifnot(by_ %in% colnames(bw_dt) || by_ == "fake")
+    stopifnot(x_ %in% colnames(bw_data), y_ %in% colnames(bw_data))
+    stopifnot(by_ %in% colnames(bw_data) || by_ == "fake")
     stopifnot(is.logical(hsv_reverse), is.logical(hsv_grayscale),
               is.logical(hsv_symmetric))
     num_args = c(hsv_saturation, hsv_value, hsv_hue_min,
@@ -65,14 +66,14 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
     q2do = round(quantile_min + q2do * (quantile_max - quantile_min), digits = 3)
 
     if(by_ == "fake"){
-        bw_dt[[by_]] = TRUE
+        bw_data[[by_]] = TRUE
         todo = TRUE
     }else{
-        todo = unique(bw_dt[, get(by_)])
+        todo = unique(bw_data[, get(by_)])
     }
 
     calc_quantiles = function(td){#, x_, y_, by_, q2do){
-        dt = bw_dt[get(by_) == td, list(qs = list(list(stats::quantile(get(y_), q2do)))), by = x_]
+        dt = bw_data[get(by_) == td, list(qs = list(list(stats::quantile(get(y_), q2do)))), by = x_]
         dt = cbind(dt, data.table::as.data.table(t(sapply(dt$qs, function(x) x[[1]]))))
         dt$qs = NULL
         dtm = data.table::melt(dt, id.vars = x_)
@@ -122,8 +123,8 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
     names(cols) = q_o
 
     #copy factor level order if any
-    if(is.factor(bw_dt[, get(by_)])){
-        plot_dt$facet_group = factor(plot_dt$facet_group, levels = levels(bw_dt[, get(by_)]))
+    if(is.factor(bw_data[, get(by_)])){
+        plot_dt$facet_group = factor(plot_dt$facet_group, levels = levels(bw_data[, get(by_)]))
     }
     p = ggplot(plot_dt) + geom_ribbon(aes_(x = ~V1, ymin = ~low, ymax = ~high, fill = ~q_range)) +
         labs(fill = "quantile band",
@@ -142,7 +143,8 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
 
 #' maps signal from 2 sample profiles to the x and y axis. axes are standard or "volcano" min XY vs fold-change Y/X
 #' @export
-#' @param bw_dt data.table of sample profiles
+#' @param bw_data a GRanges or data.table of bigwig signal.
+#' As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}
 #' @param x_name sample name to map to x-axis, must be stored in variable specified in \code{xy_variable}
 #' @param y_name sample name to map to y-axis, must be stored in variable specified in \code{xy_variable}
 #' @param color_table data.frame with 2 columns, one of which must be named "group" and gets mapped to color.
@@ -174,7 +176,7 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
 #' ssvSignalScatterplot(CTCF_in_10a_profiles_dt,
 #'     x_name = "MCF10A", y_name = "MCF10AT1",
 #'     plot_type = "volcano", show_help = TRUE)
-ssvSignalScatterplot = function(bw_dt, x_name, y_name,
+ssvSignalScatterplot = function(bw_data, x_name, y_name,
                                 color_table = NULL,
                                 value_variable = "y", xy_variable = "sample",
                                 value_function = max,
@@ -182,15 +184,15 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
                                 plot_type = c("standard", "volcano")[1],
                                 show_help = FALSE, fixed_coords = TRUE){
     xval = yval = xvolcano = id = yvolcano = group = NULL #declare binding for data.table
-    if(class(bw_dt)[1] == "GRanges"){
-        bw_dt = data.table::as.data.table(bw_dt)
+    if(class(bw_data)[1] == "GRanges"){
+        bw_data = data.table::as.data.table(bw_data)
     }
-    stopifnot(data.table::is.data.table(bw_dt))
-    stopifnot(xy_variable %in% colnames(bw_dt))
-    if(!any(x_name == bw_dt[[xy_variable]])){
+    stopifnot(data.table::is.data.table(bw_data))
+    stopifnot(xy_variable %in% colnames(bw_data))
+    if(!any(x_name == bw_data[[xy_variable]])){
         stop(x_name, "not found in", xy_variable, "variable of data.table")
     }
-    if(!any(y_name == bw_dt[[xy_variable]])){
+    if(!any(y_name == bw_data[[xy_variable]])){
         stop(y_name, "not found in", xy_variable, "variable of data.table")
     }
     stopifnot(is.character(x_name), is.character(y_name),
@@ -200,8 +202,8 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
     stopifnot(is.logical(show_help), is.logical(fixed_coords))
     stopifnot(is.function(value_function))
 
-    plot_dt = merge(bw_dt[get(xy_variable) == x_name, list(xval = value_function(get(value_variable))), by = by_],
-                    bw_dt[get(xy_variable) == y_name, list(yval = value_function(get(value_variable))), by = by_])
+    plot_dt = merge(bw_data[get(xy_variable) == x_name, list(xval = value_function(get(value_variable))), by = by_],
+                    bw_data[get(xy_variable) == y_name, list(yval = value_function(get(value_variable))), by = by_])
     if(!is.null(color_table)){
         plot_dt = merge(plot_dt, color_table, by = by_)
     }
@@ -288,7 +290,8 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
 
 #' clustering as for a heatmap
 #' @export
-#' @param bw_dt data.table of signals
+#' @param bw_data a GRanges or data.table of bigwig signal.
+#' As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}
 #' @param nclust number of clusters
 #' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
 #' @param column_ varaible mapped to column, likely bp position for ngs data
@@ -315,7 +318,7 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
 #' clust_dt4 = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 2,
 #'     clustering_col_min = 150, clustering_col_max = 250)
 #' ssvSignalHeatmap(clust_dt4)
-ssvSignalClustering = function(bw_dt, nclust = 6,
+ssvSignalClustering = function(bw_data, nclust = 6,
                                row_ = "id",
                                column_ = "x", fill_ = "y", facet_ = "sample",
                                cluster_ = "cluster_id",
@@ -323,20 +326,20 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
                                clustering_col_min = -Inf, clustering_col_max = Inf){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
     output_GRanges = FALSE
-    if(class(bw_dt)[1] == "GRanges"){
-        bw_dt = data.table::as.data.table(bw_dt)
+    if(class(bw_data)[1] == "GRanges"){
+        bw_data = data.table::as.data.table(bw_data)
         output_GRanges = TRUE
     }
-    stopifnot(is.data.table(bw_dt))
+    stopifnot(is.data.table(bw_data))
     stopifnot(is.numeric(nclust) || nclust < 2)
     stopifnot(is.character(row_), is.character(column_), is.character(fill_),
               is.character(facet_), is.character(cluster_))
-    stopifnot(row_ %in% colnames(bw_dt), column_ %in% colnames(bw_dt),
-              fill_ %in% colnames(bw_dt), facet_ %in% colnames(bw_dt))
+    stopifnot(row_ %in% colnames(bw_data), column_ %in% colnames(bw_data),
+              fill_ %in% colnames(bw_data), facet_ %in% colnames(bw_data))
     stopifnot(is.numeric(max_rows), is.numeric(max_cols),
               is.numeric(clustering_col_min), is.numeric(clustering_col_max))
 
-    plot_dt = data.table::copy(bw_dt)
+    plot_dt = data.table::copy(bw_data)
     raw_nc = length(unique(plot_dt[[column_]]))
     if(raw_nc > max_cols){
         new_scale = (seq_len(max_cols)-1) / (max_cols - 1)
@@ -378,7 +381,8 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
 #' heatmap style representation of membership table.
 #' instead of clustering, each column is sorted starting from the left.
 #' @export
-#' @param bw_dt data.table of signals
+#' @param bw_data a GRanges or data.table of bigwig signal.
+#' As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}
 #' @param nclust number of clusters
 #' @param perform_clustering should clustering be done? default is auto.
 #' auto considers if row_ has been ordered by being a factor and if cluster_ is a numeric.
@@ -401,28 +405,28 @@ ssvSignalClustering = function(bw_dt, nclust = 6,
 #' #clustering can be done manually beforehand
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 #' ssvSignalHeatmap(clust_dt)
-ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "yes", "no")[1],
+ssvSignalHeatmap = function(bw_data, nclust = 6, perform_clustering = c("auto", "yes", "no")[1],
                             row_ = "id",
                             column_ = "x", fill_ = "y", facet_ = "sample",
                             cluster_ = "cluster_id",
                             max_rows = 500, max_cols = 100,
                             clustering_col_min = -Inf, clustering_col_max = Inf){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
-    if(class(bw_dt)[1] == "GRanges"){
-        bw_dt = data.table::as.data.table(bw_dt)
+    if(class(bw_data)[1] == "GRanges"){
+        bw_data = data.table::as.data.table(bw_data)
     }
-    stopifnot(is.data.table(bw_dt))
+    stopifnot(is.data.table(bw_data))
     stopifnot(is.numeric(nclust) || nclust < 2)
     stopifnot(is.character(row_), is.character(column_), is.character(fill_),
               is.character(facet_), is.character(cluster_))
-    stopifnot(row_ %in% colnames(bw_dt), column_ %in% colnames(bw_dt),
-              fill_ %in% colnames(bw_dt), facet_ %in% colnames(bw_dt))
+    stopifnot(row_ %in% colnames(bw_data), column_ %in% colnames(bw_data),
+              fill_ %in% colnames(bw_data), facet_ %in% colnames(bw_data))
     stopifnot(is.numeric(max_rows), is.numeric(max_cols),
               is.numeric(clustering_col_min), is.numeric(clustering_col_max))
     #determine if user wants clustering
     do_cluster = perform_clustering == "yes"
     if(perform_clustering == "auto"){
-        if(is.factor(bw_dt[[row_]]) & is.numeric(bw_dt[[cluster_]])){
+        if(is.factor(bw_data[[row_]]) & is.numeric(bw_data[[cluster_]])){
             do_cluster = FALSE
         }else{
             do_cluster = TRUE
@@ -430,7 +434,7 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
     }
     if(do_cluster){
         message("clustering...")
-        plot_dt = ssvSignalClustering(bw_dt = bw_dt,
+        plot_dt = ssvSignalClustering(bw_data = bw_data,
                                       nclust = nclust,
                                       row_ = row_,
                                       column_ = column_,
@@ -442,7 +446,7 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
                                       clustering_col_min = clustering_col_min,
                                       clustering_col_max = clustering_col_max)
     }else{
-        plot_dt = bw_dt
+        plot_dt = bw_data
     }
     message("making plot...")
     scale_floor = .1
@@ -484,8 +488,8 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
 
 #' construct line type plots where each region in each sample is represented
 #' @export
-#' @param bw_dt tidy data.table containing line type profile data, see
-#' seqsetvis::fetchWindowedBigwig and seqsetvis::fetchWindowedBigwigList
+#' @param bw_data a GRanges or data.table of bigwig signal.
+#' As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}
 #' @param x_ variable name mapped to x aesthetic, x by default.
 #' @param y_ variable name mapped to y aesthetic, y by default.
 #' @param color_ variable name mapped to color aesthetic, sample by default.
@@ -518,43 +522,43 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
 #' ssvSignalLineplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "id")
 #' ssvSignalLineplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
 #'     facet_ = "id", spline_n = 10)
-ssvSignalLineplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
+ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
                               sample_ = "sample", region_ = "id",
                               group_ = "auto_grp", line_alpha = 1,
                              facet_ = "auto_facet",
                               facet_method = facet_wrap, spline_n = NULL){
     auto_grp = auto_facet = NULL
-    if(class(bw_dt)[1] == "GRanges"){
-        bw_dt = data.table::as.data.table(bw_dt)
+    if(class(bw_data)[1] == "GRanges"){
+        bw_data = data.table::as.data.table(bw_data)
     }
-    stopifnot(is.data.table(bw_dt))
+    stopifnot(is.data.table(bw_data))
     stopifnot(is.character(x_), is.character(y_), is.character(color_),
               is.character(sample_), is.character(region_),
               is.character(group_), is.character(facet_))
-    stopifnot(x_ %in% colnames(bw_dt), y_ %in% colnames(bw_dt),
-              color_ %in% colnames(bw_dt), sample_ %in% colnames(bw_dt),
-              region_ %in% colnames(bw_dt))
-    stopifnot(group_ %in% colnames(bw_dt) || group_ == "auto_grp")
+    stopifnot(x_ %in% colnames(bw_data), y_ %in% colnames(bw_data),
+              color_ %in% colnames(bw_data), sample_ %in% colnames(bw_data),
+              region_ %in% colnames(bw_data))
+    stopifnot(group_ %in% colnames(bw_data) || group_ == "auto_grp")
     facet_names = strsplit(facet_, " ?[~+] ?")[[1]]
     facet_names = facet_names[facet_names != "."]
-    stopifnot(all(facet_names %in% colnames(bw_dt)) || facet_ == "auto_facet")
+    stopifnot(all(facet_names %in% colnames(bw_data)) || facet_ == "auto_facet")
 
     stopifnot(is.function(facet_method))
     stopifnot(is.numeric(spline_n) || is.null(spline_n))
-    bw_dt[,auto_grp := paste(get(sample_), get(region_))]
-    bw_dt[,auto_facet := paste(get(sample_), get(region_))]
+    bw_data[,auto_grp := paste(get(sample_), get(region_))]
+    bw_data[,auto_facet := paste(get(sample_), get(region_))]
     if(!is.null(spline_n)){
-        p_dt = applySpline(bw_dt, n = spline_n, x_ = x_, y_ = y_, by_ = c(group_, sample_, region_, facet_))
+        p_dt = applySpline(bw_data, n = spline_n, x_ = x_, y_ = y_, by_ = c(group_, sample_, region_, facet_))
     }else{
-        p_dt = bw_dt
+        p_dt = bw_data
     }
     ggplot(p_dt) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_), alpha = line_alpha) + facet_method(facet_)
 }
 
 #' aggregate line signals in a single line plot
 #' @export
-#' @param bw_dt tidy data.table containing line type profile data, see
-#' seqsetvis::fetchWindowedBigwig and seqsetvis::fetchWindowedBigwigList
+#' @param bw_data a GRanges or data.table of bigwig signal.
+#' As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}
 #' @param x_ variable name mapped to x aesthetic, x by default.
 #' @param y_ variable name mapped to y aesthetic, y by default.
 #' @param sample_ variable name, along with region_ used to group by default,
@@ -579,28 +583,28 @@ ssvSignalLineplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
 #' ssvSignalLineplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10], sample_ = "id",
 #'     color_ = "id", spline_n = 10) +
 #'     labs(title = "agg samples by region id (weird), with spline smoothing")
-ssvSignalLineplotAgg = function(bw_dt, x_ = "x", y_ = "y",
+ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
                                  sample_ = "sample",
                                  color_ = sample_,
                                  group_ = "auto_grp", agg_fun = mean,
                                  spline_n = NULL){
     auto_grp = NULL
-    if(class(bw_dt)[1] == "GRanges"){
-        bw_dt = data.table::as.data.table(bw_dt)
+    if(class(bw_data)[1] == "GRanges"){
+        bw_data = data.table::as.data.table(bw_data)
     }
-    stopifnot(is.data.table(bw_dt))
+    stopifnot(is.data.table(bw_data))
     stopifnot(is.character(x_), is.character(y_),
               is.character(sample_), is.character(color_),
               is.character(group_))
-    stopifnot(x_ %in% colnames(bw_dt), y_ %in% colnames(bw_dt),
-              color_ %in% colnames(bw_dt), sample_ %in% colnames(bw_dt))
-    stopifnot(group_ %in% colnames(bw_dt) || group_ == "auto_grp")
+    stopifnot(x_ %in% colnames(bw_data), y_ %in% colnames(bw_data),
+              color_ %in% colnames(bw_data), sample_ %in% colnames(bw_data))
+    stopifnot(group_ %in% colnames(bw_data) || group_ == "auto_grp")
 
     stopifnot(is.function(agg_fun))
     stopifnot(is.numeric(spline_n) || is.null(spline_n))
 
-    bw_dt[, auto_grp := paste(get(sample_))]
-    agg_dt = bw_dt[, list(y = agg_fun(get(y_))), by = c(unique(c(group_, color_, sample_, x_)))]
+    bw_data[, auto_grp := paste(get(sample_))]
+    agg_dt = bw_data[, list(y = agg_fun(get(y_))), by = c(unique(c(group_, color_, sample_, x_)))]
 
     if(!is.null(spline_n)){
         p_dt = applySpline(agg_dt, n = spline_n, x_ = x_, y_ = y_,

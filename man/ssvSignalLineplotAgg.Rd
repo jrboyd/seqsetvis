@@ -4,13 +4,13 @@
 \alias{ssvSignalLineplotAgg}
 \title{aggregate line signals in a single line plot}
 \usage{
-ssvSignalLineplotAgg(bw_dt, x_ = "x", y_ = "y", sample_ = "sample",
+ssvSignalLineplotAgg(bw_data, x_ = "x", y_ = "y", sample_ = "sample",
   color_ = sample_, group_ = "auto_grp", agg_fun = mean,
   spline_n = NULL)
 }
 \arguments{
-\item{bw_dt}{tidy data.table containing line type profile data, see
-seqsetvis::fetchWindowedBigwig and seqsetvis::fetchWindowedBigwigList}
+\item{bw_data}{a GRanges or data.table of bigwig signal.
+As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}}
 
 \item{x_}{variable name mapped to x aesthetic, x by default.}
 

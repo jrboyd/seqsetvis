@@ -236,7 +236,7 @@ bw_gr
 
 ```{r}
 olap_gr = CTCF_in_10a_overlaps_gr
-bw_gr = GRanges(CTCF_in_10a_profiles_dt)
+bw_gr = CTCF_in_10a_profiles_gr
 ```
 
 Overlap information must be transformed into a factor tied to id to be useful.
@@ -257,24 +257,24 @@ lot's of different data of multiple types at single regions.  In contrast,
 
 Basic line plot of a subset of regions
 ```{r lineplot basic}
-ssvSignalLineplot(bw_dt = subset(bw_gr, id %in% 1:12), facet_ = "sample")
+ssvSignalLineplot(bw_data = subset(bw_gr, id %in% 1:12), facet_ = "sample")
 ```
 
 Facetting by region id is less overwhelming
 ```{r lineplot region facet}
-ssvSignalLineplot(bw_dt = subset(bw_gr, id %in% 1:12), facet_ = "id")
+ssvSignalLineplot(bw_data = subset(bw_gr, id %in% 1:12), facet_ = "id")
 ```
 
 ### Aggregated line plots
 
 Aggregate regions by mean 
 ```{r lineplot aggregated}
-ssvSignalLineplotAgg(bw_dt = bw_gr)
+ssvSignalLineplotAgg(bw_data = bw_gr)
 ```
 
 Apply spline of 10 to make a prettier plot
 ```{r lineplot aggregated smoothed}
-ssvSignalLineplotAgg(bw_dt = bw_gr, spline_n = 10)
+ssvSignalLineplotAgg(bw_data = bw_gr, spline_n = 10)
 ```
 
 By adding some info to `bw_gr`, tweaking the group_ parameter, and adding a facet 
@@ -285,7 +285,7 @@ separately.
 olap_2groups = ssvFactorizeMembTable(ssvMakeMembTable(olap_gr)[, 1:2])
 grouped_gr = GRanges(merge(bw_gr, olap_2groups))
 grouped_gr = subset(grouped_gr, sample %in% c("MCF10A_CTCF", "MCF10AT1_CTCF"))
-ssvSignalLineplotAgg(bw_dt = grouped_gr, spline_n = 10,
+ssvSignalLineplotAgg(bw_data = grouped_gr, spline_n = 10,
                      group_ = c("sample", "group")) + 
     facet_wrap("group", ncol = 2) +
     labs(title = "Aggregated by peak call set", y = "FE", x = "bp from center")
@@ -481,28 +481,27 @@ olap_fixedSize = centerFixedSizeGRanges(olaps, width_q75)
 
 ### Fetch profiles
 ```{r}
-bw_dt = CTCF_in_10a_profiles_dt
-bw_gr = GRanges(bw_dt)
+bw_gr = CTCF_in_10a_profiles_gr
 # reading bigWigs will not work at all on windows. if you are able to read
 # bigwigs on your system, consider the following for loading as bigwigs:
 # # alternative (1) accessing the subsetted bigwigs included with this package
 # bw_files = sapply(names(CTCF_in_10a_bigWig_urls), function(x){
 #     system.file("extdata", paste0(x, "_FE_random100.bw"), package = "seqsetvis")
 # })
-# bw_dt = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize,
+# bw_gr = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize,
 #   win_size = 100)
 
 # # alternative (2) access the complete data from GEO.  has a tendency to timeout.
-# bw_dt = fetchWindowedBigwigList(bw_files = CTCF_in_10a_bigWig_urls, 
+# bw_gr = fetchWindowedBigwigList(bw_files = CTCF_in_10a_bigWig_urls, 
 #     qgr = olap_fixedSize, win_size = 100)
 ```
 [bw load](#bw_load)
 
 ```{r, fig.width=16, fig.height=4}
-p1 = ssvSignalBandedQuantiles(bw_dt, hsv_symmetric = TRUE, hsv_reverse = TRUE, 
+p1 = ssvSignalBandedQuantiles(bw_gr, hsv_symmetric = TRUE, hsv_reverse = TRUE, 
                               hsv_grayscale = TRUE)
-p2 = ssvSignalScatterplot(bw_dt, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF")
-p3 = ssvSignalHeatmap(bw_dt)
+p2 = ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF")
+p3 = ssvSignalHeatmap(bw_gr)
 cowplot::plot_grid(p1, p2, p3, nrow = 1)
 ```
 

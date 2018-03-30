@@ -4,13 +4,14 @@
 \alias{ssvSignalScatterplot}
 \title{maps signal from 2 sample profiles to the x and y axis. axes are standard or "volcano" min XY vs fold-change Y/X}
 \usage{
-ssvSignalScatterplot(bw_dt, x_name, y_name, color_table = NULL,
+ssvSignalScatterplot(bw_data, x_name, y_name, color_table = NULL,
   value_variable = "y", xy_variable = "sample", value_function = max,
   by_ = "id", plot_type = c("standard", "volcano")[1], show_help = FALSE,
   fixed_coords = TRUE)
 }
 \arguments{
-\item{bw_dt}{data.table of sample profiles}
+\item{bw_data}{a GRanges or data.table of bigwig signal.
+As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}}
 
 \item{x_name}{sample name to map to x-axis, must be stored in variable specified in \code{xy_variable}}
 

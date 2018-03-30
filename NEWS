@@ -4,6 +4,10 @@
 * added ssvFactorizeMembTable() for converting membership table to factor
 * added movingAverage() from r cookbook
 * rename ssvSignalTrackplot to ssvSignalLineplot
+* rename bw_dt param to bw_data in all ssvSignal* functions to reflect increased
+argument flexibility (GRanges or data.table accepted).
+* expanded vignette to include more thorough overview, overview finished but need
+use cases.
 
 minor changes
 
@@ -13,7 +17,7 @@ minor changes
 
 * rename overlapIntervalSets to ssvOverlapIntervalSets
 * improved documentation for CTCF datasets used by vignette
-* expanded vignette to include more explanation and interpretation as well as downstream analysis
+* expanded vignette to include more thorough overview, work in progress.
 
 minor changes
 

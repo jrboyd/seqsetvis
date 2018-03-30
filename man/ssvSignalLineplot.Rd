@@ -4,14 +4,14 @@
 \alias{ssvSignalLineplot}
 \title{construct line type plots where each region in each sample is represented}
 \usage{
-ssvSignalLineplot(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
+ssvSignalLineplot(bw_data, x_ = "x", y_ = "y", color_ = "sample",
   sample_ = "sample", region_ = "id", group_ = "auto_grp",
   line_alpha = 1, facet_ = "auto_facet", facet_method = facet_wrap,
   spline_n = NULL)
 }
 \arguments{
-\item{bw_dt}{tidy data.table containing line type profile data, see
-seqsetvis::fetchWindowedBigwig and seqsetvis::fetchWindowedBigwigList}
+\item{bw_data}{a GRanges or data.table of bigwig signal.
+As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}}
 
 \item{x_}{variable name mapped to x aesthetic, x by default.}
 

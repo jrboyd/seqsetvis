@@ -35,49 +35,49 @@ doTest_ssvSignalPlots = function(test_object){
 
 
     test_that("ssvSignalScatterplot works with basic inputs", {
-        p1 = ssvSignalScatterplot(test_object, x_name = "MCF10A", y_name = "MCF10AT1")
+        p1 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF")
         expect_s3_class(p1, "ggplot")
-        p2 = ssvSignalScatterplot(test_object, x_name = "MCF10A", y_name = "MCF10AT1", plot_type = "volcano")
+        p2 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", plot_type = "volcano")
         expect_s3_class(p2, "ggplot")
     })
 
     test_that("ssvSignalScatterplot throws correct error for bad x_name or y_name", {
-        expect_error(ssvSignalScatterplot(test_object, x_name = "badx", y_name = "MCF10AT1",
+        expect_error(ssvSignalScatterplot(test_object, x_name = "badx", y_name = "MCF10AT1_CTCF",
                                           value_variable = "x"), "badx")
-        expect_error(ssvSignalScatterplot(test_object, x_name = "MCF10A", y_name = "bady",
+        expect_error(ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "bady",
                                           value_variable = "x"))
     })
 
     test_that("ssvSignalScatterplot works with other inputs", {
-        p1 = ssvSignalScatterplot(test_object, x_name = "MCF10A", y_name = "MCF10AT1",
+        p1 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF",
                                   value_variable = "x")
         expect_s3_class(p1, "ggplot")
-        p2 = ssvSignalScatterplot(test_object, x_name = "MCF10A", y_name = "MCF10CA1",
+        p2 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10CA1_CTCF",
                                   value_function = median)
         expect_s3_class(p2, "ggplot")
         p3 = ssvSignalScatterplot(test_object, x_name = "1", y_name = "2",
                                   value_function = median,
                                   by_ = "sample", xy_variable = "id")
         memb = data.frame(id = unique(test_object$id),  group = letters[1:5])
-        p4 = ssvSignalScatterplot(bw_dt = test_object, x_name = "MCF10A", y_name = "MCF10A",
+        p4 = ssvSignalScatterplot(bw_data = test_object, x_name = "MCF10A_CTCF", y_name = "MCF10A_CTCF",
                                   color_table = memb)
         expect_s3_class(p4, "ggplot")
 
-        p5 = ssvSignalScatterplot(bw_dt = test_object, x_name = "MCF10A", y_name = "MCF10A", fixed_coords = F,
+        p5 = ssvSignalScatterplot(bw_data = test_object, x_name = "MCF10A_CTCF", y_name = "MCF10A_CTCF", fixed_coords = F,
                                   color_table = memb)
         expect_s3_class(p5, "ggplot")
     })
 
     test_that("ssvSignalScatterplot works with help enabled inputs", {
-        p1 = ssvSignalScatterplot(test_object, x_name = "MCF10A", y_name = "MCF10AT1",
+        p1 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF",
                                   value_variable = "x", show_help = T)
         expect_s3_class(p1, "ggplot")
 
-        p1v = ssvSignalScatterplot(test_object, x_name = "MCF10A", y_name = "MCF10AT1",
+        p1v = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF",
                                    value_variable = "x", show_help = T, plot_type = "volcano")
         expect_s3_class(p1v, "ggplot")
 
-        p2 = ssvSignalScatterplot(test_object, x_name = "MCF10A", y_name = "MCF10CA1",
+        p2 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10CA1_CTCF",
                                   value_function = median, show_help = T)
         expect_s3_class(p2, "ggplot")
 
@@ -86,7 +86,7 @@ doTest_ssvSignalPlots = function(test_object){
                                   by_ = "sample", xy_variable = "id", show_help = T)
 
         memb = data.frame(id = unique(test_object$id),  group = letters[1:5])
-        p4 = ssvSignalScatterplot(bw_dt = test_object, x_name = "MCF10A", y_name = "MCF10A",
+        p4 = ssvSignalScatterplot(bw_data = test_object, x_name = "MCF10A_CTCF", y_name = "MCF10A_CTCF",
                                   color_table = memb, show_help = T)
         expect_s3_class(p4, "ggplot")
     })
@@ -106,7 +106,7 @@ doTest_ssvSignalPlots = function(test_object){
 
         expect_warning({
             p_max_cols = ssvSignalHeatmap(test_object, nclust = 2, max_cols = 2)
-        }, regexp = "5 columns were discarded")
+        }, regexp = "12 columns were discarded")
         expect_s3_class(p_max_cols, "ggplot")
     })
 

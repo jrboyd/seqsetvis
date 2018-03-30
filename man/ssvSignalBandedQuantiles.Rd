@@ -4,20 +4,21 @@
 \alias{ssvSignalBandedQuantiles}
 \title{plot profiles from bigwigs}
 \usage{
-ssvSignalBandedQuantiles(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
+ssvSignalBandedQuantiles(bw_data, y_ = "y", x_ = "x", by_ = "fake",
   hsv_reverse = FALSE, hsv_saturation = 1, hsv_value = 1,
   hsv_grayscale = FALSE, hsv_hue_min = 0, hsv_hue_max = 0.7,
   hsv_symmetric = FALSE, n_quantile = 18, quantile_min = 0.05,
   quantile_max = 0.95)
 }
 \arguments{
-\item{bw_dt}{data.table of bigwig signal}
+\item{bw_data}{a GRanges or data.table of bigwig signal.
+As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}}
 
-\item{y_}{the variable name in bw_dt for y axis in plot}
+\item{y_}{the variable name in bw_data for y axis in plot}
 
-\item{x_}{the variable name in bw_dt for x axis in plot}
+\item{x_}{the variable name in bw_data for x axis in plot}
 
-\item{by_}{the variable name in bw_dt to facet on}
+\item{by_}{the variable name in bw_data to facet on}
 
 \item{hsv_reverse}{logical, should color scale be reversed? default FALSE}
 
