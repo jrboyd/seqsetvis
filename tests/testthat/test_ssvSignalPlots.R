@@ -58,13 +58,13 @@ doTest_ssvSignalPlots = function(test_object){
         p3 = ssvSignalScatterplot(test_object, x_name = "1", y_name = "2",
                                   value_function = median,
                                   by_ = "sample", xy_variable = "id")
-        memb = data.frame(id = unique(test_object$id), plotting_group = letters[1:5])
+        memb = data.frame(id = unique(test_object$id),  group = letters[1:5])
         p4 = ssvSignalScatterplot(bw_dt = test_object, x_name = "MCF10A", y_name = "MCF10A",
-                                  plotting_group = memb)
+                                  color_table = memb)
         expect_s3_class(p4, "ggplot")
 
         p5 = ssvSignalScatterplot(bw_dt = test_object, x_name = "MCF10A", y_name = "MCF10A", fixed_coords = F,
-                                  plotting_group = memb)
+                                  color_table = memb)
         expect_s3_class(p5, "ggplot")
     })
 
@@ -85,9 +85,9 @@ doTest_ssvSignalPlots = function(test_object){
                                   value_function = median,
                                   by_ = "sample", xy_variable = "id", show_help = T)
 
-        memb = data.frame(id = unique(test_object$id), plotting_group = letters[1:5])
+        memb = data.frame(id = unique(test_object$id),  group = letters[1:5])
         p4 = ssvSignalScatterplot(bw_dt = test_object, x_name = "MCF10A", y_name = "MCF10A",
-                                  plotting_group = memb, show_help = T)
+                                  color_table = memb, show_help = T)
         expect_s3_class(p4, "ggplot")
     })
 
@@ -120,19 +120,19 @@ doTest_ssvSignalPlots = function(test_object){
         expect_s3_class(p2, "ggplot")
     })
 
-    test_that("ssvSignalTrackplot", {
+    test_that("ssvSignalLineplot", {
         #from examples
         sub_to = test_object[test_object$id %in% 1:3]
         test_plots = list(
-            ssvSignalTrackplot(sub_to, facet_ = "sample"),
-            ssvSignalTrackplot(sub_to,
+            ssvSignalLineplot(sub_to, facet_ = "sample"),
+            ssvSignalLineplot(sub_to,
                                facet_ = "sample~.",
                                facet_method = facet_grid),
-            ssvSignalTrackplot(sub_to,
+            ssvSignalLineplot(sub_to,
                                facet_ = paste("sample", "~", "id"), facet_method = facet_grid),
-            ssvSignalTrackplot(sub_to),
-            ssvSignalTrackplot(sub_to, facet_ = "id"),
-            ssvSignalTrackplot(sub_to,
+            ssvSignalLineplot(sub_to),
+            ssvSignalLineplot(sub_to, facet_ = "id"),
+            ssvSignalLineplot(sub_to,
                                facet_ = "id", spline_n = 10)
         )
         lapply(test_plots, function(p1){
@@ -140,17 +140,17 @@ doTest_ssvSignalPlots = function(test_object){
         })
     })
 
-    test_that("ssvSignalTrackplotAgg", {
+    test_that("ssvSignalLineplotAgg", {
         #from examples
         test_plots = list(
-            ssvSignalTrackplotAgg(test_object) +
+            ssvSignalLineplotAgg(test_object) +
                 labs(title = "agg regions by sample."),
-            ssvSignalTrackplotAgg(test_object, spline_n = 10) +
+            ssvSignalLineplotAgg(test_object, spline_n = 10) +
                 labs(title = "agg regions by sample, with spline smoothing."),
-            ssvSignalTrackplotAgg(test_object[test_object$id %in% 1:10],
+            ssvSignalLineplotAgg(test_object[test_object$id %in% 1:10],
                                   sample_ = "id", color_ = "id") +
                 labs(title = "agg samples by region id (weird)"),
-            ssvSignalTrackplotAgg(test_object[test_object$id %in% 1:10], sample_ = "id",
+            ssvSignalLineplotAgg(test_object[test_object$id %in% 1:10], sample_ = "id",
                                   color_ = "id", spline_n = 10) +
                 labs(title = "agg samples by region id (weird), with spline smoothing")
         )

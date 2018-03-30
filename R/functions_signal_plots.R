@@ -134,7 +134,7 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
         scale_color_manual(breaks = q2do, palette = cols)
     if(length(todo) > 1){
         p = p +
-            facet_grid(facet_group ~ ., scales = "free_y") +
+            facet_grid(facet_group ~ .) +
             theme(strip.text.y = element_text(size = 7))
     }
     p
@@ -145,7 +145,8 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
 #' @param bw_dt data.table of sample profiles
 #' @param x_name sample name to map to x-axis, must be stored in variable specified in \code{xy_variable}
 #' @param y_name sample name to map to y-axis, must be stored in variable specified in \code{xy_variable}
-#' @param plotting_group work in progress, data.table that specifies groups for color scale
+#' @param color_table data.frame with 2 columns, one of which must be named "group" and gets mapped to color.
+#' The other column must be the same as by_ parameter and is used for merging.
 #' @param value_variable variable name that stores numeric values for plotting, default is "y"
 #' @param xy_variable variable name that stores sample, must contain entires for \code{x_name} and \code{y_name}
 #' @param value_function a function to apply to \code{value_variable} in all combintations of \code{by_} per \code{x_name} and \code{y_name}
@@ -174,13 +175,13 @@ ssvSignalBandedQuantiles = function(bw_dt, y_ = "y", x_ = "x", by_ = "fake",
 #'     x_name = "MCF10A", y_name = "MCF10AT1",
 #'     plot_type = "volcano", show_help = TRUE)
 ssvSignalScatterplot = function(bw_dt, x_name, y_name,
-                                plotting_group = NULL,
+                                color_table = NULL,
                                 value_variable = "y", xy_variable = "sample",
                                 value_function = max,
                                 by_ = "id",
                                 plot_type = c("standard", "volcano")[1],
                                 show_help = FALSE, fixed_coords = TRUE){
-    xval = yval = xvolcano = id = yvolcano = NULL #declare binding for data.table
+    xval = yval = xvolcano = id = yvolcano = group = NULL #declare binding for data.table
     if(class(bw_dt)[1] == "GRanges"){
         bw_dt = data.table::as.data.table(bw_dt)
     }
@@ -201,11 +202,14 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
 
     plot_dt = merge(bw_dt[get(xy_variable) == x_name, list(xval = value_function(get(value_variable))), by = by_],
                     bw_dt[get(xy_variable) == y_name, list(yval = value_function(get(value_variable))), by = by_])
-    if(is.null(plotting_group)){
-        plot_dt$plotting_group = factor("none")
-    }else{
-        plot_dt = merge(plot_dt, plotting_group)
+    if(!is.null(color_table)){
+        plot_dt = merge(plot_dt, color_table, by = by_)
     }
+    # if(is.null(plotting_group)){
+    #     plot_dt$plotting_group = factor("none")
+    # }else{
+    #     plot_dt = merge(plot_dt, plotting_group)
+    # }
     if(plot_type == "standard"){
         if(fixed_coords){
             xlim = c(0, plot_dt[, max(xval, yval)])
@@ -215,8 +219,13 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
             ylim = c(0, plot_dt[, max(yval)])
         }
 
-        p = ggplot(plot_dt, aes(x = xval, y = yval)) +
-            geom_point(mapping = aes(alpha = 1, size = 1.5, col = plotting_group)) +
+        p = ggplot(plot_dt, aes(x = xval, y = yval))
+        if(is.null(color_table)){
+            p = p + geom_point(mapping = aes(alpha = 1, size = 1.5))
+        }else{
+            p = p + geom_point(mapping = aes(alpha = 1, size = 1.5, color = group))
+        }
+        p = p +
             scale_alpha_identity() +
             scale_size_identity() +
             guides(alpha = "none", size = "none") +
@@ -241,8 +250,13 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
         plot_dt[, yvolcano := log2(max(min(yval, xval), 1)), by = id]
         xmax = plot_dt[, max(abs(c(xvolcano)))]
         lim = c(-xmax, xmax)
-        p = ggplot(plot_dt, aes(x = xvolcano, y = yvolcano)) +
-            geom_point(mapping = aes(alpha = 1, size = 1.5, col = plotting_group)) +
+        p = ggplot(plot_dt, aes(x = xvolcano, y = yvolcano))
+        if(is.null(color_table)){
+            p = p + geom_point(mapping = aes(alpha = 1, size = 1.5))
+        }else{
+            p = p + geom_point(mapping = aes(alpha = 1, size = 1.5, color = group))
+        }
+        p = p +
             scale_size_identity() +
             scale_alpha_identity() +
             guides(alpha = "none", size = "none") +
@@ -265,9 +279,9 @@ ssvSignalScatterplot = function(bw_dt, x_name, y_name,
             p
         }
     }
-    if(is.null(plotting_group)){
-        p = p + guides(color = "none")
-    }
+    # if(is.null(plotting_group)){
+    #     p = p + guides(color = "none")
+    # }
     if(fixed_coords) p = p + coord_fixed()
     p
 }
@@ -468,9 +482,9 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
     p
 }
 
-#' construct track type plots where each region in each sample is represented
+#' construct line type plots where each region in each sample is represented
 #' @export
-#' @param bw_dt tidy data.table containing track type profile data, see
+#' @param bw_dt tidy data.table containing line type profile data, see
 #' seqsetvis::fetchWindowedBigwig and seqsetvis::fetchWindowedBigwigList
 #' @param x_ variable name mapped to x aesthetic, x by default.
 #' @param y_ variable name mapped to y aesthetic, y by default.
@@ -482,6 +496,7 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
 #' @param group_ group aesthetic keeps lines of geom_path from mis-connecting.
 #' auto_grp by default which combines sample_ and region_.
 #' probably shouldn't change.
+#' @param line_alpha alpha value for lines. default is 1.
 #' @param facet_ facetting divides up plots.
 #' auto_facet by default which combines sample_ and region_.
 #' if overriding facet_method with facet_grid, make sure to include ~ between
@@ -493,19 +508,20 @@ ssvSignalHeatmap = function(bw_dt, nclust = 6, perform_clustering = c("auto", "y
 #' @import ggplot2
 #' @return ggplot of signal potentially facetted by region and sample
 #' @examples
-#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "sample")
-#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
+#' ssvSignalLineplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "sample")
+#' ssvSignalLineplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
 #'     facet_ = "sample~.",
 #'     facet_method = facet_grid)
-#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
+#' ssvSignalLineplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
 #'     facet_ = paste("sample", "~", "id"), facet_method = facet_grid)
-#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3])
-#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "id")
-#' ssvSignalTrackplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
+#' ssvSignalLineplot(CTCF_in_10a_profiles_dt[id %in% 1:3])
+#' ssvSignalLineplot(CTCF_in_10a_profiles_dt[id %in% 1:3], facet_ = "id")
+#' ssvSignalLineplot(CTCF_in_10a_profiles_dt[id %in% 1:3],
 #'     facet_ = "id", spline_n = 10)
-ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
+ssvSignalLineplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
                               sample_ = "sample", region_ = "id",
-                              group_ = "auto_grp", facet_ = "auto_facet",
+                              group_ = "auto_grp", line_alpha = 1,
+                             facet_ = "auto_facet",
                               facet_method = facet_wrap, spline_n = NULL){
     auto_grp = auto_facet = NULL
     if(class(bw_dt)[1] == "GRanges"){
@@ -532,12 +548,12 @@ ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
     }else{
         p_dt = bw_dt
     }
-    ggplot(p_dt) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_)) + facet_method(facet_)
+    ggplot(p_dt) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_), alpha = line_alpha) + facet_method(facet_)
 }
 
-#' aggregate track signals in line plot
+#' aggregate line signals in a single line plot
 #' @export
-#' @param bw_dt tidy data.table containing track type profile data, see
+#' @param bw_dt tidy data.table containing line type profile data, see
 #' seqsetvis::fetchWindowedBigwig and seqsetvis::fetchWindowedBigwigList
 #' @param x_ variable name mapped to x aesthetic, x by default.
 #' @param y_ variable name mapped to y aesthetic, y by default.
@@ -553,17 +569,17 @@ ssvSignalTrackplot = function(bw_dt, x_ = "x", y_ = "y", color_ = "sample",
 #' @import ggplot2
 #' @return ggplot of signal aggregated with agg_fun() by sample.
 #' @examples
-#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt) +
+#' ssvSignalLineplotAgg(CTCF_in_10a_profiles_dt) +
 #'     labs(title = "agg regions by sample.")
-#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt, spline_n = 10) +
+#' ssvSignalLineplotAgg(CTCF_in_10a_profiles_dt, spline_n = 10) +
 #'     labs(title = "agg regions by sample, with spline smoothing.")
-#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10],
+#' ssvSignalLineplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10],
 #'     sample_ = "id", color_ = "id") +
 #'     labs(title = "agg samples by region id (weird)")
-#' ssvSignalTrackplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10], sample_ = "id",
+#' ssvSignalLineplotAgg(CTCF_in_10a_profiles_dt[id %in% 1:10], sample_ = "id",
 #'     color_ = "id", spline_n = 10) +
 #'     labs(title = "agg samples by region id (weird), with spline smoothing")
-ssvSignalTrackplotAgg = function(bw_dt, x_ = "x", y_ = "y",
+ssvSignalLineplotAgg = function(bw_dt, x_ = "x", y_ = "y",
                                  sample_ = "sample",
                                  color_ = sample_,
                                  group_ = "auto_grp", agg_fun = mean,
@@ -592,6 +608,7 @@ ssvSignalTrackplotAgg = function(bw_dt, x_ = "x", y_ = "y",
     }else{
         p_dt = agg_dt
     }
+    p_dt = p_dt[order(get(x_))]
     ggplot(p_dt) +
         geom_path(aes_string(x = x_, y = y_, col = color_, group = group_))
 }

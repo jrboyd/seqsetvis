@@ -63,7 +63,7 @@ safeBrew = function(n, pal = "Dark2"){
 # x: the vector n: the number of samples centered: if FALSE, then average current sample and previous (n-1) samples if TRUE, then average symmetrically in past and
 # future. (If n is even, use one more sample from future.)
 # from http://www.cookbook-r.com/Manipulating_data/Calculating_a_moving_average/
-movingAverage <- function(x, n = 1, centered = T) {
+movingAverage <- function(x, n = 1, centered = TRUE) {
 
     if (centered) {
         before <- floor((n - 1)/2)

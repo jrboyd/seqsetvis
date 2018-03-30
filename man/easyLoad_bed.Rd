@@ -26,3 +26,6 @@ easyLoad_bed takes a character vector of file paths to bed plus files and
 returning named list of GRanges.
 Mainly a utility function for loading MACS2 narrowPeak and broadPeak.
 }
+\examples{
+\dontrun{easyLoad_bed("my_bed.bed", "my_bed")}
+}

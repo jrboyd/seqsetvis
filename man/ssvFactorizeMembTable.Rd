@@ -2,16 +2,23 @@
 % Please edit documentation in R/ssvMakeMembTable.R
 \name{ssvFactorizeMembTable}
 \alias{ssvFactorizeMembTable}
-\title{Convert any object accepted by ssvMakeMembTable to a factor}
+\title{Convert any object accepted by ssvMakeMembTable to a factor
+To avoid ambiguity,}
 \usage{
 ssvFactorizeMembTable(object)
 }
 \arguments{
-\item{object}{a valid object for conversion to a membership table by}
+\item{object}{a valid object for conversion to a membership table and then factor}
 }
 \value{
-a factor representation of object
+a 2 column ("id" and "group") data.frame.
+"id" is factor of item names if any or simply order of items.
+"group" is a factor of set combinations
 }
 \description{
 see \code{\link{ssvMakeMembTable}}
+}
+\examples{
+ssvFactorizeMembTable(CTCF_in_10a_overlaps_gr)
+ssvFactorizeMembTable(list(1:4, 2:3, 4:6))
 }

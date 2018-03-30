@@ -60,30 +60,30 @@ agnostic and also accept generic data types defining sets.
 
 ## From github
 One dependency from bioconductor isn't getting installed automatically
-```{r, eval=FALSE}
+```{r bioC missed dependency, eval=FALSE}
 source("https://bioconductor.org/biocLite.R")
 biocLite("GenomeInfoDbData")
 ```
 
 Install devtools if needed
-```{r, eval=FALSE}
+```{r devtools check, eval=FALSE}
 if(!require(devtools)){
     install.packages("devtools")    
 }
 ```
 
 Install *seqsetvis* from github
-```{r, eval=FALSE}
+```{r install seqsetvis from github, eval=FALSE}
 devtools::install_github("jrboyd/seqsetvis", build_vignettes = TRUE)
 ```
 
 ## Load the library
-```{r}
+```{r load seqsetvis}
 library(seqsetvis)
 ```
 
 ## Load optional useful libraries
-```{r, message = FALSE}
+```{r load optional libs, message = FALSE}
 library(GenomicRanges)
 library(data.table)
 ```
@@ -99,13 +99,13 @@ Many functions in *seqsetvis* require some kind of sets definition
 as input.  Sets can be defined in one of several ways.  `ssvOverlapIntervalSets()` creates 
 a single *GRanges* from a list of *GRanges*
 with a logical membership table as metadata columns defining sets.
-```{r}
+```{r overlap basic}
 olaps = ssvOverlapIntervalSets(CTCF_in_10a_narrowPeak_grs)
 head(olaps)
 ```
 
 `ssvOverlapIntervalSets()` also accepts a *GRangesList* if that's more natural.
-```{r}
+```{r overlap GRangesList}
 olaps_fromGRangesList = ssvOverlapIntervalSets(GenomicRanges::GRangesList(CTCF_in_10a_narrowPeak_grs))
 ```
 
@@ -118,45 +118,50 @@ data type and calls ssvMakeMembTable again.
 
 For instance, `ssvMakeMembTable(olaps)` extracts the membership table from
 the mcols of a single *GRanges* object.
-```{r}
+```{r ssvMakeMembTable basic}
 head(ssvMakeMembTable(olaps))
 ```
 
-## Overlapping a list of sets containing items enumerated in vectors
-```{r}
+## Overlapping a list of more generic data
+
+`ssvMakeMembTable()` can handle sets defined by a list of vectors.  
+These happen to be numeric but nearly anything that `as.character()` works on
+should be acceptable.
+```{r ssvMakeMembTable numeric}
 my_set_list = list(1:3, 2:3, 3:6)
 ssvMakeMembTable(my_set_list)
 ```
 Supplying a named list is recommended
-```{r}
+```{r ssvMakeMembTable named numeric}
 names(my_set_list) = c("first", "second", "third")
 ssvMakeMembTable(my_set_list)
 ```
 
 A list of character vectors works just as well.
-```{r}
+```{r ssvMakeMembTable character}
 my_set_list_char = lapply(my_set_list, function(x)letters[x])
 ssvMakeMembTable(my_set_list_char)
 ```
-Notice the rownames changed too.
+Notice the rownames changed as the items changed.
 
 
 
 
-# Visualization of Overlaps, ssvFeature*
+# Visualization of set overlaps, ssvFeature*
+
 The ssvFeature* family of functions all accept a valid set definition and output
 a ggplot.  
 
 ## Barplot
 Barplots are useful for for conveying the size of each set/group.  
-```{r}
+```{r barplot}
 ssvFeatureBars(olaps)
 ```
 
 ## Pie chart
 Pie charts are an alternative to barplots but are generally more difficult to 
 interpret.
-```{r}
+```{r pie}
 ssvFeaturePie(olaps)
 ```
 
@@ -164,7 +169,7 @@ ssvFeaturePie(olaps)
 Venn diagrams show the number of items falling into each overlap category.
 At release, *seqsetvis* is limited to displaying 3 sets via venn diagram. This
 will be increased in a future update.
-```{r}
+```{r venn}
 ssvFeatureVenn(olaps)
 ```
 
@@ -176,12 +181,12 @@ approximations by neccessity.
 
 There is no limit to the number of sets *seqsetvis* can show in an Euler diagram
 but computation time increases rapidly along with the inaccuracy of approximation.
-```{r}
+```{r euler}
 ssvFeatureEuler(olaps)
 ```
 
 Ellipse variant of Euler diagram
-```{r}
+```{r euler ellipse}
 ssvFeatureEuler(olaps, shape = "ellipse")
 ```
 
@@ -191,11 +196,11 @@ An alternative to Venn/Euler diagrams, this "heatmap" contains one column per
 set and one row per item with item membership per set mapped to color.
 In this example black indicates TRUE for membership hence the top 2/3 is black
 for all three sets.
-```{r}
+```{r binary heatmap}
 ssvFeatureBinaryHeatmap(olaps, raster_approximation = FALSE)
 ```
 
-# Visualization of genomic signal in overlaps context, ssvSignal*
+# Visualization of genomic signal, ssvSignal*
 
 The ssvSignal* family of functions all take as input continuous signal data 
 mapped to the genome.  This type of data is generally stored in bedGraph, 
@@ -207,7 +212,8 @@ If you don't have .bigWig (or .bigwig or .bw) files you should be able to
 easily generate some using \code{r Biocpkg("rtracklayer")} `export.bw()` alongside `import.bedGraph()`
 or `import.wig()` as appropriate.
 
-```{r}
+## Loading bigwig data
+```{r fetchWindowedBigwig}
 bigwig_files = c(
     system.file("extdata", "MCF10A_CTCF_FE_random100.bw", 
                 package = "seqsetvis"),
@@ -224,8 +230,139 @@ window_size = 50
 target_size = round(target_size / window_size) * window_size
 olap_gr = resize(olap_gr, target_size, fix = "center")
 bw_gr = fetchWindowedBigwigList(bigwig_files, olap_gr, win_size = window_size)
+
 bw_gr
 ```
+
+Overlap information must be transformed into a factor tied to id to be useful.
+```{r factorize}
+olap_groups = ssvFactorizeMembTable(olap_gr)
+```
+
+## Line plots
+
+Line plots are perhaps the most natural and common type of visualization for
+this type of continuous genomic data.  Many genome browsers and other BioC 
+packages support
+this type of visualization.  These other approaches are very good at show
+lot's of different data of multiple types at single regions.  In contrast, 
+*seqsetvis* is focused on bringing in data from multiple regions simultaneously.
+
+### Individual line plots
+
+Basic line plot of a subset of regions
+```{r lineplot basic}
+ssvSignalLineplot(bw_dt = subset(bw_gr, id %in% 1:12), facet_ = "sample")
+```
+
+Facetting by region id is less overwhelming
+```{r lineplot region facet}
+ssvSignalLineplot(bw_dt = subset(bw_gr, id %in% 1:12), facet_ = "id")
+```
+
+### Aggregated line plots
+
+Aggregate regions by mean 
+```{r lineplot aggregated}
+ssvSignalLineplotAgg(bw_dt = bw_gr)
+```
+
+Apply spline of 10 to make a prettier plot
+```{r lineplot aggregated smoothed}
+ssvSignalLineplotAgg(bw_dt = bw_gr, spline_n = 10)
+```
+
+By adding some info to `bw_gr`, tweaking the group_ parameter, and adding a facet 
+call we can apply the aggregation function by peak call set and plot them 
+separately.
+```{r lineplot}
+# append set info, modify aggregation group_ and add facet
+olap_2groups = ssvFactorizeMembTable(ssvMakeMembTable(olap_gr)[, 1:2])
+grouped_gr = GRanges(merge(bw_gr, olap_2groups))
+grouped_gr = subset(grouped_gr, sample %in% c("MCF10A_CTCF", "MCF10AT1_CTCF"))
+ssvSignalLineplotAgg(bw_dt = grouped_gr, spline_n = 10,
+                     group_ = c("sample", "group")) + 
+    facet_wrap("group", ncol = 2) +
+    labs(title = "Aggregated by peak call set", y = "FE", x = "bp from center")
+```
+
+## Scatterplot
+
+Scatterplots are a common way of viewing the relationship between two variables.
+*seqsetvis* allows users to easily apply a summary function (mean by default) to 
+each region as measured in two samples and plot them on the x and y axis.
+
+A basic scatterplot
+```{r scatterplot basic}
+ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF")
+```
+
+Using the result of `olap_groups = ssvFactorizeMembTable(olap_gr)` to add color
+based on our peak calls.
+```{r scatterplot all sets}
+ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", 
+                     color_table = olap_groups)
+```
+
+More than a few colors gets confusing quickly.  Let's limit the color groups to 
+the samples being plotted.
+```{r scatterplot 2 sets}
+# by subsetting the matrix returned by ssvMakeMembTable() we have a lot of 
+# control over the coloring.
+olap_2groups = ssvFactorizeMembTable(ssvMakeMembTable(olap_gr)[, 1:2])
+ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", 
+                     color_table = olap_2groups)
+```
+
+Coloring by the third sample's peak call might be interesting.
+```{r outside group}
+olap_OutGroups = ssvFactorizeMembTable(ssvMakeMembTable(olap_gr)[, 3, drop = FALSE])
+ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", color_table = olap_OutGroups)
+```
+
+
+We can also get clever with *ggplot2*'s facetting.
+```{r scatterplot facet}
+ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", 
+                     color_table = olap_groups) + facet_wrap("group")
+```
+
+## Banded quantiles
+
+These quantile bands are a more sophisticated way to aggregate the same data 
+shown in the line plots.
+```{r banded quantiles}
+ssvSignalBandedQuantiles(bw_gr, by_ = "sample", hsv_grayscale = TRUE, 
+                         hsv_symmetric = TRUE, 
+                         hsv_reverse = TRUE)
+```
+
+## Heatmap
+
+Heatmaps combined with clustering are a powerful way to find similarly marked
+regions of the genome.  Calling ssvSignalHeatmap will perform k-means clustering 
+automatically.  k-means clusters sorted by similarity as determined by 
+hierarchical clustering.
+```{r heatmap basic}
+ssvSignalHeatmap(bw_gr, nclust = 3)
+```
+
+Performing clustering manually allows for use of cluster info.
+```{r heatmap perform pre-clustering}
+bw_clust = ssvSignalClustering(bw_gr, nclust = 3)
+bw_clust
+```
+
+Cluster selection:
+```{r heatmap cluster selection}
+subset(bw_clust, cluster_id == 3)
+```
+
+Plotting and pre-clustering (identical to just calling heatmap with same parameters)
+```{r heatmap use pre-cluster}
+ssvSignalHeatmap(bw_clust)
+```
+
 
 # Example: CTCF in breast cancer
 

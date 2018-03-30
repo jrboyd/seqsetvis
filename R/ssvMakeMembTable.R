@@ -68,8 +68,8 @@ setMethod("ssvMakeMembTable", signature(object = "GRangesList"), function(object
 #' gr$set_b = c(FALSE, TRUE, TRUE)
 #' ssvMakeMembTable(gr)
 setMethod("ssvMakeMembTable", signature(object = "GRanges"), function(object){
-    gr_object = object
-    mc_object = mcols(gr_object)
+    mc_object = mcols(object)
+    rownames(mc_object) = names(object)
     ssvMakeMembTable(mc_object)
 })
 
@@ -124,21 +124,26 @@ setMethod("ssvMakeMembTable", signature(object = "data.frame"), function(object)
 })
 
 #' Convert any object accepted by ssvMakeMembTable to a factor
+#' To avoid ambiguity,
 #'
 #' see \code{\link{ssvMakeMembTable}}
 #'
 #' @param object a valid object for conversion to a membership table and then factor
-#' @return a factor representation of object
+#' @return a 2 column ("id" and "group") data.frame.
+#' "id" is factor of item names if any or simply order of items.
+#' "group" is a factor of set combinations
 #' @export
-#' ssvMakeMembTable
+#' @examples
+#' ssvFactorizeMembTable(CTCF_in_10a_overlaps_gr)
+#' ssvFactorizeMembTable(list(1:4, 2:3, 4:6))
 ssvFactorizeMembTable = function(object){
     memb = ssvMakeMembTable(object)
     keys = expand.grid(lapply(seq_len(ncol(memb)), function(x)0:1))
     keys = keys == 1
     for(i in rev(seq_len(ncol(keys)))){
-        keys = keys[order(keys[,i], decreasing = TRUE),]
+        keys = keys[order(keys[,i, drop = FALSE], decreasing = TRUE), , drop = FALSE]
     }
-    keys = keys[order(rowSums(keys), decreasing = TRUE),]
+    keys = keys[order(rowSums(keys), decreasing = TRUE), , drop = FALSE]
     keys_rn = apply(keys, 1, function(k){
         paste(colnames(memb)[k], collapse = " & ")
     })
@@ -149,5 +154,13 @@ ssvFactorizeMembTable = function(object){
             all(x == y)
         })]
     })
-    return(factor(grps, levels = keys_rn))
+    ids = names(grps)
+    if(is.null(ids)){
+        ids = seq_along(grps)
+    }
+    ids = factor(ids, levels = ids)
+    names(grps) = NULL
+    grps = factor(grps, levels = keys_rn)
+    grp_df = data.frame(id = ids, group = grps)
+    return(grp_df)
 }

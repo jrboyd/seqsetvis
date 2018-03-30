@@ -3,6 +3,7 @@
 * added easyLoad_narrowPeak() and easyLoad_broadPeak()
 * added ssvFactorizeMembTable() for converting membership table to factor
 * added movingAverage() from r cookbook
+* rename ssvSignalTrackplot to ssvSignalLineplot
 
 minor changes
 

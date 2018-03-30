@@ -9,6 +9,8 @@
 #' @return a named list of GRanges loaded from file_paths
 #' @import rtracklayer
 #' @export
+#' @examples
+#' \dontrun{easyLoad_narrowPeak("my_peaks.narrowPeak", "my_peaks")}
 easyLoad_narrowPeak = function(file_paths, file_names = NULL){
     #from: https://charlesjb.github.io/How_to_import_narrowPeak/
     extraCols_narrowPeak <- c(signalValue = "numeric", pValue = "numeric",
@@ -27,6 +29,8 @@ easyLoad_narrowPeak = function(file_paths, file_names = NULL){
 #' @return a named list of GRanges loaded from file_paths
 #' @import rtracklayer
 #' @export
+#' @examples
+#' \dontrun{easyLoad_broadPeak("my_peaks.broadPeak", "my_peaks")}
 easyLoad_broadPeak = function(file_paths, file_names = NULL){
     #from: https://charlesjb.github.io/How_to_import_narrowPeak/
     extraCols_broadPeak <- c(signalValue = "numeric", pValue = "numeric",
@@ -48,6 +52,8 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL){
 #' @return a named list of GRanges loaded from file_paths
 #' @import rtracklayer
 #' @export
+#' @examples
+#' \dontrun{easyLoad_bed("my_bed.bed", "my_bed")}
 easyLoad_bed = function(file_paths, file_names = NULL, extraCols = character()){
     stopifnot(is.character(file_paths))
     stopifnot(all(file.exists(file_paths)))

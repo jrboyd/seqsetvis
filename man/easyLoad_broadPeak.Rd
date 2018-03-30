@@ -21,3 +21,6 @@ a named list of GRanges loaded from file_paths
 easyLoad_broadPeak takes a character vector of file paths to narrowPeak
 files from MACS2 and returns a named list of GRanges.
 }
+\examples{
+\dontrun{easyLoad_broadPeak("my_peaks.broadPeak", "my_peaks")}
+}
