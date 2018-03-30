@@ -310,7 +310,7 @@ clusteringKmeansNestedHclust = function(mat, nclust, seed = 0) {
         if (nrow(cmat) > 2) {
             mat_dt[group == i, ]$within_o = stats::hclust(stats::dist((cmat)))$order
         } else {
-            mat_dt[group == i, ]$within_o = 1:nrow(cmat)
+            mat_dt[group == i, ]$within_o = seq_len(nrow(cmat))
         }
 
     }

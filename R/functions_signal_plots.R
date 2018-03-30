@@ -61,7 +61,8 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
     stopifnot(all(num_args >= 0), all(num_args <= 1))
     stopifnot(n_quantile > 2)
 
-    variable = value = V1 = low = high = low_q = high_q = q_range = rn = q_num = q_low = q_high = NULL #declare binding for data.table
+    variable = value = V1 = low = high = low_q = high_q = NULL
+    q_range = rn = q_num = q_low = q_high = NULL #declare binding for data.table
     q2do = 0:n_quantile/n_quantile
     q2do = round(quantile_min + q2do * (quantile_max - quantile_min), digits = 3)
 
@@ -74,7 +75,10 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
 
     calc_quantiles = function(td){#, x_, y_, by_, q2do){
         dt = bw_data[get(by_) == td, list(qs = list(list(stats::quantile(get(y_), q2do)))), by = x_]
-        dt = cbind(dt, data.table::as.data.table(t(sapply(dt$qs, function(x) x[[1]]))))
+        qmat = matrix(unlist(dt$qs), nrow = nrow(dt), ncol = length(q2do), byrow = TRUE)
+        colnames(qmat) = paste0(q2do*100, "%")
+        # sapply(dt$qs, function(x)x[[1]])
+        dt = cbind(dt, qmat)
         dt$qs = NULL
         dtm = data.table::melt(dt, id.vars = x_)
         data.table::setkey(dtm, variable)
@@ -86,8 +90,8 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
         q_o = unique(dt_c$q_range)
         dt_c$q_range = factor(dt_c$q_range, levels = q_o)
 
-        dt_c$rn = 1:nrow(dt_c)
-        dt_c[, `:=`(c("q_low", "q_high"), data.table::tstrsplit(sub("%", "", q_range), split = "-", keep = 1:2)), by = rn]
+        dt_c$rn = seq_len(nrow(dt_c))
+        dt_c[, `:=`(c("q_low", "q_high"), data.table::tstrsplit(sub("%", "", q_range), split = "-", keep = seq_len(2))), by = rn]
         dt_c[, `:=`(q_num, (as.numeric(q_low) + as.numeric(q_high))/2)]
         dt_c[, `:=`(c("rn", "q_low", "q_high"), NULL)]
         dt_c$facet_group = td
@@ -344,9 +348,9 @@ ssvSignalClustering = function(bw_data, nclust = 6,
     if(raw_nc > max_cols){
         new_scale = (seq_len(max_cols)-1) / (max_cols - 1)
         old_scale = (seq_len(raw_nc)-1) / (raw_nc - 1)
-        kept = sapply(new_scale, function(v){
+        kept = vapply(new_scale, function(v){
             which.min(abs(v - old_scale))
-        })
+        }, 1)
         kept = sort(unique(plot_dt[[column_]]))[kept]
         plot_dt = plot_dt[x %in% kept]
         warning(raw_nc - max_cols, " columns were discarded according to max_cols: ", max_cols)
@@ -512,15 +516,16 @@ ssvSignalHeatmap = function(bw_data, nclust = 6, perform_clustering = c("auto", 
 #' @import ggplot2
 #' @return ggplot of signal potentially facetted by region and sample
 #' @examples
-#' ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id %in% 1:3), facet_ = "sample")
-#' ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id %in% 1:3),
+#' bw_gr = CTCF_in_10a_profiles_gr
+#' ssvSignalLineplot(subset(bw_gr, bw_gr$id %in% seq_len(3)), facet_ = "sample")
+#' ssvSignalLineplot(subset(bw_gr, bw_gr$id %in% seq_len(3)),
 #'     facet_ = "sample~.",
 #'     facet_method = facet_grid)
-#' ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id %in% 1:3),
+#' ssvSignalLineplot(subset(bw_gr, bw_gr$id %in% seq_len(3)),
 #'     facet_ = paste("sample", "~", "id"), facet_method = facet_grid)
-#' ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id %in% 1:3))
-#' ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id %in% 1:3), facet_ = "id")
-#' ssvSignalLineplot(subset(CTCF_in_10a_profiles_gr, id %in% 1:3),
+#' ssvSignalLineplot(subset(bw_gr, bw_gr$id %in% seq_len(3)))
+#' ssvSignalLineplot(subset(bw_gr, bw_gr$id %in% seq_len(3)), facet_ = "id")
+#' ssvSignalLineplot(subset(bw_gr, bw_gr$id %in% seq_len(3)),
 #'     facet_ = "id", spline_n = 10)
 ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
                               sample_ = "sample", region_ = "id",
@@ -573,14 +578,15 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
 #' @import ggplot2
 #' @return ggplot of signal aggregated with agg_fun() by sample.
 #' @examples
-#' ssvSignalLineplotAgg(CTCF_in_10a_profiles_gr) +
+#' bw_gr = CTCF_in_10a_profiles_gr
+#' ssvSignalLineplotAgg(bw_gr) +
 #'     labs(title = "agg regions by sample.")
 #' ssvSignalLineplotAgg(CTCF_in_10a_profiles_gr, spline_n = 10) +
 #'     labs(title = "agg regions by sample, with spline smoothing.")
-#' ssvSignalLineplotAgg(subset(CTCF_in_10a_profiles_gr, id %in% 1:10),
+#' ssvSignalLineplotAgg(subset(bw_gr, bw_gr$id %in% seq_len(10)),
 #'     sample_ = "id", color_ = "id") +
 #'     labs(title = "agg samples by region id (weird)")
-#' ssvSignalLineplotAgg(subset(CTCF_in_10a_profiles_gr, id %in% 1:10), sample_ = "id",
+#' ssvSignalLineplotAgg(subset(bw_gr, bw_gr$id %in% seq_len(10)), sample_ = "id",
 #'     color_ = "id", spline_n = 10) +
 #'     labs(title = "agg samples by region id (weird), with spline smoothing")
 ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",

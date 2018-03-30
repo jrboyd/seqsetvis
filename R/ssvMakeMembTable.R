@@ -26,17 +26,17 @@ setGeneric("ssvMakeMembTable", function(object){
 #' gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)), GRanges("chr1", IRanges(2:4*2, 2:4*2)))
 #' ssvMakeMembTable(gr_list)
 setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
-    if (all(sapply(object, class) == "GRanges")) {#GRanges are a special case
+    if (all(vapply(object, class, "character") == "GRanges")) {#GRanges are a special case
         return(ssvMakeMembTable(GRangesList(object)))
     }
-    if (all(sapply(object, class) != "character")) {
+    if (all(vapply(object, class, "character") != "character")) {
         object = lapply(object, as.character)
     }
-    if (all(sapply(object, class) == "character")) {
+    if (all(vapply(object, class, "character") == "character")) {
         char_object = object
         object = set_list2memb(char_object)
     } else {
-        stop("can't handle list of non-character classes as object: ", paste(sapply(object, class), collapse = ", "))
+        stop("can't handle list of non-character classes as object: ", paste(vapply(object, class, "character"), collapse = ", "))
     }
     return(object)
 })
@@ -115,7 +115,7 @@ setMethod("ssvMakeMembTable", signature(object = "data.frame"), function(object)
     if (is.null(colnames(object))) {
         colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])
     }
-    if(all(colnames(object) == paste0("V", 1:ncol(object)))){
+    if(all(colnames(object) == paste0("V", seq_len(ncol(object))))){
         colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])
     }
     mat = as.matrix(object)

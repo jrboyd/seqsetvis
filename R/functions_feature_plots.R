@@ -47,7 +47,7 @@ ssvFeatureVenn = function(object, group_names = NULL, counts_txt_size = 5,
     if (nsets > 3)
         stop("Can't plot Venn diagram for more than 3 sets")
     if (is.null(group_names))
-        group_names <- factor(colnames(object)[1:nsets], levels = colnames(object)[1:nsets])
+        group_names <- factor(colnames(object)[seq_len(nsets)], levels = colnames(object)[seq_len(nsets)])
     if (is.null(circle_colors)) {
         circle_colors = safeBrew(nsets, "Dark2")
     } else {
@@ -398,10 +398,10 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = TRUE,
     stopifnot(is.logical(raster_approximation))
     stopifnot(is.numeric(raster_width_min), is.numeric(raster_height_min))
     mat = ifelse(as.matrix(object), 0, 1)
-    for (i in rev(1:ncol(mat))) {
+    for (i in rev(seq_len(ncol(mat)))){
         mat = mat[order(mat[, i], decreasing = TRUE), , drop = FALSE]
     }
-    hdt = data.table::as.data.table(cbind(mat, row = 1:nrow(mat)))
+    hdt = data.table::as.data.table(cbind(mat, row = seq_len(nrow(mat))))
     hdt = data.table::melt(hdt, id.vars = "row", variable.name = "groups")
 
     if (raster_approximation) {
@@ -411,7 +411,7 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = TRUE,
         if (raster_width_min >= ncol(dmat)) {
             # expand cols as necessary to meet target
             raster_width_multiplier = ceiling(raster_width_min/ncol(dmat))
-            comp_col = rep(1:ncol(dmat), each = raster_width_multiplier)
+            comp_col = rep(seq_len(ncol(dmat)), each = raster_width_multiplier)
         } else {
             # evenly spaced sample down to target
             comp_col = round(1:raster_width_min/raster_width_min * ncol(dmat))
@@ -419,10 +419,10 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = TRUE,
         if (raster_height_min >= nrow(dmat)) {
             # expand rows as necessary to meet target
             raster_height_multiplier = ceiling(raster_height_min/nrow(dmat))
-            comp_row = rep(1:nrow(dmat), each = raster_height_multiplier)
+            comp_row = rep(seq_len(nrow(dmat)), each = raster_height_multiplier)
         } else {
             # evenly spaced sample down to target
-            comp_row = round(1:raster_height_min/raster_height_min * nrow(dmat))
+            comp_row = round(seq_len(raster_height_min)/raster_height_min * nrow(dmat))
         }
         # dmat = (dmat * -.95 + .95)
         comp_mat = dmat[comp_row, comp_col]

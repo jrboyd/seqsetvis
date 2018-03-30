@@ -193,7 +193,7 @@ fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files),
 #' bw_dt2 = fetchWindowedBigwigList(as.list(bw_files), qgr, win_size = 10)
 #' }
 fetchWindowedBigwigList_dt = function(bw_files, qgr, bw_names = names(bw_files),
-                                   bw_variable_name = "sample", win_size = 50) {
+                                      bw_variable_name = "sample", win_size = 50) {
     if(is.list(bw_files)){
         bw_files = unlist(bw_files)
     }
@@ -209,7 +209,7 @@ fetchWindowedBigwigList_dt = function(bw_files, qgr, bw_names = names(bw_files),
 
     if (any(duplicated(bw_names))) {
         stop("some bw_names are duplicated:\n",
-                    paste(collapse = "\n", unique(bw_names[duplicated(bw_names)])))
+             paste(collapse = "\n", unique(bw_names[duplicated(bw_names)])))
     }
 
     load_bw = function(nam) {

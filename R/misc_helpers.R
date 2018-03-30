@@ -89,7 +89,7 @@ movingAverage <- function(x, n = 1, centered = TRUE) {
     i <- 1
     while (i <= before) {
         # This is the vector with offset values to add
-        new <- c(rep(NA, i), x[1:(length(x) - i)])
+        new <- c(rep(NA, i), x[seq_len(length(x) - i)])
 
         count <- count + (!is.na(new))
         new[is.na(new)] <- 0

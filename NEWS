@@ -1,4 +1,9 @@
-# setsetvis 0.99.5
+# seqsetvis 0.99.7
+* fixed examples error for ssvSignalLineplot
+* addressed BioC notes for seq_len instead of 1:x
+* addressed BioC notes for vapply instead of sapply
+
+# seqsetvis 0.99.5
 
 * added easyLoad_narrowPeak() and easyLoad_broadPeak()
 * added ssvFactorizeMembTable() for converting membership table to factor
