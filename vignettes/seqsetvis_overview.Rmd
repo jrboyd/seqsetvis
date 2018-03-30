@@ -196,7 +196,7 @@ An alternative to Venn/Euler diagrams, this "heatmap" contains one column per
 set and one row per item with item membership per set mapped to color.
 In this example black indicates TRUE for membership hence the top 2/3 is black
 for all three sets.
-```{r binary heatmap}
+```{r binary heatmap, eval = FALSE}
 ssvFeatureBinaryHeatmap(olaps, raster_approximation = FALSE)
 ```
 
