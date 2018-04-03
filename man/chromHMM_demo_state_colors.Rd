@@ -3,10 +3,10 @@
 \docType{data}
 \name{chromHMM_demo_state_colors}
 \alias{chromHMM_demo_state_colors}
-\title{original state color mappings stored in segmentation bed}
+\title{original state name to color mappings stored in segmentation bed}
 \format{a named character vector mapping states to hex colors}
 \description{
-original state color mappings stored in segmentation bed
+original state name to color mappings stored in segmentation bed
 }
 \details{
 part of \code{\link{chromHMM_demo_data}}

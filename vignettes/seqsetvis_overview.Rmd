@@ -895,7 +895,7 @@ pdt$grp_id = as.integer(pdt$grp_id)
 dt_list = lapply(unique(pdt$grp), function(state){
     dt = pdt[grp == state]
     dtmax = dt[, .(ymax = y[which(x == x[order(abs(x))][1])]), by = grp_id]
-    dtmax = dtmax[order(ymax, decreasing = T)]
+    dtmax = dtmax[order(ymax, decreasing = TRUE)]
     dtmax[, grp_o := seq_len(.N)]
     dtmax$ymax = NULL
     dt = merge(dtmax, dt)

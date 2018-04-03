@@ -23,6 +23,7 @@ is from the publication \href{https://www.ncbi.nlm.nih.gov/pubmed/24916973}{Tabe
 Contains: \itemize{
 \item \code{\link{chromHMM_demo_overlaps_gr}}
 \item \code{\link{chromHMM_demo_bw_states_gr}}
+\item \code{\link{chromHMM_demo_state_total_widths}}
 \item \code{\link{chromHMM_demo_state_colors}}
 \item \code{\link{chromHMM_demo_segmentation_url}}
 \item \code{\link{chromHMM_demo_chain_url}}
