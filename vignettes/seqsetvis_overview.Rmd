@@ -17,13 +17,13 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Abstract
+# Synopsis
 `r Githubpkg("jrboyd/seqsetvis")` is an R package for the visual
 comparison of sets of genomic regions (typically ChIP-seq peak calls).  This 
 covers straightforward overlaps suitable for something like a Venn diagram and 
 extends to more sophisticated 
-visualization of continous signal data via clustered heatmaps and track-like 
-line plots.  
+visualization of continous signal data (typically enrichment in IP) via 
+clustered heatmaps and track-like line plots.  
 
 # Features
 
@@ -188,14 +188,15 @@ of each set and the degree to which the overlap with circles or ellipses of
 varying sizes.  For data of any appreciable complexity, Euler diagrams are 
 approximations by neccessity.
 
-There is no limit to the number of sets *seqsetvis* can show in an Euler diagram
+There is no hard limit to the number of sets *seqsetvis* can show in an Euler diagram
 but computation time increases rapidly along with the inaccuracy of 
 approximation.
 ```{r euler}
 ssvFeatureEuler(olaps)
 ```
 
-Ellipse variant of Euler diagram
+Ellipse variant of Euler diagram.  Ellipses are capable of better fitting the
+set overlaps.
 ```{r euler ellipse}
 ssvFeatureEuler(olaps, shape = "ellipse")
 ```
@@ -206,7 +207,7 @@ An alternative to Venn/Euler diagrams, this "heatmap" contains one column per
 set and one row per item with item membership per set mapped to color.
 In this example black indicates TRUE for membership hence the top 2/3 is black
 for all three sets.
-```{r binary heatmap, eval = FALSE}
+```{r binary heatmap}
 ssvFeatureBinaryHeatmap(olaps, raster_approximation = FALSE)
 ```
 
@@ -417,7 +418,7 @@ to download the complete datasets using *BiocFileCache* **IF** the package
 *BiocFileCache* is installed and `cache_path` already exists.  If enabled, this
 downloads ~3 GB of data.
 
-```{r}
+```{r setup np_files bw_files}
 pkgdata_path = system.file("extdata", 
                            package = "seqsetvis")
 cache_path = paste0(pkgdata_path, "/.cache")
@@ -461,7 +462,7 @@ if(dir.exists(cache_path) & require(BiocFileCache)){
                     package = "seqsetvis")
     )
     
-    names(np_files) = sub("_CTCF_random100.narrowPeak", "", 
+    names(np_files) = sub("_random100.narrowPeak", "", 
                           x = basename(np_files))
 }
 ```
@@ -471,12 +472,6 @@ if(dir.exists(cache_path) & require(BiocFileCache)){
 ```{r load package narrowPeak}
 # load peak calls
 np_grs = easyLoad_narrowPeak(np_files)
-```
-
-If run, this would load the full narrowPeak files from GEO.
-
-```{r load url narrowPeak, eval = FALSE}
-np_grs <- easyLoad_narrowPeak(CTCF_in_10a_narrowPeak_urls)
 ```
 
 Perform overlapping
@@ -494,7 +489,7 @@ say how many peaks are only present in MCF10AT1?) but the basic trends are
 more obvious (MCF10A has the most peaks and the majority of peaks are common to
 all 3 cell lines).
 
-```{r ctcf fig1, hold = TRUE, fig.align='center', fig.height=4, fig.width = 8}
+```{r ctcf fig1,hold=TRUE, fig.align='center', fig.height=4, fig.width = 8}
 p_bars = ssvFeatureBars(olaps, show_counts = FALSE) +  theme(legend.position = "left")
 p_bars = p_bars + theme(axis.text.x = element_blank(), 
                 axis.ticks.x = element_blank(),
@@ -516,7 +511,7 @@ cowplot::ggdraw() +
 Plot colors can be modified via the ggplot objects without recalling plot 
 functions. (These colors aren't better per se.)
 
-```{r color change, hold = TRUE, fig.align='center', fig.height=4, fig.width = 8}
+```{r color change, eval=FALSE,hold = TRUE, fig.align='center', fig.height=4, fig.width = 8}
 col_vals = c("MCF10A_CTCF" = 'red', "MCF10AT1_CTCF" = "blue", "MCF10CA1_CTCF" = "green")
 sf = scale_fill_manual(values = col_vals)
 sc = scale_color_manual(values = col_vals)
@@ -532,7 +527,7 @@ cowplot::ggdraw() +
 
 The same but grayscale.
 
-```{r color change gray, message=FALSE, hold = TRUE, fig.align='center', fig.height=4, fig.width = 8}
+```{r color change gray, message=FALSE,hold=TRUE, fig.align='center', fig.height=4, fig.width = 8}
 sf = scale_fill_grey()
 sc = scale_color_manual(values = rep("black", 3))
 cowplot::ggdraw() +
@@ -631,17 +626,12 @@ bw_gr = fetchWindowedBigwigList(bw_files = bw_files, qgr = olaps_fixedSize,
   win_size = 50)
 ```
 
-The full bigwig data is also accessible on GEO via URL.
-```{r fetch url bigwig, eval = FALSE}
-bw_gr = fetchWindowedBigwigList(bw_files = CTCF_in_10a_bigWig_urls,
-    qgr = olaps_fixedSize, win_size = 50)
-```
-
 Of course, if you're going to access the data repeatedly, it makes more sense
 to download it locally and access it there. see [bw load](#bw_load) for help
 with that.
 
 ```{r set bw_gr}
+if(dir.exists(cache_path))
 bw_gr = CTCF_in_10a_profiles_gr
 ```
 
@@ -656,7 +646,7 @@ B) Likewise for the comparison of MCF10A and MCF10CA1.  In this case, there is a
 systematic reduction in fold-enrichment in CA1 compared to 10A. While it's 
 possible there's some biology at play, it's far more likely that the 
 ChIP procedure for CA1 simply wasn't as successful.
-```{r, fig.width=12, fig.height=7}
+```{r ctcf scatterplots, fig.width=12, fig.height=7}
 all_groups = levels(ssvFactorizeMembTable(ssvMakeMembTable(olaps_fixedSize))$group)
 all_colors = RColorBrewer::brewer.pal(length(all_groups), "Dark2")
 names(all_colors) = all_groups
@@ -672,7 +662,7 @@ cowplot::plot_grid(p_12, p_13, label_y = .8, labels = "AUTO")
 
 These observations are reinforced by the heatmap.
 
-```{r, message=FALSE}
+```{r ctcf heatmap, message=FALSE}
 clust_gr = ssvSignalClustering(bw_gr, nclust = 3)
 ssvSignalHeatmap(clust_gr) + labs(fill = "FE", 
                                   y = "region", 
@@ -692,19 +682,23 @@ according to the maximum across samples.  One alternative,
 `by_ = c("id", "sample")` would have shifted each region in each sample.  
 Another alternative, `by_ = ""` or `by_ = NULL` would shift every region in 
 every sample identically.
-```{r heatmap, message = FALSE}
+```{r ctcf recentered heatmap, message = FALSE, fig.width=14, fig.height=6}
 center_gr = centerAtMax(clust_gr, view_size = 150, 
                         by_ = "id", check_by_dupes = FALSE)
-clust_center_gr = ssvSignalClustering(center_gr, nclust = 3)
-## we could have called ssvSignalHeatmap() directly on center_gr and
-## preserve the original clustering if that was important
-# ssvSignalHeatmap(clust_gr) + labs(fill = "FE", 
-#                                   y = "region", 
-#                                   x = "bp from center")
 
-ssvSignalHeatmap(clust_center_gr) + labs(fill = "FE", 
-                                  y = "region", 
+
+p_center_hmap = ssvSignalHeatmap(center_gr) + labs(fill = "FE",
+                                  y = "region",
                                   x = "bp from center")
+
+## since center_gr still retains clustering information, clustering is not
+## repeated by default, the following reclusters the data.
+clust_center_gr = ssvSignalClustering(center_gr, nclust = 3)
+p_center_hmap_reclust = ssvSignalHeatmap(clust_center_gr) + labs(fill = "FE",
+                                  y = "region",
+                                  x = "bp from center")
+cowplot::plot_grid(p_center_hmap + labs(title = "original clustering"), 
+                   p_center_hmap_reclust + labs(title = "reclustered"))
 ```
 
 Cluster 1 and 2 seem to have the most robust enrichment.  Let's extract them
@@ -730,55 +724,109 @@ In this demonstration we'll use the same CTCF dataset in breast cancer but
 bring in a chromHMM state file from an other dataset.  This is meant to 
 highlight the flexibility of *seqsetvis*.
 
-## Retrieve chromHMM data by url
+## Setup
 
-Load the full chromHMM state segmentation via url.  Notice that the "name"
-metadata column is a valid set definition.
-```{r}
-chmm_gr = rtracklayer::import.bed("ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE57nnn/GSE57498/suppl/GSE57498_MCF7_ChromHMM.bed.gz")
+If the previous CTCF in breast cancer **Use Case** made use of *BiocFileCache*,
+we'll continue caching external data sources. If not, we'll skip to a 
+pre-cooked version of the same data.
 
-# the chromHMM window size parameter.  200 bp is the default and appears to have 
-# been used for this data.
-chmm_win = 200
-# all(width(chmm_gr) / chmm_win == as.integer(width(chmm_gr) / chmm_win))
-chmm_gr
-```
-
-Cleanup state names.
+The pre-cooked version is quite a narrow slice and there's a significant 
+amount of data manipulation 
 
 ```{r}
-chmm_gr$name = gsub("\\+", " and ", chmm_gr$name)
-chmm_gr$name = gsub("_", " ", chmm_gr$name)
-```
+target_data = "MCF10A_CTCF"
+chmm_win = 200 #window size is an important chromHMM parameter.
+# 200 is the default window size and matches the state segementation
 
-Setup color to state mapping
+if(dir.exists(cache_path) & require(BiocFileCache)){
+    # set all file paths
+    chmm_bw_file = bfcrpath(ssv_bfc, rnames = paste(target_data, "bigwig", 
+                                                    sep = ","))
+    chmm_np_file = bfcrpath(ssv_bfc, rnames = paste(target_data, "narrowPeak", 
+                                                    sep = ","))
+    chmm_seg_file = bfcrpath(ssv_bfc, rnames = "MCF7,segmentation",
+                             fpath = chromHMM_demo_segmentation_url)
+    
+    query_chain = bfcquery(ssv_bfc, "hg19ToHg38,chain")
+    if(nrow(query_chain) == 0){
+        chain_hg19ToHg38_gz = bfcrpath(ssv_bfc, rnames = "hg19ToHg38,gz",
+                                       fpath = chromHMM_demo_chain_url)
+        ch_raw = readLines(gzfile(chain_hg19ToHg38_gz))
+        ch_file = bfcnew(ssv_bfc, rname = "hg19ToHg38,chain")
+        writeLines(ch_raw, con = ch_file)
+        
+    }
+    chmm_chain_file = bfcrpath(ssv_bfc, rnames = "hg19ToHg38,chain")
+    ch = rtracklayer::import.chain(chmm_chain_file)    
+    # load segmentation data
+    chmm_gr = rtracklayer::import.bed(chmm_seg_file)
+    #cleanup state names.
+    chmm_gr$name = gsub("\\+", " and ", chmm_gr$name)
+    chmm_gr$name = gsub("_", " ", chmm_gr$name)
+    #setup color to state mapping
+    colDF = unique(mcols(chmm_gr)[c("name", "itemRgb")])
+    state_colors = colDF$itemRgb
+    names(state_colors) = colDF$name
+    #liftover states from hg19 to hg38
+    ch = rtracklayer::import.chain(chmm_chain_file)
+    chmm_gr_hg38 = rtracklayer::liftOver(chmm_gr, ch)
+    chmm_gr_hg38 = unlist(chmm_gr_hg38)
+    chmm_grs_list = as.list(GenomicRanges::split(chmm_gr_hg38, chmm_gr_hg38$name))
+    #transform narrowPeak ranges to summit positions
+    chmm_np_grs = easyLoad_narrowPeak(chmm_np_file, file_names = target_data)
+    chmm_summit_grs = lapply(chmm_np_grs, function(x){
+        start(x) = start(x) + x$relSummit
+        end(x) = start(x)
+        x
+    })
+    qlist = append(chmm_summit_grs[1], chmm_grs_list)
+    chmm_olaps = ssvOverlapIntervalSets(qlist, use_first = TRUE)
+    #discard the columns for peak call and no_hit, not informative here.
+    mcols(chmm_olaps)[[1]] = NULL
+    chmm_olaps$no_hit = NULL
+    #total width of genome assigned each state
+    state_total_widths = sapply(chmm_grs_list, function(my_gr){
+        sum(as.numeric(width(my_gr)))
+    })
+    #Expand state regions into 200 bp windows.
+    state_wingrs = lapply(chmm_grs_list, function(my_gr){
+        st = my_gr$name[1]
+        wgr = unlist(slidingWindows(my_gr, chmm_win, chmm_win))
+        wgr$state = st
+        wgr
+    })
+    state_wingrs = unlist(GRangesList(state_wingrs))
+    # fetch bw data for each state
+    # it probably isn't useful to grab every single window for each state
+    # so we can cap the number of each state carried forward
+    max_per_state = 5000
+    # flank size zooms out a bit from each chromHMM window
+    flank_size = 400
+    
+    state_split = split(state_wingrs, state_wingrs$state)
+    state_split = lapply(state_split, function(my_gr){
+        samp_gr = sample(my_gr, min(length(my_gr), max_per_state))
+        samp_gr = sort(samp_gr)
+        names(samp_gr) = seq_along(samp_gr)
+        samp_gr
+    })
+    state_gr = unlist(GRangesList(state_split))
+    state_gr = resize(state_gr, width = chmm_win + 2 * flank_size, fix = "center")
+    
+    bw_states_gr = fetchWindowedBigwig(bw_file = chmm_bw_file, 
+                                       qgr = state_gr, 
+                                       win_size = 50)
+    bw_states_gr$grp = sub("\\..+", "", bw_states_gr$id)
+    bw_states_gr$grp_id = sub(".+\\.", "", bw_states_gr$id)
+}else{
+    max_per_state = 20
+    flank_size = 400
+    state_colors = chromHMM_demo_state_colors
+    bw_states_gr = chromHMM_demo_bw_states_gr
+    chmm_olaps = chromHMM_demo_overlaps_gr
+    state_total_widths = chromHMM_demo_state_total_widths
+}
 
-```{r}
-colDF = unique(mcols(chmm_gr)[c("name", "itemRgb")])
-state_colors = colDF$itemRgb
-names(state_colors) = colDF$name
-```
-
-Split states GRanges into list
-
-```{r}
-ch_f = system.file("extdata/hg19ToHg38.over.chain", package = "seqsetvis")
-ch = rtracklayer::import.chain(ch_f)
-chmm_gr_hg38 = rtracklayer::liftOver(chmm_gr, ch)
-chmm_gr_hg38 = unlist(chmm_gr_hg38)
-chmm_grs_list = as.list(GenomicRanges::split(chmm_gr_hg38, chmm_gr_hg38$name))
-```
-
-```{r}
-summit_grs = lapply(np_grs, function(x){
-    start(x) = start(x) + x$relSummit
-    end(x) = start(x)
-    x
-})
-qlist = append(summit_grs[1], chmm_grs_list)
-chmm_olaps = ssvOverlapIntervalSets(qlist, use_first = TRUE)
-mcols(chmm_olaps)[[1]] = NULL
-chmm_olaps$no_hit = NULL
 ```
 
 Create barplot of raw count of peaks overlapping states.
@@ -793,80 +841,57 @@ p_state_raw_count = ssvFeatureBars(olaps_df, show_counts = FALSE) +
     theme_cowplot() +
     theme(axis.text.x = element_text(angle = 90, size = 10,
                                      hjust = 1, vjust = .5))
-
+p_state_raw_count
 ```
 
 Create barplot of enrichment of peaks overlapping states.
 
 ```{r}
-state_total_widths = sapply(chmm_grs_list, function(my_gr){
-    sum(as.numeric(width(my_gr)))
-})
+state_width_fraction = state_total_widths / sum(state_total_widths)
 
 state_peak_hits =  colSums(olaps_df)
-
-state_width_fraction = state_total_widths / sum(state_total_widths)
 state_peak_fraction = state_peak_hits / sum(state_peak_hits)
 
-enrichment = state_peak_fraction / state_width_fraction
+enrichment = state_peak_fraction / state_width_fraction[names(state_peak_fraction)]
 enrich_df = data.frame(state = names(enrichment), enrichment = enrichment)
 p_state_enrichment =  ggplot(enrich_df) +
     geom_bar(aes(x = state, fill = state, y = enrichment), stat = "identity") +
+    labs(x = "") + 
     scale_fill_manual(values = state_colors) +
     theme(axis.text.x = element_text(angle = 90, size = 10,
                                      hjust = 1, vjust = .5))
-```
-
-Expand state regions into 200 bp windows.
-
-```{r}
-state_wingrs = lapply(chmm_grs_list, function(my_gr){
-    st = my_gr$name[1]
-    wgr = unlist(slidingWindows(my_gr, chmm_win, chmm_win))
-    wgr$state = st
-    wgr
-})
-state_wingrs = unlist(GRangesList(state_wingrs))
-```
-
-Fetch bigwig data for states
-
-```{r}
-tmp_split = split(state_wingrs, state_wingrs$state)
-tmp_split = lapply(tmp_split, function(my_gr){
-    samp_gr = sample(my_gr, min(length(my_gr), 1000))
-    samp_gr = sort(samp_gr)
-    names(samp_gr) = seq_along(samp_gr)#paste(samp_gr$state, seq_len(length(samp_gr)), sep = "_")
-    samp_gr
-})
-tmp = unlist(GRangesList(tmp_split))
-tmp = resize(tmp, width = 2000, fix = "center")
-
-bw_states_gr = fetchWindowedBigwig(bw_file = bw_files[1], qgr = tmp, win_size = 50)
-bw_states_gr$grp = sub("\\..+", "", bw_states_gr$id)
-bw_states_gr$grp_id = sub(".+\\.", "", bw_states_gr$id)
+p_state_enrichment
 ```
 
 Plot aggregated lineplot by state
 
-```{r}
+```{r, message=FALSE}
 p_agg_tracks = ssvSignalLineplotAgg(bw_states_gr, sample_ = "grp", color_ = "grp")
+gb = ggplot2::ggplot_build(p_agg_tracks)
+yrng = range(gb$data[[1]]$y)
 p_agg_tracks = p_agg_tracks +
     scale_color_manual(values = state_colors) +
-    annotate("line", x = rep(-100, 2), y = c(.6, 1.1)) +
-    annotate("line", x = rep(100, 2), y = c(.6, 1.1)) +
-    labs(y = "FE", x = "bp", color = "state", title = paste("Average FE by state,", "MCF10A CTCF"), subtitle = "states sampled to 1000 200 bp windows each\n400 bp flanking each side") +
+    annotate("line", x = rep(-chmm_win/2, 2), y = yrng) +
+    annotate("line", x = rep(chmm_win/2, 2), y = yrng) +
+    labs(y = "FE", x = "bp", color = "state", 
+         title = paste("Average FE by state,", target_data), 
+         subtitle = paste("states sampled to", 
+                          max_per_state, 
+                          chmm_win, 
+                          "bp windows each\n", 
+                          flank_size, 
+                          "bp flanking each side")) +
     theme(plot.title = element_text(hjust = 0))
+p_agg_tracks
 ```
+
+A heatmap using the same data from the aggregated line plot.  Facetting is
+done on state and regions are sorted in decreasing order of signal at center.
 
 ```{r}
 pdt = as.data.table(mcols(bw_states_gr))
-pdt[, ycap := y ]
-pdt[ycap > 20, ycap := 20]
-
-pdt = centerAtMax(pdt, by_ = c("grp", "grp_id"), view_size = 200)
 pdt$grp_id = as.integer(pdt$grp_id)
-
+# reassign grp_id to sort within each state set
 dt_list = lapply(unique(pdt$grp), function(state){
     dt = pdt[grp == state]
     dtmax = dt[, .(ymax = y[which(x == x[order(abs(x))][1])]), by = grp_id]
@@ -878,9 +903,10 @@ dt_list = lapply(unique(pdt$grp), function(state){
     dt$grp_o = NULL
     dt
 })
+# reassemble
 pdt = rbindlist(dt_list)
-
-p_hmap = ggplot(pdt[abs(x) < 1000]) + 
+# heatmap facetted by state and sorted in decreasing order
+p_state_hmap = ggplot(pdt) + 
     geom_raster(aes(x = x, y = grp_id, fill = y)) + 
     scale_y_reverse() +
     facet_wrap("grp", nrow = 2) +
@@ -891,41 +917,36 @@ p_hmap = ggplot(pdt[abs(x) < 1000]) +
           strip.text = element_text(size= 8)) +
     scale_fill_gradientn(colors = c("white", "orange", "red")) +
     labs(y = "", fill = "FE", x = "bp from local summit")
-p_hmap
+p_state_hmap
 ```
 
+Tie it all together into one figure with cowplot.
 
-# Data Download
-
-## Retrieve narrowPeak data by url {#np_load}
-```{r, eval=FALSE}
-# set file urls
-np_files = CTCF_in_10a_narrowPeak_urls
-
-# load peak calls
-np_grs = easyLoad_narrowPeak(np_files)
-
-np_grs
-#np_grs is now a valid input for ssvOverlapIntervalSets()
+```{r, fig.height=12, fig.width=8}
+bar_height = .25
+line_height = .3
+ggdraw() +
+    draw_plot(p_state_raw_count + guides(fill = "none"), 
+              x = 0, 
+              y = 1 - bar_height, 
+              width = .5, 
+              height = bar_height) +
+    draw_plot(p_state_enrichment + guides(fill = "none"), 
+              x = .5, 
+              y = 1 - bar_height, 
+              width = .5, 
+              height = bar_height) +
+    draw_plot(p_agg_tracks, 
+              x = 0, 
+              y = 1 - bar_height - line_height, 
+              width = 1, 
+              height = line_height) +
+    draw_plot(p_state_hmap, 
+              x = 0, 
+              y = 0, 
+              width = 1, 
+              height = 1 - bar_height - line_height) +
+    draw_plot_label(LETTERS[1:4], 
+                    c(0, 0.48, 0, 0), 
+                    c(1, 1, 1 - bar_height, 1 - bar_height - line_height), size = 15)
 ```
-
-## Retrieve bigwig data by url {#bw_load}
-```{r, eval=FALSE}
-# set bigwig urls
-bw_urls = CTCF_in_10a_bigWig_urls
-system.file("extdata", package = "seqsetvis")
-# set bigwig filenames
-bw_files = paste0(names(bw_urls), "_FE.bw")
-save_dir = system.file("extdata", package = "seqsetvis")
-bw_files = paste(save_dir, bw_files, sep = "/")
-names(bw_files) = names(bw_urls)
-# download bigwigs from url to local filename
-for(i in seq_along(bw_urls)){
-    if(!file.exists(bw_files[i])){
-        curl::curl_download(url = bw_urls[i], destfile = bw_files[i], quiet = F)
-    }
-}
-bw_files
-#bw_files is now a valid input for fetchWindowedBigwigList()
-```
-

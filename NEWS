@@ -1,6 +1,8 @@
 # seqsetvis 0.99.8
 
 * fetch* now automatically calculate and apply a fixed width.
+* BiocFileCache used for all URL resources in vignette
+* vigentte uses cases for CTCF peak overlap and for chromHMM states complete
 
 # seqsetvis 0.99.7
 
