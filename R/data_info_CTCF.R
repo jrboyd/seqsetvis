@@ -1,6 +1,6 @@
 #' CTCF ChIP-seq in breast cancer cell lines
 #'
-#' @description Vignette data for seqsetvis was dowloaded directly from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}.
+#' @description Vignette data for seqsetvis was downloaded directly from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}.
 #' This data is CTCF ChIP-seq from a model of breast cancer progression derived from the MCF10A cell line.
 #'
 #' @description Data from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}
