@@ -10,7 +10,9 @@
 #' @import rtracklayer
 #' @export
 #' @examples
-#' \dontrun{easyLoad_narrowPeak("my_peaks.narrowPeak", "my_peaks")}
+#' np_f = system.file("extdata/test_bigwigs/test_loading.narrowPeak",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' easyLoad_narrowPeak(np_f, "my_narrowPeak")
 easyLoad_narrowPeak = function(file_paths, file_names = NULL){
     #from: https://charlesjb.github.io/How_to_import_narrowPeak/
     extraCols_narrowPeak <- c(signalValue = "numeric", pValue = "numeric",
@@ -30,7 +32,9 @@ easyLoad_narrowPeak = function(file_paths, file_names = NULL){
 #' @import rtracklayer
 #' @export
 #' @examples
-#' \dontrun{easyLoad_broadPeak("my_peaks.broadPeak", "my_peaks")}
+#' bp_f = system.file("extdata/test_bigwigs/test_loading.broadPeak",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' easyLoad_broadPeak(bp_f, "my_broadPeak")
 easyLoad_broadPeak = function(file_paths, file_names = NULL){
     #from: https://charlesjb.github.io/How_to_import_narrowPeak/
     extraCols_broadPeak <- c(signalValue = "numeric", pValue = "numeric",
@@ -53,10 +57,12 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL){
 #' @import rtracklayer
 #' @export
 #' @examples
-#' \dontrun{easyLoad_bed("my_bed.bed", "my_bed")}
+#' bed_f = system.file("extdata/test_bigwigs/test_loading.bed",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' easyLoad_bed(bed_f, "my_bed")
 easyLoad_bed = function(file_paths, file_names = NULL, extraCols = character()){
     stopifnot(is.character(file_paths))
-    stopifnot(all(file.exists(file_paths)))
+    stopifnot(all(file.exists(file_paths) | grepl("://", file_paths)))
     #check names of file-paths
     if(is.null(names(file_paths))){
         names(file_paths) = basename(file_paths)

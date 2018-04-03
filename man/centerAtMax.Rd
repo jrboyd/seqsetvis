@@ -5,7 +5,7 @@
 \title{centers profile of x and y.  default is to center by region but across all
 samples.}
 \usage{
-centerAtMax(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL,
+centerAtMax(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL,
   trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE)
 }
 \arguments{
@@ -45,10 +45,10 @@ x = 0 matches the maximum y-value define by by_ grouping
 such that it is zero at max y.
 }
 \details{
-by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')},
-splines
-will be calculated individually for each gene in each sample. alternatively
-if \code{by_ = c('gene_id')}
+character.  by_ controls at the level of the data centering is
+applied.  If by_ is "" or NULL, a single max position will be determined
+for the entire dataset.  If by is "id" (the default) then each region will be
+centered individually across all samples.
 }
 \examples{
 centerAtMax(CTCF_in_10a_profiles_gr, y_ = 'y', by_ = 'id',

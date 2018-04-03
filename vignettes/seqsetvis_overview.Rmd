@@ -19,9 +19,9 @@ knitr::opts_chunk$set(
 
 # Abstract
 `r Githubpkg("jrboyd/seqsetvis")` is an R package for the visual
-comparison of sets of genomic regions (typically ChIP-seq peak calls).  
-This covers straightforward overlaps 
-suitable for something like a Venn diagram and extends to more sophisticated 
+comparison of sets of genomic regions (typically ChIP-seq peak calls).  This 
+covers straightforward overlaps suitable for something like a Venn diagram and 
+extends to more sophisticated 
 visualization of continous signal data via clustered heatmaps and track-like 
 line plots.  
 
@@ -30,29 +30,37 @@ line plots.
 * Mostly it "just works" with minimal assumed knowledge of R or other 
 Bioconductor packages.
 * All plots produced are `r CRANpkg("ggplot2")` objects. 
-+ easily customized according to user preferences by appending *ggplot2* functions.
-+ powerful plot arrangement with with `r CRANpkg("cowplot")`, `r CRANpkg("gridExtra")`, etc.
+    + easily customized according to user preferences by appending *ggplot2* 
+functions.
+    + powerful plot arrangement with with `r CRANpkg("cowplot")`, 
+`r CRANpkg("gridExtra")`, etc.
 * Although various plots are implemented, the underlying data are simple in 
 structure and easily accessible so **you** can do what **you** want with them.
-+ membership table for feature overlaps is just a logical matrix.
-+ signal data is stored in a tidy formatted `r CRANpkg("data.table")`, ideal for `r CRANpkg("ggplot2")` visualization.
+    + membership table for feature overlaps is just a logical matrix.
+    + signal data is stored in a tidy formatted `r CRANpkg("data.table")`, ideal 
+    for `r CRANpkg("ggplot2")` visualization.
 
-Although initially designed to focus on peak call sets, *seqsetvis* is flexile and 
-accepts any data in *GRanges* format and is therefore flexible enough to work dowstream of 
-many genomics tools and packages.  Indeed, set comparison visualizations are genomics 
-agnostic and also accept generic data types defining sets.  
+Although initially designed to focus on peak call sets, *seqsetvis* accepts any
+data in *GRanges* format and is therefore flexible enough to 
+work dowstream of many genomics tools and packages.  Indeed, set comparison 
+visualizations are genomics agnostic and also accept generic data types defining 
+sets.  
 
 # Functions
 
 * `ssv*` - most primary user facing functions are prefixed by ssv
-+ `ssvOverlapIntervalSets` - derives sets from a list of GRanges
-+ `ssvMakeMembTable` - coerces various ways of defining sets to a membership table
-+ `ssvFeature*` - visualizations of set counts and overlaps
-+ `ssvSignal*` - visualizations of signal mapped to genomic coordinates in sets context
+    + `ssvOverlapIntervalSets` - derives sets from a list of GRanges
+    + `ssvMakeMembTable` - coerces various ways of defining sets to a membership 
+table
+    + `ssvFeature*` - visualizations of set counts and overlaps
+    + `ssvSignal*` - visualizations of signal mapped to genomic coordinates in sets 
+context
 * utility functions
-+ `easyLoad_*` - loads files into a list of GRanges for input into `ssv*` functions
-+ `fetch*` - grabs data from .bigwig and .bam files
-+ miscellaneous but potentially handy functions such as wrappers for data.table functions.
+    + `easyLoad_*` - loads files into a list of GRanges for input into `ssv*` 
+functions
+    + `fetch*` - grabs data from .bigwig and .bam files
+    + miscellaneous but potentially handy functions such as wrappers for data.table 
+functions.
 
 
 
@@ -89,15 +97,15 @@ library(data.table)
 ```
 
 # Defining sets
-*seqsetvis* has several ways of accepting set information.  Since *seqsetvis* was 
-originally intended to focus on comparing sets of peak calls, a list of 
+*seqsetvis* has several ways of accepting set information.  Since *seqsetvis* 
+was originally intended to focus on comparing sets of peak calls, a list of 
 *GRanges* or a *GRangesList* is directly supported but there are more
 generic alternatives.
 
 ## Overlapping a list of *GRanges*
 Many functions in *seqsetvis* require some kind of sets definition
-as input.  Sets can be defined in one of several ways.  `ssvOverlapIntervalSets()` creates 
-a single *GRanges* from a list of *GRanges*
+as input.  Sets can be defined in one of several ways.  
+`ssvOverlapIntervalSets()` creates a single *GRanges* from a list of *GRanges*
 with a logical membership table as metadata columns defining sets.
 ```{r overlap basic}
 olaps = ssvOverlapIntervalSets(CTCF_in_10a_narrowPeak_grs)
@@ -106,7 +114,8 @@ head(olaps)
 
 `ssvOverlapIntervalSets()` also accepts a *GRangesList* if that's more natural.
 ```{r overlap GRangesList}
-olaps_fromGRangesList = ssvOverlapIntervalSets(GenomicRanges::GRangesList(CTCF_in_10a_narrowPeak_grs))
+olaps_fromGRangesList = ssvOverlapIntervalSets(
+    GenomicRanges::GRangesList(CTCF_in_10a_narrowPeak_grs))
 ```
 
 The membership data contained in the metadata columns of `olaps` is  
@@ -180,7 +189,8 @@ varying sizes.  For data of any appreciable complexity, Euler diagrams are
 approximations by neccessity.
 
 There is no limit to the number of sets *seqsetvis* can show in an Euler diagram
-but computation time increases rapidly along with the inaccuracy of approximation.
+but computation time increases rapidly along with the inaccuracy of 
+approximation.
 ```{r euler}
 ssvFeatureEuler(olaps)
 ```
@@ -209,7 +219,8 @@ bigWig format.  This is done via the `fetchWindowedBigwig()` and
 `fetchWindowedBigwigList()` functions.
 
 If you don't have .bigWig (or .bigwig or .bw) files you should be able to 
-easily generate some using \code{r Biocpkg("rtracklayer")} `export.bw()` alongside `import.bedGraph()`
+easily generate some using `r Biocpkg("rtracklayer")` `export.bw()` 
+alongside `import.bedGraph()`
 or `import.wig()` as appropriate.
 
 ## Loading bigwig data
@@ -277,8 +288,8 @@ Apply spline of 10 to make a prettier plot
 ssvSignalLineplotAgg(bw_data = bw_gr, spline_n = 10)
 ```
 
-By adding some info to `bw_gr`, tweaking the group_ parameter, and adding a facet 
-call we can apply the aggregation function by peak call set and plot them 
+By adding some info to `bw_gr`, tweaking the group_ parameter, and adding a 
+facet call we can apply the aggregation function by peak call set and plot them 
 separately.
 ```{r lineplot}
 # append set info, modify aggregation group_ and add facet
@@ -321,8 +332,12 @@ ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF",
 
 Coloring by the third sample's peak call might be interesting.
 ```{r outside group}
-olap_OutGroups = ssvFactorizeMembTable(ssvMakeMembTable(olap_gr)[, 3, drop = FALSE])
-ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", color_table = olap_OutGroups)
+olap_OutGroups = ssvFactorizeMembTable(
+    ssvMakeMembTable(olap_gr)[, 3, drop = FALSE])
+ssvSignalScatterplot(bw_gr, 
+                     x_name = "MCF10A_CTCF", 
+                     y_name = "MCF10AT1_CTCF", 
+                     color_table = olap_OutGroups)
 ```
 
 
@@ -363,166 +378,538 @@ Cluster selection:
 subset(bw_clust, cluster_id == 3)
 ```
 
-Plotting and pre-clustering (identical to just calling heatmap with same parameters)
+Plotting and pre-clustering (identical to just calling heatmap with same 
+parameters)
 ```{r heatmap use pre-cluster}
 ssvSignalHeatmap(bw_clust)
 ```
 
 
-# Example: CTCF in breast cancer
+# Use case : CTCF in breast cancer
 
-CTCF binding in 3 breast cancer cell lines
+This vignette runs using a small subset of datasets that are publicly available 
+via [GEO](https://www.ncbi.nlm.nih.gov/geo/).  These data are fully described 
+in [GSE98551](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551) and 
+the associated paper: [Intranuclear and higher-order chromatin organization of the major histone gene cluster in breast cancer](https://www.ncbi.nlm.nih.gov/pubmed/28504305)
 
-## Loading Libraries
+In brief, the three cell lines MCF10A, MCF10A-at1, and MCF10A-CA1a are used as 
+a model of breast cancer progression from normal-like MCF10A to  
+metastatic MCF10A-CA1a.  The ChIP-seq target CTCF is both a transcriptional
+regulator and an insulator frequently associated with the boundaries of genomic 
+structural domains.
+Therefore, regions where CTCF changes are interesting for follow-up to see if 
+they are also associated wtih regulatory or structural changes and perhaps 
+important to breast cancer progression.
 
-We'll use `r CRANpkg("cowplot")` to arrange our plots at the end.
+To download the full dataset see: [narrowPeak from GEO](#np_load) and 
+[bigwig from GEO](#bw_load)
 
-```{r, message = FALSE}
+We'll use `r CRANpkg("cowplot")` to arrange our plots in this section.
+
+```{r cowplot lib, message = FALSE}
 library(cowplot)
+```
+
+## Setup
+
+Set paths to bigwig files and narrowPeak files.  There is some extra code here
+to download the complete datasets using *BiocFileCache* **IF** the package
+*BiocFileCache* is installed and `cache_path` already exists.  If enabled, this
+downloads ~3 GB of data.
+
+```{r}
+pkgdata_path = system.file("extdata", 
+                           package = "seqsetvis")
+cache_path = paste0(pkgdata_path, "/.cache")
+# the next line is enough to initialize the cache
+# BiocFileCache(cache = cache_path)
+if(dir.exists(cache_path) & require(BiocFileCache)){
+    library(BiocFileCache)
+    ssv_bfc = BiocFileCache(cache = cache_path)
+    bw_files = vapply(seq_along(CTCF_in_10a_bigWig_urls), function(i){
+        rname = paste(names(CTCF_in_10a_bigWig_urls)[i], 
+                      "bigwig", 
+                      sep = ",")
+        fpath = CTCF_in_10a_bigWig_urls[i]
+        #bfcrpath calls bfcadd() if necessary and returns file path
+        bfcrpath(ssv_bfc, rname = rname, fpath = fpath)
+    }, "char")
+    names(bw_files) = names(CTCF_in_10a_bigWig_urls)
+    
+    np_files = vapply(seq_along(CTCF_in_10a_narrowPeak_urls), function(i){
+        rname = paste(names(CTCF_in_10a_narrowPeak_urls)[i], 
+                      "narrowPeak", 
+                      sep = ",")
+        fpath = CTCF_in_10a_narrowPeak_urls[i]
+        #bfcrpath calls bfcadd() if necessary and returns file path
+        bfcrpath(ssv_bfc, rname = rname, fpath = fpath)
+    }, "a")
+    names(np_files) = names(CTCF_in_10a_narrowPeak_urls)
+}else{
+    bw_files = vapply(c("MCF10A_CTCF", "MCF10AT1_CTCF", "MCF10CA1_CTCF"), 
+    function(x){
+        system.file("extdata", paste0(x, "_FE_random100.bw"), 
+                    package = "seqsetvis")
+    }, "char")
+    # set filepaths
+    np_files = c(
+        system.file("extdata", "MCF10A_CTCF_random100.narrowPeak", 
+                    package = "seqsetvis"),
+        system.file("extdata", "MCF10AT1_CTCF_random100.narrowPeak", 
+                    package = "seqsetvis"),
+        system.file("extdata", "MCF10CA1_CTCF_random100.narrowPeak", 
+                    package = "seqsetvis")
+    )
+    
+    names(np_files) = sub("_CTCF_random100.narrowPeak", "", 
+                          x = basename(np_files))
+}
 ```
 
 ## Loading narrowPeak files as *GRanges*
 
-This vignette runs using a small subset of datasets that are publicly available 
-via [GEO](https://www.ncbi.nlm.nih.gov/geo/).  
-To download the full dataset see: [narrowPeak from GEO](#np_load)
-
-```{r}
-# set filepaths
-np_files = c(
-    system.file("extdata", "MCF10A_CTCF_random100.narrowPeak", 
-                package = "seqsetvis"),
-    system.file("extdata", "MCF10AT1_CTCF_random100.narrowPeak", 
-                package = "seqsetvis"),
-    system.file("extdata", "MCF10CA1_CTCF_random100.narrowPeak", 
-                package = "seqsetvis")
-)
-
-names(np_files) = sub("_CTCF_random100.narrowPeak", "", x = basename(np_files))
-
+```{r load package narrowPeak}
 # load peak calls
 np_grs = easyLoad_narrowPeak(np_files)
-
-# # Alternatively, accesss the full datasets by url.
-# np_grs <- lapply(CTCF_in_10a_narrowPeak_urls, function(f){
-#     import(f, format = "BED",
-#            extraCols = extraCols_narrowPeak)
-# })
-
-#np_grs is now a valid input for ssvOverlapIntervalSets()
-#any list (ideally with names set) of GRanges would be fine.
 ```
 
-```{r}
+If run, this would load the full narrowPeak files from GEO.
+
+```{r load url narrowPeak, eval = FALSE}
+np_grs <- easyLoad_narrowPeak(CTCF_in_10a_narrowPeak_urls)
+```
+
+Perform overlapping
+
+```{r overlap peaks}
 olaps = ssvOverlapIntervalSets(np_grs)
-colSums(ssvMakeMembTable(olaps))
 ```
-### Subsetting Operations
-##### bound in all 3
-```{r}
-length(subset(olaps, MCF10A & MCF10AT1 & MCF10CA1))
-```
-##### bound in all but MCF10CA1
-```{r}
-length(subset(olaps, MCF10A & MCF10AT1 & !MCF10CA1))
-```
-##### bound in MCF10CA1 (ignores the other 2)
-```{r}
-length(subset(olaps, MCF10CA1))
-```
-### Plotting
 
-##### Total number of hits per sample
-```{r, hold = TRUE, fig.align='center', fig.height=3}
-p1 = ssvFeatureBars(olaps) +  theme(legend.position = "left")
-p2 = ssvFeaturePie(olaps) + guides(fill = "none")
-p1 = p1 + theme(axis.text.x = element_blank(), 
+## Peak set desciption
+
+Here we use a barplot (A) to convey the total number of peaks in each
+cell line.  The Venn diagram (B) shows precisely how many peaks are in each
+overlap set.  The Euler diagram (C) lacks the numerical precision (who could
+say how many peaks are only present in MCF10AT1?) but the basic trends are 
+more obvious (MCF10A has the most peaks and the majority of peaks are common to
+all 3 cell lines).
+
+```{r ctcf fig1, hold = TRUE, fig.align='center', fig.height=4, fig.width = 8}
+p_bars = ssvFeatureBars(olaps, show_counts = FALSE) +  theme(legend.position = "left")
+p_bars = p_bars + theme(axis.text.x = element_blank(), 
                 axis.ticks.x = element_blank(),
-                legend.justification = "center")
+                legend.justification = "center") +
+    labs(fill = "cell line")
+p_venn = ssvFeatureVenn(olaps, counts_txt_size = 4) + guides(fill = "none", color = "none")
+p_euler = ssvFeatureEuler(olaps, alpha = .5) + guides(fill = "none", color = "none")
+
 cowplot::ggdraw() +
-    cowplot::draw_plot(p1, 0, 0, .58, .7) +
-    cowplot::draw_plot(p2, 0.45, 0, 0.65, .8) +
-    cowplot::draw_plot_label(c("CTCF binding in breast cancer cell lines", "A", "B"),
-                             x = c(.04, .25, 0.65),
-                             y = c(.92, .8, .8), size = 15, hjust = 0)
+    cowplot::draw_plot(p_bars, x = 0, y = 0, width = .4, height = .7) +
+    cowplot::draw_plot(p_venn, x = .4, y = .1, width = .3, height = .7) +
+    cowplot::draw_plot(p_euler, x = 0.7, y = .1, width = 0.3, height = .7) +
+    cowplot::draw_plot_label(c("CTCF binding in breast cancer cell lines", 
+                               "A", "B", "C"),
+                             x = c(.04, .17, 0.4, .7),
+                             y = c(.92, .75, .75, .75), size = 10, hjust = 0)
 ```
 
-##### Overlaps between samples
+Plot colors can be modified via the ggplot objects without recalling plot 
+functions. (These colors aren't better per se.)
 
-```{r, hold = TRUE, fig.align='center', fig.width=8, fig.height=4}
-p1 = ssvFeatureVenn(olaps)  +
-    theme(legend.text = element_text(size = 8), 
-          legend.position = "left")
-p2 = ssvFeatureEuler(olaps) + 
-    theme(legend.text = element_text(size = 8)) + 
-    guides(fill = "none", color = "none")
-p3 = ssvFeatureBinaryHeatmap(olaps) + 
-    theme(axis.text.x = element_text(size = 8)) + 
-    labs(title = "")
+```{r color change, hold = TRUE, fig.align='center', fig.height=4, fig.width = 8}
+col_vals = c("MCF10A_CTCF" = 'red', "MCF10AT1_CTCF" = "blue", "MCF10CA1_CTCF" = "green")
+sf = scale_fill_manual(values = col_vals)
+sc = scale_color_manual(values = col_vals)
 cowplot::ggdraw() +
-    cowplot::draw_plot(p1 + theme(legend.justification = "center"), 0, 0, .47, 1) +
-    cowplot::draw_plot(p2, 0.43, 0, 0.3, 1) +
-    cowplot::draw_plot(p3, 0.75, 0, .25, 1) +
-    cowplot::draw_plot_label(c("CTCF binding in breast cancer cell lines", "A", "B", "C"),
-                             x = c(.04, .12, 0.43, .73),
-                             y = c(.92, .8, .8, .8), size = 15, hjust = 0)
+    cowplot::draw_plot(p_bars + sf, x = 0, y = 0, width = .4, height = .7) +
+    cowplot::draw_plot(p_venn + sf + sc, x = .4, y = .1, width = .3, height = .7) +
+    cowplot::draw_plot(p_euler + sf + sc, x = 0.7, y = .1, width = 0.3, height = .7) +
+    cowplot::draw_plot_label(c("CTCF binding in breast cancer cell lines", 
+                               "A", "B", "C"),
+                             x = c(.04, .17, 0.4, .7),
+                             y = c(.92, .75, .75, .75), size = 10, hjust = 0)
 ```
 
-### Prepare overlap ranges for fetching profiles
-```{r, fig.height=3}
+The same but grayscale.
+
+```{r color change gray, message=FALSE, hold = TRUE, fig.align='center', fig.height=4, fig.width = 8}
+sf = scale_fill_grey()
+sc = scale_color_manual(values = rep("black", 3))
+cowplot::ggdraw() +
+    cowplot::draw_plot(p_bars + sf, x = 0, y = 0, width = .4, height = .7) +
+    cowplot::draw_plot(p_venn + sf + sc, x = .4, y = .1, width = .3, height = .7) +
+    cowplot::draw_plot(p_euler + sf + sc, x = 0.7, y = .1, width = 0.3, height = .7) +
+    cowplot::draw_plot_label(c("CTCF binding in breast cancer cell lines", 
+                               "A", "B", "C"),
+                             x = c(.04, .17, 0.4, .7),
+                             y = c(.92, .75, .75, .75), size = 10, hjust = 0)
+```
+
+## Annotation with *ChIPpeakAnno*
+
+By using an annotation package like `r Biocpkg("ChIPpeakAnno")` we can 
+assign some biology to each peak.
+
+```{r load ChIPpeakAnno, message=FALSE}
+library(ChIPpeakAnno)
+data(TSS.human.GRCh38)
+macs.anno <- annotatePeakInBatch(olaps, AnnotationData=TSS.human.GRCh38)
+```
+
+This gets us to easily selectable "gene lists" that everyone wants.
+
+Apply a limit of 10 kb to reduce non-specific associations.
+
+```{r distance filter}
+macs.anno = subset(macs.anno, distancetoFeature < 1000)
+```
+
+Gene ids associated with peaks present in MCF10A and MCF10AT1 but not 
+MCF10CA1.
+
+```{r subset 1}
+subset(macs.anno, MCF10AT1_CTCF & MCF10A_CTCF & !MCF10CA1_CTCF)$feature
+```
+
+Gene ids associated with the peaks present in MCF10A and neither MCF10AT1 or 
+MCF10CA1.
+
+```{r subset 2}
+subset(macs.anno, MCF10A_CTCF & !MCF10AT1_CTCF & !MCF10CA1_CTCF)$feature
+```
+
+With a meaningfully chosen set of substantial size we could then move on 
+to gene ontology or a gene set enrichment type of analysis.
+
+... if we're confident that this peak call is picking up real biological 
+differences.  Let's take a closer look at these peak calls in the next section.
+
+## Peak call validation
+
+Digging into a new set of peak calls can be time-consuming and arbitrary.  It's
+easy to spend a lot of time with a genome browser checking genes of interest or
+peaks at random and not come away with a clear idea how you well your peak call
+is performing.
+
+*seqsetvis* is ideal for systematically assessing just what qualifies as a peak
+in each sample of an experiment.
+
+## Loading bigwig data
+
+Before loading bigwigs, we need to decide on a uniform region size to retrieve.
+In this case we'll use the 75th quantile of merged peak widths and round up to 
+the nearest multiple of window size.  This is a bit arbitrary but a good fit in 
+practice.  We'll fully capture 75% of peak regions 
+and not be influenced by outliers.
+
+This is the same procedure `fetchWindowedBigwig()` uses to automatically
+set a fixed width.
+
+```{r set fixed width, fig.height=3}
+window_size = 50
 width_q75 = quantile(width(olaps), .75)
-width_q75 = ceiling(width_q75 / 100) * 100
+width_q75 = ceiling(width_q75 / window_size) * window_size
 hist_res = hist(width(olaps))
 lines(rep(width_q75, 2), c(0, max(hist_res$counts)), col = "red", lwd = 5)
 text(width_q75, max(hist_res$counts), "fixedSize", adj = c(-.1, 1), col = "red")
 ## apply width
-olap_fixedSize = centerFixedSizeGRanges(olaps, width_q75)
+olaps_fixedSize = centerFixedSizeGRanges(olaps, width_q75)
 ```
 
 ### Fetch profiles
-```{r}
+
+Reading bigWig formatted files will not work at all on Windows OS. 
+If you are able to read bigwigs on your system, 
+there are few options.
+
+Loading from the subsetted bigwigs inlcuded with *seqsetvis*.
+This code chunk results in identical data to that stored in the
+`CTCF_in_10a_profiles_gr` data object.
+
+```{r fetch package bw, eval = FALSE}
+bw_gr = fetchWindowedBigwigList(bw_files = bw_files, qgr = olaps_fixedSize,
+  win_size = 50)
+```
+
+The full bigwig data is also accessible on GEO via URL.
+```{r fetch url bigwig, eval = FALSE}
+bw_gr = fetchWindowedBigwigList(bw_files = CTCF_in_10a_bigWig_urls,
+    qgr = olaps_fixedSize, win_size = 50)
+```
+
+Of course, if you're going to access the data repeatedly, it makes more sense
+to download it locally and access it there. see [bw load](#bw_load) for help
+with that.
+
+```{r set bw_gr}
 bw_gr = CTCF_in_10a_profiles_gr
-# reading bigWigs will not work at all on windows. if you are able to read
-# bigwigs on your system, consider the following for loading as bigwigs:
-# # alternative (1) accessing the subsetted bigwigs included with this package
-# bw_files = sapply(names(CTCF_in_10a_bigWig_urls), function(x){
-#     system.file("extdata", paste0(x, "_FE_random100.bw"), package = "seqsetvis")
-# })
-# bw_gr = fetchWindowedBigwigList(bw_files = bw_files, qgr = olap_fixedSize,
-#   win_size = 100)
-
-# # alternative (2) access the complete data from GEO.  has a tendency to timeout.
-# bw_gr = fetchWindowedBigwigList(bw_files = CTCF_in_10a_bigWig_urls, 
-#     qgr = olap_fixedSize, win_size = 100)
-```
-[bw load](#bw_load)
-
-```{r, fig.width=16, fig.height=4}
-p1 = ssvSignalBandedQuantiles(bw_gr, hsv_symmetric = TRUE, hsv_reverse = TRUE, 
-                              hsv_grayscale = TRUE)
-p2 = ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF")
-p3 = ssvSignalHeatmap(bw_gr)
-cowplot::plot_grid(p1, p2, p3, nrow = 1)
 ```
 
-### Retrieve narrowPeak data by url {#np_load}
+## Inspecting peaks
+
+A) This scatterplot makes it clear that the peaks that looked unique to MCF10A 
+have comparable fold-enrichment in MCF10AT1.  This suggests that there may not
+be a meaningful biological difference between peaks that are present in MCF10A 
+but absent in MCF10AT1.  
+
+B) Likewise for the comparison of MCF10A and MCF10CA1.  In this case, there is a 
+systematic reduction in fold-enrichment in CA1 compared to 10A. While it's 
+possible there's some biology at play, it's far more likely that the 
+ChIP procedure for CA1 simply wasn't as successful.
+```{r, fig.width=12, fig.height=7}
+all_groups = levels(ssvFactorizeMembTable(ssvMakeMembTable(olaps_fixedSize))$group)
+all_colors = RColorBrewer::brewer.pal(length(all_groups), "Dark2")
+names(all_colors) = all_groups
+olap_groups_12 = ssvFactorizeMembTable(ssvMakeMembTable(olaps_fixedSize)[, 1:2])
+p_12 = ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", 
+                     color_table = olap_groups_12) + scale_color_manual(values = all_colors)
+
+olap_groups_13 = ssvFactorizeMembTable(ssvMakeMembTable(olaps_fixedSize)[, c(1,3)])
+p_13  = ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10CA1_CTCF", 
+                     color_table = olap_groups_13) + scale_color_manual(values = all_colors)
+cowplot::plot_grid(p_12, p_13, label_y = .8, labels = "AUTO")
+```
+
+These observations are reinforced by the heatmap.
+
+```{r, message=FALSE}
+clust_gr = ssvSignalClustering(bw_gr, nclust = 3)
+ssvSignalHeatmap(clust_gr) + labs(fill = "FE", 
+                                  y = "region", 
+                                  x = "bp from center")
+```
+
+The heatmap can be improved by using `centerAtMax()` to allow each region to
+be shifted such that the maximum signal is at the center.  A couple parameter
+notes:
++ `view_size` controls how far each region can be shifted.  
+Shifting will cause overhangs which are trimmed by default so the resulting 
+regions are smaller.  You may need to extened the origial query GRanges 
+set and repeat the fetch if the resulting regions are too small.
++ The `by_` parameter is particularly tricky.  Its default value of "id"
+is probably what we want.  This causes each region to be individually shifted 
+according to the maximum across samples.  One alternative, 
+`by_ = c("id", "sample")` would have shifted each region in each sample.  
+Another alternative, `by_ = ""` or `by_ = NULL` would shift every region in 
+every sample identically.
+```{r heatmap, message = FALSE}
+center_gr = centerAtMax(clust_gr, view_size = 150, 
+                        by_ = "id", check_by_dupes = FALSE)
+clust_center_gr = ssvSignalClustering(center_gr, nclust = 3)
+## we could have called ssvSignalHeatmap() directly on center_gr and
+## preserve the original clustering if that was important
+# ssvSignalHeatmap(clust_gr) + labs(fill = "FE", 
+#                                   y = "region", 
+#                                   x = "bp from center")
+
+ssvSignalHeatmap(clust_center_gr) + labs(fill = "FE", 
+                                  y = "region", 
+                                  x = "bp from center")
+```
+
+Cluster 1 and 2 seem to have the most robust enrichment.  Let's extract them
+and annotate.
+
+```{r cluster annotation}
+clust_df = as.data.frame(mcols(clust_gr))
+clust_df = unique(clust_df[,c("id", "cluster_id")])
+
+olap_clust_annot = olap_gr
+mcols(olap_clust_annot) = data.frame(id = seq_along(olap_clust_annot))
+olap_clust_annot = GRanges(merge(olap_clust_annot, clust_df))
+
+olap_clust_annot = subset(olap_clust_annot, cluster_id %in% 1:2)
+
+olap_clust_annot <- annotatePeakInBatch(olap_clust_annot, AnnotationData=TSS.human.GRCh38)
+olap_clust_annot$feature
+```
+
+# Use case: ChromHMM inspection
+
+In this demonstration we'll use the same CTCF dataset in breast cancer but 
+bring in a chromHMM state file from an other dataset.  This is meant to 
+highlight the flexibility of *seqsetvis*.
+
+## Retrieve chromHMM data by url
+
+Load the full chromHMM state segmentation via url.  Notice that the "name"
+metadata column is a valid set definition.
+```{r}
+chmm_gr = rtracklayer::import.bed("ftp://ftp.ncbi.nlm.nih.gov/geo/series/GSE57nnn/GSE57498/suppl/GSE57498_MCF7_ChromHMM.bed.gz")
+
+# the chromHMM window size parameter.  200 bp is the default and appears to have 
+# been used for this data.
+chmm_win = 200
+# all(width(chmm_gr) / chmm_win == as.integer(width(chmm_gr) / chmm_win))
+chmm_gr
+```
+
+Cleanup state names.
+
+```{r}
+chmm_gr$name = gsub("\\+", " and ", chmm_gr$name)
+chmm_gr$name = gsub("_", " ", chmm_gr$name)
+```
+
+Setup color to state mapping
+
+```{r}
+colDF = unique(mcols(chmm_gr)[c("name", "itemRgb")])
+state_colors = colDF$itemRgb
+names(state_colors) = colDF$name
+```
+
+Split states GRanges into list
+
+```{r}
+ch_f = system.file("extdata/hg19ToHg38.over.chain", package = "seqsetvis")
+ch = rtracklayer::import.chain(ch_f)
+chmm_gr_hg38 = rtracklayer::liftOver(chmm_gr, ch)
+chmm_gr_hg38 = unlist(chmm_gr_hg38)
+chmm_grs_list = as.list(GenomicRanges::split(chmm_gr_hg38, chmm_gr_hg38$name))
+```
+
+```{r}
+summit_grs = lapply(np_grs, function(x){
+    start(x) = start(x) + x$relSummit
+    end(x) = start(x)
+    x
+})
+qlist = append(summit_grs[1], chmm_grs_list)
+chmm_olaps = ssvOverlapIntervalSets(qlist, use_first = TRUE)
+mcols(chmm_olaps)[[1]] = NULL
+chmm_olaps$no_hit = NULL
+```
+
+Create barplot of raw count of peaks overlapping states.
+
+```{r, message = FALSE}
+olaps_df = as.data.frame(mcols(chmm_olaps))
+colnames(olaps_df) = gsub("\\.", " ", colnames(olaps_df))
+
+p_state_raw_count = ssvFeatureBars(olaps_df, show_counts = FALSE) +
+    labs(fill = "state") +
+    scale_fill_manual(values = state_colors) +
+    theme_cowplot() +
+    theme(axis.text.x = element_text(angle = 90, size = 10,
+                                     hjust = 1, vjust = .5))
+
+```
+
+Create barplot of enrichment of peaks overlapping states.
+
+```{r}
+state_total_widths = sapply(chmm_grs_list, function(my_gr){
+    sum(as.numeric(width(my_gr)))
+})
+
+state_peak_hits =  colSums(olaps_df)
+
+state_width_fraction = state_total_widths / sum(state_total_widths)
+state_peak_fraction = state_peak_hits / sum(state_peak_hits)
+
+enrichment = state_peak_fraction / state_width_fraction
+enrich_df = data.frame(state = names(enrichment), enrichment = enrichment)
+p_state_enrichment =  ggplot(enrich_df) +
+    geom_bar(aes(x = state, fill = state, y = enrichment), stat = "identity") +
+    scale_fill_manual(values = state_colors) +
+    theme(axis.text.x = element_text(angle = 90, size = 10,
+                                     hjust = 1, vjust = .5))
+```
+
+Expand state regions into 200 bp windows.
+
+```{r}
+state_wingrs = lapply(chmm_grs_list, function(my_gr){
+    st = my_gr$name[1]
+    wgr = unlist(slidingWindows(my_gr, chmm_win, chmm_win))
+    wgr$state = st
+    wgr
+})
+state_wingrs = unlist(GRangesList(state_wingrs))
+```
+
+Fetch bigwig data for states
+
+```{r}
+tmp_split = split(state_wingrs, state_wingrs$state)
+tmp_split = lapply(tmp_split, function(my_gr){
+    samp_gr = sample(my_gr, min(length(my_gr), 1000))
+    samp_gr = sort(samp_gr)
+    names(samp_gr) = seq_along(samp_gr)#paste(samp_gr$state, seq_len(length(samp_gr)), sep = "_")
+    samp_gr
+})
+tmp = unlist(GRangesList(tmp_split))
+tmp = resize(tmp, width = 2000, fix = "center")
+
+bw_states_gr = fetchWindowedBigwig(bw_file = bw_files[1], qgr = tmp, win_size = 50)
+bw_states_gr$grp = sub("\\..+", "", bw_states_gr$id)
+bw_states_gr$grp_id = sub(".+\\.", "", bw_states_gr$id)
+```
+
+Plot aggregated lineplot by state
+
+```{r}
+p_agg_tracks = ssvSignalLineplotAgg(bw_states_gr, sample_ = "grp", color_ = "grp")
+p_agg_tracks = p_agg_tracks +
+    scale_color_manual(values = state_colors) +
+    annotate("line", x = rep(-100, 2), y = c(.6, 1.1)) +
+    annotate("line", x = rep(100, 2), y = c(.6, 1.1)) +
+    labs(y = "FE", x = "bp", color = "state", title = paste("Average FE by state,", "MCF10A CTCF"), subtitle = "states sampled to 1000 200 bp windows each\n400 bp flanking each side") +
+    theme(plot.title = element_text(hjust = 0))
+```
+
+```{r}
+pdt = as.data.table(mcols(bw_states_gr))
+pdt[, ycap := y ]
+pdt[ycap > 20, ycap := 20]
+
+pdt = centerAtMax(pdt, by_ = c("grp", "grp_id"), view_size = 200)
+pdt$grp_id = as.integer(pdt$grp_id)
+
+dt_list = lapply(unique(pdt$grp), function(state){
+    dt = pdt[grp == state]
+    dtmax = dt[, .(ymax = y[which(x == x[order(abs(x))][1])]), by = grp_id]
+    dtmax = dtmax[order(ymax, decreasing = T)]
+    dtmax[, grp_o := seq_len(.N)]
+    dtmax$ymax = NULL
+    dt = merge(dtmax, dt)
+    dt[, grp_id := grp_o]
+    dt$grp_o = NULL
+    dt
+})
+pdt = rbindlist(dt_list)
+
+p_hmap = ggplot(pdt[abs(x) < 1000]) + 
+    geom_raster(aes(x = x, y = grp_id, fill = y)) + 
+    scale_y_reverse() +
+    facet_wrap("grp", nrow = 2) +
+    theme(axis.text.y = element_blank(), 
+          axis.ticks.y = element_blank(),
+          axis.line.y = element_blank(), 
+          axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5),
+          strip.text = element_text(size= 8)) +
+    scale_fill_gradientn(colors = c("white", "orange", "red")) +
+    labs(y = "", fill = "FE", x = "bp from local summit")
+p_hmap
+```
+
+
+# Data Download
+
+## Retrieve narrowPeak data by url {#np_load}
 ```{r, eval=FALSE}
 # set file urls
 np_files = CTCF_in_10a_narrowPeak_urls
 
 # load peak calls
-# from: https://charlesjb.github.io/How_to_import_narrowPeak/
-extraCols_narrowPeak <- c(signalValue = "numeric", pValue = "numeric",
-                          qValue = "numeric", peak = "integer")
-np_grs <- lapply(np_files, function(f){
-    import(f, format = "BED",
-           extraCols = extraCols_narrowPeak)
-})
+np_grs = easyLoad_narrowPeak(np_files)
+
 np_grs
 #np_grs is now a valid input for ssvOverlapIntervalSets()
 ```
 
-### Retrieve bigwig data by url {#bw_load}
+## Retrieve bigwig data by url {#bw_load}
 ```{r, eval=FALSE}
 # set bigwig urls
 bw_urls = CTCF_in_10a_bigWig_urls
@@ -541,5 +928,4 @@ for(i in seq_along(bw_urls)){
 bw_files
 #bw_files is now a valid input for fetchWindowedBigwigList()
 ```
-    
-    
+

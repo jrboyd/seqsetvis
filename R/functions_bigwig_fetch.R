@@ -60,10 +60,15 @@ fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
     if (!all(width(qgr)%%win_size == 0)) {
         stop("all widths of qgr are not evenly divisible by win_size, ", win_size)
     }
-    if (!all(width(qgr) == width(qgr)[1])) {
-        warning("Widths vary between GRanges.  Before aggregating or co-plotting, recommend one of:
-            1) modifying input qgr such that all GRanges have same width
-            2) filtering output so that the same values of x are present for every region")
+    if(length(unique(width(qgr))) > 1){
+        target_size = quantile(width(qgr), .75)
+        win_size = 50
+        target_size = round(target_size / win_size) * win_size
+        qgr = centerFixedSizeGRanges(qgr, fixed_size = target_size)
+        warning("fetchWindowedBigwigList_dt requires widths of qgr be ",
+                "identical and evenly divisible by win_size.",
+                "\nA fixed width of ",
+                target_size, " was applied based on the data provided.")
     }
     # suppressWarnings({
     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
@@ -211,6 +216,18 @@ fetchWindowedBigwigList_dt = function(bw_files, qgr, bw_names = names(bw_files),
         stop("some bw_names are duplicated:\n",
              paste(collapse = "\n", unique(bw_names[duplicated(bw_names)])))
     }
+
+    if(length(unique(width(qgr))) > 1){
+        target_size = quantile(width(qgr), .75)
+        win_size = 50
+        target_size = round(target_size / win_size) * win_size
+        qgr = centerFixedSizeGRanges(qgr, fixed_size = target_size)
+        warning("fetchWindowedBigwigList_dt requires widths of qgr be ",
+                "identical and evenly divisible by win_size.",
+                "\nA fixed width of ",
+                target_size, " was applied based on the data provided.")
+    }
+
 
     load_bw = function(nam) {
         message("loading ", nam, " ...")

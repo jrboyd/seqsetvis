@@ -27,5 +27,7 @@ returning named list of GRanges.
 Mainly a utility function for loading MACS2 narrowPeak and broadPeak.
 }
 \examples{
-\dontrun{easyLoad_bed("my_bed.bed", "my_bed")}
+bed_f = system.file("extdata/test_bigwigs/test_loading.bed",
+    package = "seqsetvis", mustWork = TRUE)
+easyLoad_bed(bed_f, "my_bed")
 }

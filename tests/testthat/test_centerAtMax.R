@@ -44,7 +44,7 @@ ggplot(cm_dt_wBy, aes(x = xvals, y = yvals, col = locus)) +
 
 doTests_centerAtMax = function(test_object, test_object2){
     test_that("centerAtMax warnings for by_ specification", {
-        expect_message(centerAtMax(test_object, x_ = "xvals", y_ = "yvals"), regexp = "centerAtMax")
+        expect_message(centerAtMax(test_object, x_ = "xvals", y_ = "yvals", by_ = NULL), regexp = "centerAtMax")
         expect_failure(expect_message(centerAtMax(test_object, x_ = "xvals", y_ = "yvals", by_ = "locus")))
     })
 

@@ -151,10 +151,10 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::s
 #' x_ for a by_ instance.
 #' if this is not the case and you want to disable warnings about set this
 #' to FALSE.
-#' @details by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')},
-#' splines
-#' will be calculated individually for each gene in each sample. alternatively
-#' if \code{by_ = c('gene_id')}
+#' @details character.  by_ controls at the level of the data centering is
+#' applied.  If by_ is "" or NULL, a single max position will be determined
+#' for the entire dataset.  If by is "id" (the default) then each region will be
+#' centered individually across all samples.
 #' @return
 #' data.table with x (or xnew if replace_x is FALSE) shifted such that
 #' x = 0 matches the maximum y-value define by by_ grouping
@@ -169,7 +169,7 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::s
 #' #excessive data trimming.
 #' centerAtMax(CTCF_in_10a_profiles_gr, y_ = 'y', view_size = 100, by_ = 'id',
 #' check_by_dupes = FALSE)
-centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = NULL, view_size = NULL, trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE) {
+centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL, trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE) {
     ymax = xsummit = xnew = N = NULL  #reserve data.table variables
     output_GRanges = FALSE
     if(class(dt)[1] == "GRanges"){

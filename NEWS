@@ -1,4 +1,9 @@
+# seqsetvis 0.99.8
+
+* fetch* now automatically calculate and apply a fixed width.
+
 # seqsetvis 0.99.7
+
 * fixed examples error for ssvSignalLineplot
 * addressed BioC notes for seq_len instead of 1:x
 * addressed BioC notes for vapply instead of sapply
