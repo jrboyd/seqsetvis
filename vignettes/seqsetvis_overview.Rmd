@@ -41,6 +41,16 @@ highly customizable. By default, *data.table* is used entirely internally so
 users unfamiliar with its use can safely ignore it. That said, fans of 
 *data.table* can use seqsetvis in a *data.table* exclusive mode if they wish.
 
+```{r}
+order(sample(seq_len(10)))
+```
+```{r}
+order(as.matrix(sample(seq_len(10))))
+```
+
+```{r}
+order(as.data.table(sample(seq_len(10))))
+```
 
 # Features
 
