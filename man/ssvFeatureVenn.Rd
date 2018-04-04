@@ -28,7 +28,10 @@ ssvFeatureVenn(object, group_names = NULL, counts_txt_size = 5,
 
 \item{line_alpha}{numeric [0,1], alpha value for circle line}
 
-\item{counts_color}{single color to use for displaying counts}
+\item{counts_color}{character. single color to use for displaying counts}
+
+\item{n_points}{integer.  number of points to approximate circle with.
+default is 200.}
 }
 \value{
 ggplot venn diagram

@@ -20,7 +20,9 @@
 #' @param circle_colors colors to use for circle line colors. Uses Dark2 set from RColorBrewer by default.
 #' @param fill_alpha alpha value to use for fill, defaults to .3.
 #' @param line_alpha numeric [0,1], alpha value for circle line
-#' @param counts_color single color to use for displaying counts
+#' @param counts_color character. single color to use for displaying counts
+#' @param n_points integer.  number of points to approximate circle with.
+#' default is 200.
 #' @return ggplot venn diagram
 #' @import ggplot2
 #' @import S4Vectors
@@ -152,20 +154,6 @@ ssvFeatureEuler = function(object,
     b <- dd$b
     phi <- dd$phi
 
-    # # internal function from eulerr
-    # eulerr_ellipse = function (h, k, a, b = a, phi = 0, n = 200L) {
-    #     theta <- seq.int(0, 2 * pi, length.out = n)
-    #     m <- length(h)
-    #     out <- vector("list", m)
-    #     for (i in seq_along(h)) {
-    #         out[[i]]$x <- h[i] + a[i] * cos(theta) * cos(phi[i]) -
-    #             b[i] * sin(theta) * sin(phi[i])
-    #         out[[i]]$y <- k[i] + b[i] * sin(theta) * cos(phi[i]) +
-    #             a[i] * cos(theta) * sin(phi[i])
-    #     }
-    #     out
-    # }
-
     p = ggellipse(xcentres = h,
                   ycentres = k,
                   r = a,
@@ -177,54 +165,6 @@ ssvFeatureEuler = function(object,
                   fill_alpha = fill_alpha,
                   line_width = line_width,
                   n_points = n_points)
-    # e <- eulerr_ellipse(h, k, a, b, phi, n)
-    # names(e) = colnames(object)
-    # ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x,
-    #                                                        y = ell$y))
-    # ell_dt = data.table::rbindlist(ell_dt, use.names = TRUE, idcol = "group")
-    #
-    # if(is.null(circle_colors)){
-    #     circle_colors = safeBrew(ncol(object), "Dark2")
-    # }
-    #
-    # ahex = substr(grDevices::rgb(red = 1, blue = 1, green = 1, alpha = fill_alpha), start = 8, stop = 9)
-    # fill_scale = paste0(circle_colors, ahex)
-    # names(fill_scale) = names(circle_colors)
-    #
-    # ahex = substr(grDevices::rgb(red = 1, blue = 1, green = 1, alpha = line_alpha), start = 8, stop = 9)
-    # line_scale = paste0(circle_colors, ahex)
-    # names(line_scale) = names(circle_colors)
-
-    # p = ggplot() +
-    #     labs(fill = "", color = "") +
-    #     scale_color_manual(values = line_scale) +
-    #     scale_size_identity() +
-    #     scale_fill_manual(values = fill_scale) +
-    #     theme_minimal() +
-    #     theme(plot.background = element_blank(),
-    #           axis.title = element_blank(),
-    #           axis.text = element_blank(),
-    #           axis.ticks = element_blank(),
-    #           panel.grid = element_blank(),
-    #           legend.position = "top") +
-    #     coord_fixed()
-    # p = p +
-    #     geom_polygon(data = ell_dt, aes(x = x,
-    #                                     y = y,
-    #                                     fill = group,
-    #                                     col = NA,
-    #                                     alpha = fill_alpha
-    #     )) +
-    #     geom_polygon(data = ell_dt, aes(x = x,
-    #                                     y = y,
-    #                                     fill = NA,
-    #                                     col = group,
-    #                                     size = line_width
-    #     )) +
-    #     scale_alpha_identity() + guides(alpha = "none")
-    # p
-
-
     p
 }
 
@@ -233,7 +173,9 @@ ssvFeatureEuler = function(object,
 #' @export
 #' @param object passed to ssvMakeMembTable for conversion to membership table
 #' @param show_counts logical.  should counts be displayed at the center of each
-#' bar? default is TRUE
+#' bar. default is TRUE
+#' @param bar_colors character. rcolor or hex colors. default of NULL
+#' uses RColorBrewer Dark2.
 #' @return ggplot of bar plot of set sizes
 #' @import ggplot2
 #' @import S4Vectors
@@ -241,9 +183,21 @@ ssvFeatureEuler = function(object,
 #' ssvFeatureBars(list(1:3, 2:6))
 #' ssvFeatureBars(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
-ssvFeatureBars = function(object, show_counts = TRUE) {
+ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL) {
     group = count = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
+    stopifnot(is.logical(show_counts))
+    stopifnot(is.null(bar_colors) || all(is.character(bar_colors)))
+    n_bars = ncol(object)
+    if (is.null(bar_colors)) {
+        bar_colors = safeBrew(n_bars, "Dark2")
+    } else {
+        not_hex = substr(bar_colors, 0, 1) != "#"
+        bar_colors[not_hex] = col2hex(bar_colors[not_hex])
+    }
+    if (length(bar_colors) < n_bars)
+        bar_colors <- rep(bar_colors, length.out = n_bars)
+    names(bar_colors) = colnames(object)
     hit_counts = colSums(object)
     hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)))
     p <- ggplot(hit_counts_df, aes(x = group, y = count, fill = group)) +
@@ -253,7 +207,7 @@ ssvFeatureBars = function(object, show_counts = TRUE) {
         theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
               panel.grid.major.x = element_blank(),
               panel.grid.minor.x = element_blank()) +
-        scale_fill_brewer(palette = "Dark2")
+        scale_fill_manual(values = bar_colors)
     if(show_counts)
         p = p + annotate("text", y = hit_counts/2, x = seq_along(hit_counts), label = hit_counts)
     return(p)
@@ -377,6 +331,10 @@ ssvFeaturePie = function(object) {
 #' @param raster_approximation If TRUE, instead of standard ggplot, write
 #' temporary raster png image and redraw that as plot background. default is
 #' FALSE
+#' @param true_color character. rcolor or hex color used for TRUE values.
+#' default is "black".
+#' @param false_color character. rcolor or hex color used for TRUE values.
+#' default is "#EFEFEF", a gray.
 #' @param raster_width_min raster width will be minimum multiple of number of
 #' columns over this number.  ignored if raster_approximation is FALSE.
 #' @param raster_height_min raster height will be minimum multiple of number of
@@ -388,10 +346,15 @@ ssvFeaturePie = function(object) {
 #' @importFrom grid rasterGrob
 #' @examples
 #' ssvFeatureBinaryHeatmap(list(1:3, 2:6))
+#' # horizontal version
+#' ssvFeatureBinaryHeatmap(list(1:3, 2:6)) + coord_flip() +
+#'   theme(axis.text.x = element_blank(), axis.text.y = element_text())
 #' ssvFeatureBinaryHeatmap(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 #' ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,3:2])
 ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
+                                   true_color = "black",
+                                   false_color = "#EFEFEF",
                                    raster_width_min = 1000, raster_height_min = 1000) {
     groups = bool = value = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
@@ -407,9 +370,9 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
     if (raster_approximation) {
         stopifnot(is.numeric(raster_width_min), is.numeric(raster_height_min))
         dmat = as.matrix(data.table::dcast(hdt, value.var = "value", formula = rev(row) ~ groups))[, 1 + seq_len(ncol(object)), drop = FALSE]
-        low_v = 0.9372549
+        low_v = 1
         dmat = ifelse(dmat > low_v, low_v, dmat)
-        dmat = -1*(dmat - low_v)
+        # dmat = -1*(dmat - low_v)
         if (raster_width_min >= ncol(dmat)) {
             # expand cols as necessary to meet target
             raster_width_multiplier = ceiling(raster_width_min/ncol(dmat))
@@ -428,7 +391,11 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
         }
         # dmat = (dmat * -.95 + .95)
         comp_mat = dmat[comp_row, comp_col]
-        png::writePNG(comp_mat, target = "tmp.png")
+        comp_ar = array(comp_mat, c(nrow(comp_mat), ncol(comp_mat), 3))
+        comp_ar[, , 1] = ifelse(comp_mat == 1, col2rgb(true_color)[1,1]/255, col2rgb(false_color)[1,1]/255)
+        comp_ar[, , 2] = ifelse(comp_mat == 1, col2rgb(true_color)[2,1]/255, col2rgb(false_color)[2,1]/255)
+        comp_ar[, , 3] = ifelse(comp_mat == 1, col2rgb(true_color)[3,1]/255, col2rgb(false_color)[3,1]/255)
+        png::writePNG(comp_ar, target = "tmp.png")
         png_grob = grid::rasterGrob(png::readPNG("tmp.png"),
                                     width = unit(1, "npc"),
                                     height = unit(1, "npc"),
@@ -438,7 +405,8 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
             geom_tile(aes(x = groups, y = row, fill = NA, col = NULL)) +
             scale_fill_manual(values = c(`TRUE` = "black", `FALSE` = "#EFEFEF")) +
             scale_alpha(0) +
-            labs(fill = "present", y = "", title = "items in sets") +
+            labs(fill = "", y = "") +
+            guides(fill = "none") +
             theme(
                 axis.line = element_blank(),
                 axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
@@ -449,10 +417,6 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
                 axis.text.y = element_blank(),
                 axis.ticks.y = element_blank(),
                 axis.ticks.x = element_blank(),
-                axis.text = element_text(size = rel(1.5)),
-                legend.key.size = unit(0.12, units = "npc"),
-                legend.text = element_text(size = rel(2)),
-                legend.title = element_text(size = rel(3)),
                 axis.title = element_blank()
             ) +
             annotation_custom(png_grob, xmin = 0.5, xmax = ncol(dmat) + 0.5,
@@ -461,8 +425,10 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
         hdt[, `:=`(bool, value == 1)]
         p = ggplot(hdt) +
             geom_tile(aes(x = groups, y = row, fill = bool, col = NULL)) +
-            scale_fill_manual(values = c(`TRUE` = "black", `FALSE` = "#EFEFEF")) +
-            labs(fill = "present", y = "", title = "items in sets") +
+            scale_fill_manual(values = c(`TRUE` = true_color,
+                                         `FALSE` = false_color)) +
+            labs(fill = "", y = "") +
+            guides(fill = "none") +
             theme(
                 axis.line = element_blank(),
                 axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
@@ -473,10 +439,6 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
                 axis.text.y = element_blank(),
                 axis.ticks.y = element_blank(),
                 axis.ticks.x = element_blank(),
-                axis.text = element_text(size = rel(1.5)),
-                legend.key.size = unit(0.12, units = "npc"),
-                legend.text = element_text(size = rel(2)),
-                legend.title = element_text(size = rel(3)),
                 axis.title = element_blank()
             )
     }

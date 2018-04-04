@@ -7,7 +7,8 @@ heatmap is sorted by column left to right.
 change column order to reveal patterns}
 \usage{
 ssvFeatureBinaryHeatmap(object, raster_approximation = FALSE,
-  raster_width_min = 1000, raster_height_min = 1000)
+  true_color = "black", false_color = "#EFEFEF", raster_width_min = 1000,
+  raster_height_min = 1000)
 }
 \arguments{
 \item{object}{passed to ssvMakeMembTable}
@@ -15,6 +16,12 @@ ssvFeatureBinaryHeatmap(object, raster_approximation = FALSE,
 \item{raster_approximation}{If TRUE, instead of standard ggplot, write
 temporary raster png image and redraw that as plot background. default is
 FALSE}
+
+\item{true_color}{character. rcolor or hex color used for TRUE values.
+default is "black".}
+
+\item{false_color}{character. rcolor or hex color used for TRUE values.
+default is "#EFEFEF", a gray.}
 
 \item{raster_width_min}{raster width will be minimum multiple of number of
 columns over this number.  ignored if raster_approximation is FALSE.}
@@ -32,6 +39,9 @@ change column order to reveal patterns
 }
 \examples{
 ssvFeatureBinaryHeatmap(list(1:3, 2:6))
+# horizontal version
+ssvFeatureBinaryHeatmap(list(1:3, 2:6)) + coord_flip() +
+  theme(axis.text.x = element_blank(), axis.text.y = element_text())
 ssvFeatureBinaryHeatmap(CTCF_in_10a_overlaps_gr)
 ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,3:2])

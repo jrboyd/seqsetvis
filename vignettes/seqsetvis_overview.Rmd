@@ -13,17 +13,34 @@ vignette: >
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
     collapse = TRUE,
-    dpi=64
+    dpi=60
 )
 ```
 
 # Synopsis
-`r Githubpkg("jrboyd/seqsetvis")` is an R package for the visual
-comparison of sets of genomic regions (typically ChIP-seq peak calls).  This 
-covers straightforward overlaps suitable for something like a Venn diagram and 
-extends to more sophisticated 
-visualization of continous signal data (typically enrichment in IP) via 
-clustered heatmaps and track-like line plots.  
+`r Githubpkg("jrboyd/seqsetvis")` enables the visualization and analysis of 
+multiple genomic datasets. Although seqsetvis was designed for the comparison 
+of mulitple ChIP-seq datasets, this package is domain-agnostic and allows the 
+processing of multiple genomic coordinate files (bed-like files) and signal 
+files (bigwig files).
+
+*seqsetvis* is ideal for the following tasks:
+
+1.	Feature assessment and comparison.
+2.	Differential enrichment or expression results assessment.
+3.	Replicate comparison and reproducibility analysis.
+4.	Chromatin state inspection.
+5.	Clustering of histone modification and/or transcription factor enrichment 
+at features such as promoters or enhancers.
+
+*seqsetvis* accepts and outputs the Bioconductor standard GRanges object while 
+leveraging the power and speed of the *data.table* package (an enhancement of 
+data.frame) with the flexibility of *ggplot2* to provide users with 
+visualizations that are simultaneously publication ready while still being 
+highly customizable. By default, *data.table* is used entirely internally so 
+users unfamiliar with its use can safely ignore it. That said, fans of 
+*data.table* can use seqsetvis in a *data.table* exclusive mode if they wish.
+
 
 # Features
 
@@ -86,7 +103,7 @@ devtools::install_github("jrboyd/seqsetvis", build_vignettes = TRUE)
 ```
 
 ## Load the library
-```{r load seqsetvis}
+```{r load seqsetvis, message=FALSE}
 library(seqsetvis)
 ```
 
@@ -94,6 +111,8 @@ library(seqsetvis)
 ```{r load optional libs, message = FALSE}
 library(GenomicRanges)
 library(data.table)
+library(cowplot)
+theme_set(cowplot::theme_cowplot())
 ```
 
 # Defining sets
@@ -163,14 +182,14 @@ a ggplot.
 
 ## Barplot
 Barplots are useful for for conveying the size of each set/group.  
-```{r barplot}
+```{r barplot, fig.width=4, fig.height=3}
 ssvFeatureBars(olaps)
 ```
 
 ## Pie chart
 Pie charts are an alternative to barplots but are generally more difficult to 
 interpret.
-```{r pie}
+```{r pie, fig.width=5, fig.height=3}
 ssvFeaturePie(olaps)
 ```
 
@@ -178,7 +197,7 @@ ssvFeaturePie(olaps)
 Venn diagrams show the number of items falling into each overlap category.
 At release, *seqsetvis* is limited to displaying 3 sets via venn diagram. This
 will be increased in a future update.
-```{r venn}
+```{r venn, fig.width=4, fig.height=3}
 ssvFeatureVenn(olaps)
 ```
 
@@ -191,14 +210,8 @@ approximations by neccessity.
 There is no hard limit to the number of sets *seqsetvis* can show in an Euler 
 diagram but computation time increases rapidly along with the inaccuracy of 
 approximation.
-```{r euler}
+```{r euler, fig.width=4, fig.height=3}
 ssvFeatureEuler(olaps)
-```
-
-Ellipse variant of Euler diagram.  Ellipses are capable of better fitting the
-set overlaps.
-```{r euler ellipse}
-ssvFeatureEuler(olaps, shape = "ellipse")
 ```
 
 ## Binary Heatmap 
@@ -207,8 +220,8 @@ An alternative to Venn/Euler diagrams, this "heatmap" contains one column per
 set and one row per item with item membership per set mapped to color.
 In this example black indicates TRUE for membership hence the top 2/3 is black
 for all three sets.
-```{r binary heatmap}
-ssvFeatureBinaryHeatmap(olaps, raster_approximation = FALSE)
+```{r binary heatmap, fig.width=3, fig.height=4}
+ssvFeatureBinaryHeatmap(olaps)
 ```
 
 # Visualization of genomic signal, ssvSignal*
@@ -268,24 +281,25 @@ lot's of different data of multiple types at single regions.  In contrast,
 ### Individual line plots
 
 Basic line plot of a subset of regions
-```{r lineplot basic}
-ssvSignalLineplot(bw_data = subset(bw_gr, id %in% 1:12), facet_ = "sample")
+```{r lineplot basic, fig.width=6, fig.height=2.5}
+bw_gr$facet_label = sub("_", "\n", bw_gr$sample)
+ssvSignalLineplot(bw_data = subset(bw_gr, id %in% 1:12), facet_ = "facet_label")
 ```
 
 Facetting by region id is less overwhelming
-```{r lineplot region facet}
-ssvSignalLineplot(bw_data = subset(bw_gr, id %in% 1:12), facet_ = "id")
+```{r lineplot region facet, fig.width=5, fig.height=3}
+ssvSignalLineplot(bw_data = subset(bw_gr, id %in% 1:4), facet_ = "id")
 ```
 
 ### Aggregated line plots
 
 Aggregate regions by mean 
-```{r lineplot aggregated}
+```{r lineplot aggregated, fig.width=5, fig.height=2}
 ssvSignalLineplotAgg(bw_data = bw_gr)
 ```
 
 Apply spline of 10 to make a prettier plot
-```{r lineplot aggregated smoothed}
+```{r lineplot aggregated smoothed, fig.width=5, fig.height=2}
 ssvSignalLineplotAgg(bw_data = bw_gr, spline_n = 10)
 ```
 
@@ -310,20 +324,20 @@ Scatterplots are a common way of viewing the relationship between two variables.
 each region as measured in two samples and plot them on the x and y axis.
 
 A basic scatterplot
-```{r scatterplot basic}
+```{r scatterplot basic, fig.width=3, fig.height=3}
 ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF")
 ```
 
 Using the result of `olap_groups = ssvFactorizeMembTable(olap_gr)` to add color
 based on our peak calls.
-```{r scatterplot all sets}
+```{r scatterplot all sets, fig.width=8, fig.height=3}
 ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", 
                      color_table = olap_groups)
 ```
 
 More than a few colors gets confusing quickly.  Let's limit the color groups to 
 the samples being plotted.
-```{r scatterplot 2 sets}
+```{r scatterplot 2 sets, fig.width=6, fig.height=3}
 # by subsetting the matrix returned by ssvMakeMembTable() we have a lot of 
 # control over the coloring.
 olap_2groups = ssvFactorizeMembTable(ssvMakeMembTable(olap_gr)[, 1:2])
@@ -332,7 +346,7 @@ ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF",
 ```
 
 Coloring by the third sample's peak call might be interesting.
-```{r outside group}
+```{r outside group, fig.width=5, fig.height=3}
 olap_OutGroups = ssvFactorizeMembTable(
     ssvMakeMembTable(olap_gr)[, 3, drop = FALSE])
 ssvSignalScatterplot(bw_gr, 
@@ -343,9 +357,14 @@ ssvSignalScatterplot(bw_gr,
 
 
 We can also get clever with *ggplot2*'s facetting.
-```{r scatterplot facet}
+```{r scatterplot facet, fig.width=6, fig.height=4}
+#tweaking group description will clean up plot labels a lot
+olap_groups$group = gsub("_CTCF", "", olap_groups$group)
+olap_groups$group = gsub(" & ", "\n", olap_groups$group)
 ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", 
-                     color_table = olap_groups) + facet_wrap("group")
+                     color_table = olap_groups) + 
+    facet_wrap("group") + guides(color = "none") +
+    theme_linedraw() 
 ```
 
 ## Banded quantiles
@@ -364,8 +383,8 @@ Heatmaps combined with clustering are a powerful way to find similarly marked
 regions of the genome.  Calling ssvSignalHeatmap will perform k-means clustering 
 automatically.  k-means clusters sorted by similarity as determined by 
 hierarchical clustering.
-```{r heatmap basic}
-ssvSignalHeatmap(bw_gr, nclust = 3)
+```{r heatmap basic, message=FALSE, fig.width=5}
+ssvSignalHeatmap(bw_gr, nclust = 3, facet_ = "facet_label") 
 ```
 
 Performing clustering manually allows for use of cluster info.
@@ -381,8 +400,8 @@ subset(bw_clust, cluster_id == 3)
 
 Plotting and pre-clustering (identical to just calling heatmap with same 
 parameters)
-```{r heatmap use pre-cluster}
-ssvSignalHeatmap(bw_clust)
+```{r heatmap use pre-cluster, message=FALSE, fig.width=5}
+ssvSignalHeatmap(bw_clust, facet_ = "facet_label")
 ```
 
 
@@ -406,10 +425,6 @@ To download the full dataset see: [narrowPeak from GEO](#np_load) and
 [bigwig from GEO](#bw_load)
 
 We'll use `r CRANpkg("cowplot")` to arrange our plots in this section.
-
-```{r cowplot lib, message = FALSE}
-library(cowplot)
-```
 
 ## Setup
 
@@ -536,27 +551,6 @@ cowplot::ggdraw() +
                              y = c(.92, .75, .75, .75), size = 10, hjust = 0)
 ```
 
-The same but grayscale.
-
-```{r color change gray, message=FALSE,hold=TRUE, fig.align='center', fig.height=4, fig.width = 8}
-sf = scale_fill_grey()
-sc = scale_color_manual(values = rep("black", 3))
-cowplot::ggdraw() +
-    cowplot::draw_plot(p_bars + sf, 
-                       x = 0, y = 0, 
-                       width = .4, height = .7) +
-    cowplot::draw_plot(p_venn + sf + sc, 
-                       x = .4, y = .1, 
-                       width = .3, height = .7) +
-    cowplot::draw_plot(p_euler + sf + sc, 
-                       x = 0.7, y = .1, 
-                       width = 0.3, height = .7) +
-    cowplot::draw_plot_label(c("CTCF binding in breast cancer cell lines", 
-                               "A", "B", "C"),
-                             x = c(.04, .17, 0.4, .7),
-                             y = c(.92, .75, .75, .75), size = 10, hjust = 0)
-```
-
 ## Annotation with *ChIPpeakAnno*
 
 By using an annotation package like `r Biocpkg("ChIPpeakAnno")` we can 
@@ -617,7 +611,7 @@ and not be influenced by outliers.
 This is the same procedure `fetchWindowedBigwig()` uses to automatically
 set a fixed width.
 
-```{r set fixed width, fig.height=3}
+```{r set fixed width, fig.height=3, fig.width=3}
 window_size = 50
 width_q75 = quantile(width(olaps), .75)
 width_q75 = ceiling(width_q75 / window_size) * window_size
@@ -643,10 +637,6 @@ bw_gr = fetchWindowedBigwigList(bw_files = bw_files, qgr = olaps_fixedSize,
   win_size = 50)
 ```
 
-Of course, if you're going to access the data repeatedly, it makes more sense
-to download it locally and access it there. see [bw load](#bw_load) for help
-with that.
-
 ```{r set bw_gr}
 if(dir.exists(cache_path))
 bw_gr = CTCF_in_10a_profiles_gr
@@ -663,7 +653,9 @@ B) Likewise for the comparison of MCF10A and MCF10CA1.  In this case, there is a
 systematic reduction in fold-enrichment in CA1 compared to 10A. While it's 
 possible there's some biology at play, it's far more likely that the 
 ChIP procedure for CA1 simply wasn't as successful.
-```{r ctcf scatterplots, fig.width=12, fig.height=7}
+```{r ctcf scatterplots, fig.width=10, fig.height=4}
+colnames(mcols(olaps_fixedSize)) = sub("_CTCF", "", colnames(mcols(olaps_fixedSize)))
+
 all_groups = levels(ssvFactorizeMembTable(
     ssvMakeMembTable(olaps_fixedSize))$group)
 all_colors = RColorBrewer::brewer.pal(length(all_groups), "Dark2")
@@ -684,14 +676,16 @@ p_13  = ssvSignalScatterplot(bw_gr,
                      color_table = olap_groups_13) + 
     scale_color_manual(values = all_colors)
 
-cowplot::plot_grid(p_12, p_13, label_y = .8, labels = "AUTO")
+cowplot::plot_grid(p_12 + labs(title = ""), 
+                   p_13 + labs(title = ""), label_y = .85, labels = "AUTO")
 ```
 
 These observations are reinforced by the heatmap.
 
-```{r ctcf heatmap, message=FALSE}
-clust_gr = ssvSignalClustering(bw_gr, nclust = 3)
-ssvSignalHeatmap(clust_gr) + labs(fill = "FE", 
+```{r ctcf heatmap, message=FALSE, fig.width=5}
+bw_gr$facet_label = sub("_", "\n", bw_gr$sample)
+clust_gr = ssvSignalClustering(bw_gr, nclust = 3, facet_ = "facet_label")
+ssvSignalHeatmap(clust_gr, facet_ = "facet_label") + labs(fill = "FE", 
                                   y = "region", 
                                   x = "bp from center")
 ```
@@ -709,21 +703,24 @@ according to the maximum across samples.  One alternative,
 `by_ = c("id", "sample")` would have shifted each region in each sample.  
 Another alternative, `by_ = ""` or `by_ = NULL` would shift every region in 
 every sample identically.
-```{r ctcf recentered heatmap, message = FALSE, fig.width=14, fig.height=6}
+```{r ctcf recentered heatmap, message = FALSE, fig.width=10, fig.height=6}
 center_gr = centerAtMax(clust_gr, view_size = 150, 
                         by_ = "id", check_by_dupes = FALSE)
 
 
-p_center_hmap = ssvSignalHeatmap(center_gr) + labs(fill = "FE",
-                                  y = "region",
-                                  x = "bp from center")
+p_center_hmap = ssvSignalHeatmap(center_gr, facet_ = "facet_label") + 
+    labs(fill = "FE",
+         y = "region",
+         x = "bp from center")
 
 ## since center_gr still retains clustering information, clustering is not
 ## repeated by default, the following reclusters the data.
 clust_center_gr = ssvSignalClustering(center_gr, nclust = 3)
-p_center_hmap_reclust = ssvSignalHeatmap(clust_center_gr) + labs(fill = "FE",
-                                  y = "region",
-                                  x = "bp from center")
+p_center_hmap_reclust = ssvSignalHeatmap(clust_center_gr, 
+                                         facet_ = "facet_label") + 
+    labs(fill = "FE",
+         y = "region",
+         x = "bp from center")
 cowplot::plot_grid(p_center_hmap + labs(title = "original clustering"), 
                    p_center_hmap_reclust + labs(title = "reclustered"))
 ```
@@ -859,24 +856,26 @@ if(dir.exists(cache_path) & require(BiocFileCache)){
 
 ```
 
+## Peak overlaps with states, counts
 Create barplot of raw count of peaks overlapping states.
 
-```{r, message = FALSE}
+```{r state raw, message = FALSE, fig.width=3, fig.height=3}
 olaps_df = as.data.frame(mcols(chmm_olaps))
 colnames(olaps_df) = gsub("\\.", " ", colnames(olaps_df))
 
 p_state_raw_count = ssvFeatureBars(olaps_df, show_counts = FALSE) +
-    labs(fill = "state") +
+    labs(fill = "state", x = "") +
     scale_fill_manual(values = state_colors) +
-    theme_cowplot() +
-    theme(axis.text.x = element_text(angle = 90, size = 10,
+    theme_cowplot() + guides(fill = "none") +
+    theme(axis.text.x = element_text(angle = 90, size = 8,
                                      hjust = 1, vjust = .5))
 p_state_raw_count
 ```
 
+## Peak overlaps with states, enrichment
 Create barplot of enrichment of peaks overlapping states.
 
-```{r}
+```{r state enrichment, fig.width=3, fig.height=3}
 state_width_fraction = state_total_widths / sum(state_total_widths)
 
 state_peak_hits =  colSums(olaps_df)
@@ -888,15 +887,17 @@ enrich_df = data.frame(state = names(enrichment), enrichment = enrichment)
 p_state_enrichment =  ggplot(enrich_df) +
     geom_bar(aes(x = state, fill = state, y = enrichment), stat = "identity") +
     labs(x = "") + 
+    theme_cowplot() + guides(fill = "none") +
     scale_fill_manual(values = state_colors) +
-    theme(axis.text.x = element_text(angle = 90, size = 10,
+    theme(axis.text.x = element_text(angle = 90, size = 8,
                                      hjust = 1, vjust = .5))
 p_state_enrichment
 ```
 
-Plot aggregated lineplot by state
+## Aggregated line plots by state
+Plot aggregated line plot by state
 
-```{r, message=FALSE}
+```{r, message=FALSE, fig.width=6}
 p_agg_tracks = ssvSignalLineplotAgg(bw_states_gr, 
                                     sample_ = "grp", 
                                     color_ = "grp")
@@ -918,10 +919,11 @@ p_agg_tracks = p_agg_tracks +
 p_agg_tracks
 ```
 
+## States heatmap
 A heatmap using the same data from the aggregated line plot.  Facetting is
 done on state and regions are sorted in decreasing order of signal at center.
 
-```{r}
+```{r state heatmap, fig.width=8}
 pdt = as.data.table(mcols(bw_states_gr))
 pdt$grp_id = as.integer(pdt$grp_id)
 # reassign grp_id to sort within each state set
@@ -949,10 +951,13 @@ p_state_hmap = ggplot(pdt) +
           axis.text.x = element_text(angle = 90, hjust = 1, vjust = .5),
           strip.text = element_text(size= 8)) +
     scale_fill_gradientn(colors = c("white", "orange", "red")) +
-    labs(y = "", fill = "FE", x = "bp from local summit")
+    labs(y = "", fill = "FE", 
+         x = "bp from local summit", 
+         title = paste(max_per_state, "random regions per state"))
 p_state_hmap
 ```
 
+## Figure assembly
 Tie it all together into one figure with cowplot.
 
 ```{r, fig.height=12, fig.width=8}

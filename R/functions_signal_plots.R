@@ -235,7 +235,7 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
             scale_alpha_identity() +
             scale_size_identity() +
             guides(alpha = "none", size = "none") +
-            labs(x = x_name, y = y_name, title = "Max FE in regions") +
+            labs(x = x_name, y = y_name, title = paste(value_variable, "aggregated per", paste(by_, collapse = ", "))) +
             ylim(ylim) + xlim(xlim)
 
         if(show_help){
@@ -353,7 +353,9 @@ ssvSignalClustering = function(bw_data, nclust = 6,
         }, 1)
         kept = sort(unique(plot_dt[[column_]]))[kept]
         plot_dt = plot_dt[x %in% kept]
-        warning(raw_nc - max_cols, " columns were discarded according to max_cols: ", max_cols)
+        warning(raw_nc - max_cols,
+                " columns were discarded according to max_cols: ",
+                max_cols)
     }
     row_ids = unique(plot_dt[[row_]])
     raw_nr = length(row_ids)
@@ -361,12 +363,15 @@ ssvSignalClustering = function(bw_data, nclust = 6,
         set.seed(0)
         row_ids = sample(row_ids, max_rows)
         plot_dt = plot_dt[id %in% row_ids]
-        warning(raw_nr - max_rows, " rows were discarded according to max_cols: ", max_rows)
+        warning(raw_nr - max_rows,
+                " rows were discarded according to max_cols: ",
+                max_rows)
     }
 
-    dc_dt = data.table::dcast(plot_dt[get(column_) > clustering_col_min & get(column_) < clustering_col_max],
-                              formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + ")),
-                              # formula = as.name(row_) ~ as.name(facet_) + as.name(column_),
+    dc_formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + "))
+    dc_dt = data.table::dcast(plot_dt[get(column_) > clustering_col_min &
+                                          get(column_) < clustering_col_max],
+                              formula = dc_formula,
                               value.var = fill_)
     dc_mat = as.matrix(dc_dt[,-1])
     rownames(dc_mat) = dc_dt[[row_]]
@@ -409,12 +414,18 @@ ssvSignalClustering = function(bw_data, nclust = 6,
 #' #clustering can be done manually beforehand
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 3)
 #' ssvSignalHeatmap(clust_dt)
-ssvSignalHeatmap = function(bw_data, nclust = 6, perform_clustering = c("auto", "yes", "no")[1],
+ssvSignalHeatmap = function(bw_data,
+                            nclust = 6,
+                            perform_clustering = c("auto", "yes", "no")[1],
                             row_ = "id",
-                            column_ = "x", fill_ = "y", facet_ = "sample",
+                            column_ = "x",
+                            fill_ = "y",
+                            facet_ = "sample",
                             cluster_ = "cluster_id",
-                            max_rows = 500, max_cols = 100,
-                            clustering_col_min = -Inf, clustering_col_max = Inf){
+                            max_rows = 500,
+                            max_cols = 100,
+                            clustering_col_min = -Inf,
+                            clustering_col_max = Inf){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -458,9 +469,25 @@ ssvSignalHeatmap = function(bw_data, nclust = 6, perform_clustering = c("auto", 
     p = ggplot(plot_dt) +
         geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
         facet_grid(paste(". ~", facet_)) +
-        theme(axis.text.y = element_blank(), axis.ticks.y = element_blank(), panel.background = element_blank()) +
-        scale_fill_distiller(type = "div", palette = "Spectral", values = scale_vals)
-    # rclust = plot_dt[, list(cluster_id = unique(cluster_id)), by = get(row_)]
+        theme(axis.line = element_blank(),
+              axis.text.y = element_blank(),
+              axis.ticks.y = element_blank(),
+              panel.background = element_blank()) +
+        scale_fill_distiller(type = "div", palette = "Spectral",
+                             values = scale_vals)
+
+    xs = sort(unique(plot_dt$x), decreasing = FALSE)
+    xleft = min(xs) - (xs[2] - xs[1])/2
+    xright = max(xs) + (xs[2] - xs[1])/2
+    if(xleft < 0 & xright > 0){
+        xbr = c(xleft, 0, xright)
+    }else{
+        xbr = c(xleft, xright)
+    }
+
+    p = p + scale_x_continuous(breaks = xbr) +
+        theme(axis.text.x  = element_text(angle = 90, hjust = 1, vjust = .5))
+
     rclust = plot_dt[, list(cluster_id = unique(get(cluster_))), by = get(row_)]
     ends = cumsum(rev(table(rclust$cluster_id)))
     starts = c(1, ends[-length(ends)] + 1)
@@ -470,7 +497,10 @@ ssvSignalHeatmap = function(bw_data, nclust = 6, perform_clustering = c("auto", 
     xfactor = diff(range(plot_dt$x))
     xfloor = min(plot_dt$x)
 
-    df_rects = data.frame(xmin = xfloor - .12*xfactor, xmax = xfloor - .03*xfactor, ymin = starts, ymax = ends)
+    df_rects = data.frame(xmin = xfloor - .12*xfactor,
+                          xmax = xfloor - .03*xfactor,
+                          ymin = starts,
+                          ymax = ends)
     df_rects$fill = c("black", "gray")[seq_len(nrow(df_rects))%%2+1]
     df_rects$color = c("gray", "black")[seq_len(nrow(df_rects))%%2+1]
     df_rects = df_rects[rev(seq_len(nrow(df_rects))),]
@@ -528,10 +558,10 @@ ssvSignalHeatmap = function(bw_data, nclust = 6, perform_clustering = c("auto", 
 #' ssvSignalLineplot(subset(bw_gr, bw_gr$id %in% seq_len(3)),
 #'     facet_ = "id", spline_n = 10)
 ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
-                              sample_ = "sample", region_ = "id",
-                              group_ = "auto_grp", line_alpha = 1,
+                             sample_ = "sample", region_ = "id",
+                             group_ = "auto_grp", line_alpha = 1,
                              facet_ = "auto_facet",
-                              facet_method = facet_wrap, spline_n = NULL){
+                             facet_method = facet_wrap, spline_n = NULL){
     auto_grp = auto_facet = NULL
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -553,11 +583,17 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
     bw_data[,auto_grp := paste(get(sample_), get(region_))]
     bw_data[,auto_facet := paste(get(sample_), get(region_))]
     if(!is.null(spline_n)){
-        p_dt = applySpline(bw_data, n = spline_n, x_ = x_, y_ = y_, by_ = c(group_, sample_, region_, facet_))
+        p_dt = applySpline(bw_data, n = spline_n, x_ = x_, y_ = y_,
+                           by_ = c(group_, sample_, region_, facet_))
     }else{
         p_dt = bw_data
     }
-    ggplot(p_dt) + geom_path(aes_string(x = x_, y = y_, col = color_, group = group_), alpha = line_alpha) + facet_method(facet_)
+    ggplot(p_dt) + geom_path(aes_string(x = x_,
+                                        y = y_,
+                                        col = color_,
+                                        group = group_),
+                             alpha = line_alpha) +
+        facet_method(facet_)
 }
 
 #' aggregate line signals in a single line plot
@@ -590,10 +626,10 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
 #'     color_ = "id", spline_n = 10) +
 #'     labs(title = "agg samples by region id (weird), with spline smoothing")
 ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
-                                 sample_ = "sample",
-                                 color_ = sample_,
-                                 group_ = "auto_grp", agg_fun = mean,
-                                 spline_n = NULL){
+                                sample_ = "sample",
+                                color_ = sample_,
+                                group_ = "auto_grp", agg_fun = mean,
+                                spline_n = NULL){
     auto_grp = NULL
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -610,7 +646,8 @@ ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
     stopifnot(is.numeric(spline_n) || is.null(spline_n))
 
     bw_data[, auto_grp := paste(get(sample_))]
-    agg_dt = bw_data[, list(y = agg_fun(get(y_))), by = c(unique(c(group_, color_, sample_, x_)))]
+    agg_dt = bw_data[, list(y = agg_fun(get(y_))),
+                     by = c(unique(c(group_, color_, sample_, x_)))]
 
     if(!is.null(spline_n)){
         p_dt = applySpline(agg_dt, n = spline_n, x_ = x_, y_ = y_,

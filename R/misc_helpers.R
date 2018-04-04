@@ -115,6 +115,45 @@ movingAverage <- function(x, n = 1, centered = TRUE) {
     s/count
 }
 
+#' returns a ggplot with ellipses drawn with specified parameters
+#' used by ssvFeatureVenn and ssvFeatureEuler
+#'
+#' @param xcentres numeric x-coord of centers of ellipses
+#' @param ycentres numeric y-coord of centers of ellipses, must have same
+#' length as xcentres
+#' @param r numeric radius1 of ellipse, must have length of 1 or match length
+#' of xcentres
+#' @param r2 numeric radius2 of ellipse, must have length of 1 or match length
+#' of xcentres.  same as r by default.
+#' @param phi numeric phi of ellipse, must have length of 1 or match length
+#' of xcentres.  0 by default.
+#' @param circle_colors character of rcolors or hex colors or NULL.  if
+#' null safeBrew of Dark2 is used
+#' @param group_names character/factor names of color/fill groups.  capital
+#' letters by default.
+#' @param line_alpha numeric [0,1] alpha of lines, 1 by default
+#' @param fill_alpha numeric [0,1] alpha of fill, .3 by default.
+#' @param line_width numeric > 0.  passed to size. 2 by default
+#' @param n_points integer > 1.  number of points to approximate circle with.
+#' 200 by default
+#' @return a ggplot containing ellipses
+#' @export
+#' @import grDevices
+#' @examples
+#' ggellipse(xcentres = c(1, 1, 2),
+#'     ycentres = c(2, 1, 1),
+#'     r = c(1, 2, 1))
+#' ggellipse(xcentres = c(1, 1, 2),
+#'     ycentres = c(2, 1, 1),
+#'     r = c(1, 2, 1),
+#'     fill_alpha = 0,
+#'     group_names = paste("set", 1:3))
+#'ggellipse(xcentres = c(1, 1, 2),
+#'     ycentres = c(2, 1, 1),
+#'     r = c(1, 2, 1),
+#'     circle_colors = c("red", "orange", "yellow"),
+#'     line_alpha = 0,
+#'     group_names = paste("set", 1:3))
 ggellipse = function(xcentres,
                      ycentres,
                      r,
@@ -159,19 +198,22 @@ ggellipse = function(xcentres,
     e <- eulerr_ellipse(xcentres, ycentres, r,
                         r2, phi, n_points)
     names(e) = group_names
+    x = y = group = NULL #reserve data.table bindings
     ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x, y = ell$y))
     ell_dt = data.table::rbindlist(ell_dt, use.names = TRUE, idcol = "group")
     #check colors
+    stopifnot(is.null(circle_colors) || all(is.character(circle_colors)))
+
     if (is.null(circle_colors)) {
         circle_colors = safeBrew(n_circles, "Dark2")
     } else {
         not_hex = substr(circle_colors, 0, 1) != "#"
         circle_colors[not_hex] = col2hex(circle_colors[not_hex])
     }
+    stopifnot(length(circle_colors) == 1 || length(circle_colors) == n_circles)
     if (length(circle_colors) < n_circles)
         circle_colors <- rep(circle_colors, length.out = n_circles)
-    stopifnot(is.null(circle_colors) || all(is.character(circle_colors)))
-    stopifnot(length(circle_colors) == 1 || length(circle_colors) == n_circles)
+
     if(length(circle_colors) == 1) circle_colors = rep(circle_colors, n_circles)
     # make scales
     names(circle_colors) = group_names

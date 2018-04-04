@@ -4,13 +4,16 @@
 \alias{ssvFeatureBars}
 \title{bar plots of set sizes}
 \usage{
-ssvFeatureBars(object, show_counts = TRUE)
+ssvFeatureBars(object, show_counts = TRUE, bar_colors = NULL)
 }
 \arguments{
 \item{object}{passed to ssvMakeMembTable for conversion to membership table}
 
 \item{show_counts}{logical.  should counts be displayed at the center of each
-bar? default is TRUE}
+bar. default is TRUE}
+
+\item{bar_colors}{character. rcolor or hex colors. default of NULL
+uses RColorBrewer Dark2.}
 }
 \value{
 ggplot of bar plot of set sizes
