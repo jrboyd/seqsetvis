@@ -114,3 +114,103 @@ movingAverage <- function(x, n = 1, centered = TRUE) {
     # return sum divided by count
     s/count
 }
+
+ggellipse = function(xcentres,
+                     ycentres,
+                     r,
+                     r2 = r,
+                     phi = rep(0, length(xcentres)),
+                     circle_colors = NULL,
+                     group_names = LETTERS[seq_along(xcentres)],
+                     line_alpha = 1,
+                     fill_alpha = .3,
+                     line_width = 2,
+                     n_points = 200){
+    stopifnot(length(xcentres) == length(ycentres))
+    n_circles = length(xcentres)
+    stopifnot(is.numeric(xcentres), is.numeric(ycentres),
+              is.numeric(r), is.numeric(phi))
+    stopifnot(length(r) == 1 || length(r) == n_circles)
+    if(length(r) == 1) r = rep(r, n_circles)
+    stopifnot(length(r2) == 1 || length(r2) == n_circles)
+    if(length(r2) == 1) r2 = rep(r2, n_circles)
+    stopifnot(length(phi) == 1 || length(phi) == n_circles)
+    if(length(phi) == 1) phi = rep(phi, n_circles)
+    stopifnot(all(is.character(group_names) | is.factor(group_names)))
+    stopifnot(length(group_names) == n_circles)
+    stopifnot(is.numeric(line_alpha), is.numeric(fill_alpha),
+              is.numeric(line_width))
+
+    #ellipse coordinates
+    # internal function from eulerr
+    eulerr_ellipse = function (h, k, a, b = a, phi = 0, n = 200L) {
+        theta <- seq.int(0, 2 * pi, length.out = n)
+        m <- length(h)
+        out <- vector("list", m)
+        for (i in seq_along(h)) {
+            out[[i]]$x <- h[i] + a[i] * cos(theta) * cos(phi[i]) -
+                b[i] * sin(theta) * sin(phi[i])
+            out[[i]]$y <- k[i] + b[i] * sin(theta) * cos(phi[i]) +
+                a[i] * cos(theta) * sin(phi[i])
+        }
+        out
+    }
+
+    e <- eulerr_ellipse(xcentres, ycentres, r,
+                        r2, phi, n_points)
+    names(e) = group_names
+    ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x, y = ell$y))
+    ell_dt = data.table::rbindlist(ell_dt, use.names = TRUE, idcol = "group")
+    #check colors
+    if (is.null(circle_colors)) {
+        circle_colors = safeBrew(n_circles, "Dark2")
+    } else {
+        not_hex = substr(circle_colors, 0, 1) != "#"
+        circle_colors[not_hex] = col2hex(circle_colors[not_hex])
+    }
+    if (length(circle_colors) < n_circles)
+        circle_colors <- rep(circle_colors, length.out = n_circles)
+    stopifnot(is.null(circle_colors) || all(is.character(circle_colors)))
+    stopifnot(length(circle_colors) == 1 || length(circle_colors) == n_circles)
+    if(length(circle_colors) == 1) circle_colors = rep(circle_colors, n_circles)
+    # make scales
+    names(circle_colors) = group_names
+
+    ahex = substr(grDevices::rgb(red = 1, blue = 1, green = 1, alpha = fill_alpha), start = 8, stop = 9)
+    fill_scale = paste0(circle_colors, ahex)
+    names(fill_scale) = names(circle_colors)
+
+    ahex = substr(grDevices::rgb(red = 1, blue = 1, green = 1, alpha = line_alpha), start = 8, stop = 9)
+    line_scale = paste0(circle_colors, ahex)
+    names(line_scale) = names(circle_colors)
+
+    # make plot
+    p = ggplot() +
+        labs(fill = "", color = "") +
+        scale_color_manual(values = line_scale) +
+        scale_size_identity() +
+        scale_fill_manual(values = fill_scale) +
+        theme_minimal() +
+        theme(plot.background = element_blank(),
+              axis.title = element_blank(),
+              axis.text = element_blank(),
+              axis.ticks = element_blank(),
+              panel.grid = element_blank(),
+              legend.position = "top") +
+        coord_fixed()
+    p = p +
+        geom_polygon(data = ell_dt, aes(x = x,
+                                        y = y,
+                                        fill = group,
+                                        col = NA,
+                                        alpha = fill_alpha
+        )) +
+        geom_polygon(data = ell_dt, aes(x = x,
+                                        y = y,
+                                        fill = NA,
+                                        col = group,
+                                        size = line_width
+        )) +
+        scale_alpha_identity() + guides(alpha = "none")
+    p
+}

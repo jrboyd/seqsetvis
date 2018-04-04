@@ -5,7 +5,8 @@
 \title{Try to load a bed-like file and convert it to a GRanges object}
 \usage{
 ssvFeatureEuler(object, line_width = 2, shape = c("circle", "ellipse")[1],
-  n = 200, fill_circles = TRUE, alpha = 0.15, circle_colors = NULL)
+  n_points = 200, fill_alpha = 0.3, line_alpha = 1,
+  circle_colors = NULL)
 }
 \arguments{
 \item{object}{A membership table}
@@ -14,11 +15,11 @@ ssvFeatureEuler(object, line_width = 2, shape = c("circle", "ellipse")[1],
 
 \item{shape}{shape argument passed to eulerr::euler}
 
-\item{n}{number of points to use for drawing ellipses, passed to  eulerr:::ellipse}
+\item{n_points}{number of points to use for drawing ellipses, passed to  eulerr:::ellipse}
 
-\item{fill_circles}{logical, should circles be filled or empty?}
+\item{fill_alpha}{numeric [0,1], alpha value for circle fill}
 
-\item{alpha}{numeric [0,1], alpha value for circle fill}
+\item{line_alpha}{numeric [0,1], alpha value for circle line}
 
 \item{circle_colors}{colors to choose from for circles.  passed to ggplot2 color scales.}
 }

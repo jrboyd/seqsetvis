@@ -57,7 +57,7 @@ test_that("ssvFeatureEuler fill, no fill", {
     p1 = ssvFeatureEuler(setL)
     expect_s3_class(p1, class = "ggplot")
 
-    p2 = ssvFeatureEuler(setL, fill_circles = F)
+    p2 = ssvFeatureEuler(setL, fill_alpha = 0)
     expect_s3_class(p2, class = "ggplot")
 })
 
@@ -84,7 +84,7 @@ test_that("ssvFeatureVenn various other paramters don't throw error", {
                        counts_txt_size = 10, show_outside_count = T,
                        counts_as_labels = T)
     expect_s3_class(p, class = "ggplot")
-    p = ssvFeatureVenn(olap, circle_colors = c("red", "blue", "green"), fill_circles = F,
+    p = ssvFeatureVenn(olap, circle_colors = c("red", "blue", "green"), fill_alpha = 0,
                        counts_txt_size = 10, show_outside_count = T,
                        counts_as_labels = T)
     expect_s3_class(p, class = "ggplot")

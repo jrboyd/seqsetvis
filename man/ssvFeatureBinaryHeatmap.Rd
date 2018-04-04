@@ -6,20 +6,21 @@
 heatmap is sorted by column left to right.
 change column order to reveal patterns}
 \usage{
-ssvFeatureBinaryHeatmap(object, raster_approximation = TRUE,
+ssvFeatureBinaryHeatmap(object, raster_approximation = FALSE,
   raster_width_min = 1000, raster_height_min = 1000)
 }
 \arguments{
 \item{object}{passed to ssvMakeMembTable}
 
-\item{raster_approximation}{instead of standard plot, write temporary raster
-image and redraw that as plot background.}
+\item{raster_approximation}{If TRUE, instead of standard ggplot, write
+temporary raster png image and redraw that as plot background. default is
+FALSE}
 
-\item{raster_width_min}{raster width will be minimun multiple of number of
-columns over this number}
+\item{raster_width_min}{raster width will be minimum multiple of number of
+columns over this number.  ignored if raster_approximation is FALSE.}
 
-\item{raster_height_min}{raster height will be minimun multiple of number of
-rows over this number}
+\item{raster_height_min}{raster height will be minimum multiple of number of
+rows over this number  ignored if raster_approximation is FALSE}
 }
 \value{
 ggplot using geom_tile of membership table sorted from left to right.

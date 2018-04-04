@@ -1,3 +1,11 @@
+# seqsetvis 0.99.9
+
+* vigentte - some plots reduced in size and dpi reduced to save space.
+* ssvFeatureVenn and Euler refactored to use common internal ggellipse function for
+consistency.
+* ssvBinarizeHeatmap cleaned up plot output and changed default to
+raster_approximation = FALSE
+
 # seqsetvis 0.99.8
 
 * fetch* now automatically calculate and apply a fixed width.

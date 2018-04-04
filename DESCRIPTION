@@ -1,21 +1,14 @@
 Package: seqsetvis
 Type: Package
 Title: Visualizations for User Friendly ChIP-seq Peak Comparison and Analysis
-Version: 0.99.8
+Version: 0.99.9
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
-Description: seqsetvis enables the visualization and analysis of ChIP-seq peak sets and 
-    enrichment tracks.  Unlike most existing packages and genome browsers, seqsetvis
-    is focused on the ability to simultaneously compare many sites that have been
-    divided into sets.  
-    This assumes you have 
-    a set of bed-like files representing areas of enrichment (peaks) or other 
-    biologically relevant regions (promoters, enhancers) and bigwigs 
-    representing enrichment for the same samples or other relevant samples.
-    This package makes heavy use of the data.table and ggplot2 packages and should
-    be straightforward to understand and highly customizable if users are familiar 
-    with these packages. If not, it should also "just work" and familiarity with 
-    these packages is not required.
+Description: seqsetvis enables the visualization and analysis of multiple 
+genomic datasets. Although seqsetvis was designed for the comparison of mulitple 
+ChIP-seq datasets, this package is domain-agnostic and allows the processing of 
+multiple genomic coordinate files (bed-like files) and signal files 
+(bigwig files).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -28,7 +21,7 @@ Suggests:
     knitr, 
     rmarkdown, 
     testthat 
-Depends: R (>= 3.5), ggplot2
+Depends: R (>= 3.4), ggplot2
 Imports: 
     data.table, 
     eulerr, 

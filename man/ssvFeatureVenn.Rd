@@ -5,9 +5,9 @@
 \title{ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets}
 \usage{
 ssvFeatureVenn(object, group_names = NULL, counts_txt_size = 5,
-  counts_as_labels = FALSE, show_outside_count = FALSE, lwd = 3,
-  circle_colors = NULL, fill_circles = TRUE,
-  fill_alpha = ifelse(fill_circles, 0.5, 0), counts_color = NULL)
+  counts_as_labels = FALSE, show_outside_count = FALSE, line_width = 3,
+  circle_colors = NULL, fill_alpha = 0.3, line_alpha = 1,
+  counts_color = NULL, n_points = 200)
 }
 \arguments{
 \item{object}{will be passed to \code{\link{ssvMakeMembTable}} for conversion to membership matrix}
@@ -20,13 +20,13 @@ ssvFeatureVenn(object, group_names = NULL, counts_txt_size = 5,
 
 \item{show_outside_count}{if TRUE, items outside of all sets are counted outside. can be confusing.}
 
-\item{lwd}{uses size aesthetic to control line width of circles.}
+\item{line_width}{uses size aesthetic to control line width of circles.}
 
 \item{circle_colors}{colors to use for circle line colors. Uses Dark2 set from RColorBrewer by default.}
 
-\item{fill_circles}{if TRUE, fill circles}
+\item{fill_alpha}{alpha value to use for fill, defaults to .3.}
 
-\item{fill_alpha}{alpha value to use for fill, defaults to .5.}
+\item{line_alpha}{numeric [0,1], alpha value for circle line}
 
 \item{counts_color}{single color to use for displaying counts}
 }

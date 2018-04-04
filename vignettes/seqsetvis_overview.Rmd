@@ -4,7 +4,6 @@ author: "Joseph R Boyd"
 output:
   BiocStyle::html_document:
     toc_float: true
-  BiocStyle::pdf_document: default
 vignette: >
     %\VignetteIndexEntry{CTCF binding in breast cancer cell lines: From GEO}
     %\VignetteEngine{knitr::rmarkdown}
@@ -13,7 +12,8 @@ vignette: >
 
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
-    collapse = TRUE
+    collapse = TRUE,
+    dpi=64
 )
 ```
 
@@ -53,14 +53,14 @@ sets.
     + `ssvMakeMembTable` - coerces various ways of defining sets to a membership 
 table
     + `ssvFeature*` - visualizations of set counts and overlaps
-    + `ssvSignal*` - visualizations of signal mapped to genomic coordinates in sets 
-context
+    + `ssvSignal*` - visualizations of signal mapped to genomic coordinates in 
+    sets context
 * utility functions
     + `easyLoad_*` - loads files into a list of GRanges for input into `ssv*` 
 functions
     + `fetch*` - grabs data from .bigwig and .bam files
-    + miscellaneous but potentially handy functions such as wrappers for data.table 
-functions.
+    + miscellaneous but potentially handy functions such as wrappers for 
+    data.table functions.
 
 
 
@@ -188,8 +188,8 @@ of each set and the degree to which the overlap with circles or ellipses of
 varying sizes.  For data of any appreciable complexity, Euler diagrams are 
 approximations by neccessity.
 
-There is no hard limit to the number of sets *seqsetvis* can show in an Euler diagram
-but computation time increases rapidly along with the inaccuracy of 
+There is no hard limit to the number of sets *seqsetvis* can show in an Euler 
+diagram but computation time increases rapidly along with the inaccuracy of 
 approximation.
 ```{r euler}
 ssvFeatureEuler(olaps)
@@ -490,13 +490,16 @@ more obvious (MCF10A has the most peaks and the majority of peaks are common to
 all 3 cell lines).
 
 ```{r ctcf fig1,hold=TRUE, fig.align='center', fig.height=4, fig.width = 8}
-p_bars = ssvFeatureBars(olaps, show_counts = FALSE) +  theme(legend.position = "left")
+p_bars = ssvFeatureBars(olaps, show_counts = FALSE) +  
+    theme(legend.position = "left")
 p_bars = p_bars + theme(axis.text.x = element_blank(), 
                 axis.ticks.x = element_blank(),
                 legend.justification = "center") +
     labs(fill = "cell line")
-p_venn = ssvFeatureVenn(olaps, counts_txt_size = 4) + guides(fill = "none", color = "none")
-p_euler = ssvFeatureEuler(olaps, alpha = .5) + guides(fill = "none", color = "none")
+p_venn = ssvFeatureVenn(olaps, counts_txt_size = 4) + 
+    guides(fill = "none", color = "none")
+p_euler = ssvFeatureEuler(olaps) + 
+    guides(fill = "none", color = "none")
 
 cowplot::ggdraw() +
     cowplot::draw_plot(p_bars, x = 0, y = 0, width = .4, height = .7) +
@@ -512,13 +515,21 @@ Plot colors can be modified via the ggplot objects without recalling plot
 functions. (These colors aren't better per se.)
 
 ```{r color change, eval=FALSE,hold = TRUE, fig.align='center', fig.height=4, fig.width = 8}
-col_vals = c("MCF10A_CTCF" = 'red', "MCF10AT1_CTCF" = "blue", "MCF10CA1_CTCF" = "green")
+col_vals = c("MCF10A_CTCF" = 'red', 
+             "MCF10AT1_CTCF" = "blue", 
+             "MCF10CA1_CTCF" = "green")
 sf = scale_fill_manual(values = col_vals)
 sc = scale_color_manual(values = col_vals)
 cowplot::ggdraw() +
-    cowplot::draw_plot(p_bars + sf, x = 0, y = 0, width = .4, height = .7) +
-    cowplot::draw_plot(p_venn + sf + sc, x = .4, y = .1, width = .3, height = .7) +
-    cowplot::draw_plot(p_euler + sf + sc, x = 0.7, y = .1, width = 0.3, height = .7) +
+    cowplot::draw_plot(p_bars + sf, 
+                       x = 0, y = 0, 
+                       width = .4, height = .7) +
+    cowplot::draw_plot(p_venn + sf + sc, 
+                       x = .4, y = .1, 
+                       width = .3, height = .7) +
+    cowplot::draw_plot(p_euler + sf + sc, 
+                       x = 0.7, y = .1, 
+                       width = 0.3, height = .7) +
     cowplot::draw_plot_label(c("CTCF binding in breast cancer cell lines", 
                                "A", "B", "C"),
                              x = c(.04, .17, 0.4, .7),
@@ -531,9 +542,15 @@ The same but grayscale.
 sf = scale_fill_grey()
 sc = scale_color_manual(values = rep("black", 3))
 cowplot::ggdraw() +
-    cowplot::draw_plot(p_bars + sf, x = 0, y = 0, width = .4, height = .7) +
-    cowplot::draw_plot(p_venn + sf + sc, x = .4, y = .1, width = .3, height = .7) +
-    cowplot::draw_plot(p_euler + sf + sc, x = 0.7, y = .1, width = 0.3, height = .7) +
+    cowplot::draw_plot(p_bars + sf, 
+                       x = 0, y = 0, 
+                       width = .4, height = .7) +
+    cowplot::draw_plot(p_venn + sf + sc, 
+                       x = .4, y = .1, 
+                       width = .3, height = .7) +
+    cowplot::draw_plot(p_euler + sf + sc, 
+                       x = 0.7, y = .1, 
+                       width = 0.3, height = .7) +
     cowplot::draw_plot_label(c("CTCF binding in breast cancer cell lines", 
                                "A", "B", "C"),
                              x = c(.04, .17, 0.4, .7),
@@ -647,16 +664,26 @@ systematic reduction in fold-enrichment in CA1 compared to 10A. While it's
 possible there's some biology at play, it's far more likely that the 
 ChIP procedure for CA1 simply wasn't as successful.
 ```{r ctcf scatterplots, fig.width=12, fig.height=7}
-all_groups = levels(ssvFactorizeMembTable(ssvMakeMembTable(olaps_fixedSize))$group)
+all_groups = levels(ssvFactorizeMembTable(
+    ssvMakeMembTable(olaps_fixedSize))$group)
 all_colors = RColorBrewer::brewer.pal(length(all_groups), "Dark2")
 names(all_colors) = all_groups
-olap_groups_12 = ssvFactorizeMembTable(ssvMakeMembTable(olaps_fixedSize)[, 1:2])
-p_12 = ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", 
-                     color_table = olap_groups_12) + scale_color_manual(values = all_colors)
+olap_groups_12 = ssvFactorizeMembTable(
+    ssvMakeMembTable(olaps_fixedSize)[, 1:2])
+p_12 = ssvSignalScatterplot(bw_gr, 
+                            x_name = "MCF10A_CTCF", 
+                            y_name = "MCF10AT1_CTCF", 
+                            color_table = olap_groups_12) + 
+    scale_color_manual(values = all_colors)
 
-olap_groups_13 = ssvFactorizeMembTable(ssvMakeMembTable(olaps_fixedSize)[, c(1,3)])
-p_13  = ssvSignalScatterplot(bw_gr, x_name = "MCF10A_CTCF", y_name = "MCF10CA1_CTCF", 
-                     color_table = olap_groups_13) + scale_color_manual(values = all_colors)
+olap_groups_13 = ssvFactorizeMembTable(
+    ssvMakeMembTable(olaps_fixedSize)[, c(1,3)])
+p_13  = ssvSignalScatterplot(bw_gr, 
+                             x_name = "MCF10A_CTCF", 
+                             y_name = "MCF10CA1_CTCF", 
+                     color_table = olap_groups_13) + 
+    scale_color_manual(values = all_colors)
+
 cowplot::plot_grid(p_12, p_13, label_y = .8, labels = "AUTO")
 ```
 
@@ -714,7 +741,8 @@ olap_clust_annot = GRanges(merge(olap_clust_annot, clust_df))
 
 olap_clust_annot = subset(olap_clust_annot, cluster_id %in% 1:2)
 
-olap_clust_annot <- annotatePeakInBatch(olap_clust_annot, AnnotationData=TSS.human.GRCh38)
+olap_clust_annot <- annotatePeakInBatch(olap_clust_annot, 
+                                        AnnotationData=TSS.human.GRCh38)
 olap_clust_annot$feature
 ```
 
@@ -771,7 +799,8 @@ if(dir.exists(cache_path) & require(BiocFileCache)){
     ch = rtracklayer::import.chain(chmm_chain_file)
     chmm_gr_hg38 = rtracklayer::liftOver(chmm_gr, ch)
     chmm_gr_hg38 = unlist(chmm_gr_hg38)
-    chmm_grs_list = as.list(GenomicRanges::split(chmm_gr_hg38, chmm_gr_hg38$name))
+    chmm_grs_list = as.list(GenomicRanges::split(chmm_gr_hg38, 
+                                                 chmm_gr_hg38$name))
     #transform narrowPeak ranges to summit positions
     chmm_np_grs = easyLoad_narrowPeak(chmm_np_file, file_names = target_data)
     chmm_summit_grs = lapply(chmm_np_grs, function(x){
@@ -811,7 +840,8 @@ if(dir.exists(cache_path) & require(BiocFileCache)){
         samp_gr
     })
     state_gr = unlist(GRangesList(state_split))
-    state_gr = resize(state_gr, width = chmm_win + 2 * flank_size, fix = "center")
+    state_gr = resize(state_gr, width = chmm_win + 2 * flank_size, 
+                      fix = "center")
     
     bw_states_gr = fetchWindowedBigwig(bw_file = chmm_bw_file, 
                                        qgr = state_gr, 
@@ -852,7 +882,8 @@ state_width_fraction = state_total_widths / sum(state_total_widths)
 state_peak_hits =  colSums(olaps_df)
 state_peak_fraction = state_peak_hits / sum(state_peak_hits)
 
-enrichment = state_peak_fraction / state_width_fraction[names(state_peak_fraction)]
+enrichment = state_peak_fraction / 
+    state_width_fraction[names(state_peak_fraction)]
 enrich_df = data.frame(state = names(enrichment), enrichment = enrichment)
 p_state_enrichment =  ggplot(enrich_df) +
     geom_bar(aes(x = state, fill = state, y = enrichment), stat = "identity") +
@@ -866,7 +897,9 @@ p_state_enrichment
 Plot aggregated lineplot by state
 
 ```{r, message=FALSE}
-p_agg_tracks = ssvSignalLineplotAgg(bw_states_gr, sample_ = "grp", color_ = "grp")
+p_agg_tracks = ssvSignalLineplotAgg(bw_states_gr, 
+                                    sample_ = "grp", 
+                                    color_ = "grp")
 gb = ggplot2::ggplot_build(p_agg_tracks)
 yrng = range(gb$data[[1]]$y)
 p_agg_tracks = p_agg_tracks +
@@ -948,5 +981,6 @@ ggdraw() +
               height = 1 - bar_height - line_height) +
     draw_plot_label(LETTERS[1:4], 
                     c(0, 0.48, 0, 0), 
-                    c(1, 1, 1 - bar_height, 1 - bar_height - line_height), size = 15)
+                    c(1, 1, 1 - bar_height, 1 - bar_height - line_height), 
+                    size = 15)
 ```
