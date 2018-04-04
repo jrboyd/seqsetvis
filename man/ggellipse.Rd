@@ -2,7 +2,7 @@
 % Please edit documentation in R/misc_helpers.R
 \name{ggellipse}
 \alias{ggellipse}
-\title{returns a ggplot with ellipses drawn using specified parameters
+\title{returns a ggplot with ellipses drawn with specified parameters
 used by ssvFeatureVenn and ssvFeatureEuler}
 \usage{
 ggellipse(xcentres, ycentres, r, r2 = r, phi = rep(0, length(xcentres)),
@@ -43,7 +43,7 @@ letters by default.}
 a ggplot containing ellipses
 }
 \description{
-returns a ggplot with ellipses drawn using specified parameters
+returns a ggplot with ellipses drawn with specified parameters
 used by ssvFeatureVenn and ssvFeatureEuler
 }
 \examples{
