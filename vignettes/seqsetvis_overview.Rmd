@@ -282,6 +282,7 @@ lot's of different data of multiple types at single regions.  In contrast,
 
 Basic line plot of a subset of regions
 ```{r lineplot basic, fig.width=6, fig.height=2.5}
+# facet labels will display better if split into multiple lines
 bw_gr$facet_label = sub("_", "\n", bw_gr$sample)
 ssvSignalLineplot(bw_data = subset(bw_gr, id %in% 1:12), facet_ = "facet_label")
 ```
@@ -439,7 +440,8 @@ pkgdata_path = system.file("extdata",
 cache_path = paste0(pkgdata_path, "/.cache")
 # the next line is enough to initialize the cache
 # BiocFileCache(cache = cache_path)
-if(dir.exists(cache_path) & require(BiocFileCache)){
+use_full_data = dir.exists(cache_path) & require(BiocFileCache)
+if(use_full_data){
     library(BiocFileCache)
     ssv_bfc = BiocFileCache(cache = cache_path)
     bw_files = vapply(seq_along(CTCF_in_10a_bigWig_urls), function(i){
@@ -632,14 +634,11 @@ Loading from the subsetted bigwigs inlcuded with *seqsetvis*.
 This code chunk results in identical data to that stored in the
 `CTCF_in_10a_profiles_gr` data object.
 
-```{r fetch package bw, eval = FALSE}
-bw_gr = fetchWindowedBigwigList(bw_files = bw_files, qgr = olaps_fixedSize,
-  win_size = 50)
-```
-
-```{r set bw_gr}
-if(dir.exists(cache_path))
-bw_gr = CTCF_in_10a_profiles_gr
+```{r fetch package bw}
+if(use_full_data){
+    bw_gr = fetchWindowedBigwigList(bw_files = bw_files, qgr = olaps_fixedSize,
+                                    win_size = 50)
+}
 ```
 
 ## Inspecting peaks
@@ -653,8 +652,10 @@ B) Likewise for the comparison of MCF10A and MCF10CA1.  In this case, there is a
 systematic reduction in fold-enrichment in CA1 compared to 10A. While it's 
 possible there's some biology at play, it's far more likely that the 
 ChIP procedure for CA1 simply wasn't as successful.
-```{r ctcf scatterplots, fig.width=10, fig.height=4}
-colnames(mcols(olaps_fixedSize)) = sub("_CTCF", "", colnames(mcols(olaps_fixedSize)))
+```{r ctcf scatterplots, fig.width=10, fig.height=4, message=FALSE}
+# shortening colnames will make group names less cumbersome in plot legend
+colnames(mcols(olaps_fixedSize)) = sub("_CTCF", "", 
+                                       colnames(mcols(olaps_fixedSize)))
 
 all_groups = levels(ssvFactorizeMembTable(
     ssvMakeMembTable(olaps_fixedSize))$group)
@@ -676,8 +677,19 @@ p_13  = ssvSignalScatterplot(bw_gr,
                      color_table = olap_groups_13) + 
     scale_color_manual(values = all_colors)
 
-cowplot::plot_grid(p_12 + labs(title = ""), 
-                   p_13 + labs(title = ""), label_y = .85, labels = "AUTO")
+
+if(use_full_data){
+    tp_12 = p_12 + scale_size_continuous(range = .1) + scale_alpha_continuous(range = .1) + geom_density2d(aes(color = group), h = 40, bins = 3)
+    tp_13 = p_13 + scale_size_continuous(range = .1) + scale_alpha_continuous(range = .1) + geom_density2d(aes(color = group), h = 40, bins = 3)
+    cowplot::plot_grid(tp_12 + labs(title = ""), 
+                       tp_13 + labs(title = ""), 
+                       label_y = .85, labels = "AUTO") 
+}else{
+    cowplot::plot_grid(p_12 + labs(title = ""), 
+                       p_13 + labs(title = ""), 
+                       label_y = .85, labels = "AUTO")
+}
+
 ```
 
 These observations are reinforced by the heatmap.
@@ -763,7 +775,7 @@ target_data = "MCF10A_CTCF"
 chmm_win = 200 #window size is an important chromHMM parameter.
 # 200 is the default window size and matches the state segementation
 
-if(dir.exists(cache_path) & require(BiocFileCache)){
+if(use_full_data){
     # set all file paths
     chmm_bw_file = bfcrpath(ssv_bfc, rnames = paste(target_data, "bigwig", 
                                                     sep = ","))
