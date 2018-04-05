@@ -20,7 +20,6 @@ R/seqsetvis.Rcheck
 R/*.bu
 R/functions_annotation.R
 R/old_sources
-R/functions_bam_fetch.R
 tests/testthat/*.bu
 dev_fetch_bam.R
 tmp.chain

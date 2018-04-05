@@ -1,35 +1,3 @@
-# windowViewGRanges_dt = function(score_gr, query_gr, window_size){
-#     x = id = NULL
-#     windows = slidingWindows(query_gr, width = window_size, step = window_size)
-#     if (is.null(query_gr$id)) {
-#         if (!is.null(names(query_gr))) {
-#             query_gr$id = names(query_gr)
-#         } else {
-#             query_gr$id = paste0("region_", seq_along(query_gr))
-#         }
-#     }
-#     names(windows) = query_gr$id
-#     windows = unlist(windows)
-#     windows$id = names(windows)
-#     windows = resize(windows, width = 1, fix = "center")
-#     olaps = suppressWarnings(data.table::as.data.table(findOverlaps(query = windows, subject = score_gr)))
-#     # patch up missing/out of bound data with 0
-#     missing_idx = setdiff(seq_along(windows), olaps$queryHits)
-#     if (length(missing_idx) > 0) {
-#         olaps = rbind(olaps, data.table::data.table(queryHits = missing_idx, subjectHits = length(score_gr) + 1))[order(queryHits)]
-#         score_gr = c(score_gr, GRanges(seqnames(score_gr)[length(score_gr)], IRanges::IRanges(1, 1), score = 0))
-#     }
-#     # set y and output windows = windows[olaps$queryHits]
-#     windows$y = score_gr[olaps$subjectHits]$score
-#     score_dt = data.table::as.data.table(windows)
-#     score_dt[, `:=`(x, start - min(start) + window_size/2), by = id]
-#     score_dt[, `:=`(x, x - round(mean(x))), by = id]
-#     shift = round(window_size/2)
-#     score_dt[, `:=`(start, start - shift + 1)]
-#     score_dt[, `:=`(end, end + window_size - shift)]
-# }
-
-
 #' Fetch values from a bigwig appropriate for heatmaps etc.
 #'
 #' \code{fetchWindowedBigwig_dt} Gets values for each region of the query GRanges (\code{qgr}).
@@ -60,11 +28,9 @@ fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
     if (!all(width(qgr)%%win_size == 0)) {
         stop("all widths of qgr are not evenly divisible by win_size, ", win_size)
     }
-    if(length(unique(width(qgr))) > 1){
-        target_size = quantile(width(qgr), .75)
-        win_size = 50
-        target_size = round(target_size / win_size) * win_size
-        qgr = centerFixedSizeGRanges(qgr, fixed_size = target_size)
+    if(length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0){
+        qgr = fixGRangesWidth(qgr, min_quantile = .75, win_size = win_size)
+        target_size = width(qgr)[1]
         warning("fetchWindowedBigwigList_dt requires widths of qgr be ",
                 "identical and evenly divisible by win_size.",
                 "\nA fixed width of ",
