@@ -1,4 +1,7 @@
 #' parse fragLen from MACS2 output
+#' @param macs2xls_file character.  an xls file output by MACS2 to parse
+#' frag length from
+#' @return numeric fragment length
 #' @export
 fragLen_fromMacs2Xls = function(macs2xls_file){
     stopifnot(is.character(macs2xls_file))
@@ -15,14 +18,31 @@ fragLen_fromMacs2Xls = function(macs2xls_file){
 }
 
 #' calculate fragLen from a bam file for specified regions
-#' @import Rsamtools
+#' @param bam_f character or BamFile. bam file to read from.
+#' .bai index file must be in same directory
+#' @param qgr GRanges.  used as which for ScanBamParam. Can be NULL if it's
+#' REALLY important to load the entire bam, force_no_which = TRUE also required.
+#' @param ma_distance numeric (integer)  range to use for movingRange.
+#' Default is 21.
+#' @param n_regions numeric (integer) it's generally overkill to pull all
+#' regions at this stage and will slow calculation down.  Default is 100.
+#' @param force_no_which logical. if TRUE and qgr is also NULL, the entire
+#' bam will be read.
+#' @param include_plot_in_output if TRUE ouptut is a list of fragLen and a
+#' ggplot showing values considered by calculation. Default is FALSE.
+#' @param max_fragLen numeric.  The maximum fragLen to calculate for. Calculation
+#' time is directly proportional to this number. Default
+#' is 300.
 #' @param ... passed to Rsamtools::ScanBamParam, can't be which or what.
+#' @return numeric fragment length
+#' @import Rsamtools
 #' @export
 fragLen_calcStranded = function(bam_f,
                                 qgr,
+                                ma_distance = 21,
                                 n_regions = 100,
                                 force_no_which = FALSE,
-                                return_fragLen_only = TRUE,
+                                include_plot_in_output = FALSE,
                                 max_fragLen = 300, ...){
     if(is.null(qgr)){
         if(force_no_which){
@@ -33,11 +53,7 @@ fragLen_calcStranded = function(bam_f,
                  "Recall with :\nforce_no_which = TRUE\n if you're certain.")
         }
     }else{
-        if(is.character(qgr)){
-            peak_gr = easyLoad_narrowPeak(qgr)[[1]]
-            qgr = peak_gr[order(peak_gr$signalValue, decreasing = T)][1:n_regions]
-            qgr = GenomicRanges::resize(qgr, width = 2500, fix = "center")
-        }
+        set.seed(0)
         sbParam = Rsamtools::ScanBamParam(which = sample(qgr, min(length(qgr), n_regions)), what = c("rname", "strand", "pos", "qwidth"), ...)
     }
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
@@ -56,21 +72,22 @@ fragLen_calcStranded = function(bam_f,
         tmp = tmp[, .N, by = .(seqnames, pos)]
         (tmp[N > 1, .N] / nrow(tmp)) * 100
     })
-    ma_perc21 = movingAverage(perc, n = 21)
+    ma_perc21 = movingAverage(perc, n = ma_distance)
     fragLenMa = which.max(ma_perc21)
-    if(return_fragLen_only){
+    if(!include_plot_in_output){
         return(fragLenMa)
     }else{
-        pdt = data.table(x = xs, raw = perc, MA_21 = ma_perc21)
+        pdt = data.table(x = xs, raw = perc, moving_average = ma_perc21)
+
         pdt = data.table::melt(pdt, id.vars = "x", variable.name = "transform", value.name = "y")
         p = ggplot(pdt) +
             labs(x = "Fragment Length", y = "% strand match",
                  title = paste(basename(bam_f)),
                  subtitle = paste("Fragment Length determined by strand match maximization",
-                                  "Moving averge window 21 applied",
+                                  paste("Moving averge window", ma_distance, "applied"),
                                   sep = "\n")) +
             geom_line(aes(x = x, y = y, color = transform)) +
-            scale_color_manual(values = c(raw = "black", MA_21 = "red")) +
+            scale_color_manual(values = c(raw = "black", moving_average = "red")) +
             annotate("line", x = rep(fragLenMa, 2), y = range(perc), color = "green") +
             annotate("label", x = fragLenMa, y = mean(range(perc)), label = fragLenMa, color = "black")
         return(list(fragLenMa, p))
@@ -78,18 +95,39 @@ fragLen_calcStranded = function(bam_f,
 }
 
 #' get a windowed sampling of score_gr
+#'
+#' Summarizes score_gr by grabbing value of "score" every window_size bp.
+#' Columns in output data.table are:
+#' standard GRanges columns: seqnames, start, end, width, strand
+#' id - matched to names(score_gr). if names(score_gr) is missing, added as 1:length(score_gr)
+#' y - value of score from score_gr
+#' x -
+#'
+#' @param score_gr GRanges with a "score" metadata columns.
+#' @param qgr regions to view by window.
+#' @param window_size qgr will be represented by value from score_gr every
+#' window_size bp.
+#' @return data.table that is GRanges compatible
 #' @export
-windowViewGRanges_dt = function(score_gr, query_gr, window_size){
+windowViewGRanges_dt = function(score_gr, qgr, window_size,
+                                x0 = c("center", "center_unstranded", "left", "left_unstranded")[1]){
     x = id = NULL
-    windows = slidingWindows(query_gr, width = window_size, step = window_size)
-    if (is.null(query_gr$id)) {
-        if (!is.null(names(query_gr))) {
-            query_gr$id = names(query_gr)
+    stopifnot(class(score_gr) == "GRanges")
+    stopifnot(!is.null(score_gr$score))
+    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is.numeric(window_size))
+    stopifnot(window_size >= 1)
+    stopifnot(window_size %% 1 == 0)
+    stopifnot(x0 %in% c("center", "center_unstranded", "left", "left_unstranded"))
+    windows = slidingWindows(qgr, width = window_size, step = window_size)
+    if (is.null(qgr$id)) {
+        if (!is.null(names(qgr))) {
+            qgr$id = names(qgr)
         } else {
-            query_gr$id = paste0("region_", seq_along(query_gr))
+            qgr$id = paste0("region_", seq_along(qgr))
         }
     }
-    names(windows) = query_gr$id
+    names(windows) = qgr$id
     windows = unlist(windows)
     windows$id = names(windows)
     windows = resize(windows, width = 1, fix = "center")
@@ -103,21 +141,44 @@ windowViewGRanges_dt = function(score_gr, query_gr, window_size){
     # set y and output windows = windows[olaps$queryHits]
     windows$y = score_gr[olaps$subjectHits]$score
     score_dt = data.table::as.data.table(windows)
-    score_dt[, `:=`(x, start - min(start) + window_size/2), by = id]
-    score_dt[, `:=`(x, x - round(mean(x))), by = id]
+
     shift = round(window_size/2)
+    switch(x0,
+        center = {
+            score_dt[, `:=`(x, start - min(start) + shift), by = id]
+            score_dt[, `:=`(x, x - round(mean(x))), by = id]
+            score_dt[strand == "-", x := -1*x]
+        },
+        center_unstranded = {
+            score_dt[, `:=`(x, start - min(start) + shift), by = id]
+            score_dt[, `:=`(x, x - round(mean(x))), by = id]
+        },
+        left = {
+            score_dt[, x := -1]
+            score_dt[strand != "-", `:=`(x, start - min(start) + shift), by = id]
+            #flip negative
+            score_dt[strand == "-", `:=`(x, -1*(end - max(end) - shift)), by = id]
+        },
+        left_unstranded = {
+            score_dt[, `:=`(x, start - min(start) + shift), by = id]
+        }
+    )
+
     score_dt[, `:=`(start, start - shift + 1)]
     score_dt[, `:=`(end, end + window_size - shift)]
+    if(x0 == "center"){
+
+    }
     score_dt
 }
 
 #' fetch a bam file pileup with the ability to consider cross strand correlation
 #' @param target_strand character. if one of "+" or "-", reads are filtered
+#' to match. ignored if any other value.
 #' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
-#' @param ... passed to ScanBamParam(), can't be which or what.
 #' if NULL, value is calculated with fragLen_calcStranded
 #' if NA, raw bam pileup with no cross strand shift is returned.
-#' accordingly. ignored if any other value.
+#' @param ... passed to ScanBamParam(), can't be which or what.
 #' @export
 fetchBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1], ...){
     if(is.null(fragLen)){
@@ -128,10 +189,6 @@ fetchBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c
         stopifnot(is.numeric(fragLen))
         stopifnot(fragLen %% 1 == 0)
         stopifnot(fragLen >= 1)
-    }
-
-    if(is.character(qgr)){
-        qgr = easyLoad_narrowPeak(qgr)[[1]]
     }
     if(length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0){
         qgr = fixGRangesWidth(qgr, min_quantile = .75, win_size = win_size)

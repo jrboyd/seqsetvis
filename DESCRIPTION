@@ -33,6 +33,7 @@ Imports:
     methods, 
     png, 
     RColorBrewer, 
+    Rsamtools,
     rtracklayer, 
     S4Vectors, 
     stats

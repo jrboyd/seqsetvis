@@ -5,7 +5,7 @@
 \title{calculate fragLen from a bam file for specified regions}
 \usage{
 fragLen_calcStranded(bam_f, qgr, n_regions = 100, force_no_which = FALSE,
-  return_fragLen_only = TRUE, max_fragLen = 300)
+  return_fragLen_only = TRUE, max_fragLen = 300, ...)
 }
 \arguments{
 \item{...}{passed to Rsamtools::ScanBamParam, can't be which or what.}
