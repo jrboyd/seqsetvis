@@ -36,37 +36,8 @@ fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
                 "\nA fixed width of ",
                 target_size, " was applied based on the data provided.")
     }
-    # suppressWarnings({
     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
-    # })
-    windows = slidingWindows(qgr, width = win_size, step = win_size)
-    if (is.null(qgr$id)) {
-        if (!is.null(names(qgr))) {
-            qgr$id = names(qgr)
-        } else {
-            qgr$id = paste0("region_", seq_along(qgr))
-        }
-    }
-    names(windows) = qgr$id
-    windows = unlist(windows)
-    windows$id = names(windows)
-    windows = resize(windows, width = 1, fix = "center")
-    olaps = suppressWarnings(data.table::as.data.table(findOverlaps(query = windows, subject = bw_gr)))
-    # patch up missing/out of bound data with 0
-    missing_idx = setdiff(seq_along(windows), olaps$queryHits)
-    if (length(missing_idx) > 0) {
-        olaps = rbind(olaps, data.table::data.table(queryHits = missing_idx, subjectHits = length(bw_gr) + 1))[order(queryHits)]
-        bw_gr = c(bw_gr, GRanges(seqnames(bw_gr)[length(bw_gr)], IRanges::IRanges(1, 1), score = 0))
-    }
-    # set y and output windows = windows[olaps$queryHits]
-    windows$y = bw_gr[olaps$subjectHits]$score
-    bw_dt = data.table::as.data.table(windows)
-    bw_dt[, `:=`(x, start - min(start) + win_size/2), by = id]
-    bw_dt[, `:=`(x, x - round(mean(x))), by = id]
-    shift = round(win_size/2)
-    bw_dt[, `:=`(start, start - shift + 1)]
-    bw_dt[, `:=`(end, end + win_size - shift)]
-    return(bw_dt)
+    viewGRangesWindowed_dt(score_gr = bw_gr, qgr = qgr, window_size = win_size)
 }
 
 

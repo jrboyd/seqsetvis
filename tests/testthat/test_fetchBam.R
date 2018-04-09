@@ -44,7 +44,7 @@ test_that("fragLen_calcStranded can force no which", {
     expect_failure(expect_error({fragLen_calcStranded(bam_file, qgr = NULL, force_no_which = TRUE)}))
 })
 
-test_that("windowViewGRanges_dt strand and position functions", {
+test_that("viewGRangesWindowed_dt strand and position functions", {
 
 
     bam_score = fetchBam(bam_file, qgr = qgr)
@@ -54,13 +54,13 @@ test_that("windowViewGRanges_dt strand and position functions", {
     qgr_stranded = qgr
     GenomicRanges::strand(qgr_stranded) = c(rep("+", 2), rep("-", 3))
 
-    b_dt_center = windowViewGRanges_dt(bam_score, qgr_stranded, 50, x0 = "center")
+    b_dt_center = viewGRangesWindowed_dt(bam_score, qgr_stranded, 50, x0 = "center")
 
-    b_dt_center_uns = windowViewGRanges_dt(bam_score, qgr_stranded, 50, x0 = "center_unstranded")
+    b_dt_center_uns = viewGRangesWindowed_dt(bam_score, qgr_stranded, 50, x0 = "center_unstranded")
 
-    b_dt_left = windowViewGRanges_dt(bam_score, qgr, 50, x0 = "left")
+    b_dt_left = viewGRangesWindowed_dt(bam_score, qgr_stranded, 50, x0 = "left")
 
-    b_dt_left_uns = windowViewGRanges_dt(bam_score, qgr, 50, x0 = "left_unstranded")
+    b_dt_left_uns = viewGRangesWindowed_dt(bam_score, qgr_stranded, 50, x0 = "left_unstranded")
 
     # b_dt = rbindlist(list(center = b_dt_center,
     #                       center_unstranded = b_dt_center_uns,

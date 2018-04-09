@@ -8,12 +8,21 @@ fetchWindowedBam_dt(bam_f, qgr, fragLen = NULL, win_size = 50,
   target_strand = c("*", "+", "-")[1])
 }
 \arguments{
+\item{bam_f}{character or BamFile to load}
+
+\item{qgr}{GRanges regions to fetch}
+
 \item{fragLen}{numeric, NULL, or NA.  if numeric, supplied value is used.
 if NULL, value is calculated with fragLen_calcStranded
-if NA, raw bam pileup with no cross strand shift is returned.
-accordingly. ignored if any other value.}
+if NA, raw bam pileup with no cross strand shift is returned.}
+
+\item{win_size}{numeric >=1.  pileup grabbed every win_size bp}
 
 \item{target_strand}{character. if one of "+" or "-", reads are filtered}
+}
+\value{
+tidy data.table with GRanges compatible columns.  pileup is
+calculated only every win_size bp.
 }
 \description{
 fetch a windowed version of a bam file, returns data.table

@@ -6,6 +6,13 @@
 \usage{
 fragLen_fromMacs2Xls(macs2xls_file)
 }
+\arguments{
+\item{macs2xls_file}{character.  an xls file output by MACS2 to parse
+frag length from}
+}
+\value{
+numeric fragment length
+}
 \description{
 parse fragLen from MACS2 output
 }

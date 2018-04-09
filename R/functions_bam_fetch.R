@@ -6,7 +6,7 @@
 fragLen_fromMacs2Xls = function(macs2xls_file){
     stopifnot(is.character(macs2xls_file))
     stopifnot(file.exists(macs2xls_file))
-    str = read.table(macs2xls_file, nrows = 30, comment.char = "", sep = "\n", stringsAsFactors = F)$V1
+    str = utils::read.table(macs2xls_file, nrows = 30, comment.char = "", sep = "\n", stringsAsFactors = FALSE)$V1
     d = str[grepl(" d = ", str)]
 
     ts = str[grepl(" tag size is determined as ", str)]
@@ -44,6 +44,7 @@ fragLen_calcStranded = function(bam_f,
                                 force_no_which = FALSE,
                                 include_plot_in_output = FALSE,
                                 max_fragLen = 300, ...){
+    x = y = N = NULL #reserve bindings for data.table
     if(is.null(qgr)){
         if(force_no_which){
             sbParam = Rsamtools::ScanBamParam(what = c("rname", "strand", "pos", "qwidth"), ...)
@@ -60,18 +61,18 @@ fragLen_calcStranded = function(bam_f,
     bam_dt = lapply(bam_raw, function(x){
         data.table(seqnames = x$rname, strand = x$strand, start = x$pos, width = x$qwidth)
     })
-    bam_dt = data.table::rbindlist(bam_dt, use.names = T, idcol = "which_label")
+    bam_dt = data.table::rbindlist(bam_dt, use.names = TRUE, idcol = "which_label")
     bam_dt[, end := start + width - 1L]
     bam_dt[, pos := start]
     bam_dt[strand == "-", pos := end]
 
     xs = 0:max_fragLen
-    perc = pbapply::pbsapply(xs, function(x){
+    perc = vapply(xs, function(x){
         bam_dt[strand == "+", pos := pos + 1L]
-        tmp = bam_dt[, .N, by = .(seqnames, pos, strand) ]
-        tmp = tmp[, .N, by = .(seqnames, pos)]
+        tmp = bam_dt[, .N, by = list(seqnames, pos, strand) ]
+        tmp = tmp[, .N, by = list(seqnames, pos)]
         (tmp[N > 1, .N] / nrow(tmp)) * 100
-    })
+    }, 1)
     ma_perc21 = movingAverage(perc, n = ma_distance)
     fragLenMa = which.max(ma_perc21)
     if(!include_plot_in_output){
@@ -107,9 +108,12 @@ fragLen_calcStranded = function(bam_f,
 #' @param qgr regions to view by window.
 #' @param window_size qgr will be represented by value from score_gr every
 #' window_size bp.
+#' @param x0 character. controls how x value is derived from position for
+#' each region in qgr.  0 may be the left side or center.  If not unstranded,
+#' x coordinates are flipped for (-) strand.
 #' @return data.table that is GRanges compatible
 #' @export
-windowViewGRanges_dt = function(score_gr, qgr, window_size,
+viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
                                 x0 = c("center", "center_unstranded", "left", "left_unstranded")[1]){
     x = id = NULL
     stopifnot(class(score_gr) == "GRanges")
@@ -173,12 +177,17 @@ windowViewGRanges_dt = function(score_gr, qgr, window_size,
 }
 
 #' fetch a bam file pileup with the ability to consider cross strand correlation
-#' @param target_strand character. if one of "+" or "-", reads are filtered
-#' to match. ignored if any other value.
+#' @param bam_f character or BamFile to load
+#' @param qgr GRanges regions to fetchs
 #' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
 #' if NULL, value is calculated with fragLen_calcStranded
 #' if NA, raw bam pileup with no cross strand shift is returned.
+#' @param win_size numeric >=1.  pileup grabbed every win_size bp
+#' @param target_strand character. if one of "+" or "-", reads are filtered
+#' to match. ignored if any other value.
 #' @param ... passed to ScanBamParam(), can't be which or what.
+#' @return GRanges containing tag pileup values in score meta column.  tags are
+#' optionally extended to fragment length (fragLen) prior to pile up.
 #' @export
 fetchBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1], ...){
     if(is.null(fragLen)){
@@ -201,7 +210,7 @@ fetchBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c
     bam_dt = lapply(bam_raw, function(x){
         data.table(seqnames = x$rname, strand = x$strand, start = x$pos, width = x$qwidth)
     })
-    bam_dt = data.table::rbindlist(bam_dt, use.names = T, idcol = "which_label")
+    bam_dt = data.table::rbindlist(bam_dt, use.names = TRUE, idcol = "which_label")
     bam_dt[, end := start + width - 1L]
 
     ext_dt = copy(bam_dt)
@@ -230,23 +239,34 @@ fetchBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c
 }
 
 #' fetch a windowed version of a bam file, returns data.table
-#' @param target_strand character. if one of "+" or "-", reads are filtered
+#'
+#' @param bam_f character or BamFile to load
+#' @param qgr GRanges regions to fetch
 #' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
 #' if NULL, value is calculated with fragLen_calcStranded
 #' if NA, raw bam pileup with no cross strand shift is returned.
-#' accordingly. ignored if any other value.
+#' @param win_size numeric >=1.  pileup grabbed every win_size bp
+#' @param target_strand character. if one of "+" or "-", reads are filtered
+#' @return tidy data.table with GRanges compatible columns.  pileup is
+#' calculated only every win_size bp.
 #' @export
 fetchWindowedBam_dt = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1]) {
     score_gr = fetchBam(bam_f, qgr, fragLen, win_size, target_strand)
-    windowViewGRanges_dt(score_gr, qgr, win_size)
+    viewGRangesWindowed_dt(score_gr, qgr, win_size)
 }
 
 #' fetch a windowed version of a bam file, returns GRanges
-#' @param target_strand character. if one of "+" or "-", reads are filtered
+#'
+#' @param bam_f character or BamFile to load
+#' @param qgr GRanges regions to fetchs
 #' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
 #' if NULL, value is calculated with fragLen_calcStranded
 #' if NA, raw bam pileup with no cross strand shift is returned.
+#' @param win_size numeric >=1.  pileup grabbed every win_size bp
+#' @param target_strand character. if one of "+" or "-", reads are filtered
 #' accordingly. ignored if any other value.
+#' @return tidy GRanges with pileups from bam file.  pileup is
+#' calculated only every win_size bp.
 #' @export
 fetchWindowedBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1]) {
     GRanges(fetchWindowedBam_dt(bam_f, qgr, fragLen, win_size, target_strand))
