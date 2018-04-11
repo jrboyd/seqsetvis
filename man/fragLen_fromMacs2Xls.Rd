@@ -16,3 +16,8 @@ numeric fragment length
 \description{
 parse fragLen from MACS2 output
 }
+\examples{
+xls_file = system.file("extdata/test_peaks.xls",
+    package = "seqsetvis")
+fragLen_fromMacs2Xls(xls_file)
+}

@@ -38,7 +38,7 @@ retrieved from \code{bw_file}
 \examples{
 if(Sys.info()['sysname'] != "Windows"){
 library(GenomicRanges)
-bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+bw_f = system.file("extdata/test_loading.bw",
     package = "seqsetvis", mustWork = TRUE)
 bw_files = c("a" = bw_f, "b" = bw_f)
 qgr = GRanges("chrTest", IRanges(1, 30))

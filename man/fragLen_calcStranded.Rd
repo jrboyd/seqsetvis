@@ -39,3 +39,12 @@ numeric fragment length
 \description{
 calculate fragLen from a bam file for specified regions
 }
+\examples{
+bam_file = system.file("extdata/test.bam",
+    package = "seqsetvis")
+qgr = CTCF_in_10a_overlaps_gr[1:5]
+fragLen_calcStranded(bam_file, qgr)
+#if plot is included, a list is returned, item 2 is the plot
+fragLen_calcStranded(bam_file, qgr,
+  include_plot_in_output = TRUE)[[2]]
+}

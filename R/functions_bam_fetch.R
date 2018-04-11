@@ -3,6 +3,10 @@
 #' frag length from
 #' @return numeric fragment length
 #' @export
+#' @examples
+#' xls_file = system.file("extdata/test_peaks.xls",
+#'     package = "seqsetvis")
+#' fragLen_fromMacs2Xls(xls_file)
 fragLen_fromMacs2Xls = function(macs2xls_file){
     stopifnot(is.character(macs2xls_file))
     stopifnot(file.exists(macs2xls_file))
@@ -37,6 +41,14 @@ fragLen_fromMacs2Xls = function(macs2xls_file){
 #' @return numeric fragment length
 #' @import Rsamtools
 #' @export
+#' @examples
+#' bam_file = system.file("extdata/test.bam",
+#'     package = "seqsetvis")
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' fragLen_calcStranded(bam_file, qgr)
+#' #if plot is included, a list is returned, item 2 is the plot
+#' fragLen_calcStranded(bam_file, qgr,
+#'   include_plot_in_output = TRUE)[[2]]
 fragLen_calcStranded = function(bam_f,
                                 qgr,
                                 ma_distance = 21,
@@ -100,9 +112,10 @@ fragLen_calcStranded = function(bam_f,
 #' Summarizes score_gr by grabbing value of "score" every window_size bp.
 #' Columns in output data.table are:
 #' standard GRanges columns: seqnames, start, end, width, strand
-#' id - matched to names(score_gr). if names(score_gr) is missing, added as 1:length(score_gr)
+#' id - matched to names(score_gr). if names(score_gr) is missing,
+#' added as 1:length(score_gr)
 #' y - value of score from score_gr
-#' x -
+#' x - relative bp position
 #'
 #' @param score_gr GRanges with a "score" metadata columns.
 #' @param qgr regions to view by window.
@@ -113,8 +126,17 @@ fragLen_calcStranded = function(bam_f,
 #' x coordinates are flipped for (-) strand.
 #' @return data.table that is GRanges compatible
 #' @export
+#' @examples
+#' bam_file = system.file("extdata/test.bam",
+#'     package = "seqsetvis")
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' bam_gr = fetchBam(bam_file, qgr)
+#' viewGRangesWindowed_dt(bam_gr, qgr, 50)
+#'
+#' bw_file =
 viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
-                                x0 = c("center", "center_unstranded", "left", "left_unstranded")[1]){
+                                x0 = c("center", "center_unstranded",
+                                       "left", "left_unstranded")[1]){
     x = id = NULL
     stopifnot(class(score_gr) == "GRanges")
     stopifnot(!is.null(score_gr$score))
@@ -182,14 +204,18 @@ viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
 #' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
 #' if NULL, value is calculated with fragLen_calcStranded
 #' if NA, raw bam pileup with no cross strand shift is returned.
-#' @param win_size numeric >=1.  pileup grabbed every win_size bp
 #' @param target_strand character. if one of "+" or "-", reads are filtered
 #' to match. ignored if any other value.
 #' @param ... passed to ScanBamParam(), can't be which or what.
 #' @return GRanges containing tag pileup values in score meta column.  tags are
 #' optionally extended to fragment length (fragLen) prior to pile up.
 #' @export
-fetchBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1], ...){
+#' @examples
+#' bam_file = system.file("extdata/test.bam", package = "seqsetvis")
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' fetchBam(bam_file, qgr)
+#' fetchBam(bam_file, qgr, fragLen = 180, target_strand = "+")
+fetchBam = function(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+", "-")[1], ...){
     if(is.null(fragLen)){
         fragLen = fragLen_calcStranded(bam_f, qgr)
         message("fragLen was calculated as: ", fragLen)
@@ -198,12 +224,6 @@ fetchBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c
         stopifnot(is.numeric(fragLen))
         stopifnot(fragLen %% 1 == 0)
         stopifnot(fragLen >= 1)
-    }
-    if(length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0){
-        qgr = fixGRangesWidth(qgr, min_quantile = .75, win_size = win_size)
-        target_size = width(qgr)[1]
-        message("A fixed width of ",
-                target_size, " was applied based on the data provided.")
     }
     sbParam = Rsamtools::ScanBamParam(which = qgr, what = c("rname", "strand", "pos", "qwidth"), ...)
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
@@ -223,8 +243,8 @@ fetchBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c
     }
 
     if(!is.na(fragLen)){#extension to fragLen
-        ext_dt[strand == "+", end := start + fragLen - 1L]
-        ext_dt[strand == "-", start := end - fragLen + 1L]
+        ext_dt[strand == "+", end := start + as.integer(fragLen) - 1L]
+        ext_dt[strand == "-", start := end - as.integer(fragLen) + 1L]
     }
 
     ext_cov = coverage(split(GRanges(ext_dt), ext_dt$which_label))
@@ -250,8 +270,15 @@ fetchBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c
 #' @return tidy data.table with GRanges compatible columns.  pileup is
 #' calculated only every win_size bp.
 #' @export
+#' @examples
+#' bam_file = system.file("extdata/test.bam",
+#'     package = "seqsetvis")
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' bam_dt = fetchWindowedBam_dt(bam_file, qgr)
+#' bam_dt = fetchWindowedBam_dt(bam_file, qgr, fragLen = 180,
+#'     win_size = 10, target_strand = "+")
 fetchWindowedBam_dt = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1]) {
-    score_gr = fetchBam(bam_f, qgr, fragLen, win_size, target_strand)
+    score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
     viewGRangesWindowed_dt(score_gr, qgr, win_size)
 }
 
@@ -268,6 +295,13 @@ fetchWindowedBam_dt = function(bam_f, qgr, fragLen = NULL, win_size = 50, target
 #' @return tidy GRanges with pileups from bam file.  pileup is
 #' calculated only every win_size bp.
 #' @export
+#' @examples
+#' bam_file = system.file("extdata/test.bam",
+#'     package = "seqsetvis")
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' bam_gr = fetchWindowedBam(bam_file, qgr)
+#' bam_gr = fetchWindowedBam(bam_file, qgr, fragLen = 180,
+#'     win_size = 10, target_strand = "+")
 fetchWindowedBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1]) {
     GRanges(fetchWindowedBam_dt(bam_f, qgr, fragLen, win_size, target_strand))
 }

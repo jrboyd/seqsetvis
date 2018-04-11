@@ -252,8 +252,8 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
             p = p + annotate("label", x = mean(xlim), y = mean(ylim), label = gsub(" ", "\n", paste("both binding")))
         }
     }else if(plot_type == "volcano"){
-        plot_dt[, xvolcano := log2(max(yval, 1) / max(xval, 1)), by = id]
-        plot_dt[, yvolcano := log2(max(min(yval, xval), 1)), by = id]
+        plot_dt[, xvolcano := log2(max(yval, 1) / max(xval, 1)), by = by_]
+        plot_dt[, yvolcano := log2(max(min(yval, xval), 1)), by = by_]
         xmax = plot_dt[, max(abs(c(xvolcano)))]
         lim = c(-xmax, xmax)
         p = ggplot(plot_dt, aes(x = xvolcano, y = yvolcano))
@@ -365,7 +365,7 @@ ssvSignalClustering = function(bw_data, nclust = 6,
         row_ids = sample(row_ids, max_rows)
         plot_dt = plot_dt[get(row_) %in% row_ids]
         warning(raw_nr - max_rows,
-                " rows were discarded according to max_cols: ",
+                " rows were discarded according to max_rows: ",
                 max_rows)
     }
 
@@ -385,14 +385,51 @@ ssvSignalClustering = function(bw_data, nclust = 6,
     rownames(dc_mat) = dc_dt[[row_]]
     rclusters = clusteringKmeansNestedHclust(dc_mat, nclust = nclust)
     rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
-
-    plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[[row_]])
+    plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[["id"]])
     data.table::setkey(rclusters, id)
-    plot_dt[[cluster_]] = rclusters[list(plot_dt$id), group]
+    plot_dt[[cluster_]] = rclusters[list(plot_dt[[row_]]), group]
     if(output_GRanges){
         plot_dt = GRanges(plot_dt)
     }
     return(plot_dt)
+}
+
+
+add_cluster_annotation = function(cluster_ids, p = NULL,
+                                  xleft = 0, xright = 1,
+                                  lowAtTop = TRUE,
+                                  rect_colors = c("black", "gray"),
+                                  text_colors = rev(rect_colors)){
+    if(is.null(p)){
+        p = ggplot() + theme_void()
+    }
+    ends = cumsum(rev(table(cluster_ids)))
+    starts = c(1, ends[-length(ends)] + 1)
+    starts = starts - .5
+    ends = ends + .5
+
+
+    df_rects = data.frame(xmin = xleft,
+                          xmax = xright,
+                          ymin = starts,
+                          ymax = ends)
+    df_rects$fill = rect_colors[seq_len(nrow(df_rects))%%length(rect_colors)+1]
+    df_rects$color = text_colors[seq_len(nrow(df_rects))%%length(text_colors)+1]
+    df_rects = df_rects[rev(seq_len(nrow(df_rects))),]
+    for(i in seq_len(nrow(df_rects))){
+        p = p + annotate("rect",
+                         xmin = df_rects$xmin[i],
+                         xmax = df_rects$xmax[i],
+                         ymin= df_rects$ymin[i],
+                         ymax = df_rects$ymax[i],
+                         fill = df_rects$fill[i])
+        p = p + annotate("text",
+                         x = mean(c(df_rects$xmin[i], df_rects$xmax[i])),
+                         y = mean(c(df_rects$ymin[i], df_rects$ymax[i])),
+                         label = i,
+                         color = df_rects$color[i])
+    }
+    p
 }
 
 #' heatmap style representation of membership table.
@@ -477,55 +514,41 @@ ssvSignalHeatmap = function(bw_data,
     scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
     p = ggplot(plot_dt) +
         geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
-        facet_grid(paste(". ~", facet_)) +
         theme(axis.line = element_blank(),
               axis.text.y = element_blank(),
               axis.ticks.y = element_blank(),
               panel.background = element_blank()) +
         scale_fill_distiller(type = "div", palette = "Spectral",
                              values = scale_vals)
-
-    xs = sort(unique(plot_dt$x), decreasing = FALSE)
-    xleft = min(xs) - (xs[2] - xs[1])/2
-    xright = max(xs) + (xs[2] - xs[1])/2
-    if(xleft < 0 & xright > 0){
-        xbr = c(xleft, 0, xright)
-    }else{
-        xbr = c(xleft, xright)
+    if(facet_ != ""){
+        p = p +  facet_grid(paste(". ~", facet_))
     }
-
-    p = p + scale_x_continuous(breaks = xbr) +
-        theme(axis.text.x  = element_text(angle = 90, hjust = 1, vjust = .5))
+    xs = sort(unique(as.numeric(plot_dt[, get(column_)])), decreasing = FALSE)
+    if(is.numeric(plot_dt[, get(column_)])){
+        xleft = min(xs) - (xs[2] - xs[1])/2
+        xright = max(xs) + (xs[2] - xs[1])/2
+        if(xleft < 0 & xright > 0){
+            xbr = c(xleft, 0, xright)
+        }else{
+            xbr = c(xleft, xright)
+        }
+        p = p + scale_x_continuous(breaks = xbr)
+    }
+    p = p + theme(axis.text.x  = element_text(angle = 90, hjust = 1, vjust = .5))
 
     rclust = plot_dt[, list(cluster_id = unique(get(cluster_))), by = get(row_)]
-    ends = cumsum(rev(table(rclust$cluster_id)))
-    starts = c(1, ends[-length(ends)] + 1)
-    starts = starts - .5
-    ends = ends + .5
 
-    xfactor = diff(range(plot_dt$x))
-    xfloor = min(plot_dt$x)
+    xfactor = diff(range(xs))
+    xfloor = min(xs) - .5 - xfactor/20
+    xleft = xfloor - .12*xfactor
+    xright = xfloor - .03*xfactor
 
-    df_rects = data.frame(xmin = xfloor - .12*xfactor,
-                          xmax = xfloor - .03*xfactor,
-                          ymin = starts,
-                          ymax = ends)
-    df_rects$fill = c("black", "gray")[seq_len(nrow(df_rects))%%2+1]
-    df_rects$color = c("gray", "black")[seq_len(nrow(df_rects))%%2+1]
-    df_rects = df_rects[rev(seq_len(nrow(df_rects))),]
-    for(i in seq_len(nrow(df_rects))){
-        p = p + annotate("rect",
-                         xmin = df_rects$xmin[i],
-                         xmax = df_rects$xmax[i],
-                         ymin= df_rects$ymin[i],
-                         ymax = df_rects$ymax[i],
-                         fill = df_rects$fill[i])
-        p = p + annotate("text",
-                         x = mean(c(df_rects$xmin[i], df_rects$xmax[i])),
-                         y = mean(c(df_rects$ymin[i], df_rects$ymax[i])),
-                         label = i,
-                         color = df_rects$color[i])
-    }
+    p = add_cluster_annotation(p,
+                               cluster_ids = rclust$cluster_id,
+                               xleft = xleft,
+                               xright = xright,
+                               lowAtTop = TRUE)
+
     p
 }
 

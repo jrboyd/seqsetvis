@@ -27,3 +27,11 @@ calculated only every win_size bp.
 \description{
 fetch a windowed version of a bam file, returns data.table
 }
+\examples{
+bam_file = system.file("extdata/test.bam",
+    package = "seqsetvis")
+qgr = CTCF_in_10a_overlaps_gr[1:5]
+bam_dt = fetchWindowedBam_dt(bam_file, qgr)
+bam_dt = fetchWindowedBam_dt(bam_file, qgr, fragLen = 180,
+    win_size = 10, target_strand = "+")
+}

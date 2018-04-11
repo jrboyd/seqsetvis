@@ -10,7 +10,7 @@
 #' @import rtracklayer
 #' @export
 #' @examples
-#' np_f = system.file("extdata/test_bigwigs/test_loading.narrowPeak",
+#' np_f = system.file("extdata/test_loading.narrowPeak",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_narrowPeak(np_f, "my_narrowPeak")
 easyLoad_narrowPeak = function(file_paths, file_names = NULL){
@@ -32,7 +32,7 @@ easyLoad_narrowPeak = function(file_paths, file_names = NULL){
 #' @import rtracklayer
 #' @export
 #' @examples
-#' bp_f = system.file("extdata/test_bigwigs/test_loading.broadPeak",
+#' bp_f = system.file("extdata/test_loading.broadPeak",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_broadPeak(bp_f, "my_broadPeak")
 easyLoad_broadPeak = function(file_paths, file_names = NULL){
@@ -57,7 +57,7 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL){
 #' @import rtracklayer
 #' @export
 #' @examples
-#' bed_f = system.file("extdata/test_bigwigs/test_loading.bed",
+#' bed_f = system.file("extdata/test_loading.bed",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_bed(bed_f, "my_bed")
 easyLoad_bed = function(file_paths, file_names = NULL, extraCols = character()){

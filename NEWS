@@ -1,4 +1,14 @@
-# setsetvis 0.99.10
+# seqsetvis 0.99.13 (accepted before)
+
+* added bamFetch*
+* refactored bwFetch* to use viewGRangesWindowed_dt, same as bamFetch*
+* ssvSignalClustering and Heatmap bug fixes related to hardcoded data.table variables
+
+# seqsetvis 0.99.11-12
+
+* small changes to clear warning for Bioc acceptance.
+
+# seqsetvis 0.99.10
 
 * fewer and smaller vignette figures
 * ggellipse exported with documentation

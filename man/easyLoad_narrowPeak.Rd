@@ -22,7 +22,7 @@ easyLoad_narrowPeak takes a character vector of file paths to narrowPeak
 files from MACS2 and returns a named list of GRanges.
 }
 \examples{
-np_f = system.file("extdata/test_bigwigs/test_loading.narrowPeak",
+np_f = system.file("extdata/test_loading.narrowPeak",
     package = "seqsetvis", mustWork = TRUE)
 easyLoad_narrowPeak(np_f, "my_narrowPeak")
 }

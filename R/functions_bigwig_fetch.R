@@ -15,7 +15,7 @@
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
 #' library(GenomicRanges)
-#' bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+#' bw_f = system.file("extdata/test_loading.bw",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' qgr = GRanges("chrTest", IRanges(1, 30))
 #' bw_dt = fetchWindowedBigwig_dt(bw_f, qgr, win_size = 10)
@@ -58,7 +58,7 @@ fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
 #' library(GenomicRanges)
-#' bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+#' bw_f = system.file("extdata/test_loading.bw",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' qgr = GRanges("chrTest", IRanges(1, 30))
 #' bw_gr = fetchWindowedBigwig(bw_f, qgr, win_size = 10)
@@ -90,7 +90,7 @@ fetchWindowedBigwig = function(bw_file, qgr, win_size = 50) {
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
 #' library(GenomicRanges)
-#' bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+#' bw_f = system.file("extdata/test_loading.bw",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bw_files = c("a" = bw_f, "b" = bw_f)
 #' qgr = GRanges("chrTest", IRanges(1, 30))
@@ -127,7 +127,7 @@ fetchWindowedBigwigList = function(bw_files, qgr, bw_names = names(bw_files),
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
 #' library(GenomicRanges)
-#' bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+#' bw_f = system.file("extdata/test_loading.bw",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bw_files = c("a" = bw_f, "b" = bw_f)
 #' qgr = GRanges("chrTest", IRanges(1, 30))

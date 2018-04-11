@@ -4,8 +4,8 @@ library(testthat)
 qgr = CTCF_in_10a_overlaps_gr[1:5]
 qgr = centerFixedSizeGRanges(qgr, 500)
 # rtracklayer::export.bed(qgr, con = "ctcf_5.bed") #bed used to intersect bam
-bam_file = system.file("extdata/test_bigwigs/ctcf_5.bam", package = "seqsetvis")
-xls_file = system.file("extdata/test_bigwigs/ctcf_head_peaks.xls", package = "seqsetvis")
+bam_file = system.file("extdata/test.bam", package = "seqsetvis")
+xls_file = system.file("extdata/test_peaks.xls", package = "seqsetvis")
 
 # fetchWindowedBam(bam_file, qgr)
 

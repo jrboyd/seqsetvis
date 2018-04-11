@@ -30,7 +30,7 @@ for(met_nam in c("easyLoad_bed",
     fail_tests(met_nam)
 }
 
-test_dir = system.file("extdata/test_bigwigs", package = "seqsetvis")
+test_dir = system.file("extdata/", package = "seqsetvis")
 test_files = c("test_loading.narrowPeak", "test_loading.broadPeak", "test_loading.bed")
 test_files = paste0(test_dir, "/", test_files)
 stopifnot(all(file.exists(test_files)))

@@ -22,7 +22,7 @@ easyLoad_broadPeak takes a character vector of file paths to narrowPeak
 files from MACS2 and returns a named list of GRanges.
 }
 \examples{
-bp_f = system.file("extdata/test_bigwigs/test_loading.broadPeak",
+bp_f = system.file("extdata/test_loading.broadPeak",
     package = "seqsetvis", mustWork = TRUE)
 easyLoad_broadPeak(bp_f, "my_broadPeak")
 }

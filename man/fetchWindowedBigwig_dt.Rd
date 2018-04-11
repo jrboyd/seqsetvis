@@ -29,7 +29,7 @@ if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
 \examples{
 if(Sys.info()['sysname'] != "Windows"){
 library(GenomicRanges)
-bw_f = system.file("extdata/test_bigwigs/test_loading.bw",
+bw_f = system.file("extdata/test_loading.bw",
     package = "seqsetvis", mustWork = TRUE)
 qgr = GRanges("chrTest", IRanges(1, 30))
 bw_dt = fetchWindowedBigwig_dt(bw_f, qgr, win_size = 10)

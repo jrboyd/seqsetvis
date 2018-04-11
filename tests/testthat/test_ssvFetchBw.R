@@ -4,7 +4,7 @@ library(seqsetvis)
 library(testthat)
 library(GenomicRanges)
 # library(rtracklayer)
-test_bw = system.file("extdata/test_bigwigs/test_loading.bw", package = "seqsetvis", mustWork = TRUE)
+test_bw = system.file("extdata/test_loading.bw", package = "seqsetvis", mustWork = TRUE)
 pos = c(20, 180, 210, 440, 520, 521)
 region_size = 30
 test_qgr = GRanges("chrTest", IRanges(pos+1, pos + region_size))

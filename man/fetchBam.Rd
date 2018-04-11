@@ -4,8 +4,8 @@
 \alias{fetchBam}
 \title{fetch a bam file pileup with the ability to consider cross strand correlation}
 \usage{
-fetchBam(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*",
-  "+", "-")[1], ...)
+fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+", "-")[1],
+  ...)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}
@@ -15,8 +15,6 @@ fetchBam(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*",
 \item{fragLen}{numeric, NULL, or NA.  if numeric, supplied value is used.
 if NULL, value is calculated with fragLen_calcStranded
 if NA, raw bam pileup with no cross strand shift is returned.}
-
-\item{win_size}{numeric >=1.  pileup grabbed every win_size bp}
 
 \item{target_strand}{character. if one of "+" or "-", reads are filtered
 to match. ignored if any other value.}
@@ -29,4 +27,10 @@ optionally extended to fragment length (fragLen) prior to pile up.
 }
 \description{
 fetch a bam file pileup with the ability to consider cross strand correlation
+}
+\examples{
+bam_file = system.file("extdata/test.bam", package = "seqsetvis")
+qgr = CTCF_in_10a_overlaps_gr[1:5]
+fetchBam(bam_file, qgr)
+fetchBam(bam_file, qgr, fragLen = 180, target_strand = "+")
 }
