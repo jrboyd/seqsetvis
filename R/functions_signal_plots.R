@@ -339,7 +339,8 @@ ssvSignalClustering = function(bw_data, nclust = 6,
     stopifnot(is.character(row_), is.character(column_), is.character(fill_),
               is.character(facet_), is.character(cluster_))
     stopifnot(row_ %in% colnames(bw_data), column_ %in% colnames(bw_data),
-              fill_ %in% colnames(bw_data), facet_ %in% colnames(bw_data))
+              fill_ %in% colnames(bw_data))
+    stopifnot(facet_ %in% colnames(bw_data) || facet_ == "")
     stopifnot(is.numeric(max_rows), is.numeric(max_cols),
               is.numeric(clustering_col_min), is.numeric(clustering_col_max))
 
@@ -362,17 +363,24 @@ ssvSignalClustering = function(bw_data, nclust = 6,
     if(raw_nr > max_rows){
         set.seed(0)
         row_ids = sample(row_ids, max_rows)
-        plot_dt = plot_dt[id %in% row_ids]
+        plot_dt = plot_dt[get(row_) %in% row_ids]
         warning(raw_nr - max_rows,
                 " rows were discarded according to max_cols: ",
                 max_rows)
     }
 
     dc_formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + "))
-    dc_dt = data.table::dcast(plot_dt[get(column_) > clustering_col_min &
-                                          get(column_) < clustering_col_max],
-                              formula = dc_formula,
-                              value.var = fill_)
+    if(is.numeric(plot_dt[[column_]])){
+        dc_dt = data.table::dcast(plot_dt[get(column_) > clustering_col_min &
+                                              get(column_) < clustering_col_max],
+                                  formula = dc_formula,
+                                  value.var = fill_)
+    }else{
+        dc_dt = data.table::dcast(plot_dt,
+                                  formula = dc_formula,
+                                  value.var = fill_)
+    }
+
     dc_mat = as.matrix(dc_dt[,-1])
     rownames(dc_mat) = dc_dt[[row_]]
     rclusters = clusteringKmeansNestedHclust(dc_mat, nclust = nclust)
@@ -435,7 +443,8 @@ ssvSignalHeatmap = function(bw_data,
     stopifnot(is.character(row_), is.character(column_), is.character(fill_),
               is.character(facet_), is.character(cluster_))
     stopifnot(row_ %in% colnames(bw_data), column_ %in% colnames(bw_data),
-              fill_ %in% colnames(bw_data), facet_ %in% colnames(bw_data))
+              fill_ %in% colnames(bw_data))
+    stopifnot(facet_ %in% colnames(bw_data) || facet_ == "")
     stopifnot(is.numeric(max_rows), is.numeric(max_cols),
               is.numeric(clustering_col_min), is.numeric(clustering_col_max))
     #determine if user wants clustering
