@@ -26,3 +26,5 @@ last_intersectR.save
 test_chrSizes.txt
 seqsetvis-Ex.pdf
 dev_data
+ctcf*
+dev_*

@@ -24,3 +24,4 @@ tests/testthat/*.bu
 dev_fetch_bam.R
 dev_*
 tmp.chain
+ctcf*
