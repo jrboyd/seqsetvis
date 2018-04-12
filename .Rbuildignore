@@ -20,11 +20,11 @@
 ^run_cov.R$
 ^vignettes/tmp.Rmd
 ^inst/extdata/test_beds/t10.bed
-CTCF_in_10a_profiles.save
+^CTCF_in_10a_profiles.save
 h.pdf
 last_intersectR.save
 test_chrSizes.txt
 seqsetvis-Ex.pdf
 dev_data
-ctcf*
+^ctcf_*
 dev_*
