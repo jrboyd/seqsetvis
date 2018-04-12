@@ -14,7 +14,6 @@
 # Range for calculating regional lambda is: 1000 bps and 10000 bps
 # Broad region calling is off
 # Paired-End mode is off
-
 # tag size is determined as 101 bps
 # total tags in treatment: 56114109
 # tags after filtering in treatment: 46781634
