@@ -3,7 +3,8 @@ library(testthat)
 
 qgr = CTCF_in_10a_overlaps_gr[1:5]
 qgr = centerFixedSizeGRanges(qgr, 500)
-# rtracklayer::export.bed(qgr, con = "ctcf_5.bed") #bed used to intersect bam
+#bed used to intersect bam
+# rtracklayer::export.bed(qgr, con = "ctcf_5.bed")
 bam_file = system.file("extdata/test.bam", package = "seqsetvis")
 xls_file = system.file("extdata/test_peaks.xls", package = "seqsetvis")
 

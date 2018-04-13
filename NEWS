@@ -1,4 +1,4 @@
-# seqsetvis 0.99.13 (accepted before)
+# seqsetvis 0.99.13
 
 * added bamFetch*
 * refactored bwFetch* to use viewGRangesWindowed_dt, same as bamFetch*

@@ -35,8 +35,12 @@ x - relative bp position
 bam_file = system.file("extdata/test.bam",
     package = "seqsetvis")
 qgr = CTCF_in_10a_overlaps_gr[1:5]
+qgr = GenomicRanges::resize(qgr, width = 500, fix = "center")
 bam_gr = fetchBam(bam_file, qgr)
-viewGRangesWindowed_dt(bam_gr, qgr, 50)
+bam_dt = viewGRangesWindowed_dt(bam_gr, qgr, 50)
 
-bw_file =
+bw_file = system.file("extdata/MCF10A_CTCF_FE_random100.bw",
+    package = "seqsetvis")
+bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
+bw_dt = viewGRangesWindowed_dt(bw_gr, qgr, 50)
 }
