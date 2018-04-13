@@ -3,6 +3,7 @@
 * added bamFetch*
 * refactored bwFetch* to use viewGRangesWindowed_dt, same as bamFetch*
 * ssvSignalClustering and Heatmap bug fixes related to hardcoded data.table variables
+* restructured and renamed extdata to be cleaner/more intuitive.
 
 # seqsetvis 0.99.11-12
 
