@@ -25,9 +25,7 @@ fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
     stopifnot(is.character(bw_file))
     stopifnot(class(qgr) == "GRanges")
     stopifnot(is.numeric(win_size))
-    if (!all(width(qgr)%%win_size == 0)) {
-        stop("all widths of qgr are not evenly divisible by win_size, ", win_size)
-    }
+
     if(length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0){
         qgr = fixGRangesWidth(qgr, min_quantile = .75, win_size = win_size)
         target_size = width(qgr)[1]
@@ -35,6 +33,9 @@ fetchWindowedBigwig_dt = function(bw_file, qgr, win_size = 50) {
                 "identical and evenly divisible by win_size.",
                 "\nA fixed width of ",
                 target_size, " was applied based on the data provided.")
+    }
+    if (!all(width(qgr)%%win_size == 0)) {
+        stop("all widths of qgr are not evenly divisible by win_size, ", win_size)
     }
     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
     viewGRangesWindowed_dt(score_gr = bw_gr, qgr = qgr, window_size = win_size)
@@ -154,17 +155,16 @@ fetchWindowedBigwigList_dt = function(bw_files, qgr, bw_names = names(bw_files),
              paste(collapse = "\n", unique(bw_names[duplicated(bw_names)])))
     }
 
-    if(length(unique(width(qgr))) > 1){
-        target_size = quantile(width(qgr), .75)
-        win_size = 50
-        target_size = round(target_size / win_size) * win_size
-        qgr = centerFixedSizeGRanges(qgr, fixed_size = target_size)
-        warning("fetchWindowedBigwigList_dt requires widths of qgr be ",
-                "identical and evenly divisible by win_size.",
-                "\nA fixed width of ",
-                target_size, " was applied based on the data provided.")
-    }
-
+    # if(length(unique(width(qgr))) > 1){
+    #     target_size = quantile(width(qgr), .75)
+    #     target_size = round(target_size / win_size) * win_size
+    #     qgr = centerFixedSizeGRanges(qgr, fixed_size = target_size)
+    #     warning("fetchWindowedBigwigList_dt requires widths of qgr be ",
+    #             "identical and evenly divisible by win_size.",
+    #             "\nA fixed width of ",
+    #             target_size, " was applied based on the data provided.")
+    # }
+    qgr = prepare_fetch_GRanges(qgr = qgr, win_size = win_size, target_size = NULL)
 
     load_bw = function(nam) {
         message("loading ", nam, " ...")
