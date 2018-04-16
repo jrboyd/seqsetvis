@@ -126,7 +126,11 @@ fragLen_calcStranded = function(bam_f,
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
 #' fetchBam(bam_file, qgr)
 #' fetchBam(bam_file, qgr, fragLen = 180, target_strand = "+")
-fetchBam = function(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+", "-")[1], ...){
+fetchBam = function(bam_f,
+                    qgr,
+                    fragLen = NULL,
+                    target_strand = c("*", "+", "-")[1],
+                    ...){
     if(is.null(fragLen)){
         fragLen = fragLen_calcStranded(bam_f, qgr)
         message("fragLen was calculated as: ", fragLen)
@@ -169,30 +173,6 @@ fetchBam = function(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+", "-")
     return(score_gr)
 }
 
-#' fetch a windowed version of a bam file, returns data.table
-#'
-#' @param bam_f character or BamFile to load
-#' @param qgr GRanges regions to fetch
-#' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
-#' if NULL, value is calculated with fragLen_calcStranded
-#' if NA, raw bam pileup with no cross strand shift is returned.
-#' @param win_size numeric >=1.  pileup grabbed every win_size bp
-#' @param target_strand character. if one of "+" or "-", reads are filtered
-#' @return tidy data.table with GRanges compatible columns.  pileup is
-#' calculated only every win_size bp.
-#' @export
-#' @examples
-#' bam_file = system.file("extdata/test.bam",
-#'     package = "seqsetvis")
-#' qgr = CTCF_in_10a_overlaps_gr[1:5]
-#' bam_dt = fetchWindowedBam_dt(bam_file, qgr)
-#' bam_dt = fetchWindowedBam_dt(bam_file, qgr, fragLen = 180,
-#'     win_size = 10, target_strand = "+")
-fetchWindowedBam_dt = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1]) {
-    score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
-    viewGRangesWindowed_dt(score_gr, qgr, win_size)
-}
-
 #' fetch a windowed version of a bam file, returns GRanges
 #'
 #' @param bam_f character or BamFile to load
@@ -203,8 +183,10 @@ fetchWindowedBam_dt = function(bam_f, qgr, fragLen = NULL, win_size = 50, target
 #' @param win_size numeric >=1.  pileup grabbed every win_size bp
 #' @param target_strand character. if one of "+" or "-", reads are filtered
 #' accordingly. ignored if any other value.
-#' @return tidy GRanges with pileups from bam file.  pileup is
-#' calculated only every win_size bp.
+#' @param return_data.table logical. If TRUE the internal data.table is
+#' returned instead of GRanges.  Default is FALSE.
+#' @return tidy GRanges (or data.table if specified) with pileups from bam
+#' file.  pileup is calculated only every win_size bp.
 #' @export
 #' @examples
 #' bam_file = system.file("extdata/test.bam",
@@ -213,6 +195,28 @@ fetchWindowedBam_dt = function(bam_f, qgr, fragLen = NULL, win_size = 50, target
 #' bam_gr = fetchWindowedBam(bam_file, qgr)
 #' bam_gr = fetchWindowedBam(bam_file, qgr, fragLen = 180,
 #'     win_size = 10, target_strand = "+")
-fetchWindowedBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1]) {
-    GRanges(fetchWindowedBam_dt(bam_f, qgr, fragLen, win_size, target_strand))
+#'
+#' bam_dt = fetchWindowedBam(bam_file, qgr,
+#'     return_data.table = TRUE)
+fetchWindowedBam = function(bam_f, qgr,
+                            fragLen = NULL,
+                            win_size = 50,
+                            target_strand = c("*", "+", "-")[1],
+                            return_data.table = FALSE) {
+    qgr = prepare_fetch_GRanges(qgr, win_size)
+    score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
+    out = viewGRangesWindowed_dt(score_gr, qgr, win_size)
+    if(!return_data.table){
+        out = GRanges(out)
+    }
+    return(out)
+}
+
+fetchWindowedBamList = function(bw_files,
+                                qgr,
+                                bw_names = names(bw_files),
+                                bw_variable_name = "sample",
+                                win_size = 50,
+                                return_data.table = FALSE){
+
 }

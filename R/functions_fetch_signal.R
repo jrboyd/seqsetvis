@@ -105,11 +105,15 @@ viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
 #' @param qgr GRanges to prepare
 #' @param win_size numeric window size for fetch
 #' @param target_size numeric final width of qgr
+#' @return GRanges, either identical to qgr or with suitable consistent width
+#' applied.
+#' @export
 prepare_fetch_GRanges = function(qgr, win_size, target_size = NULL){
     if(length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0 ){
         if(is.null(target_size)){
-            target_size = quantile(width(qgr), .75)
-            target_size = round(target_size / win_size) * win_size
+            target_size = quantileGRangesWidth(qgr = qgr,
+                                               min_quantile = .75,
+                                               win_size = win_size)
         }
         if(target_size %% win_size != 0){
             stop("target_size: ", target_size,
@@ -117,7 +121,7 @@ prepare_fetch_GRanges = function(qgr, win_size, target_size = NULL){
         }
 
         qgr = centerFixedSizeGRanges(qgr, fixed_size = target_size)
-        warning("fetchWindowedBigwigList_dt requires widths of qgr be ",
+        warning("widths of qgr were not ",
                 "identical and evenly divisible by win_size.",
                 "\nA fixed width of ",
                 target_size, " was applied based on the data provided.")
@@ -129,6 +133,13 @@ prepare_fetch_GRanges = function(qgr, win_size, target_size = NULL){
 #'
 #' Returns the lowest multiple of win_size greater than
 #' min_quantile quantile of width(qgr)
+#'
+#' @param qgr GRanges to calculate quantile width for
+#' @param min_quantile numeric [0,1] the minimum quantile of width in qgr
+#' @param win_size numeric/integer >=1, returned value will be a multiple of
+#' this
+#' @return numeric that is >= min_quantile and evenly divisible by win_size
+#' @export
 quantileGRangesWidth = function(qgr,
                                 min_quantile = .75,
                                 win_size = 1){
@@ -144,44 +155,78 @@ quantileGRangesWidth = function(qgr,
     return(fwidth)
 }
 
-#' Derive a new GRanges of consistent width based on quantile.
-#' Width is selected by rounding up to the lowest multiple of win_size greater than
-#' min_quantile quantile of widths.
+#' #' Derive a new GRanges of consistent width based on quantile.
+#' #' Width is selected by rounding up to the lowest multiple of win_size greater than
+#' #' min_quantile quantile of widths.
+#' #'
+#' #' @param qgr GRanges. To be resized.
+#' #' @param min_quantile numeric [0,1]. The quantile level final width must be
+#' #' greater than. default is 0.75
+#' #' @param win_size integer > 0.  final width must be a multiple of win_size.
+#' #' @return a GRanges derived from qgr (length and order match).  All ranges
+#' #' are of same width and centered on old.  Width is at least minimum quantile
+#' #' and a multiple of win_size
+#' fixGRangesWidth = function(qgr,
+#'                            min_quantile = .75,
+#'                            win_size = 1,
+#'                            anchor = c("center", "start")[1]){
+#'     stopifnot(class(qgr) == "GRanges")
+#'     fwidth = quantileGRangesWidth(qgr, min_quantile, win_size)
+#'     qgr = setGRangesWidth(qgr = qgr, fwidth = fwidth, anchor = anchor)
 #'
-#' @param qgr GRanges. To be resized.
-#' @param min_quantile numeric [0,1]. The quantile level final width must be
-#' greater than. default is 0.75
-#' @param win_size integer > 0.  final width must be a multiple of win_size.
-#' @return a GRanges derived from qgr (length and order match).  All ranges
-#' are of same width and centered on old.  Width is at least minimum quantile
-#' and a multiple of win_size
-fixGRangesWidth = function(qgr,
-                           min_quantile = .75,
-                           win_size = 1,
-                           anchor = c("center", "start")[1]){
-    stopifnot(class(qgr) == "GRanges")
-
-
-    fwidth = quantileGRangesWidth(qgr, min_quantile, win_size)
-    qgr = setGRangesWidth(qgr = qgr, fwidth = fwidth, anchor = anchor)
-
-}
-
-#' Return GRanges with single width
+#' }
 #'
-#' Essentially works like GenomicRanges::resize() but repeated applications
-#' of center do not cause rounding induced drift.
-setGRangesWidth = function(qgr, fwidth, anchor = c("center", "start")[1]){
-    stopifnot(class(qgr) == "GRanges")
-    stopifnot(is.numeric(fwidth))
-    stopifnot(anchor %in% c("center", "start"))
-    switch(anchor,
-           center = {
-               centerFixedSizeGRanges(qgr, fixed_size = fwidth)
-           },
-           start = {
-               resize(qgr, width = fwidth, fix = "start")
-           }
-    )
-}
+#' #' Return GRanges with single width
+#' #'
+#' #' Essentially works like GenomicRanges::resize() but repeated applications
+#' #' of center do not cause rounding induced drift.
+#' setGRangesWidth = function(qgr, fwidth, anchor = c("center", "start")[1]){
+#'     stopifnot(class(qgr) == "GRanges")
+#'     stopifnot(is.numeric(fwidth))
+#'     stopifnot(anchor %in% c("center", "start"))
+#'     switch(anchor,
+#'            center = {
+#'                centerFixedSizeGRanges(qgr, fixed_size = fwidth)
+#'            },
+#'            start = {
+#'                resize(qgr, width = fwidth, fix = "start")
+#'            }
+#'     )
+#' }
 
+
+# fetchWindowedSignalList = function(signal_file_paths,
+#                                    qgr,
+#                                    load_signal = function(nam) {
+#                                        message("loading ", nam, " ...")
+#                                        warning("nothing happened, add code here to load files")
+#                                        message("finished loading ", nam, ".")
+#                                    },
+#                                    signal_unique_names = names(signal_file_paths),
+#                                    names_variable = "sample",
+#                                    win_size = 50,
+#                                    return_data.table = FALSE){
+#     if(is.list(signal_file_paths)){
+#         signal_file_paths = unlist(signal_file_paths)
+#     }
+#     if (is.null(signal_unique_names)) {
+#         signal_unique_names = basename(signal_file_paths)
+#     }
+#     names(signal_file_paths) = signal_unique_names
+#     stopifnot(is.character(signal_file_paths))
+#     stopifnot(class(qgr) == "GRanges")
+#     stopifnot(is.character(signal_unique_names))
+#     stopifnot(is.character(names_variable))
+#     stopifnot(is.numeric(win_size))
+#     if (any(duplicated(signal_unique_names))) {
+#         stop("some signal_unique_names are duplicated:\n",
+#              paste(collapse = "\n", unique(signal_unique_names[duplicated(signal_unique_names)])))
+#     }
+#     qgr = prepare_fetch_GRanges(qgr = qgr, win_size = win_size, target_size = NULL)
+#     bw_list = lapply(names(signal_file_paths), load_signal)
+#     out = data.table::rbindlist(bw_list)
+#     if(!return_data.table){
+#         out = GRanges(out)
+#     }
+#     return(out)
+# }

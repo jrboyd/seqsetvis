@@ -72,7 +72,7 @@ test_that("fetchWindowedBigwig throws error if widths aren't divisble by win_siz
     mix_width_gr = test_qgr
     end(mix_width_gr) =  end(mix_width_gr) + seq_along(mix_width_gr)
     for(win in c(7, 31)){
-        expect_warning(regexp = "fetchWindowedBigwigList_dt requires widths of qgr be identical", {
+        expect_warning(regexp = "widths of qgr were not identical and evenly divisible by win_size", {
             fetchWindowedBigwig(bw_file = test_bw, win_size = win, qgr = mix_width_gr)
         })
     }
