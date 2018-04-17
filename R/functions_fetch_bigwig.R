@@ -49,12 +49,12 @@ fetchWindowedBigwig = function(bw_file,
 #' \code{fetchWindowedBigwigList} iteratively calls \code{fetchWindowedBigwig}.
 #' See \code{\link{fetchWindowedBigwig}} for more info.
 #' @export
-#' @param bw_files The character vector or list of paths to bigwig files to
+#' @param file_paths The character vector or list of paths to bigwig files to
 #'  read from.
 #' @param qgr Set of GRanges to query.  For valid results the width of each
 #' interval should be identical and evenly divisible by \code{win_size}.
-#' @param bw_names names to use in final data.table to designate source bigwig
-#' @param bw_variable_name The column name where bw_names are stored.
+#' @param unique_names names to use in final data.table to designate source bigwig
+#' @param names_variable The column name where unique_names are stored.
 #' Default is 'sample'
 #' @param win_size The window size that evenly divides widths in \code{qgr}.
 #' @param return_data.table logical. If TRUE the internal data.table is
@@ -78,46 +78,31 @@ fetchWindowedBigwig = function(bw_file,
 #' bw_dt = fetchWindowedBigwigList(bw_files, qgr, win_size = 10,
 #'     return_data.table = TRUE)
 #' }
-fetchWindowedBigwigList = function(bw_files,
+fetchWindowedBigwigList = function(file_paths,
                                    qgr,
-                                   bw_names = names(bw_files),
-                                   bw_variable_name = "sample",
+                                   unique_names = names(file_paths),
+                                   names_variable = "sample",
                                    win_size = 50,
                                    return_data.table = FALSE) {
-    if(is.list(bw_files)){
-        bw_files = unlist(bw_files)
-    }
-    if (is.null(bw_names)) {
-        bw_names = basename(bw_files)
-    }
-    names(bw_files) = bw_names
-    stopifnot(is.character(bw_files))
-    stopifnot(class(qgr) == "GRanges")
-    stopifnot(is.character(bw_names))
-    stopifnot(is.character(bw_variable_name))
-    stopifnot(is.numeric(win_size))
-    if (any(duplicated(bw_names))) {
-        stop("some bw_names are duplicated:\n",
-             paste(collapse = "\n", unique(bw_names[duplicated(bw_names)])))
-    }
-    qgr = prepare_fetch_GRanges(qgr = qgr, win_size = win_size, target_size = NULL)
-    load_bw = function(nam) {
-        message("loading ", nam, " ...")
-        f = bw_files[nam]
+
+    load_bw = function(f, nam, qgr) {
+        message("loading ", f, " ...")
         dt = fetchWindowedBigwig(bw_file = f,
                                  win_size = win_size,
                                  qgr = qgr,
                                  return_data.table = TRUE)
-        dt[[bw_variable_name]] = nam
+        dt[[names_variable]] = nam
         message("finished loading ", nam, ".")
         dt
     }
-    bw_list = lapply(names(bw_files), load_bw)
-    out = data.table::rbindlist(bw_list)
-    if(!return_data.table){
-        out = GRanges(out)
-    }
-    return(out)
+
+    fetchWindowedSignalList(file_paths = file_paths,
+                            qgr = qgr,
+                            load_signal = load_bw,
+                            unique_names = unique_names,
+                            names_variable = names_variable,
+                            win_size = win_size,
+                            return_data.table = return_data.table)
 }
 
 

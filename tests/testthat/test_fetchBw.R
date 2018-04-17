@@ -95,7 +95,7 @@ test_that("fetchWindowedBigwigList works with character vector bw_files", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
-    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+    hidden = capture_output({res = fetchWindowedBigwigList(file_paths = bw_files,
                                                            win_size = 3,
                                                            qgr = test_qgr)})
     expect_is(res, "GRanges")
@@ -107,7 +107,7 @@ test_that("fetchWindowedBigwigList works with list bw_files", {
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
     bw_files = as.list(bw_files)
-    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+    hidden = capture_output({res = fetchWindowedBigwigList(file_paths = bw_files,
                                                            win_size = 3,
                                                            qgr = test_qgr)})
     expect_is(res, "GRanges")
@@ -118,10 +118,10 @@ test_that("fetchWindowedBigwigList can set variable name", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
-    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+    hidden = capture_output({res = fetchWindowedBigwigList(file_paths = bw_files,
                                                            win_size = 3,
                                                            qgr = test_qgr,
-                                                           bw_variable_name = "group")})
+                                                           names_variable = "group")})
     expect_is(res, "GRanges")
     expect_equal(colnames(mcols(res)), c(exp_colnames, "group"))
 })
@@ -130,7 +130,7 @@ test_that("fetchWindowedBigwigList duplicate names throws error", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     expect_error(
-        fetchWindowedBigwigList(bw_files = bw_files,
+        fetchWindowedBigwigList(file_paths = bw_files,
                                 win_size = 3,
                                 qgr = test_qgr)
     )

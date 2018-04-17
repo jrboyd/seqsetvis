@@ -6,19 +6,19 @@
 on each.  Appends grouping variable to each resulting data.table and uses rbindlist to
 efficiently combine results}
 \usage{
-fetchWindowedBigwigList(bw_files, qgr, bw_names = names(bw_files),
-  bw_variable_name = "sample", win_size = 50, return_data.table = FALSE)
+fetchWindowedBigwigList(file_paths, qgr, unique_names = names(file_paths),
+  names_variable = "sample", win_size = 50, return_data.table = FALSE)
 }
 \arguments{
-\item{bw_files}{The character vector or list of paths to bigwig files to
+\item{file_paths}{The character vector or list of paths to bigwig files to
 read from.}
 
 \item{qgr}{Set of GRanges to query.  For valid results the width of each
 interval should be identical and evenly divisible by \code{win_size}.}
 
-\item{bw_names}{names to use in final data.table to designate source bigwig}
+\item{unique_names}{names to use in final data.table to designate source bigwig}
 
-\item{bw_variable_name}{The column name where bw_names are stored.
+\item{names_variable}{The column name where unique_names are stored.
 Default is 'sample'}
 
 \item{win_size}{The window size that evenly divides widths in \code{qgr}.}

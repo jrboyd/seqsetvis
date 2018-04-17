@@ -4,7 +4,7 @@
 \alias{fetchWindowedBam}
 \title{fetch a windowed version of a bam file, returns GRanges}
 \usage{
-fetchWindowedBam(bam_f, qgr, fragLen = NULL, win_size = 50,
+fetchWindowedBam(bam_f, qgr, win_size = 50, fragLen = NULL,
   target_strand = c("*", "+", "-")[1], return_data.table = FALSE)
 }
 \arguments{
@@ -12,18 +12,21 @@ fetchWindowedBam(bam_f, qgr, fragLen = NULL, win_size = 50,
 
 \item{qgr}{GRanges regions to fetchs}
 
+\item{win_size}{numeric >=1.  pileup grabbed every win_size bp}
+
 \item{fragLen}{numeric, NULL, or NA.  if numeric, supplied value is used.
 if NULL, value is calculated with fragLen_calcStranded
 if NA, raw bam pileup with no cross strand shift is returned.}
 
-\item{win_size}{numeric >=1.  pileup grabbed every win_size bp}
-
 \item{target_strand}{character. if one of "+" or "-", reads are filtered
 accordingly. ignored if any other value.}
+
+\item{return_data.table}{logical. If TRUE the internal data.table is
+returned instead of GRanges.  Default is FALSE.}
 }
 \value{
-tidy GRanges with pileups from bam file.  pileup is
-calculated only every win_size bp.
+tidy GRanges (or data.table if specified) with pileups from bam
+file.  pileup is calculated only every win_size bp.
 }
 \description{
 fetch a windowed version of a bam file, returns GRanges

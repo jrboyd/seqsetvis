@@ -11,7 +11,8 @@ prepare_fetch_GRanges(qgr, win_size, target_size = NULL)
 
 \item{win_size}{numeric window size for fetch}
 
-\item{target_size}{numeric final width of qgr}
+\item{target_size}{numeric final width of qgr if known. Default of NULL
+leads to quantile based determination of target_size.}
 }
 \value{
 GRanges, either identical to qgr or with suitable consistent width
@@ -21,4 +22,9 @@ applied.
 output GRanges parallels input with consistent width evenly divisible by
 win_size.  Has warning if GRanges needed resizing, otherwise no warning
 and input GRanges is returned unchanged.
+}
+\examples{
+qgr = prepare_fetch_GRanges(CTCF_in_10a_overlaps_gr, win_size = 50)
+#no warning if qgr is already valid for windowed fetching
+prepare_fetch_GRanges(qgr, win_size = 50)
 }

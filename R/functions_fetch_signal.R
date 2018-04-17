@@ -28,10 +28,12 @@
 #' bam_gr = fetchBam(bam_file, qgr)
 #' bam_dt = viewGRangesWindowed_dt(bam_gr, qgr, 50)
 #'
-#' bw_file = system.file("extdata/MCF10A_CTCF_FE_random100.bw",
-#'     package = "seqsetvis")
-#' bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
-#' bw_dt = viewGRangesWindowed_dt(bw_gr, qgr, 50)
+#' if(Sys.info()['sysname'] != "Windows"){
+#'     bw_file = system.file("extdata/MCF10A_CTCF_FE_random100.bw",
+#'         package = "seqsetvis")
+#'     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
+#'     bw_dt = viewGRangesWindowed_dt(bw_gr, qgr, 50)
+#' }
 viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
                                   x0 = c("center", "center_unstranded",
                                          "left", "left_unstranded")[1]){
@@ -104,10 +106,15 @@ viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
 #'
 #' @param qgr GRanges to prepare
 #' @param win_size numeric window size for fetch
-#' @param target_size numeric final width of qgr
+#' @param target_size numeric final width of qgr if known. Default of NULL
+#' leads to quantile based determination of target_size.
 #' @return GRanges, either identical to qgr or with suitable consistent width
 #' applied.
 #' @export
+#' @examples
+#' qgr = prepare_fetch_GRanges(CTCF_in_10a_overlaps_gr, win_size = 50)
+#' #no warning if qgr is already valid for windowed fetching
+#' prepare_fetch_GRanges(qgr, win_size = 50)
 prepare_fetch_GRanges = function(qgr, win_size, target_size = NULL){
     if(length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0 ){
         if(is.null(target_size)){
@@ -155,78 +162,114 @@ quantileGRangesWidth = function(qgr,
     return(fwidth)
 }
 
-#' #' Derive a new GRanges of consistent width based on quantile.
-#' #' Width is selected by rounding up to the lowest multiple of win_size greater than
-#' #' min_quantile quantile of widths.
-#' #'
-#' #' @param qgr GRanges. To be resized.
-#' #' @param min_quantile numeric [0,1]. The quantile level final width must be
-#' #' greater than. default is 0.75
-#' #' @param win_size integer > 0.  final width must be a multiple of win_size.
-#' #' @return a GRanges derived from qgr (length and order match).  All ranges
-#' #' are of same width and centered on old.  Width is at least minimum quantile
-#' #' and a multiple of win_size
-#' fixGRangesWidth = function(qgr,
-#'                            min_quantile = .75,
-#'                            win_size = 1,
-#'                            anchor = c("center", "start")[1]){
-#'     stopifnot(class(qgr) == "GRanges")
-#'     fwidth = quantileGRangesWidth(qgr, min_quantile, win_size)
-#'     qgr = setGRangesWidth(qgr = qgr, fwidth = fwidth, anchor = anchor)
+#' Derive a new GRanges of consistent width based on quantile.
 #'
-#' }
+#' Width is selected by rounding up to the lowest multiple of win_size greater
+#' than min_quantile quantile of widths.
 #'
-#' #' Return GRanges with single width
-#' #'
-#' #' Essentially works like GenomicRanges::resize() but repeated applications
-#' #' of center do not cause rounding induced drift.
-#' setGRangesWidth = function(qgr, fwidth, anchor = c("center", "start")[1]){
-#'     stopifnot(class(qgr) == "GRanges")
-#'     stopifnot(is.numeric(fwidth))
-#'     stopifnot(anchor %in% c("center", "start"))
-#'     switch(anchor,
-#'            center = {
-#'                centerFixedSizeGRanges(qgr, fixed_size = fwidth)
-#'            },
-#'            start = {
-#'                resize(qgr, width = fwidth, fix = "start")
-#'            }
-#'     )
-#' }
+#' @param qgr GRanges. To be resized.
+#' @param min_quantile numeric [0,1]. The quantile level final width must be
+#' greater than. default is 0.75
+#' @param win_size integer > 0.  final width must be a multiple of win_size.
+#' @param anchor extend from center of from start (strand sensitive)
+#' @return a GRanges derived from qgr (length and order match).  All ranges
+#' are of same width and centered on old.  Width is at least minimum quantile
+#' and a multiple of win_size
+fixGRangesWidth = function(qgr,
+                           min_quantile = .75,
+                           win_size = 1,
+                           anchor = c("center", "start")[1]){
+    stopifnot(class(qgr) == "GRanges")
+    fwidth = quantileGRangesWidth(qgr, min_quantile, win_size)
+    qgr = setGRangesWidth(qgr = qgr, fwidth = fwidth, anchor = anchor)
+
+}
+
+#' Return GRanges with single width
+#'
+#' Essentially works like GenomicRanges::resize() but repeated applications
+#' of center do not cause rounding induced drift.
+#' @param qgr GRanges
+#' @param fwidth numeric width to apply
+#' @param anchor extend from center of from start (strand sensitive)
+#' @return GRanges that parallels qgr with fwidth applied according to anchor.
+setGRangesWidth = function(qgr, fwidth, anchor = c("center", "start")[1]){
+    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is.numeric(fwidth))
+    stopifnot(anchor %in% c("center", "start"))
+    switch(anchor,
+           center = {
+               centerFixedSizeGRanges(qgr, fixed_size = fwidth)
+           },
+           start = {
+               resize(qgr, width = fwidth, fix = "start")
+           }
+    )
+}
 
 
-# fetchWindowedSignalList = function(signal_file_paths,
-#                                    qgr,
-#                                    load_signal = function(nam) {
-#                                        message("loading ", nam, " ...")
-#                                        warning("nothing happened, add code here to load files")
-#                                        message("finished loading ", nam, ".")
-#                                    },
-#                                    signal_unique_names = names(signal_file_paths),
-#                                    names_variable = "sample",
-#                                    win_size = 50,
-#                                    return_data.table = FALSE){
-#     if(is.list(signal_file_paths)){
-#         signal_file_paths = unlist(signal_file_paths)
-#     }
-#     if (is.null(signal_unique_names)) {
-#         signal_unique_names = basename(signal_file_paths)
-#     }
-#     names(signal_file_paths) = signal_unique_names
-#     stopifnot(is.character(signal_file_paths))
-#     stopifnot(class(qgr) == "GRanges")
-#     stopifnot(is.character(signal_unique_names))
-#     stopifnot(is.character(names_variable))
-#     stopifnot(is.numeric(win_size))
-#     if (any(duplicated(signal_unique_names))) {
-#         stop("some signal_unique_names are duplicated:\n",
-#              paste(collapse = "\n", unique(signal_unique_names[duplicated(signal_unique_names)])))
-#     }
-#     qgr = prepare_fetch_GRanges(qgr = qgr, win_size = win_size, target_size = NULL)
-#     bw_list = lapply(names(signal_file_paths), load_signal)
-#     out = data.table::rbindlist(bw_list)
-#     if(!return_data.table){
-#         out = GRanges(out)
-#     }
-#     return(out)
-# }
+#' Generic signal loading function
+#'
+#' Does nothing unless load_signal is overridden to carry out reading
+#' data from file_paths (likely via the appropriate fetchWindowed function,
+#' ie. \code{\link{fetchWindowedBigwig}} or \code{\link{fetchWindowedBam}}
+#'
+#' @param file_paths character vector of file_paths to load from
+#' @param qgr GRanges of intervals to return from each file
+#' @param unique_names unique file ids for each file in file_paths.  Default
+#' is names of file_paths vector
+#' @param names_variable character, variable name for column containing
+#' unique_names entries.  Default is "sample"
+#' @param win_size numeric/integer window size resolution to load signal at.
+#' Default is 50.
+#' @param return_data.table logical. If TRUE data.table is returned instead of
+#' GRanges, the default.
+#' @param load_signal function taking f, nam, and qgr arguments.  f is from
+#' file_paths, nam is from unique_names, and qgr is qgr. See details.
+#' @details load_signal is passed f, nam, and qgr and is executed in the
+#' environment where load_signal is defined. See
+#' \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBam}}
+#'  for examples.
+#' @return A GRanges with values read from file_paths at intervals of win_size.
+#' Originating file is coded by unique_names and assigned to column of name
+#' names_variable.  Output is data.table is return_data.table is TRUE.
+#' @export
+fetchWindowedSignalList = function(file_paths,
+                                   qgr,
+                                   unique_names = names(file_paths),
+                                   names_variable = "sample",
+                                   win_size = 50,
+                                   return_data.table = FALSE,
+                                   load_signal = function(f, nam) {
+                                       message("loading ", nam, " ...")
+                                       warning("nothing happened, add code here to load files")
+                                       message("finished loading ", nam, ".")
+                                   }){
+    if(is.list(file_paths)){
+        file_paths = unlist(file_paths)
+    }
+    if (is.null(unique_names)) {
+        unique_names = basename(file_paths)
+    }
+    names(file_paths) = unique_names
+    stopifnot(is.character(file_paths))
+    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is.character(unique_names))
+    stopifnot(is.character(names_variable))
+    stopifnot(is.numeric(win_size))
+    if (any(duplicated(unique_names))) {
+        stop("some unique_names are duplicated:\n",
+             paste(collapse = "\n", unique(unique_names[duplicated(unique_names)])))
+    }
+    qgr = prepare_fetch_GRanges(qgr = qgr, win_size = win_size, target_size = NULL)
+    nam_load_signal = function(nam){
+        f = file_paths[nam]
+        load_signal(f, nam, qgr)
+    }
+    bw_list = lapply(names(file_paths), nam_load_signal)
+    out = data.table::rbindlist(bw_list)
+    if(!return_data.table){
+        out = GRanges(out)
+    }
+    return(out)
+}
