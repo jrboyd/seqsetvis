@@ -256,25 +256,3 @@ ggellipse = function(xcentres,
     p
 }
 
-#' Derive a new GRanges of consistent width.
-#' Width is selected by rounding up to the lowest multiple of win_size greater than
-#' min_quantile quantile of widths.
-#'
-#' @param qgr GRanges. To be resized.
-#' @param min_quantile numeric [0,1]. The quantile level final width must be
-#' greater than. default is 0.75
-#' @param win_size integer > 0.  final width must be a multiple of win_size.
-#' @return a GRanges derived from qgr (length and order match).  All ranges
-#' are of same width and centered on old.  Width is at least minimum quantile
-#' and a multiple of win_size
-fixGRangesWidth = function(qgr, min_quantile = .75, win_size = 1){
-    stopifnot(class(qgr) == "GRanges")
-    stopifnot(is.numeric(min_quantile), is.numeric(win_size))
-    stopifnot(min_quantile >= 0 && min_quantile <= 1)
-    stopifnot(length(min_quantile) == 1 && length(win_size) == 1)
-    stopifnot(win_size%%1==0)
-    stopifnot(win_size >= 1)
-    qwidth = quantile(width(qgr), min_quantile)
-    fwidth = ceiling(qwidth / win_size) * win_size
-    centerFixedSizeGRanges(qgr, fixed_size = fwidth)
-}

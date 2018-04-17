@@ -107,102 +107,6 @@ fragLen_calcStranded = function(bam_f,
     }
 }
 
-#' get a windowed sampling of score_gr
-#'
-#' Summarizes score_gr by grabbing value of "score" every window_size bp.
-#' Columns in output data.table are:
-#' standard GRanges columns: seqnames, start, end, width, strand
-#' id - matched to names(score_gr). if names(score_gr) is missing,
-#' added as 1:length(score_gr)
-#' y - value of score from score_gr
-#' x - relative bp position
-#'
-#' @param score_gr GRanges with a "score" metadata columns.
-#' @param qgr regions to view by window.
-#' @param window_size qgr will be represented by value from score_gr every
-#' window_size bp.
-#' @param x0 character. controls how x value is derived from position for
-#' each region in qgr.  0 may be the left side or center.  If not unstranded,
-#' x coordinates are flipped for (-) strand.
-#' @return data.table that is GRanges compatible
-#' @export
-#' @examples
-#' bam_file = system.file("extdata/test.bam",
-#'     package = "seqsetvis")
-#' qgr = CTCF_in_10a_overlaps_gr[1:5]
-#' qgr = GenomicRanges::resize(qgr, width = 500, fix = "center")
-#' bam_gr = fetchBam(bam_file, qgr)
-#' bam_dt = viewGRangesWindowed_dt(bam_gr, qgr, 50)
-#' if(Sys.info()['sysname'] != "Windows"){
-#' bw_file = system.file("extdata/MCF10A_CTCF_FE_random100.bw",
-#'     package = "seqsetvis")
-#' bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
-#' bw_dt = viewGRangesWindowed_dt(bw_gr, qgr, 50)
-#' }
-viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
-                                x0 = c("center", "center_unstranded",
-                                       "left", "left_unstranded")[1]){
-    x = id = NULL
-    stopifnot(class(score_gr) == "GRanges")
-    stopifnot(!is.null(score_gr$score))
-    stopifnot(class(qgr) == "GRanges")
-    stopifnot(is.numeric(window_size))
-    stopifnot(window_size >= 1)
-    stopifnot(window_size %% 1 == 0)
-    stopifnot(x0 %in% c("center", "center_unstranded", "left", "left_unstranded"))
-    windows = slidingWindows(qgr, width = window_size, step = window_size)
-    if (is.null(qgr$id)) {
-        if (!is.null(names(qgr))) {
-            qgr$id = names(qgr)
-        } else {
-            qgr$id = paste0("region_", seq_along(qgr))
-        }
-    }
-    names(windows) = qgr$id
-    windows = unlist(windows)
-    windows$id = names(windows)
-    windows = resize(windows, width = 1, fix = "center")
-    olaps = suppressWarnings(data.table::as.data.table(findOverlaps(query = windows, subject = score_gr)))
-    # patch up missing/out of bound data with 0
-    missing_idx = setdiff(seq_along(windows), olaps$queryHits)
-    if (length(missing_idx) > 0) {
-        olaps = rbind(olaps, data.table::data.table(queryHits = missing_idx, subjectHits = length(score_gr) + 1))[order(queryHits)]
-        score_gr = c(score_gr, GRanges(seqnames(score_gr)[length(score_gr)], IRanges::IRanges(1, 1), score = 0))
-    }
-    # set y and output windows = windows[olaps$queryHits]
-    windows$y = score_gr[olaps$subjectHits]$score
-    score_dt = data.table::as.data.table(windows)
-
-    shift = round(window_size/2)
-    switch(x0,
-        center = {
-            score_dt[, `:=`(x, start - min(start) + shift), by = id]
-            score_dt[, `:=`(x, x - round(mean(x))), by = id]
-            score_dt[strand == "-", x := -1*x]
-        },
-        center_unstranded = {
-            score_dt[, `:=`(x, start - min(start) + shift), by = id]
-            score_dt[, `:=`(x, x - round(mean(x))), by = id]
-        },
-        left = {
-            score_dt[, x := -1]
-            score_dt[strand != "-", `:=`(x, start - min(start) + shift), by = id]
-            #flip negative
-            score_dt[strand == "-", `:=`(x, -1*(end - max(end) - shift)), by = id]
-        },
-        left_unstranded = {
-            score_dt[, `:=`(x, start - min(start) + shift), by = id]
-        }
-    )
-
-    score_dt[, `:=`(start, start - shift + 1)]
-    score_dt[, `:=`(end, end + window_size - shift)]
-    if(x0 == "center"){
-
-    }
-    score_dt
-}
-
 #' fetch a bam file pileup with the ability to consider cross strand correlation
 #' @param bam_f character or BamFile to load
 #' @param qgr GRanges regions to fetchs
@@ -220,7 +124,11 @@ viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
 #' fetchBam(bam_file, qgr)
 #' fetchBam(bam_file, qgr, fragLen = 180, target_strand = "+")
-fetchBam = function(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+", "-")[1], ...){
+fetchBam = function(bam_f,
+                    qgr,
+                    fragLen = NULL,
+                    target_strand = c("*", "+", "-")[1],
+                    ...){
     if(is.null(fragLen)){
         fragLen = fragLen_calcStranded(bam_f, qgr)
         message("fragLen was calculated as: ", fragLen)
@@ -263,42 +171,20 @@ fetchBam = function(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+", "-")
     return(score_gr)
 }
 
-#' fetch a windowed version of a bam file, returns data.table
-#'
-#' @param bam_f character or BamFile to load
-#' @param qgr GRanges regions to fetch
-#' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
-#' if NULL, value is calculated with fragLen_calcStranded
-#' if NA, raw bam pileup with no cross strand shift is returned.
-#' @param win_size numeric >=1.  pileup grabbed every win_size bp
-#' @param target_strand character. if one of "+" or "-", reads are filtered
-#' @return tidy data.table with GRanges compatible columns.  pileup is
-#' calculated only every win_size bp.
-#' @export
-#' @examples
-#' bam_file = system.file("extdata/test.bam",
-#'     package = "seqsetvis")
-#' qgr = CTCF_in_10a_overlaps_gr[1:5]
-#' bam_dt = fetchWindowedBam_dt(bam_file, qgr)
-#' bam_dt = fetchWindowedBam_dt(bam_file, qgr, fragLen = 180,
-#'     win_size = 10, target_strand = "+")
-fetchWindowedBam_dt = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1]) {
-    score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
-    viewGRangesWindowed_dt(score_gr, qgr, win_size)
-}
-
 #' fetch a windowed version of a bam file, returns GRanges
 #'
 #' @param bam_f character or BamFile to load
 #' @param qgr GRanges regions to fetchs
+#' @param win_size numeric >=1.  pileup grabbed every win_size bp
 #' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
 #' if NULL, value is calculated with fragLen_calcStranded
 #' if NA, raw bam pileup with no cross strand shift is returned.
-#' @param win_size numeric >=1.  pileup grabbed every win_size bp
 #' @param target_strand character. if one of "+" or "-", reads are filtered
 #' accordingly. ignored if any other value.
-#' @return tidy GRanges with pileups from bam file.  pileup is
-#' calculated only every win_size bp.
+#' @param return_data.table logical. If TRUE the internal data.table is
+#' returned instead of GRanges.  Default is FALSE.
+#' @return tidy GRanges (or data.table if specified) with pileups from bam
+#' file.  pileup is calculated only every win_size bp.
 #' @export
 #' @examples
 #' bam_file = system.file("extdata/test.bam",
@@ -307,6 +193,102 @@ fetchWindowedBam_dt = function(bam_f, qgr, fragLen = NULL, win_size = 50, target
 #' bam_gr = fetchWindowedBam(bam_file, qgr)
 #' bam_gr = fetchWindowedBam(bam_file, qgr, fragLen = 180,
 #'     win_size = 10, target_strand = "+")
-fetchWindowedBam = function(bam_f, qgr, fragLen = NULL, win_size = 50, target_strand = c("*", "+", "-")[1]) {
-    GRanges(fetchWindowedBam_dt(bam_f, qgr, fragLen, win_size, target_strand))
+#'
+#' bam_dt = fetchWindowedBam(bam_file, qgr,
+#'     return_data.table = TRUE)
+fetchWindowedBam = function(bam_f,
+                            qgr,
+                            win_size = 50,
+                            fragLen = NULL,
+                            target_strand = c("*", "+", "-")[1],
+                            return_data.table = FALSE) {
+    qgr = prepare_fetch_GRanges(qgr, win_size)
+    score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
+    out = viewGRangesWindowed_dt(score_gr, qgr, win_size)
+    if(!return_data.table){
+        out = GRanges(out)
+    }
+    return(out)
+}
+
+#' Iterates a character vector (ideally named) and calls \code{fetchWindowedBam}
+#' on each.  Appends grouping variable to each resulting data.table and uses rbindlist to
+#' efficiently combine results
+#'
+#' \code{fetchWindowedBamList} iteratively calls \code{fetchWindowedBam}.
+#' See \code{\link{fetchWindowedBam}} for more info.
+#' @export
+#' @param file_paths The character vector or list of paths to bigwig files to
+#'  read from.
+#' @param qgr Set of GRanges to query.  For valid results the width of each
+#' interval should be identical and evenly divisible by \code{win_size}.
+#' @param unique_names names to use in final data.table to designate source bigwig
+#' Default is 'sample'
+#' @param win_size The window size that evenly divides widths in \code{qgr}.
+#' @param fragLens numeric. The fragment length to use to extend reads.  The
+#' default value NULL causes an automatical calculation from 100 regions in
+#' qgr.
+#' @param target_strand character. One of c("*", "+", "-"). Controls
+#' filtering of reads by strand.  Default of "*" combines both strands.
+#' @param names_variable The column name where unique_names are stored.
+#' @param return_data.table logical. If TRUE the internal data.table is
+#' returned instead of GRanges.  Default is FALSE.
+#' @return A tidy formatted GRanges (or data.table if specified) containing
+#' fetched values.
+#' @rawNamespace import(data.table, except = c(shift, first, second))
+#' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
+#' 10, values from positions chr1 5,15,25...85, and 95 will be
+#' retrieved from \code{bw_file}
+#' @examples
+#' if(Sys.info()['sysname'] != "Windows"){
+#' library(GenomicRanges)
+#' bam_f = system.file("extdata/test.bam",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' bam_files = c("a" = bam_f, "b" = bam_f)
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' bw_gr = fetchWindowedBamList(bam_files, qgr, win_size = 10)
+#' bw_gr2 = fetchWindowedBamList(as.list(bam_files), qgr, win_size = 10)
+#'
+#' bw_dt = fetchWindowedBamList(bam_files, qgr, win_size = 10,
+#'     return_data.table = TRUE)
+#' }
+fetchWindowedBamList = function(file_paths,
+                                qgr,
+                                unique_names = names(file_paths),
+                                win_size = 50,
+                                fragLens = "auto",
+                                target_strand = c("*", "+", "-")[1],
+                                names_variable = "sample",
+                                return_data.table = FALSE){
+    stopifnot(all(is.character(fragLens) | is.numeric(fragLens)))
+    stopifnot(length(fragLens) == 1 || length(fragLens) == length(file_paths))
+    if(length(fragLens == 1)){
+        fragLens = rep(fragLens[1], length(file_paths))
+    }
+    names(fragLens) = file_paths
+    load_bam = function(f, nam, qgr) {
+        message("loading ", f, " ...")
+        fl = fragLens[f]
+        if(fl == "auto"){
+            fl = NULL
+        }
+        dt = fetchWindowedBam(bam_f = f,
+                              qgr = qgr,
+                              win_size = win_size,
+                              fragLen = fl,
+                              target_strand = target_strand,
+                              return_data.table = TRUE)
+        dt[[names_variable]] = nam
+        message("finished loading ", nam, ".")
+        dt
+    }
+
+    fetchWindowedSignalList(file_paths = file_paths,
+                            qgr = qgr,
+                            load_signal = load_bam,
+                            unique_names = unique_names,
+                            names_variable = names_variable,
+                            win_size = win_size,
+                            return_data.table = return_data.table)
+
 }

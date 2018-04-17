@@ -71,8 +71,8 @@ test_that("fetchWindowedBigwig throws error if widths aren't divisble by win_siz
     skip_on_os("windows")
     mix_width_gr = test_qgr
     end(mix_width_gr) =  end(mix_width_gr) + seq_along(mix_width_gr)
-    for(win in c(7, 11, 4, 8, 20)){
-        expect_error({
+    for(win in c(7, 31)){
+        expect_warning(regexp = "widths of qgr were not identical and evenly divisible by win_size", {
             fetchWindowedBigwig(bw_file = test_bw, win_size = win, qgr = mix_width_gr)
         })
     }
@@ -95,7 +95,7 @@ test_that("fetchWindowedBigwigList works with character vector bw_files", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
-    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+    hidden = capture_output({res = fetchWindowedBigwigList(file_paths = bw_files,
                                                            win_size = 3,
                                                            qgr = test_qgr)})
     expect_is(res, "GRanges")
@@ -107,7 +107,7 @@ test_that("fetchWindowedBigwigList works with list bw_files", {
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
     bw_files = as.list(bw_files)
-    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+    hidden = capture_output({res = fetchWindowedBigwigList(file_paths = bw_files,
                                                            win_size = 3,
                                                            qgr = test_qgr)})
     expect_is(res, "GRanges")
@@ -118,10 +118,10 @@ test_that("fetchWindowedBigwigList can set variable name", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
-    hidden = capture_output({res = fetchWindowedBigwigList(bw_files = bw_files,
+    hidden = capture_output({res = fetchWindowedBigwigList(file_paths = bw_files,
                                                            win_size = 3,
                                                            qgr = test_qgr,
-                                                           bw_variable_name = "group")})
+                                                           names_variable = "group")})
     expect_is(res, "GRanges")
     expect_equal(colnames(mcols(res)), c(exp_colnames, "group"))
 })
@@ -130,7 +130,7 @@ test_that("fetchWindowedBigwigList duplicate names throws error", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     expect_error(
-        fetchWindowedBigwigList(bw_files = bw_files,
+        fetchWindowedBigwigList(file_paths = bw_files,
                                 win_size = 3,
                                 qgr = test_qgr)
     )
