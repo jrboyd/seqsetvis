@@ -1,6 +1,8 @@
 #' chromHMM state segmentation in the MCF7 cell line
 #'
-#' @description Vignette data for seqsetvis was downloaded directly from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE57498}{GSE57498}.
+#' @description Vignette data for seqsetvis was downloaded directly from GEO
+#' series
+#' \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE57498}{GSE57498}.
 #' This data is the state segmentation by chromHMM in the MCF7 cell line.
 #' chromHMM creates a hidden markov model by integrating several ChIP-seq
 #' samples, in this case: \itemize{
@@ -11,8 +13,10 @@
 #' \item MCF7_RNApolIIp_ChIP-Seq
 #' }
 #'
-#' @description Data from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE57498}{GSE57498}
-#' is from the publication \href{https://www.ncbi.nlm.nih.gov/pubmed/24916973}{Taberlay PC et al. 2014}
+#' @description Data from GEO series
+#' \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE57498}{GSE57498}
+#' is from the publication
+#' \href{https://www.ncbi.nlm.nih.gov/pubmed/24916973}{Taberlay PC et al. 2014}
 #' @details Contains: \itemize{
 #' \item \code{\link{chromHMM_demo_overlaps_gr}}
 #' \item \code{\link{chromHMM_demo_bw_states_gr}}

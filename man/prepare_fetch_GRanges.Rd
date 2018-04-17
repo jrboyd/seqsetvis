@@ -4,12 +4,16 @@
 \alias{prepare_fetch_GRanges}
 \title{prepares GRanges for windowed fetching.}
 \usage{
-prepare_fetch_GRanges(qgr, win_size, target_size = NULL)
+prepare_fetch_GRanges(qgr, win_size, min_quantile = 0.75,
+  target_size = NULL)
 }
 \arguments{
 \item{qgr}{GRanges to prepare}
 
 \item{win_size}{numeric window size for fetch}
+
+\item{min_quantile}{numeric [0,1], lowest possible quantile value.  Only
+relevant if target_size is not specified.}
 
 \item{target_size}{numeric final width of qgr if known. Default of NULL
 leads to quantile based determination of target_size.}

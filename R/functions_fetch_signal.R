@@ -106,6 +106,8 @@ viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
 #'
 #' @param qgr GRanges to prepare
 #' @param win_size numeric window size for fetch
+#' @param min_quantile numeric [0,1], lowest possible quantile value.  Only
+#' relevant if target_size is not specified.
 #' @param target_size numeric final width of qgr if known. Default of NULL
 #' leads to quantile based determination of target_size.
 #' @return GRanges, either identical to qgr or with suitable consistent width
@@ -115,11 +117,14 @@ viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
 #' qgr = prepare_fetch_GRanges(CTCF_in_10a_overlaps_gr, win_size = 50)
 #' #no warning if qgr is already valid for windowed fetching
 #' prepare_fetch_GRanges(qgr, win_size = 50)
-prepare_fetch_GRanges = function(qgr, win_size, target_size = NULL){
+prepare_fetch_GRanges = function(qgr,
+                                 win_size,
+                                 min_quantile = .75,
+                                 target_size = NULL){
     if(length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0 ){
         if(is.null(target_size)){
             target_size = quantileGRangesWidth(qgr = qgr,
-                                               min_quantile = .75,
+                                               min_quantile = min_quantile,
                                                win_size = win_size)
         }
         if(target_size %% win_size != 0){
@@ -147,6 +152,10 @@ prepare_fetch_GRanges = function(qgr, win_size, target_size = NULL){
 #' this
 #' @return numeric that is >= min_quantile and evenly divisible by win_size
 #' @export
+#' @examples
+#' gr = CTCF_in_10a_overlaps_gr
+#' quantileGRangesWidth(gr)
+#' quantileGRangesWidth(gr, min_quantile = .5, win_size = 100)
 quantileGRangesWidth = function(qgr,
                                 min_quantile = .75,
                                 win_size = 1){
@@ -234,6 +243,26 @@ setGRangesWidth = function(qgr, fwidth, anchor = c("center", "start")[1]){
 #' Originating file is coded by unique_names and assigned to column of name
 #' names_variable.  Output is data.table is return_data.table is TRUE.
 #' @export
+#' @examples
+#' library(GenomicRanges)
+#' bam_f = system.file("extdata/test.bam",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' bam_files = c("a" = bam_f, "b" = bam_f)
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#'
+#' load_bam = function(f, nam, qgr) {
+#'     message("loading ", f, " ...")
+#'     dt = fetchWindowedBam(bam_f = f,
+#'                       qgr = qgr,
+#'                       win_size = 50,
+#'                       fragLen = NULL,
+#'                       target_strand = "*",
+#'                       return_data.table = TRUE)
+#'     dt[["sample"]] = nam
+#'     message("finished loading ", nam, ".")
+#'     dt
+#' }
+#' fetchWindowedSignalList(bam_files, qgr, load_signal = load_bam)
 fetchWindowedSignalList = function(file_paths,
                                    qgr,
                                    unique_names = names(file_paths),

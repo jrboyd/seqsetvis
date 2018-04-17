@@ -21,3 +21,8 @@ numeric that is >= min_quantile and evenly divisible by win_size
 Returns the lowest multiple of win_size greater than
 min_quantile quantile of width(qgr)
 }
+\examples{
+gr = CTCF_in_10a_overlaps_gr
+quantileGRangesWidth(gr)
+quantileGRangesWidth(gr, min_quantile = .5, win_size = 100)
+}

@@ -1,3 +1,4 @@
+# seqsetvis 0.99.17
 
 * fetch functions, _dt versions removed and param return_data.table = FALSE added
 * refactoring to encapsulate fetch utility functions shared by bw and bam
@@ -9,7 +10,7 @@
 * ssvSignalClustering and Heatmap bug fixes related to hardcoded data.table variables
 * restructured and renamed extdata to be cleaner/more intuitive.
 
-# seqsetvis 0.99.11-12
+# seqsetvis 0.99.12
 
 * small changes to clear warning for Bioc acceptance.
 

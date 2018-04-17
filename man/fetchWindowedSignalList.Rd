@@ -46,3 +46,24 @@ environment where load_signal is defined. See
 \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBam}}
  for examples.
 }
+\examples{
+library(GenomicRanges)
+bam_f = system.file("extdata/test.bam",
+    package = "seqsetvis", mustWork = TRUE)
+bam_files = c("a" = bam_f, "b" = bam_f)
+qgr = CTCF_in_10a_overlaps_gr[1:5]
+
+load_bam = function(f, nam, qgr) {
+    message("loading ", f, " ...")
+    dt = fetchWindowedBam(bam_f = f,
+                      qgr = qgr,
+                      win_size = 50,
+                      fragLen = NULL,
+                      target_strand = "*",
+                      return_data.table = TRUE)
+    dt[["sample"]] = nam
+    message("finished loading ", nam, ".")
+    dt
+}
+fetchWindowedSignalList(bam_files, qgr, load_signal = load_bam)
+}
