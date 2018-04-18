@@ -291,6 +291,7 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL) {
 #' pie plot of set sizes
 #' @export
 #' @param object object that ssvMakeMembTable can convert to logical matrix membership
+#' @param slice_colors colors to use for pie slices
 #' @import ggplot2
 #' @import S4Vectors
 #' @return ggplot pie graph of set sizes
@@ -298,11 +299,25 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL) {
 #' ssvFeaturePie(list(1:3, 2:6))
 #' ssvFeaturePie(CTCF_in_10a_overlaps_gr)
 #' ssvFeaturePie(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
-ssvFeaturePie = function(object) {
+ssvFeaturePie = function(object, slice_colors = NULL) {
     count = group = NULL#declare binding for data.table
+
+    stopifnot(is.null(slice_colors) || all(is.character(slice_colors)))
+
     object = ssvMakeMembTable(object)
     hit_counts = colSums(object)
     hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)))
+
+    n_slices = ncol(object)
+    if (is.null(slice_colors)) {
+        slice_colors = safeBrew(n_slices, "Dark2")
+    } else {
+        not_hex = substr(slice_colors, 0, 1) != "#"
+        slice_colors[not_hex] = col2hex(slice_colors[not_hex])
+    }
+    if (length(slice_colors) < n_slices)
+        slice_colors <- rep(slice_colors, length.out = n_slices)
+    names(slice_colors) = colnames(object)
 
     p <- ggplot(hit_counts_df, aes(x = "", y = count, fill = group)) +
         labs(x = "") +
@@ -314,7 +329,7 @@ ssvFeaturePie = function(object) {
               axis.ticks = element_blank()) +
         coord_polar("y", start = 0) +
         scale_y_reverse() +
-        scale_fill_brewer(palette = "Dark2")
+        scale_fill_manual(values = slice_colors)
     hc = rev(hit_counts)/sum(hit_counts)
     hc = c(0, cumsum(hc)[-length(hc)]) + hc/2
     p = p + annotate(geom = "text", y = hc * sum(hit_counts), x = 1.1, label = rev(hit_counts_df$count))

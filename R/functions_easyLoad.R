@@ -61,6 +61,9 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL){
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_bed(bed_f, "my_bed")
 easyLoad_bed = function(file_paths, file_names = NULL, extraCols = character()){
+    if(is.factor(file_paths)){
+        file_paths = as.character(file_paths)
+    }
     stopifnot(is.character(file_paths))
     stopifnot(all(file.exists(file_paths) | grepl("://", file_paths)))
     #check names of file-paths
@@ -69,6 +72,9 @@ easyLoad_bed = function(file_paths, file_names = NULL, extraCols = character()){
     }
     #override names with file_names if not NULL
     if(!is.null(file_names)){
+        if(is.factor(file_names)){
+            file_names = as.character(file_names)
+        }
         stopifnot(is.character(file_paths))
         stopifnot(length(file_paths) == length(file_names))
         names(file_paths) = file_names
