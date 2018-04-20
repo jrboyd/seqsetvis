@@ -6,3 +6,4 @@
 *.save
 *.Rcheck
 run_cov.R
+dev*
