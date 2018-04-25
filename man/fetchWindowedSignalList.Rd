@@ -7,7 +7,7 @@
 fetchWindowedSignalList(file_paths, qgr, unique_names = names(file_paths),
   names_variable = "sample", win_size = 50, return_data.table = FALSE,
   load_signal = function(f, nam) {     message("loading ", nam, " ...")    
-  warning("nothing happened, add code here to load files")    
+  warning("nothing happened, ", "add code here to load files")    
   message("finished loading ", nam, ".") })
 }
 \arguments{

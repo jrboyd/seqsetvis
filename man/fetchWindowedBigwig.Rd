@@ -21,13 +21,15 @@ returned instead of GRanges.  Default is FALSE.}
 A GRanges (or data.table if specified) containing fetched values.
 }
 \description{
-\code{fetchWindowedBigwig} Gets values for each region of the query GRanges (\code{qgr}).
-Values correspond to the center of each window of size \code{win_size}.  A tidy formatted data.table
+\code{fetchWindowedBigwig} Gets values for each region of the query
+GRanges (\code{qgr}). Values correspond to the center of each window of
+size \code{win_size}.  A tidy formatted data.table
 object is returned suitable for plotting using ggplots.
 }
 \details{
 if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
-10, values from positions chr1 5,15,25...85, and 95 will be retrieved from \code{bw_file}
+10, values from positions chr1 5,15,25...85, and 95 will be retrieved
+from \code{bw_file}
 }
 \examples{
 if(Sys.info()['sysname'] != "Windows"){

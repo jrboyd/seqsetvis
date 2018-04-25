@@ -4,8 +4,8 @@
 #' files from MACS2 and returns a named list of GRanges.
 #' @param file_paths character vector of paths to narrowPeak files.  If named,
 #' those names will be used in output unless overriden by providing file_names.
-#' @param file_names character vector of names for output list.  If not NULL will
-#' override any existing names for file_paths.  Default is NULL.
+#' @param file_names character vector of names for output list.  If not NULL
+#' will override any existing names for file_paths.  Default is NULL.
 #' @return a named list of GRanges loaded from file_paths
 #' @import rtracklayer
 #' @export
@@ -26,8 +26,8 @@ easyLoad_narrowPeak = function(file_paths, file_names = NULL){
 #' files from MACS2 and returns a named list of GRanges.
 #' @param file_paths character vector of paths to narrowPeak files.  If named,
 #' those names will be used in output unless overriden by providing file_names.
-#' @param file_names character vector of names for output list.  If not NULL will
-#' override any existing names for file_paths.  Default is NULL.
+#' @param file_names character vector of names for output list.  If not NULL
+#' will override any existing names for file_paths.  Default is NULL.
 #' @return a named list of GRanges loaded from file_paths
 #' @import rtracklayer
 #' @export
@@ -49,8 +49,8 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL){
 #' Mainly a utility function for loading MACS2 narrowPeak and broadPeak.
 #' @param file_paths character vector of paths to narrowPeak files.  If named,
 #' those names will be used in output unless overriden by providing file_names.
-#' @param file_names character vector of names for output list.  If not NULL will
-#' override any existing names for file_paths.  Default is NULL.
+#' @param file_names character vector of names for output list.  If not NULL
+#' will override any existing names for file_paths.  Default is NULL.
 #' @param extraCols named character vector of classes.  passed to
 #' rtracklayer::import for format = "BED". default is character().
 #' @return a named list of GRanges loaded from file_paths

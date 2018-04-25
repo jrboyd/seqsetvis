@@ -3,8 +3,8 @@
 \name{fetchWindowedBamList}
 \alias{fetchWindowedBamList}
 \title{Iterates a character vector (ideally named) and calls \code{fetchWindowedBam}
-on each.  Appends grouping variable to each resulting data.table and uses rbindlist to
-efficiently combine results}
+on each.  Appends grouping variable to each resulting data.table and uses
+rbindlist to efficiently combine results}
 \usage{
 fetchWindowedBamList(file_paths, qgr, unique_names = names(file_paths),
   win_size = 50, fragLens = "auto", target_strand = c("*", "+", "-")[1],
@@ -17,8 +17,8 @@ read from.}
 \item{qgr}{Set of GRanges to query.  For valid results the width of each
 interval should be identical and evenly divisible by \code{win_size}.}
 
-\item{unique_names}{names to use in final data.table to designate source bigwig
-Default is 'sample'}
+\item{unique_names}{names to use in final data.table to designate source
+bigwig. Default is 'sample'}
 
 \item{win_size}{The window size that evenly divides widths in \code{qgr}.}
 

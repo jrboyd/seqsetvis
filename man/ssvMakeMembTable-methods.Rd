@@ -27,12 +27,13 @@ ssvMakeMembTable(object)
 \S4method{ssvMakeMembTable}{data.frame}(object)
 }
 \arguments{
-\item{object}{the object to convert. Supported types: list (of character or GRanges),
-GRanges with membership table metadata, GRangesList,
+\item{object}{the object to convert. Supported types: list (of character
+or GRanges), GRanges with membership table metadata, GRangesList,
 data.frame/matrix/DataFrame of membership table}
 }
 \value{
-a logical matrix indicating membership of items (rows) in sets (columns)
+a logical matrix indicating membership of items (rows) in sets
+(columns)
 }
 \description{
 generic for methods to convert various objects to a logical matrix indicating
@@ -49,16 +50,19 @@ DataFrame input
 matrix of logicals, membership table
 
 data.frame input, final output
-The final method for all inputs, checks column names and returns logical matrix
+The final method for all inputs, checks column names and returns logical
+matrix
 }
 \examples{
 char_list = list(letters[1:3], letters[2:4])
 ssvMakeMembTable(char_list)
 library(GenomicRanges)
-gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)), GRanges("chr1", IRanges(2:4*2, 2:4*2)))
+gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)),
+    GRanges("chr1", IRanges(2:4*2, 2:4*2)))
 ssvMakeMembTable(gr_list)
 library(GenomicRanges)
-gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)), GRanges("chr1", IRanges(2:4*2, 2:4*2)))
+gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)),
+    GRanges("chr1", IRanges(2:4*2, 2:4*2)))
 ssvMakeMembTable(GRangesList(gr_list))
 gr = GRanges("chr1", IRanges(1:3*2, 1:3*2))
 gr$set_a = c(TRUE, TRUE, FALSE)
@@ -68,8 +72,10 @@ gr = GRanges("chr1", IRanges(1:3*2, 1:3*2))
 gr$set_a = c(TRUE, TRUE, FALSE)
 gr$set_b = c(FALSE, TRUE, TRUE)
 ssvMakeMembTable(mcols(gr))
-memb_mat =  matrix(c(TRUE, TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE), ncol = 2, byrow = FALSE)
+memb_mat =  matrix(c(TRUE, TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE),
+    ncol = 2, byrow = FALSE)
 ssvMakeMembTable(memb_mat)
-memb_df = data.frame(a = c(TRUE, TRUE, FALSE, FALSE), b = c(TRUE, FALSE, TRUE, FALSE))
+memb_df = data.frame(a = c(TRUE, TRUE, FALSE, FALSE),
+    b = c(TRUE, FALSE, TRUE, FALSE))
 ssvMakeMembTable(memb_df)
 }

@@ -5,11 +5,16 @@
 \alias{CTCF_in_10a_data}
 \title{CTCF ChIP-seq in breast cancer cell lines}
 \description{
-Vignette data for seqsetvis was downloaded directly from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}.
-This data is CTCF ChIP-seq from a model of breast cancer progression derived from the MCF10A cell line.
+Vignette data for seqsetvis was downloaded directly from GEO
+series
+\href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}.
+This data is CTCF ChIP-seq from a model of breast cancer progression
+derived from the MCF10A cell line.
 
-Data from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}
-is from the publication \href{https://www.ncbi.nlm.nih.gov/pubmed/28504305}{Fritz AJ et al. 2018}
+Data from GEO series
+\href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}
+is from the publication
+\href{https://www.ncbi.nlm.nih.gov/pubmed/28504305}{Fritz AJ et al. 2018}
 }
 \details{
 Contains: \itemize{

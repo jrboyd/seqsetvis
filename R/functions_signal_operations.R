@@ -1,7 +1,8 @@
 #' Transforms set of GRanges to all have the same size.
 #'
 #' \code{centerFixedSizeGRanges} First calculates the central coordinate of each
-#' GRange in \code{grs} and extends in both direction by half of \code{fixed_size}
+#' GRange in \code{grs} and extends in both direction by half of
+#' \code{fixed_size}
 #' @export
 #' @param grs Set of GRanges with incosistent and/or incorrect size
 #' @param fixed_size The final width of each GRange returned.
@@ -65,7 +66,8 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #'     y_ = 'y', by_ = c('id', 'sample'))
 #' ggplot(splined_smooth[, list(y = mean(y)), by = list(sample, x)]) +
 #'     geom_line(aes(x = x, y = y, color = sample))
-applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::spline) {
+applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "",
+                       splineFun = stats::spline) {
     output_GRanges = FALSE
     if(class(dt)[1] == "GRanges"){
         dt = as.data.table(dt)
@@ -75,14 +77,17 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::s
     stopifnot(is.character(x_), is.character(y_), is.character(by_))
     stopifnot(is.function(splineFun))
     if (!any(x_ == colnames(dt))) {
-        stop("applySpline : x_ (", x_, ") not found in colnames of input data.table")
+        stop("applySpline : x_ (", x_,
+             ") not found in colnames of input data.table")
     }
     if (!any(y_ == colnames(dt))) {
-        stop("applySpline : y_ (", y_, ") not found in colnames of input data.table")
+        stop("applySpline : y_ (", y_,
+             ") not found in colnames of input data.table")
     }
     if (by_[1] != "" | length(by_) > 1)
         if (!all(by_ %in% colnames(dt))) {
-            stop("applySpline : by_ (", by_, ") not found in colnames of input data.table")
+            stop("applySpline : by_ (", by_,
+                 ") not found in colnames of input data.table")
         }
     dt = dt[order(get(x_))]
     if(by_[1] != ""){
@@ -90,10 +95,13 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::s
     }
 
     stopifnot(n > 1)
-    dupe_x_within_by = suppressWarnings(any(dt[, any(duplicated(get(x_))), by = by_]$V1))
+    dupe_x_within_by = suppressWarnings(
+        any(dt[, any(duplicated(get(x_))), by = by_]$V1))
     if (dupe_x_within_by)
-        warning("applySpline : Duplicate values of x_ (\"", x_, "\") exist within groups defined with by_ (\"", by_, "\").
-                       This Results in splines through the means of yvalues at duplicated xs.")
+        warning("applySpline : Duplicate values of x_ (\"", x_,
+                "\") exist within groups defined with by_ (\"", by_, "\"). ",
+                "This Results in splines through the means of yvalues at",
+                " duplicated xs.")
     extra_cols = setdiff(colnames(dt), c(x_, y_, by_))
     # sdt = dt[, list(n = floor(.N * n)), by = by_]
     sdt = dt[, splineFun(x = get(x_), y = get(y_), n = floor(.N * n)), by = by_]
@@ -104,7 +112,8 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::s
     #each row will be duplicated n times
     if(length(extra_cols) > 0){
         if(n > 1){
-            repair = dt[rep(seq_len(nrow(dt)), each = n), c(extra_cols, by_[by_ != ""]), with = FALSE]
+            repair = dt[rep(seq_len(nrow(dt)), each = n),
+                        c(extra_cols, by_[by_ != ""]), with = FALSE]
             sdt = cbind(sdt, repair)
         }else{
             # warning("")
@@ -169,7 +178,9 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::s
 #' #excessive data trimming.
 #' centerAtMax(CTCF_in_10a_profiles_gr, y_ = 'y', view_size = 100, by_ = 'id',
 #' check_by_dupes = FALSE)
-centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL, trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE) {
+centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL,
+                       trim_to_valid = TRUE, check_by_dupes = TRUE,
+                       replace_x = TRUE) {
     ymax = xsummit = xnew = N = NULL  #reserve data.table variables
     output_GRanges = FALSE
     if(class(dt)[1] == "GRanges"){
@@ -179,14 +190,20 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL, tri
     if (!data.table::is.data.table(dt)) {
         stop("dt must be of type data.table, was ", class(dt))
     }
-    stopifnot(is.character(x_), is.character(y_), is.character(by_) || is.null(by_))
+    stopifnot(is.character(x_),
+              is.character(y_),
+              is.character(by_) || is.null(by_))
     stopifnot(is.numeric(view_size) || is.null(view_size))
-    stopifnot(is.logical(trim_to_valid), is.logical(check_by_dupes), is.logical(replace_x))
+    stopifnot(is.logical(trim_to_valid),
+              is.logical(check_by_dupes),
+              is.logical(replace_x))
     if (!any(x_ == colnames(dt))) {
-        stop("centerAtMax : x_ (", x_, ") not found in colnames of input data.table")
+        stop("centerAtMax : x_ (", x_,
+             ") not found in colnames of input data.table")
     }
     if (!any(y_ == colnames(dt))) {
-        stop("centerAtMax : y_ (", y_, ") not found in colnames of input data.table")
+        stop("centerAtMax : y_ (", y_,
+             ") not found in colnames of input data.table")
     }
     # check_by_dupes = FALSE
     if (is.null(by_)) {
@@ -195,12 +212,19 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL, tri
     }
     if (all(by_ != ""))
         if (!any(by_ %in% colnames(dt))) {
-            stop("centerAtMax : by_ (", by_, ") not found in colnames of input data.table")
+            stop("centerAtMax : by_ (", by_,
+                 ") not found in colnames of input data.table")
         }
     if (check_by_dupes) {
-        dupe_x_within_by = suppressWarnings(any(dt[, any(duplicated(get(x_))), by = by_]$V1))
+        dupe_x_within_by = suppressWarnings(any(dt[, any(duplicated(get(x_))),
+                                                   by = by_]$V1))
         if (dupe_x_within_by)
-            message(paste0("centerAtMax : duplicate values of x_ (", x_, ") exist within groups defined with by_ (", by_, ").\n    If this is the desired functionality, set check_by_dupes <- FALSE to hide future messages. If no by_ grouping is intended set by_ <- \"\" as well."))
+            message("centerAtMax : duplicate values of x_ (", x_,
+                    ") exist within groups defined with by_ (", by_,
+                    ").\n    If this is the desired functionality, set",
+                    "check_by_dupes <- FALSE to hide future messages. ",
+                    "If no by_ grouping is intended set by_ <- \"\" as",
+                    "well.")
     }
     dt = data.table::copy(dt)
     if (is.null(view_size)) {
@@ -212,7 +236,8 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL, tri
     closestToZero = function(x) {
         x[order(abs(x))][1]
     }
-    dt[, `:=`(ymax, max(get(y_)[get(x_) <= max(view_size) & get(x_) >= min(view_size)])), by = by_]
+    dt[, `:=`(ymax, max(get(y_)[get(x_) <= max(view_size) &
+                                    get(x_) >= min(view_size)])), by = by_]
     dt[, `:=`(xsummit, closestToZero(get(x_)[get(y_) == ymax])), by = by_]
     dt[, `:=`(xnew, get(x_) - xsummit)]
     dt[, `:=`(ymax, NULL)]
@@ -269,15 +294,18 @@ clusteringKmeans = function(mat, nclust, seed = 0) {
     center_reo = seq_along(center_o)
     names(center_reo) = center_o
     center_reo[as.character(mat_kmclust$cluster)]
-    mat_dt = data.table::data.table(mat_name = names(mat_kmclust$cluster),
-                                    cluster = mat_kmclust$cluster,
-                                    cluster_ordered = center_reo[as.character(mat_kmclust$cluster)])
-    mat_dt = mat_dt[order(cluster_ordered), list(id = mat_name, group = cluster_ordered)]
+    mat_dt = data.table::data.table(
+        mat_name = names(mat_kmclust$cluster),
+        cluster = mat_kmclust$cluster,
+        cluster_ordered = center_reo[as.character(mat_kmclust$cluster)])
+    mat_dt = mat_dt[order(cluster_ordered),
+                    list(id = mat_name, group = cluster_ordered)]
     return(mat_dt)
 }
 
 
-#' perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments
+#' perform kmeans clustering on matrix rows and return reordered matrix along
+#' with order matched cluster assignments
 #' clusters are sorted using hclust on centers
 #' the contents of each cluster are sorted using hclust
 #' @param mat A wide format matrix
@@ -308,7 +336,8 @@ clusteringKmeansNestedHclust = function(mat, nclust, seed = 0) {
     for (i in seq_along(nclust)) {
         cmat = mat[mat_dt[group == i, id], , drop = FALSE]
         if (nrow(cmat) > 2) {
-            mat_dt[group == i, ]$within_o = stats::hclust(stats::dist((cmat)))$order
+            mat_dt[group == i, ]$within_o =
+                stats::hclust(stats::dist((cmat)))$order
         } else {
             mat_dt[group == i, ]$within_o = seq_len(nrow(cmat))
         }

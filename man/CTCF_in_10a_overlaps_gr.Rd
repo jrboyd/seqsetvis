@@ -3,11 +3,13 @@
 \docType{data}
 \name{CTCF_in_10a_overlaps_gr}
 \alias{CTCF_in_10a_overlaps_gr}
-\title{100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq}
+\title{100 randomly selected regions from overlapping CTCF peaks in 10a cell
+ChIP-seq}
 \format{GenomicRanges with 3 metadata columns of membership table}
 \description{
-MACS2 narrowPeak calls on pooled biological replicates at pval 1e-5 and then 0.05 IDR filtered
-IDR cutoffs determined  by comparing top 150,000 pvalue sorted peak in replicates.
+MACS2 narrowPeak calls on pooled biological replicates at pval 1e-5 and
+then 0.05 IDR filtered. IDR cutoffs determined  by comparing top 150,000
+pvalue sorted peak in replicates.
 }
 \details{
 See  GEO series GSE98551 for details.

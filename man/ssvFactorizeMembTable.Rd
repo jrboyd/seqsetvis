@@ -8,7 +8,8 @@ To avoid ambiguity,}
 ssvFactorizeMembTable(object)
 }
 \arguments{
-\item{object}{a valid object for conversion to a membership table and then factor}
+\item{object}{a valid object for conversion to a membership table and then
+factor}
 }
 \value{
 a 2 column ("id" and "group") data.frame.

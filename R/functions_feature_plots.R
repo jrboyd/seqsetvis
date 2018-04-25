@@ -9,15 +9,21 @@
 #   - list containing character vectors of set members
 #   - list of GRanges
 
-#' ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets
+#' ggplot implementation of vennDiagram from limma package.  currently limited
+#' at 3 sets
 #' @export
-#' @param object will be passed to \code{\link{ssvMakeMembTable}} for conversion to membership matrix
-#' @param group_names useful if names weren't provided or were lost in creating membership matrix
+#' @param object will be passed to \code{\link{ssvMakeMembTable}} for
+#' conversion to membership matrix
+#' @param group_names useful if names weren't provided or were lost in
+#' creating membership matrix
 #' @param counts_txt_size font size for count numbers
-#' @param counts_as_labels if TRUE, geom_label is used instead of geom_text.  can be easier to read.
-#' @param show_outside_count if TRUE, items outside of all sets are counted outside. can be confusing.
+#' @param counts_as_labels if TRUE, geom_label is used instead of geom_text.
+#' can be easier to read.
+#' @param show_outside_count if TRUE, items outside of all sets are counted
+#' outside. can be confusing.
 #' @param line_width uses size aesthetic to control line width of circles.
-#' @param circle_colors colors to use for circle line colors. Uses Dark2 set from RColorBrewer by default.
+#' @param circle_colors colors to use for circle line colors. Uses Dark2 set
+#' from RColorBrewer by default.
 #' @param fill_alpha alpha value to use for fill, defaults to .3.
 #' @param line_alpha numeric [0,1], alpha value for circle line
 #' @param counts_color character. single color to use for displaying counts
@@ -55,7 +61,8 @@ ssvFeatureVenn = function(object,
     if (nsets > 3)
         stop("Can't plot Venn diagram for more than 3 sets")
     if (is.null(group_names))
-        group_names <- factor(colnames(object)[seq_len(nsets)], levels = colnames(object)[seq_len(nsets)])
+        group_names <- factor(colnames(object)[seq_len(nsets)],
+                              levels = colnames(object)[seq_len(nsets)])
     if (is.null(counts_color))
         counts_color <- grDevices::rgb(0,0,0)
 
@@ -85,37 +92,56 @@ ssvFeatureVenn = function(object,
                       {
                           df = data.frame(x = 0,
                                           y = 0,
-                                          label = set_counts[-1], size = counts_txt_size, col = counts_color)
+                                          label = set_counts[-1],
+                                          size = counts_txt_size,
+                                          col = counts_color)
                           if (show_outside_count) {
-                              df = rbind(df, data.frame(x = 2.3, y = -2.1, label = set_counts[1], size = counts_txt_size, col = counts_color))
+                              df = rbind(df, data.frame(x = 2.3, y = -2.1,
+                                                        label = set_counts[1],
+                                                        size = counts_txt_size,
+                                                        col = counts_color))
                           }
                           df
                       }, {
                           df = data.frame(x = c(1.5, -1.5, 0),
                                           y = c(0.1, 0.1, 0.1),
-                                          label = set_counts[-1], size = counts_txt_size, col = counts_color)
+                                          label = set_counts[-1],
+                                          size = counts_txt_size,
+                                          col = counts_color)
                           if (show_outside_count) {
-                              df = rbind(df, data.frame(x = 2.3, y = -2.1, label = set_counts[1], size = counts_txt_size, col = counts_color))
+                              df = rbind(df, data.frame(x = 2.3,
+                                                        y = -2.1,
+                                                        label = set_counts[1],
+                                                        size = counts_txt_size,
+                                                        col = counts_color))
                           }
                           df
                       }, {
-                          df = data.frame(x = c(0, 1.5, 0.75, -1.5, -0.75, 0, 0),
-                                          y = c(-1.7, 1, -0.35, 1, -0.35, 0.9, 0),
+                          df = data.frame(x = c(0, 1.5, 0.75, -1.5,
+                                                -0.75, 0, 0),
+                                          y = c(-1.7, 1, -0.35, 1, -0.35,
+                                                0.9, 0),
                                           label = set_counts[-1],
-                                          size = counts_txt_size, col = counts_color)
+                                          size = counts_txt_size,
+                                          col = counts_color)
                           if (show_outside_count) {
-                              df = rbind(df, data.frame(x = 2.5, y = -3, label = set_counts[1], size = counts_txt_size, col = counts_color))
+                              df = rbind(df, data.frame(x = 2.5, y = -3,
+                                                        label = set_counts[1],
+                                                        size = counts_txt_size,
+                                                        col = counts_color))
                           }
                           df
                       })
 
     counts_method = ifelse(counts_as_labels, geom_label, geom_text)
-    p = p + counts_method(data = df_text, mapping = aes(x = x, y = y, label = label, size = size))
+    p = p + counts_method(data = df_text,
+                          mapping = aes(x = x, y = y,
+                                        label = label, size = size))
     return(p)
 }
 
-# from https://gist.github.com/trinker/31edc08d0a4ec4c73935a23040c2f6cb p_load(dplyr, venneuler, ggforce, textshape)
 #' Try to load a bed-like file and convert it to a GRanges object
+#'
 #' @export
 #' @param object A membership table
 #' @param line_width numeric, passed to size aesthetic to control line width
@@ -141,7 +167,9 @@ ssvFeatureEuler = function(object,
                            circle_colors = NULL) {
     x = y = group = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
-    stopifnot(is.numeric(line_width), is.numeric(n_points), is.numeric(fill_alpha))
+    stopifnot(is.numeric(line_width),
+              is.numeric(n_points),
+              is.numeric(fill_alpha))
     stopifnot(is.character(shape))
     stopifnot(shape %in% c("circle", "ellipse"))
     cn = colnames(object)
@@ -199,7 +227,9 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL) {
         bar_colors <- rep(bar_colors, length.out = n_bars)
     names(bar_colors) = colnames(object)
     hit_counts = colSums(object)
-    hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)))
+    hit_counts_df = data.frame(count = hit_counts,
+                               group = factor(names(hit_counts),
+                                              levels = names(hit_counts)))
     p <- ggplot(hit_counts_df, aes(x = group, y = count, fill = group)) +
         labs(x = "") +
         geom_bar(stat = "identity") +
@@ -209,7 +239,10 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL) {
               panel.grid.minor.x = element_blank()) +
         scale_fill_manual(values = bar_colors)
     if(show_counts)
-        p = p + annotate("text", y = hit_counts/2, x = seq_along(hit_counts), label = hit_counts)
+        p = p + annotate("text",
+                         y = hit_counts/2,
+                         x = seq_along(hit_counts),
+                         label = hit_counts)
     return(p)
 }
 
@@ -306,7 +339,9 @@ ssvFeaturePie = function(object, slice_colors = NULL) {
 
     object = ssvMakeMembTable(object)
     hit_counts = colSums(object)
-    hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)))
+    hit_counts_df = data.frame(count = hit_counts,
+                               group = factor(names(hit_counts),
+                                              levels = names(hit_counts)))
 
     n_slices = ncol(object)
     if (is.null(slice_colors)) {
@@ -332,7 +367,10 @@ ssvFeaturePie = function(object, slice_colors = NULL) {
         scale_fill_manual(values = slice_colors)
     hc = rev(hit_counts)/sum(hit_counts)
     hc = c(0, cumsum(hc)[-length(hc)]) + hc/2
-    p = p + annotate(geom = "text", y = hc * sum(hit_counts), x = 1.1, label = rev(hit_counts_df$count))
+    p = p + annotate(geom = "text",
+                     y = hc * sum(hit_counts),
+                     x = 1.1,
+                     label = rev(hit_counts_df$count))
     return(p)
 }
 
@@ -370,7 +408,8 @@ ssvFeaturePie = function(object, slice_colors = NULL) {
 ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
                                    true_color = "black",
                                    false_color = "#EFEFEF",
-                                   raster_width_min = 1000, raster_height_min = 1000) {
+                                   raster_width_min = 1000,
+                                   raster_height_min = 1000) {
     groups = bool = value = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     stopifnot(is.logical(raster_approximation))
@@ -384,7 +423,10 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
 
     if (raster_approximation) {
         stopifnot(is.numeric(raster_width_min), is.numeric(raster_height_min))
-        dmat = as.matrix(data.table::dcast(hdt, value.var = "value", formula = rev(row) ~ groups))[, 1 + seq_len(ncol(object)), drop = FALSE]
+        dmat = as.matrix(
+            data.table::dcast(hdt,
+                              value.var = "value",
+                              formula = rev(row) ~ groups))[, 1 + seq_len(ncol(object)), drop = FALSE]
         low_v = 1
         dmat = ifelse(dmat > low_v, low_v, dmat)
         # dmat = -1*(dmat - low_v)
@@ -407,9 +449,15 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
         # dmat = (dmat * -.95 + .95)
         comp_mat = dmat[comp_row, comp_col]
         comp_ar = array(comp_mat, c(nrow(comp_mat), ncol(comp_mat), 3))
-        comp_ar[, , 1] = ifelse(comp_mat == 1, col2rgb(true_color)[1,1]/255, col2rgb(false_color)[1,1]/255)
-        comp_ar[, , 2] = ifelse(comp_mat == 1, col2rgb(true_color)[2,1]/255, col2rgb(false_color)[2,1]/255)
-        comp_ar[, , 3] = ifelse(comp_mat == 1, col2rgb(true_color)[3,1]/255, col2rgb(false_color)[3,1]/255)
+        comp_ar[, , 1] = ifelse(comp_mat == 1,
+                                col2rgb(true_color)[1,1]/255,
+                                col2rgb(false_color)[1,1]/255)
+        comp_ar[, , 2] = ifelse(comp_mat == 1,
+                                col2rgb(true_color)[2,1]/255,
+                                col2rgb(false_color)[2,1]/255)
+        comp_ar[, , 3] = ifelse(comp_mat == 1,
+                                col2rgb(true_color)[3,1]/255,
+                                col2rgb(false_color)[3,1]/255)
         png::writePNG(comp_ar, target = "tmp.png")
         png_grob = grid::rasterGrob(png::readPNG("tmp.png"),
                                     width = unit(1, "npc"),
@@ -418,7 +466,8 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
         file.remove("tmp.png")
         p = ggplot(hdt) +
             geom_tile(aes(x = groups, y = row, fill = NA, col = NULL)) +
-            scale_fill_manual(values = c(`TRUE` = "black", `FALSE` = "#EFEFEF")) +
+            scale_fill_manual(values = c(`TRUE` = "black",
+                                         `FALSE` = "#EFEFEF")) +
             scale_alpha(0) +
             labs(fill = "", y = "") +
             guides(fill = "none") +

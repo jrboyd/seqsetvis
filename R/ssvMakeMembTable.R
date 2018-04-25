@@ -1,13 +1,14 @@
 #' generic for methods to convert various objects to a logical matrix indicating
 #' membership of items (rows) in sets (columns)
 #' @export
-#' @param object the object to convert. Supported types: list (of character or GRanges),
-#' GRanges with membership table metadata, GRangesList,
+#' @param object the object to convert. Supported types: list (of character
+#' or GRanges), GRanges with membership table metadata, GRangesList,
 #' data.frame/matrix/DataFrame of membership table
 #' @rdname ssvMakeMembTable-methods
 #' @exportMethod ssvMakeMembTable
 #' @import methods
-#' @return a logical matrix indicating membership of items (rows) in sets (columns)
+#' @return a logical matrix indicating membership of items (rows) in sets
+#' (columns)
 setGeneric("ssvMakeMembTable", function(object){
     standardGeneric("ssvMakeMembTable")
 })
@@ -23,10 +24,12 @@ setGeneric("ssvMakeMembTable", function(object){
 #' char_list = list(letters[1:3], letters[2:4])
 #' ssvMakeMembTable(char_list)
 #' library(GenomicRanges)
-#' gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)), GRanges("chr1", IRanges(2:4*2, 2:4*2)))
+#' gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)),
+#'     GRanges("chr1", IRanges(2:4*2, 2:4*2)))
 #' ssvMakeMembTable(gr_list)
 setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
-    if (all(vapply(object, class, "character") == "GRanges")) {#GRanges are a special case
+    #GRanges are a special case
+    if (all(vapply(object, class, "character") == "GRanges")) {
         return(ssvMakeMembTable(GRangesList(object)))
     }
     if (all(vapply(object, class, "character") != "character")) {
@@ -36,7 +39,8 @@ setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
         char_object = object
         object = set_list2memb(char_object)
     } else {
-        stop("can't handle list of non-character classes as object: ", paste(vapply(object, class, "character"), collapse = ", "))
+        stop("can't handle list of non-character classes as object: ",
+             paste(vapply(object, class, "character"), collapse = ", "))
     }
     return(object)
 })
@@ -48,9 +52,11 @@ setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
 #' @import GenomicRanges
 #' @examples
 #' library(GenomicRanges)
-#' gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)), GRanges("chr1", IRanges(2:4*2, 2:4*2)))
+#' gr_list = list(GRanges("chr1", IRanges(1:3*2, 1:3*2)),
+#'     GRanges("chr1", IRanges(2:4*2, 2:4*2)))
 #' ssvMakeMembTable(GRangesList(gr_list))
-setMethod("ssvMakeMembTable", signature(object = "GRangesList"), function(object){
+setMethod("ssvMakeMembTable",
+          signature(object = "GRangesList"), function(object){
     GRlist_object = object
     ssvMakeMembTable(ssvOverlapIntervalSets(GRlist_object))
 })
@@ -95,7 +101,8 @@ setMethod("ssvMakeMembTable", signature(object = "DataFrame"), function(object){
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,matrix-method
 #' @examples
-#' memb_mat =  matrix(c(TRUE, TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE), ncol = 2, byrow = FALSE)
+#' memb_mat =  matrix(c(TRUE, TRUE, FALSE, FALSE, TRUE, FALSE, TRUE, FALSE),
+#'     ncol = 2, byrow = FALSE)
 #' ssvMakeMembTable(memb_mat)
 setMethod("ssvMakeMembTable", signature(object = "matrix"), function(object){
     mat_object = object
@@ -104,14 +111,17 @@ setMethod("ssvMakeMembTable", signature(object = "matrix"), function(object){
 })
 
 #' data.frame input, final output
-#' The final method for all inputs, checks column names and returns logical matrix
+#' The final method for all inputs, checks column names and returns logical
+#' matrix
 #' @export
 #' @rdname ssvMakeMembTable-methods
 #' @aliases ssvMakeMembTable,data.frame-method
 #' @examples
-#' memb_df = data.frame(a = c(TRUE, TRUE, FALSE, FALSE), b = c(TRUE, FALSE, TRUE, FALSE))
+#' memb_df = data.frame(a = c(TRUE, TRUE, FALSE, FALSE),
+#'     b = c(TRUE, FALSE, TRUE, FALSE))
 #' ssvMakeMembTable(memb_df)
-setMethod("ssvMakeMembTable", signature(object = "data.frame"), function(object){
+setMethod("ssvMakeMembTable",
+          signature(object = "data.frame"), function(object){
     if (is.null(colnames(object))) {
         colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])
     }
@@ -128,7 +138,8 @@ setMethod("ssvMakeMembTable", signature(object = "data.frame"), function(object)
 #'
 #' see \code{\link{ssvMakeMembTable}}
 #'
-#' @param object a valid object for conversion to a membership table and then factor
+#' @param object a valid object for conversion to a membership table and then
+#' factor
 #' @return a 2 column ("id" and "group") data.frame.
 #' "id" is factor of item names if any or simply order of items.
 #' "group" is a factor of set combinations
@@ -141,7 +152,8 @@ ssvFactorizeMembTable = function(object){
     keys = expand.grid(lapply(seq_len(ncol(memb)), function(x)0:1))
     keys = keys == 1
     for(i in rev(seq_len(ncol(keys)))){
-        keys = keys[order(keys[,i, drop = FALSE], decreasing = TRUE), , drop = FALSE]
+        keys = keys[order(keys[,i, drop = FALSE], decreasing = TRUE), ,
+                    drop = FALSE]
     }
     keys = keys[order(rowSums(keys), decreasing = TRUE), , drop = FALSE]
     keys_rn = apply(keys, 1, function(k){

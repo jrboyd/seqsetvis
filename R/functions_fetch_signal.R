@@ -44,7 +44,8 @@ viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
     stopifnot(is.numeric(window_size))
     stopifnot(window_size >= 1)
     stopifnot(window_size %% 1 == 0)
-    stopifnot(x0 %in% c("center", "center_unstranded", "left", "left_unstranded"))
+    stopifnot(x0 %in% c("center", "center_unstranded",
+                        "left", "left_unstranded"))
     windows = slidingWindows(qgr, width = window_size, step = window_size)
     if (is.null(qgr$id)) {
         if (!is.null(names(qgr))) {
@@ -57,12 +58,18 @@ viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
     windows = unlist(windows)
     windows$id = names(windows)
     windows = resize(windows, width = 1, fix = "center")
-    olaps = suppressWarnings(data.table::as.data.table(findOverlaps(query = windows, subject = score_gr)))
+    olaps = suppressWarnings(data.table::as.data.table(
+        findOverlaps(query = windows, subject = score_gr)
+    ))
     # patch up missing/out of bound data with 0
     missing_idx = setdiff(seq_along(windows), olaps$queryHits)
     if (length(missing_idx) > 0) {
-        olaps = rbind(olaps, data.table::data.table(queryHits = missing_idx, subjectHits = length(score_gr) + 1))[order(queryHits)]
-        score_gr = c(score_gr, GRanges(seqnames(score_gr)[length(score_gr)], IRanges::IRanges(1, 1), score = 0))
+        olaps = rbind(olaps, data.table::data.table(
+            queryHits = missing_idx,
+            subjectHits = length(score_gr) + 1))[order(queryHits)]
+        score_gr = c(score_gr,
+                     GRanges(seqnames(score_gr)[length(score_gr)],
+                             IRanges::IRanges(1, 1), score = 0))
     }
     # set y and output windows = windows[olaps$queryHits]
     windows$y = score_gr[olaps$subjectHits]$score
@@ -81,9 +88,11 @@ viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
            },
            left = {
                score_dt[, x := -1]
-               score_dt[strand != "-", `:=`(x, start - min(start) + shift), by = id]
+               score_dt[strand != "-", `:=`(x, start - min(start) + shift),
+                        by = id]
                #flip negative
-               score_dt[strand == "-", `:=`(x, -1*(end - max(end) - shift)), by = id]
+               score_dt[strand == "-", `:=`(x, -1*(end - max(end) - shift)),
+                        by = id]
            },
            left_unstranded = {
                score_dt[, `:=`(x, start - min(start) + shift), by = id]
@@ -271,7 +280,8 @@ fetchWindowedSignalList = function(file_paths,
                                    return_data.table = FALSE,
                                    load_signal = function(f, nam) {
                                        message("loading ", nam, " ...")
-                                       warning("nothing happened, add code here to load files")
+                                       warning("nothing happened, ",
+                                               "add code here to load files")
                                        message("finished loading ", nam, ".")
                                    }){
     if(is.list(file_paths)){
@@ -288,9 +298,12 @@ fetchWindowedSignalList = function(file_paths,
     stopifnot(is.numeric(win_size))
     if (any(duplicated(unique_names))) {
         stop("some unique_names are duplicated:\n",
-             paste(collapse = "\n", unique(unique_names[duplicated(unique_names)])))
+             paste(collapse = "\n",
+                   unique(unique_names[duplicated(unique_names)])))
     }
-    qgr = prepare_fetch_GRanges(qgr = qgr, win_size = win_size, target_size = NULL)
+    qgr = prepare_fetch_GRanges(qgr = qgr,
+                                win_size = win_size,
+                                target_size = NULL)
     nam_load_signal = function(nam){
         f = file_paths[nam]
         load_signal(f, nam, qgr)

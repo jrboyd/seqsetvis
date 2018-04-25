@@ -1,7 +1,8 @@
 #' Fetch values from a bigwig appropriate for heatmaps etc.
 #'
-#' \code{fetchWindowedBigwig} Gets values for each region of the query GRanges (\code{qgr}).
-#' Values correspond to the center of each window of size \code{win_size}.  A tidy formatted data.table
+#' \code{fetchWindowedBigwig} Gets values for each region of the query
+#' GRanges (\code{qgr}). Values correspond to the center of each window of
+#' size \code{win_size}.  A tidy formatted data.table
 #' object is returned suitable for plotting using ggplots.
 #' @export
 #' @param bw_file The character vector path to bigwig files to read from.
@@ -13,7 +14,8 @@
 #' @return A GRanges (or data.table if specified) containing fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second))
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
-#' 10, values from positions chr1 5,15,25...85, and 95 will be retrieved from \code{bw_file}
+#' 10, values from positions chr1 5,15,25...85, and 95 will be retrieved
+#' from \code{bw_file}
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
 #' library(GenomicRanges)
@@ -32,7 +34,9 @@ fetchWindowedBigwig = function(bw_file,
     stopifnot(is.character(bw_file))
     stopifnot(class(qgr) == "GRanges")
     stopifnot(is.numeric(win_size))
-    qgr = prepare_fetch_GRanges(qgr = qgr, win_size = win_size, target_size = NULL)
+    qgr = prepare_fetch_GRanges(qgr = qgr,
+                                win_size = win_size,
+                                target_size = NULL)
     score_gr = rtracklayer::import.bw(bw_file, which = qgr)
     out = viewGRangesWindowed_dt(score_gr, qgr, win_size)
     if(!return_data.table){
@@ -42,9 +46,9 @@ fetchWindowedBigwig = function(bw_file,
 }
 
 
-#' Iterates a character vector (ideally named) and calls \code{fetchWindowedBigwig}
-#' on each.  Appends grouping variable to each resulting data.table and uses rbindlist to
-#' efficiently combine results
+#' Iterates a character vector (ideally named) and calls
+#' \code{fetchWindowedBigwig} on each.  Appends grouping variable to each
+#' resulting data.table and uses rbindlist to efficiently combine results.
 #'
 #' \code{fetchWindowedBigwigList} iteratively calls \code{fetchWindowedBigwig}.
 #' See \code{\link{fetchWindowedBigwig}} for more info.
@@ -53,7 +57,8 @@ fetchWindowedBigwig = function(bw_file,
 #'  read from.
 #' @param qgr Set of GRanges to query.  For valid results the width of each
 #' interval should be identical and evenly divisible by \code{win_size}.
-#' @param unique_names names to use in final data.table to designate source bigwig
+#' @param unique_names names to use in final data.table to designate source
+#' bigwig.
 #' @param names_variable The column name where unique_names are stored.
 #' Default is 'sample'
 #' @param win_size The window size that evenly divides widths in \code{qgr}.

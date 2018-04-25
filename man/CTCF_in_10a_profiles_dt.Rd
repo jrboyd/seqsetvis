@@ -3,7 +3,8 @@
 \docType{data}
 \name{CTCF_in_10a_profiles_dt}
 \alias{CTCF_in_10a_profiles_dt}
-\title{Profiles for 100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq
+\title{Profiles for 100 randomly selected regions from overlapping CTCF peaks in
+10a cell ChIP-seq
 Results from fetching bigwigs with CTCF_in_10a_overlaps_gr.}
 \format{A tidy data.table of 2100 rows and 9 columns}
 \description{

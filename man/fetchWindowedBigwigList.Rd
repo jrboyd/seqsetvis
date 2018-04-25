@@ -2,9 +2,9 @@
 % Please edit documentation in R/functions_fetch_bigwig.R
 \name{fetchWindowedBigwigList}
 \alias{fetchWindowedBigwigList}
-\title{Iterates a character vector (ideally named) and calls \code{fetchWindowedBigwig}
-on each.  Appends grouping variable to each resulting data.table and uses rbindlist to
-efficiently combine results}
+\title{Iterates a character vector (ideally named) and calls
+\code{fetchWindowedBigwig} on each.  Appends grouping variable to each
+resulting data.table and uses rbindlist to efficiently combine results.}
 \usage{
 fetchWindowedBigwigList(file_paths, qgr, unique_names = names(file_paths),
   names_variable = "sample", win_size = 50, return_data.table = FALSE)
@@ -16,7 +16,8 @@ read from.}
 \item{qgr}{Set of GRanges to query.  For valid results the width of each
 interval should be identical and evenly divisible by \code{win_size}.}
 
-\item{unique_names}{names to use in final data.table to designate source bigwig}
+\item{unique_names}{names to use in final data.table to designate source
+bigwig.}
 
 \item{names_variable}{The column name where unique_names are stored.
 Default is 'sample'}

@@ -2,7 +2,8 @@
 % Please edit documentation in R/functions_feature_plots.R
 \name{ssvFeatureVenn}
 \alias{ssvFeatureVenn}
-\title{ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets}
+\title{ggplot implementation of vennDiagram from limma package.  currently limited
+at 3 sets}
 \usage{
 ssvFeatureVenn(object, group_names = NULL, counts_txt_size = 5,
   counts_as_labels = FALSE, show_outside_count = FALSE, line_width = 3,
@@ -10,19 +11,24 @@ ssvFeatureVenn(object, group_names = NULL, counts_txt_size = 5,
   counts_color = NULL, n_points = 200)
 }
 \arguments{
-\item{object}{will be passed to \code{\link{ssvMakeMembTable}} for conversion to membership matrix}
+\item{object}{will be passed to \code{\link{ssvMakeMembTable}} for
+conversion to membership matrix}
 
-\item{group_names}{useful if names weren't provided or were lost in creating membership matrix}
+\item{group_names}{useful if names weren't provided or were lost in
+creating membership matrix}
 
 \item{counts_txt_size}{font size for count numbers}
 
-\item{counts_as_labels}{if TRUE, geom_label is used instead of geom_text.  can be easier to read.}
+\item{counts_as_labels}{if TRUE, geom_label is used instead of geom_text.
+can be easier to read.}
 
-\item{show_outside_count}{if TRUE, items outside of all sets are counted outside. can be confusing.}
+\item{show_outside_count}{if TRUE, items outside of all sets are counted
+outside. can be confusing.}
 
 \item{line_width}{uses size aesthetic to control line width of circles.}
 
-\item{circle_colors}{colors to use for circle line colors. Uses Dark2 set from RColorBrewer by default.}
+\item{circle_colors}{colors to use for circle line colors. Uses Dark2 set
+from RColorBrewer by default.}
 
 \item{fill_alpha}{alpha value to use for fill, defaults to .3.}
 
@@ -37,7 +43,8 @@ default is 200.}
 ggplot venn diagram
 }
 \description{
-ggplot implementation of vennDiagram from limma package.  currently limited at 3 sets
+ggplot implementation of vennDiagram from limma package.  currently limited
+at 3 sets
 }
 \examples{
 ssvFeatureVenn(list(1:3, 2:6))

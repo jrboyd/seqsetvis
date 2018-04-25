@@ -11,8 +11,8 @@ easyLoad_broadPeak(file_paths, file_names = NULL)
 \item{file_paths}{character vector of paths to narrowPeak files.  If named,
 those names will be used in output unless overriden by providing file_names.}
 
-\item{file_names}{character vector of names for output list.  If not NULL will
-override any existing names for file_paths.  Default is NULL.}
+\item{file_names}{character vector of names for output list.  If not NULL
+will override any existing names for file_paths.  Default is NULL.}
 }
 \value{
 a named list of GRanges loaded from file_paths

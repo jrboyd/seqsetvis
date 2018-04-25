@@ -2,7 +2,8 @@
 % Please edit documentation in R/functions_signal_operations.R
 \name{clusteringKmeansNestedHclust}
 \alias{clusteringKmeansNestedHclust}
-\title{perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments
+\title{perform kmeans clustering on matrix rows and return reordered matrix along
+with order matched cluster assignments
 clusters are sorted using hclust on centers
 the contents of each cluster are sorted using hclust}
 \usage{
@@ -22,7 +23,8 @@ each cluster using hierarchical clusering
 group column indicates cluster assignment
 }
 \description{
-perform kmeans clustering on matrix rows and return reordered matrix along with order matched cluster assignments
+perform kmeans clustering on matrix rows and return reordered matrix along
+with order matched cluster assignments
 clusters are sorted using hclust on centers
 the contents of each cluster are sorted using hclust
 }

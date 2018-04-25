@@ -3,7 +3,8 @@
 #' @export
 #' @param grs A list of GRanges
 #' @param ext An integer specifying how far to extend ranges before merging.
-#' in effect, ranges withing 2*ext of one another will be joined during the merge
+#' in effect, ranges withing 2*ext of one another will be joined during the
+#' merge
 #' @param use_first A logical.  If True, instead of merging all grs, only use
 #' first and add metadata logicals for others.
 #' @return GRanges with metadata columns describing overlap of input grs

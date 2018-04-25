@@ -27,8 +27,8 @@ bam will be read.}
 \item{include_plot_in_output}{if TRUE ouptut is a list of fragLen and a
 ggplot showing values considered by calculation. Default is FALSE.}
 
-\item{max_fragLen}{numeric.  The maximum fragLen to calculate for. Calculation
-time is directly proportional to this number. Default
+\item{max_fragLen}{numeric.  The maximum fragLen to calculate for.
+Calculation time is directly proportional to this number. Default
 is 300.}
 
 \item{...}{passed to Rsamtools::ScanBamParam, can't be which or what.}

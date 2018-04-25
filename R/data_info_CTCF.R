@@ -1,10 +1,15 @@
 #' CTCF ChIP-seq in breast cancer cell lines
 #'
-#' @description Vignette data for seqsetvis was downloaded directly from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}.
-#' This data is CTCF ChIP-seq from a model of breast cancer progression derived from the MCF10A cell line.
+#' @description Vignette data for seqsetvis was downloaded directly from GEO
+#' series
+#' \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}.
+#' This data is CTCF ChIP-seq from a model of breast cancer progression
+#' derived from the MCF10A cell line.
 #'
-#' @description Data from GEO series \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}
-#' is from the publication \href{https://www.ncbi.nlm.nih.gov/pubmed/28504305}{Fritz AJ et al. 2018}
+#' @description Data from GEO series
+#' \href{https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551}{GSE98551}
+#' is from the publication
+#' \href{https://www.ncbi.nlm.nih.gov/pubmed/28504305}{Fritz AJ et al. 2018}
 #' @details Contains: \itemize{
 #' \item \code{\link{CTCF_in_10a_overlaps_gr}}
 #' \item \code{\link{CTCF_in_10a_profiles_dt}}
@@ -16,7 +21,8 @@
 #' @name CTCF_in_10a_data
 NULL
 
-#' Profiles for 100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq
+#' Profiles for 100 randomly selected regions from overlapping CTCF peaks in
+#' 10a cell ChIP-seq
 #' Results from CTCF_in_10a_overlaps_gr
 #'
 #' A tidy GRanges at window size 50 bp within 350 bp of peak center
@@ -35,7 +41,8 @@ NULL
 #' @format A tidy GRanges of 2100 rows and 4 metadata columns
 NULL
 
-#' Profiles for 100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq
+#' Profiles for 100 randomly selected regions from overlapping CTCF peaks in
+#' 10a cell ChIP-seq
 #' Results from fetching bigwigs with CTCF_in_10a_overlaps_gr.
 #'
 #' A tidy data.table at window size 50 bp within 350 bp of peak center
@@ -59,10 +66,12 @@ NULL
 #' @format A tidy data.table of 2100 rows and 9 columns
 NULL
 
-#' 100 randomly selected regions from overlapping CTCF peaks in 10a cell ChIP-seq
+#' 100 randomly selected regions from overlapping CTCF peaks in 10a cell
+#' ChIP-seq
 #'
-#' MACS2 narrowPeak calls on pooled biological replicates at pval 1e-5 and then 0.05 IDR filtered
-#' IDR cutoffs determined  by comparing top 150,000 pvalue sorted peak in replicates.
+#' MACS2 narrowPeak calls on pooled biological replicates at pval 1e-5 and
+#' then 0.05 IDR filtered. IDR cutoffs determined  by comparing top 150,000
+#' pvalue sorted peak in replicates.
 #'
 #' See  GEO series GSE98551 for details.
 #' @details part of \code{\link{CTCF_in_10a_data}}

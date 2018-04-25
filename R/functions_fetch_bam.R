@@ -10,7 +10,11 @@
 fragLen_fromMacs2Xls = function(macs2xls_file){
     stopifnot(is.character(macs2xls_file))
     stopifnot(file.exists(macs2xls_file))
-    str = utils::read.table(macs2xls_file, nrows = 30, comment.char = "", sep = "\n", stringsAsFactors = FALSE)$V1
+    str = utils::read.table(macs2xls_file,
+                            nrows = 30,
+                            comment.char = "",
+                            sep = "\n",
+                            stringsAsFactors = FALSE)$V1
     d = str[grepl(" d = ", str)]
 
     ts = str[grepl(" tag size is determined as ", str)]
@@ -34,8 +38,8 @@ fragLen_fromMacs2Xls = function(macs2xls_file){
 #' bam will be read.
 #' @param include_plot_in_output if TRUE ouptut is a list of fragLen and a
 #' ggplot showing values considered by calculation. Default is FALSE.
-#' @param max_fragLen numeric.  The maximum fragLen to calculate for. Calculation
-#' time is directly proportional to this number. Default
+#' @param max_fragLen numeric.  The maximum fragLen to calculate for.
+#' Calculation time is directly proportional to this number. Default
 #' is 300.
 #' @param ... passed to Rsamtools::ScanBamParam, can't be which or what.
 #' @return numeric fragment length
@@ -59,7 +63,8 @@ fragLen_calcStranded = function(bam_f,
     x = y = N = NULL #reserve bindings for data.table
     if(is.null(qgr)){
         if(force_no_which){
-            sbParam = Rsamtools::ScanBamParam(what = c("rname", "strand", "pos", "qwidth"), ...)
+            sbParam = Rsamtools::ScanBamParam(
+                what = c("rname", "strand", "pos", "qwidth"), ...)
         }else{
             stop("No qgr was set for ScanBamParam which arg.  ",
                  "This will probably be very slow and uneccessary.  ",
@@ -67,13 +72,21 @@ fragLen_calcStranded = function(bam_f,
         }
     }else{
         set.seed(0)
-        sbParam = Rsamtools::ScanBamParam(which = sample(qgr, min(length(qgr), n_regions)), what = c("rname", "strand", "pos", "qwidth"), ...)
+        sbParam = Rsamtools::ScanBamParam(
+            which =  sample(qgr, min(length(qgr), n_regions)),
+            what = c("rname", "strand", "pos", "qwidth"),
+            ...)
     }
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
     bam_dt = lapply(bam_raw, function(x){
-        data.table(seqnames = x$rname, strand = x$strand, start = x$pos, width = x$qwidth)
+        data.table(seqnames = x$rname,
+                   strand = x$strand,
+                   start = x$pos,
+                   width = x$qwidth)
     })
-    bam_dt = data.table::rbindlist(bam_dt, use.names = TRUE, idcol = "which_label")
+    bam_dt = data.table::rbindlist(bam_dt,
+                                   use.names = TRUE,
+                                   idcol = "which_label")
     bam_dt[, end := start + width - 1L]
     bam_dt[, pos := start]
     bam_dt[strand == "-", pos := end]
@@ -92,17 +105,29 @@ fragLen_calcStranded = function(bam_f,
     }else{
         pdt = data.table(x = xs, raw = perc, moving_average = ma_perc21)
 
-        pdt = data.table::melt(pdt, id.vars = "x", variable.name = "transform", value.name = "y")
+        pdt = data.table::melt(pdt, id.vars = "x",
+                               variable.name = "transform", value.name = "y")
         p = ggplot(pdt) +
             labs(x = "Fragment Length", y = "% strand match",
                  title = paste(basename(bam_f)),
-                 subtitle = paste("Fragment Length determined by strand match maximization",
-                                  paste("Moving averge window", ma_distance, "applied"),
+                 subtitle = paste("Fragment Length determined by",
+                                  "strand match maximization",
+                                  paste("Moving averge window",
+                                        ma_distance,
+                                        "applied"),
                                   sep = "\n")) +
             geom_line(aes(x = x, y = y, color = transform)) +
-            scale_color_manual(values = c(raw = "black", moving_average = "red")) +
-            annotate("line", x = rep(fragLenMa, 2), y = range(perc), color = "green") +
-            annotate("label", x = fragLenMa, y = mean(range(perc)), label = fragLenMa, color = "black")
+            scale_color_manual(values = c(raw = "black",
+                                          moving_average = "red")) +
+            annotate("line",
+                     x = rep(fragLenMa, 2),
+                     y = range(perc),
+                     color = "green") +
+            annotate("label",
+                     x = fragLenMa,
+                     y = mean(range(perc)),
+                     label = fragLenMa,
+                     color = "black")
         return(list(fragLenMa, p))
     }
 }
@@ -138,12 +163,17 @@ fetchBam = function(bam_f,
         stopifnot(fragLen %% 1 == 0)
         stopifnot(fragLen >= 1)
     }
-    sbParam = Rsamtools::ScanBamParam(which = qgr, what = c("rname", "strand", "pos", "qwidth"), ...)
+    sbParam = Rsamtools::ScanBamParam(
+        which = qgr,
+        what = c("rname", "strand", "pos", "qwidth"), ...)
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
     bam_dt = lapply(bam_raw, function(x){
-        data.table(seqnames = x$rname, strand = x$strand, start = x$pos, width = x$qwidth)
+        data.table(seqnames = x$rname, strand = x$strand,
+                   start = x$pos, width = x$qwidth)
     })
-    bam_dt = data.table::rbindlist(bam_dt, use.names = TRUE, idcol = "which_label")
+    bam_dt = data.table::rbindlist(bam_dt,
+                                   use.names = TRUE,
+                                   idcol = "which_label")
     bam_dt[, end := start + width - 1L]
 
     ext_dt = copy(bam_dt)
@@ -212,8 +242,8 @@ fetchWindowedBam = function(bam_f,
 }
 
 #' Iterates a character vector (ideally named) and calls \code{fetchWindowedBam}
-#' on each.  Appends grouping variable to each resulting data.table and uses rbindlist to
-#' efficiently combine results
+#' on each.  Appends grouping variable to each resulting data.table and uses
+#' rbindlist to efficiently combine results
 #'
 #' \code{fetchWindowedBamList} iteratively calls \code{fetchWindowedBam}.
 #' See \code{\link{fetchWindowedBam}} for more info.
@@ -222,8 +252,8 @@ fetchWindowedBam = function(bam_f,
 #'  read from.
 #' @param qgr Set of GRanges to query.  For valid results the width of each
 #' interval should be identical and evenly divisible by \code{win_size}.
-#' @param unique_names names to use in final data.table to designate source bigwig
-#' Default is 'sample'
+#' @param unique_names names to use in final data.table to designate source
+#' bigwig. Default is 'sample'
 #' @param win_size The window size that evenly divides widths in \code{qgr}.
 #' @param fragLens numeric. The fragment length to use to extend reads.  The
 #' default value NULL causes an automatical calculation from 100 regions in

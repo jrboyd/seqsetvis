@@ -54,13 +54,18 @@ safeBrew = function(n, pal = "Dark2"){
     rownames(pal_info) = tolower(rownames(pal_info))
     pal = tolower(pal)
     if(!any(pal == rownames(pal_info)))
-        stop("Palette", pal, "not a valid RColorBrewer palette, see RColorBrewer::brewer.pal.info")
+        stop("Palette", pal, "not a valid RColorBrewer palette, ",
+             "see RColorBrewer::brewer.pal.info")
     maxColors = pal_info[pal,]$maxcolors
     nbrew = min(max(n, 3), maxColors)
-    RColorBrewer::brewer.pal(n = nbrew, name = pal_info[pal,]$brewName)[(seq_len(n)-1) %% maxColors + 1]
+    RColorBrewer::brewer.pal(
+        n = nbrew,
+        name = pal_info[pal,]$brewName)[(seq_len(n)-1) %% maxColors + 1]
 }
 
-# x: the vector n: the number of samples centered: if FALSE, then average current sample and previous (n-1) samples if TRUE, then average symmetrically in past and
+# x: the vector n: the number of samples centered: if FALSE, then average
+# current sample and previous (n-1) samples if TRUE, then average
+# symmetrically in past and
 # future. (If n is even, use one more sample from future.)
 # from http://www.cookbook-r.com/Manipulating_data/Calculating_a_moving_average/
 movingAverage <- function(x, n = 1, centered = TRUE) {
@@ -198,7 +203,8 @@ ggellipse = function(xcentres,
                         r2, phi, n_points)
     names(e) = group_names
     x = y = group = NULL #reserve data.table bindings
-    ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x, y = ell$y))
+    ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x,
+                                                           y = ell$y))
     ell_dt = data.table::rbindlist(ell_dt, use.names = TRUE, idcol = "group")
     #check colors
     stopifnot(is.null(circle_colors) || all(is.character(circle_colors)))
@@ -217,11 +223,13 @@ ggellipse = function(xcentres,
     # make scales
     names(circle_colors) = group_names
 
-    ahex = substr(grDevices::rgb(red = 1, blue = 1, green = 1, alpha = fill_alpha), start = 8, stop = 9)
+    ahex = substr(grDevices::rgb(red = 1, blue = 1, green = 1,
+                                 alpha = fill_alpha), start = 8, stop = 9)
     fill_scale = paste0(circle_colors, ahex)
     names(fill_scale) = names(circle_colors)
 
-    ahex = substr(grDevices::rgb(red = 1, blue = 1, green = 1, alpha = line_alpha), start = 8, stop = 9)
+    ahex = substr(grDevices::rgb(red = 1, blue = 1, green = 1,
+                                 alpha = line_alpha), start = 8, stop = 9)
     line_scale = paste0(circle_colors, ahex)
     names(line_scale) = names(circle_colors)
 

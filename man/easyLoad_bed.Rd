@@ -12,8 +12,8 @@ easyLoad_bed(file_paths, file_names = NULL, extraCols = character())
 \item{file_paths}{character vector of paths to narrowPeak files.  If named,
 those names will be used in output unless overriden by providing file_names.}
 
-\item{file_names}{character vector of names for output list.  If not NULL will
-override any existing names for file_paths.  Default is NULL.}
+\item{file_names}{character vector of names for output list.  If not NULL
+will override any existing names for file_paths.  Default is NULL.}
 
 \item{extraCols}{named character vector of classes.  passed to
 rtracklayer::import for format = "BED". default is character().}
