@@ -1,13 +1,20 @@
+# seqsetvis 0.99.18
+
+* updated package title
+* updated vignette title
+
 # seqsetvis 0.99.17
 
-* fetch functions, _dt versions removed and param return_data.table = FALSE added
+* fetch functions, _dt versions removed and param return_data.table = FALSE
+added
 * refactoring to encapsulate fetch utility functions shared by bw and bam
 
 # seqsetvis 0.99.13
 
 * added bamFetch*
 * refactored bwFetch* to use viewGRangesWindowed_dt, same as bamFetch*
-* ssvSignalClustering and Heatmap bug fixes related to hardcoded data.table variables
+* ssvSignalClustering and Heatmap bug fixes related to hardcoded data.table
+variables
 * restructured and renamed extdata to be cleaner/more intuitive.
 
 # seqsetvis 0.99.12
@@ -19,14 +26,16 @@
 * fewer and smaller vignette figures
 * ggellipse exported with documentation
 * ssvSignalHeatmap calcs better xticks
-* ssvFeatureBinaryHeatmap true_color and false_color params addedto allow color control
+* ssvFeatureBinaryHeatmap true_color and false_color params added to allow
+color control
 * ssvFeatureVenn and Euler params unified
 * ssvFeatureBars has bar_color param like that of venn and euler
 
 # seqsetvis 0.99.9
 
 * vigentte - some plots reduced in size and dpi reduced to save space.
-* ssvFeatureVenn and Euler refactored to use common internal ggellipse function for
+* ssvFeatureVenn and Euler refactored to use common internal ggellipse function
+for
 consistency.
 * ssvBinarizeHeatmap cleaned up plot output and changed default to
 raster_approximation = FALSE

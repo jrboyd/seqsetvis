@@ -4,10 +4,12 @@
 \alias{ssvFeaturePie}
 \title{pie plot of set sizes}
 \usage{
-ssvFeaturePie(object)
+ssvFeaturePie(object, slice_colors = NULL)
 }
 \arguments{
 \item{object}{object that ssvMakeMembTable can convert to logical matrix membership}
+
+\item{slice_colors}{colors to use for pie slices}
 }
 \value{
 ggplot pie graph of set sizes

@@ -1,6 +1,6 @@
 Package: seqsetvis
 Type: Package
-Title: Visualizations for User Friendly ChIP-seq Peak Comparison and Analysis
+Title: Set Based Visualizations for Next-Gen Sequencing Data
 Version: 0.99.17
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))

@@ -5,7 +5,7 @@ output:
   BiocStyle::html_document:
     toc_float: true
 vignette: >
-    %\VignetteIndexEntry{CTCF binding in breast cancer cell lines: From GEO}
+    %\VignetteIndexEntry{Overview and Use Cases}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---
@@ -400,7 +400,8 @@ ssvSignalHeatmap(bw_clust, facet_ = "facet_label")
 This vignette runs using a small subset of datasets that are publicly available 
 via [GEO](https://www.ncbi.nlm.nih.gov/geo/).  These data are fully described 
 in [GSE98551](https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE98551) and 
-the associated paper: [Intranuclear and higher-order chromatin organization of the major histone gene cluster in breast cancer](https://www.ncbi.nlm.nih.gov/pubmed/28504305)
+the associated paper: 
+[Intranuclear and higher-order chromatin organization of the major histone gene cluster in breast cancer](https://www.ncbi.nlm.nih.gov/pubmed/28504305)
 
 In brief, the three cell lines MCF10A, MCF10A-at1, and MCF10A-CA1a are used as 
 a model of breast cancer progression from normal-like MCF10A to  
@@ -625,7 +626,8 @@ This code chunk results in identical data to that stored in the
 
 ```{r fetch package bw}
 if(use_full_data){
-    bw_gr = fetchWindowedBigwigList(bw_files = bw_files, qgr = olaps_fixedSize,
+    bw_gr = fetchWindowedBigwigList(file_paths = bw_files, 
+                                    qgr = olaps_fixedSize,
                                     win_size = 50)
 }
 ```
@@ -648,7 +650,8 @@ colnames(mcols(olaps_fixedSize)) = sub("_CTCF", "",
 
 all_groups = levels(ssvFactorizeMembTable(
     ssvMakeMembTable(olaps_fixedSize))$group)
-all_colors = RColorBrewer::brewer.pal(length(all_groups), "Dark2")
+all_colors = RColorBrewer::brewer.pal(length(all_groups), "Set1")
+all_colors[5:7] = safeBrew(3, "Dark2")
 names(all_colors) = all_groups
 olap_groups_12 = ssvFactorizeMembTable(
     ssvMakeMembTable(olaps_fixedSize)[, 1:2])
@@ -668,8 +671,12 @@ p_13  = ssvSignalScatterplot(bw_gr,
 
 
 if(use_full_data){
-    tp_12 = p_12 + scale_size_continuous(range = .1) + scale_alpha_continuous(range = .1) + geom_density2d(aes(color = group), h = 40, bins = 3)
-    tp_13 = p_13 + scale_size_continuous(range = .1) + scale_alpha_continuous(range = .1) + geom_density2d(aes(color = group), h = 40, bins = 3)
+    tp_12 = p_12 + scale_size_continuous(range = .1) + 
+        scale_alpha_continuous(range = .1) + 
+        geom_density2d(aes(color = group), h = 40, bins = 3)
+    tp_13 = p_13 + scale_size_continuous(range = .1) + 
+        scale_alpha_continuous(range = .1) + 
+        geom_density2d(aes(color = group), h = 40, bins = 3)
     cowplot::plot_grid(tp_12 + labs(title = ""), 
                        tp_13 + labs(title = ""), 
                        label_y = .85, labels = "AUTO") 
