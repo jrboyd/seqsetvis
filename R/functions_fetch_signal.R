@@ -300,14 +300,14 @@ viewGRangesWinSummary_dt = function (score_gr,
     #x is already set and regions are already contiguous.
     #just need to flip x or center as needed.
     switch(x0, center = {
-        score_dt[, x := x - round(mean(x)), by = id]
-        score_dt[strand == "-", x := -1 * x]
+        score_dt[, x := x - (mean(x)), by = id]
+        score_dt[strand == "-", x := (1 - 1 * x)]
     }, center_unstranded = {
-        score_dt[, x := x - round(mean(x)), by = id]
+        score_dt[, x := x - (mean(x)), by = id]
     }, left = {
         score_dt[strand == "-", x := (1 - 1 * x), by = id]
     }, left_unstranded = {
-
+        #do nothing
     })
     score_dt
 }
