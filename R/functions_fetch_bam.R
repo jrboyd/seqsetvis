@@ -205,7 +205,9 @@ fetchBam = function(bam_f,
 #'
 #' @param bam_f character or BamFile to load
 #' @param qgr GRanges regions to fetchs
-#' @param win_size numeric >=1.  pileup grabbed every win_size bp
+#' @param win_size numeric >=1.  pileup grabbed every win_size bp for win_method
+#' sample.  If win_method is summary, this is the number of windows used
+#' (confusing, sorry).
 #' @param win_method character.  one of c("sample", "summary").  Determines
 #' if \code{\link{viewGRangesWinSample_dt}} or
 #' \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
@@ -217,6 +219,8 @@ fetchBam = function(bam_f,
 #' if NA, raw bam pileup with no cross strand shift is returned.
 #' @param target_strand character. if one of "+" or "-", reads are filtered
 #' accordingly. ignored if any other value.
+#' @param x0 character, one of c("center", "center_unstranded",
+#' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
 #' @return tidy GRanges (or data.table if specified) with pileups from bam
@@ -239,6 +243,8 @@ fetchWindowedBam = function(bam_f,
                             summary_FUN = weighted.mean,
                             fragLen = NULL,
                             target_strand = c("*", "+", "-")[1],
+                            x0 = c("left", "left_unstranded", "center",
+                                   "center_unstranded")[3],
                             return_data.table = FALSE) {
     stopifnot(is.character(win_method))
     stopifnot(length(win_method) == 1)
@@ -248,18 +254,13 @@ fetchWindowedBam = function(bam_f,
             sample = {
                 qgr = prepare_fetch_GRanges(qgr, win_size)
                 score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
-                out = viewGRangesWinSample_dt(score_gr, qgr, win_size)
+                out = viewGRangesWinSample_dt(score_gr, qgr, win_size, x0 = x0)
             },
             summary = {
-                if(!all(width(qgr) %% win_size != 0)){
-                    fwidths = ceiling(width(qgr) / win_size) * win_size
-                    qgr = resize(qgr, width = fwidths, fix = "center")
-                    warning("Not all widths of qgr were evenly divisible by ",
-                            "win_size.  Some were resized accordingly.")
-                }
-
                 score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
-                out = viewGRangesWinSummary_dt(score_gr, qgr, win_size)
+                out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
+                                               summary_FUN = summary_FUN,
+                                               x0 = x0)
             }
     )
 
@@ -284,11 +285,19 @@ fetchWindowedBam = function(bam_f,
 #' @param unique_names names to use in final data.table to designate source
 #' bigwig. Default is 'sample'
 #' @param win_size The window size that evenly divides widths in \code{qgr}.
+#' @param win_method character.  one of c("sample", "summary").  Determines
+#' if \code{\link{viewGRangesWinSample_dt}} or
+#' \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+#' qgr.
+#' @param summary_FUN function.  only relevant if win_method is "summary".
+#' passed to \code{\link{viewGRangesWinSummary_dt}}.
 #' @param fragLens numeric. The fragment length to use to extend reads.  The
 #' default value NULL causes an automatical calculation from 100 regions in
 #' qgr.
 #' @param target_strand character. One of c("*", "+", "-"). Controls
 #' filtering of reads by strand.  Default of "*" combines both strands.
+#' @param x0 character, one of c("center", "center_unstranded",
+#' "left", "left_unstranded")
 #' @param names_variable The column name where unique_names are stored.
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
@@ -315,8 +324,12 @@ fetchWindowedBamList = function(file_paths,
                                 qgr,
                                 unique_names = names(file_paths),
                                 win_size = 50,
+                                win_method = c("sample", "summary")[1],
+                                summary_FUN = weighted.mean,
                                 fragLens = "auto",
                                 target_strand = c("*", "+", "-")[1],
+                                x0 = c("left", "left_unstranded", "center",
+                                       "center_unstranded")[3],
                                 names_variable = "sample",
                                 return_data.table = FALSE){
     stopifnot(all(is.character(fragLens) | is.numeric(fragLens)))
@@ -334,6 +347,8 @@ fetchWindowedBamList = function(file_paths,
         dt = fetchWindowedBam(bam_f = f,
                               qgr = qgr,
                               win_size = win_size,
+                              win_method = win_method,
+                              summary_FUN = summary_FUN,
                               fragLen = fl,
                               target_strand = target_strand,
                               return_data.table = TRUE)
@@ -348,6 +363,7 @@ fetchWindowedBamList = function(file_paths,
                             unique_names = unique_names,
                             names_variable = names_variable,
                             win_size = win_size,
+                            win_method = win_method,
                             return_data.table = return_data.table)
 
 }

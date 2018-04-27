@@ -4,7 +4,9 @@
 \alias{fetchWindowedBigwig}
 \title{Fetch values from a bigwig appropriate for heatmaps etc.}
 \usage{
-fetchWindowedBigwig(bw_file, qgr, win_size = 50, return_data.table = FALSE)
+fetchWindowedBigwig(bw_file, qgr, win_size = 50, x0 = c("left",
+  "left_unstranded", "center", "center_unstranded")[3],
+  return_data.table = FALSE)
 }
 \arguments{
 \item{bw_file}{The character vector path to bigwig files to read from.}
@@ -13,6 +15,9 @@ fetchWindowedBigwig(bw_file, qgr, win_size = 50, return_data.table = FALSE)
 interval should be identical and evenly divisible by \code{win_size}.}
 
 \item{win_size}{The window size that evenly divides widths in \code{qgr}.}
+
+\item{x0}{character, one of c("center", "center_unstranded",
+"left", "left_unstranded")}
 
 \item{return_data.table}{logical. If TRUE the internal data.table is
 returned instead of GRanges.  Default is FALSE.}

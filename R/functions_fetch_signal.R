@@ -15,6 +15,10 @@
 #' unique_names entries.  Default is "sample"
 #' @param win_size numeric/integer window size resolution to load signal at.
 #' Default is 50.
+#' @param win_method character.  one of c("sample", "summary").  Determines
+#' if \code{\link{viewGRangesWinSample_dt}} or
+#' \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+#' qgr.
 #' @param return_data.table logical. If TRUE data.table is returned instead of
 #' GRanges, the default.
 #' @param load_signal function taking f, nam, and qgr arguments.  f is from
@@ -52,6 +56,7 @@ fetchWindowedSignalList = function(file_paths,
                                    unique_names = names(file_paths),
                                    names_variable = "sample",
                                    win_size = 50,
+                                   win_method = c("sample", "summary")[1],
                                    return_data.table = FALSE,
                                    load_signal = function(f, nam) {
                                        message("loading ", nam, " ...")
@@ -76,9 +81,12 @@ fetchWindowedSignalList = function(file_paths,
              paste(collapse = "\n",
                    unique(unique_names[duplicated(unique_names)])))
     }
-    qgr = prepare_fetch_GRanges(qgr = qgr,
-                                win_size = win_size,
-                                target_size = NULL)
+    if(win_method == "sample"){
+        qgr = prepare_fetch_GRanges(qgr = qgr,
+                                    win_size = win_size,
+                                    target_size = NULL)
+    }
+
     nam_load_signal = function(nam){
         f = file_paths[nam]
         load_signal(f, nam, qgr)
@@ -264,9 +272,11 @@ viewGRangesWinSummary_dt = function (score_gr,
         as.data.table(tiles[olaps$queryHits])[,-c(1, 4:5)],
         tile_id = olaps$queryHits
     )
-
-    #trim score regions to fit in tiles so score weighting is accurate
     colnames(cov_dt)[4:5] = c("tile_start", "tile_end")
+
+    cov_dt[start == 1 & end == 1, c("start", "end") := .(tile_start, tile_end)]
+    #trim score regions to fit in tiles so score weighting is accurate
+
     cov_dt[start < tile_start, start := tile_start]
     cov_dt[end > tile_end, end := tile_end]
     cov_dt[, width := end - start + 1]
@@ -301,7 +311,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     #just need to flip x or center as needed.
     switch(x0, center = {
         score_dt[, x := x - (mean(x)), by = id]
-        score_dt[strand == "-", x := (1 - 1 * x)]
+        score_dt[strand == "-", x := (- 1 * x)]
     }, center_unstranded = {
         score_dt[, x := x - (mean(x)), by = id]
     }, left = {

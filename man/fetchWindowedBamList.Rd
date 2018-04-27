@@ -7,8 +7,11 @@ on each.  Appends grouping variable to each resulting data.table and uses
 rbindlist to efficiently combine results}
 \usage{
 fetchWindowedBamList(file_paths, qgr, unique_names = names(file_paths),
-  win_size = 50, fragLens = "auto", target_strand = c("*", "+", "-")[1],
-  names_variable = "sample", return_data.table = FALSE)
+  win_size = 50, win_method = c("sample", "summary")[1],
+  summary_FUN = weighted.mean, fragLens = "auto", target_strand = c("*",
+  "+", "-")[1], x0 = c("left", "left_unstranded", "center",
+  "center_unstranded")[3], names_variable = "sample",
+  return_data.table = FALSE)
 }
 \arguments{
 \item{file_paths}{The character vector or list of paths to bigwig files to
@@ -22,12 +25,23 @@ bigwig. Default is 'sample'}
 
 \item{win_size}{The window size that evenly divides widths in \code{qgr}.}
 
+\item{win_method}{character.  one of c("sample", "summary").  Determines
+if \code{\link{viewGRangesWinSample_dt}} or
+\code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+qgr.}
+
+\item{summary_FUN}{function.  only relevant if win_method is "summary".
+passed to \code{\link{viewGRangesWinSummary_dt}}.}
+
 \item{fragLens}{numeric. The fragment length to use to extend reads.  The
 default value NULL causes an automatical calculation from 100 regions in
 qgr.}
 
 \item{target_strand}{character. One of c("*", "+", "-"). Controls
 filtering of reads by strand.  Default of "*" combines both strands.}
+
+\item{x0}{character, one of c("center", "center_unstranded",
+"left", "left_unstranded")}
 
 \item{names_variable}{The column name where unique_names are stored.}
 

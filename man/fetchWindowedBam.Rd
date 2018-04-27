@@ -6,14 +6,17 @@
 \usage{
 fetchWindowedBam(bam_f, qgr, win_size = 50, win_method = c("sample",
   "summary")[1], summary_FUN = weighted.mean, fragLen = NULL,
-  target_strand = c("*", "+", "-")[1], return_data.table = FALSE)
+  target_strand = c("*", "+", "-")[1], x0 = c("left", "left_unstranded",
+  "center", "center_unstranded")[3], return_data.table = FALSE)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}
 
 \item{qgr}{GRanges regions to fetchs}
 
-\item{win_size}{numeric >=1.  pileup grabbed every win_size bp}
+\item{win_size}{numeric >=1.  pileup grabbed every win_size bp for win_method
+sample.  If win_method is summary, this is the number of windows used
+(confusing, sorry).}
 
 \item{win_method}{character.  one of c("sample", "summary").  Determines
 if \code{\link{viewGRangesWinSample_dt}} or
@@ -29,6 +32,9 @@ if NA, raw bam pileup with no cross strand shift is returned.}
 
 \item{target_strand}{character. if one of "+" or "-", reads are filtered
 accordingly. ignored if any other value.}
+
+\item{x0}{character, one of c("center", "center_unstranded",
+"left", "left_unstranded")}
 
 \item{return_data.table}{logical. If TRUE the internal data.table is
 returned instead of GRanges.  Default is FALSE.}

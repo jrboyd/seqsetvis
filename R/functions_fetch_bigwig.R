@@ -9,6 +9,8 @@
 #' @param qgr Set of GRanges to query.  For valid results the width of each
 #' interval should be identical and evenly divisible by \code{win_size}.
 #' @param win_size The window size that evenly divides widths in \code{qgr}.
+#' @param x0 character, one of c("center", "center_unstranded",
+#' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
 #' @return A GRanges (or data.table if specified) containing fetched values.
@@ -30,6 +32,8 @@
 fetchWindowedBigwig = function(bw_file,
                                qgr,
                                win_size = 50,
+                               x0 = c("left", "left_unstranded", "center",
+                                      "center_unstranded")[3],
                                return_data.table = FALSE) {
     stopifnot(is.character(bw_file))
     stopifnot(class(qgr) == "GRanges")
@@ -62,6 +66,8 @@ fetchWindowedBigwig = function(bw_file,
 #' @param names_variable The column name where unique_names are stored.
 #' Default is 'sample'
 #' @param win_size The window size that evenly divides widths in \code{qgr}.
+#' @param x0 character, one of c("center", "center_unstranded",
+#' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
@@ -88,6 +94,8 @@ fetchWindowedBigwigList = function(file_paths,
                                    unique_names = names(file_paths),
                                    names_variable = "sample",
                                    win_size = 50,
+                                   x0 = c("left", "left_unstranded", "center",
+                                          "center_unstranded")[3],
                                    return_data.table = FALSE) {
 
     load_bw = function(f, nam, qgr) {

@@ -5,10 +5,10 @@
 \title{Generic signal loading function}
 \usage{
 fetchWindowedSignalList(file_paths, qgr, unique_names = names(file_paths),
-  names_variable = "sample", win_size = 50, return_data.table = FALSE,
-  load_signal = function(f, nam) {     message("loading ", nam, " ...")    
-  warning("nothing happened, ", "add code here to load files")    
-  message("finished loading ", nam, ".") })
+  names_variable = "sample", win_size = 50, win_method = c("sample",
+  "summary")[1], return_data.table = FALSE, load_signal = function(f, nam) {
+      message("loading ", nam, " ...")     warning("nothing happened, ",
+  "add code here to load files")     message("finished loading ", nam, ".") })
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from}
@@ -23,6 +23,11 @@ unique_names entries.  Default is "sample"}
 
 \item{win_size}{numeric/integer window size resolution to load signal at.
 Default is 50.}
+
+\item{win_method}{character.  one of c("sample", "summary").  Determines
+if \code{\link{viewGRangesWinSample_dt}} or
+\code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+qgr.}
 
 \item{return_data.table}{logical. If TRUE data.table is returned instead of
 GRanges, the default.}

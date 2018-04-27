@@ -19,8 +19,8 @@ test_that("viewGRangesWinSample_dt center", {
     dt_us = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 50, x0 = "center_unstranded")
     # dt_us$group = "unstranded"
     # ssvSignalLineplot(rbind(dt, dt_us), sample_ = "id", color_ = "strand", group_ = "group")
-    expect_equal(dt[strand == "+"], dt_us[strand == "+"])
-    expect_failure(expect_equal(dt[strand == "-"], dt_us[strand == "-"]))
+    expect_true(all(dt[strand == "+"][order(x)]$y == dt_us[strand == "+"][order(x)]$y))
+    expect_false(all(dt[strand == "-"][order(x)]$y == dt_us[strand == "-"][order(x)]$y))
     expect_false(all(dt$x > 0))
     expect_false(all(dt$x < 0))
     expect_false(all(dt_us$x > 0))
@@ -33,8 +33,8 @@ test_that("viewGRangesWinSample_dt left", {
     dt_us = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 50, x0 = "left_unstranded")
     # dt_us$group = "unstranded"
     # ssvSignalLineplot(rbind(dt, dt_us), sample_ = "id", color_ = "strand", group_ = "group")
-    expect_equal(dt[strand == "+"], dt_us[strand == "+"])
-    expect_failure(expect_equal(dt[strand == "-"], dt_us[strand == "-"]))
+    expect_equal(dt[strand == "+"][order(x)]$y, dt_us[strand == "+"][order(x)]$y)
+    expect_failure(expect_equal(dt[strand == "-"][order(x)]$y, dt_us[strand == "-"][order(x)]$y))
     expect_true(all(dt$x > 0))
     expect_true(all(dt_us$x > 0))
 })
@@ -46,8 +46,8 @@ test_that("viewGRangesWinSummary_dt center", {
     dt_us = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, x0 = "center_unstranded")
     # dt_us$group = "unstranded"
     # ssvSignalLineplot(rbind(dt, dt_us), sample_ = "id", color_ = "strand", group_ = "group")
-    expect_equal(dt[strand == "+"], dt_us[strand == "+"])
-    expect_failure(expect_equal(dt[strand == "-"], dt_us[strand == "-"]))
+    expect_equal(dt[strand == "+"][order(x)]$y, dt_us[strand == "+"][order(x)]$y)
+    expect_failure(expect_equal(dt[strand == "-"][order(x)]$y, dt_us[strand == "-"][order(x)]$y))
     expect_false(all(dt$x > 0))
     expect_false(all(dt$x < 0))
     expect_false(all(dt_us$x > 0))
@@ -60,8 +60,8 @@ test_that("viewGRangesWinSummary_dt left", {
     dt_us = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, x0 = "left_unstranded")
     # dt_us$group = "unstranded"
     # ssvSignalLineplot(rbind(dt, dt_us), sample_ = "id", color_ = "strand", group_ = "group")
-    expect_equal(dt[strand == "+"], dt_us[strand == "+"])
-    expect_failure(expect_equal(dt[strand == "-"], dt_us[strand == "-"]))
+    expect_equal(dt[strand == "+"][order(x)]$y, dt_us[strand == "+"][order(x)]$y)
+    expect_failure(expect_equal(dt[strand == "-"][order(x)]$y, dt_us[strand == "-"][order(x)]$y))
     expect_true(all(dt$x > 0))
     expect_true(all(dt_us$x > 0))
 })
@@ -70,10 +70,42 @@ test_that("viewGRangesWinSummary_dt left", {
 vgr = qgr
 end(vgr) = end(vgr) + 0:4*100
 
-test_that("viewGrangesWin* sizes vary", {
-    viewGRangesWin(bam_gr, qgr, n_tiles = 10, x0 = "left")
-    viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, x0 = "left")
+test_that("viewGRangesWinSample_dt sizes vary, viewGRangesWinSummary_dt don't", {
+    sample_dt = viewGRangesWinSample_dt(bam_gr, vgr, window_size = 100, x0 = "left")
+    expect_gt(length(unique(sample_dt[, .N, by = id]$N)), 1)
+    summary_dt = viewGRangesWinSummary_dt(bam_gr, vgr, n_tiles = 10, x0 = "left")
+    summary_dt[, .N, by = id]
+    expect_equal(length(unique(summary_dt[, .N, by = id]$N)), 1)
 })
+
+
+test_that("can fetch bam summary", {
+    #sample is bp scale
+    sample_dt = fetchWindowedBam(bam_file, vgr, return_data.table = TRUE)
+    expect_gte(max(abs(range(sample_dt$x))), 100)
+    #summaries have range of x < .5 for center x0
+    summary_dt = fetchWindowedBam(bam_file, vgr, win_method = "summary", return_data.table = TRUE)
+    expect_lte(max(abs(range(summary_dt$x))), .5)
+    summary_dt.med = fetchWindowedBam(bam_file, vgr[5], win_method = "summary",
+                                      summary_FUN = function(x, w){min(w)}, return_data.table = TRUE)
+    expect_lte(max(abs(range(summary_dt.med$x))), .5)
+    #summary fun did something
+    expect_false(all(summary_dt$y == summary_dt.med$y))
+    #win size did something
+    summary_dt10 = fetchWindowedBam(bam_file, vgr, win_method = "summary",
+                                  win_size = 10,
+                                  return_data.table = TRUE)
+    expect_true(all(summary_dt10[, .N, by = id]$N == 10))
+    expect_true(all(summary_dt[, .N, by = id]$N == 50))
+})
+
+bams = c("A" = bam_file, "B" = bam_file)
+bams_sample_dt = fetchWindowedBamList(bams, vgr)
+bams_summary_dt = fetchWindowedBamList(bams, vgr, win_method = "summary")
+bams_summary_dt10 = fetchWindowedBamList(bams, vgr, win_method = "summary",
+                                       win_size = 10)
+bams_summary_dtFUN = fetchWindowedBamList(bams, vgr, win_method = "summary",
+                                       summary_FUN = function(x, w){min(w)})
 
 # fetchBam and fetchBw params
 # win_method
