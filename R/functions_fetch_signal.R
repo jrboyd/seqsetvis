@@ -305,7 +305,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     }, center_unstranded = {
         score_dt[, x := x - round(mean(x)), by = id]
     }, left = {
-        score_dt[strand == "-", x := 1 - 1 * x, by = id]
+        score_dt[strand == "-", x := (1 - 1 * x), by = id]
     }, left_unstranded = {
 
     })
