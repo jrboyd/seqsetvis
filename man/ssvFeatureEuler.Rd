@@ -15,13 +15,15 @@ ssvFeatureEuler(object, line_width = 2, shape = c("circle", "ellipse")[1],
 
 \item{shape}{shape argument passed to eulerr::euler}
 
-\item{n_points}{number of points to use for drawing ellipses, passed to  eulerr:::ellipse}
+\item{n_points}{number of points to use for drawing ellipses, passed to
+eulerr:::ellipse}
 
 \item{fill_alpha}{numeric [0,1], alpha value for circle fill}
 
 \item{line_alpha}{numeric [0,1], alpha value for circle line}
 
-\item{circle_colors}{colors to choose from for circles.  passed to ggplot2 color scales.}
+\item{circle_colors}{colors to choose from for circles.  passed to ggplot2
+color scales.}
 }
 \value{
 ggplot of venneuler results

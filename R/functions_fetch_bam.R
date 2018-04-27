@@ -206,6 +206,12 @@ fetchBam = function(bam_f,
 #' @param bam_f character or BamFile to load
 #' @param qgr GRanges regions to fetchs
 #' @param win_size numeric >=1.  pileup grabbed every win_size bp
+#' @param win_method character.  one of c("sample", "summary").  Determines
+#' if \code{\link{viewGRangesWinSample_dt}} or
+#' \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+#' qgr.
+#' @param summary_FUN function.  only relevant if win_method is "summary".
+#' passed to \code{\link{viewGRangesWinSummary_dt}}.
 #' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
 #' if NULL, value is calculated with fragLen_calcStranded
 #' if NA, raw bam pileup with no cross strand shift is returned.
@@ -229,12 +235,35 @@ fetchBam = function(bam_f,
 fetchWindowedBam = function(bam_f,
                             qgr,
                             win_size = 50,
+                            win_method = c("sample", "summary")[1],
+                            summary_FUN = weighted.mean,
                             fragLen = NULL,
                             target_strand = c("*", "+", "-")[1],
                             return_data.table = FALSE) {
-    qgr = prepare_fetch_GRanges(qgr, win_size)
-    score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
-    out = viewGRangesWinSample_dt(score_gr, qgr, win_size)
+    stopifnot(is.character(win_method))
+    stopifnot(length(win_method) == 1)
+    stopifnot(win_method %in% c("sample", "summary"))
+    stopifnot(is.function(summary_FUN))
+    switch (win_method,
+            sample = {
+                qgr = prepare_fetch_GRanges(qgr, win_size)
+                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
+                out = viewGRangesWinSample_dt(score_gr, qgr, win_size)
+            },
+            summary = {
+                if(!all(width(qgr) %% win_size != 0)){
+                    fwidths = ceiling(width(qgr) / win_size) * win_size
+                    qgr = resize(qgr, width = fwidths, fix = "center")
+                    warning("Not all widths of qgr were evenly divisible by ",
+                            "win_size.  Some were resized accordingly.")
+                }
+
+                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
+                out = viewGRangesWinSummary_dt(score_gr, qgr, win_size)
+            }
+    )
+
+
     if(!return_data.table){
         out = GRanges(out)
     }

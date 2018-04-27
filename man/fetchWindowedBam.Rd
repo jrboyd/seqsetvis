@@ -4,7 +4,8 @@
 \alias{fetchWindowedBam}
 \title{fetch a windowed version of a bam file, returns GRanges}
 \usage{
-fetchWindowedBam(bam_f, qgr, win_size = 50, fragLen = NULL,
+fetchWindowedBam(bam_f, qgr, win_size = 50, win_method = c("sample",
+  "summary")[1], summary_FUN = weighted.mean, fragLen = NULL,
   target_strand = c("*", "+", "-")[1], return_data.table = FALSE)
 }
 \arguments{
@@ -13,6 +14,14 @@ fetchWindowedBam(bam_f, qgr, win_size = 50, fragLen = NULL,
 \item{qgr}{GRanges regions to fetchs}
 
 \item{win_size}{numeric >=1.  pileup grabbed every win_size bp}
+
+\item{win_method}{character.  one of c("sample", "summary").  Determines
+if \code{\link{viewGRangesWinSample_dt}} or
+\code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+qgr.}
+
+\item{summary_FUN}{function.  only relevant if win_method is "summary".
+passed to \code{\link{viewGRangesWinSummary_dt}}.}
 
 \item{fragLen}{numeric, NULL, or NA.  if numeric, supplied value is used.
 if NULL, value is calculated with fragLen_calcStranded

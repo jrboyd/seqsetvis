@@ -1,6 +1,96 @@
 # functions useful for fetching signal data regardless of source:
 # bam, bigwig, etc.
 
+#' Generic signal loading function
+#'
+#' Does nothing unless load_signal is overridden to carry out reading
+#' data from file_paths (likely via the appropriate fetchWindowed function,
+#' ie. \code{\link{fetchWindowedBigwig}} or \code{\link{fetchWindowedBam}}
+#'
+#' @param file_paths character vector of file_paths to load from
+#' @param qgr GRanges of intervals to return from each file
+#' @param unique_names unique file ids for each file in file_paths.  Default
+#' is names of file_paths vector
+#' @param names_variable character, variable name for column containing
+#' unique_names entries.  Default is "sample"
+#' @param win_size numeric/integer window size resolution to load signal at.
+#' Default is 50.
+#' @param return_data.table logical. If TRUE data.table is returned instead of
+#' GRanges, the default.
+#' @param load_signal function taking f, nam, and qgr arguments.  f is from
+#' file_paths, nam is from unique_names, and qgr is qgr. See details.
+#' @details load_signal is passed f, nam, and qgr and is executed in the
+#' environment where load_signal is defined. See
+#' \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBam}}
+#'  for examples.
+#' @return A GRanges with values read from file_paths at intervals of win_size.
+#' Originating file is coded by unique_names and assigned to column of name
+#' names_variable.  Output is data.table is return_data.table is TRUE.
+#' @export
+#' @examples
+#' library(GenomicRanges)
+#' bam_f = system.file("extdata/test.bam",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' bam_files = c("a" = bam_f, "b" = bam_f)
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#'
+#' load_bam = function(f, nam, qgr) {
+#'     message("loading ", f, " ...")
+#'     dt = fetchWindowedBam(bam_f = f,
+#'                       qgr = qgr,
+#'                       win_size = 50,
+#'                       fragLen = NULL,
+#'                       target_strand = "*",
+#'                       return_data.table = TRUE)
+#'     dt[["sample"]] = nam
+#'     message("finished loading ", nam, ".")
+#'     dt
+#' }
+#' fetchWindowedSignalList(bam_files, qgr, load_signal = load_bam)
+fetchWindowedSignalList = function(file_paths,
+                                   qgr,
+                                   unique_names = names(file_paths),
+                                   names_variable = "sample",
+                                   win_size = 50,
+                                   return_data.table = FALSE,
+                                   load_signal = function(f, nam) {
+                                       message("loading ", nam, " ...")
+                                       warning("nothing happened, ",
+                                               "add code here to load files")
+                                       message("finished loading ", nam, ".")
+                                   }){
+    if(is.list(file_paths)){
+        file_paths = unlist(file_paths)
+    }
+    if (is.null(unique_names)) {
+        unique_names = basename(file_paths)
+    }
+    names(file_paths) = unique_names
+    stopifnot(is.character(file_paths))
+    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is.character(unique_names))
+    stopifnot(is.character(names_variable))
+    stopifnot(is.numeric(win_size))
+    if (any(duplicated(unique_names))) {
+        stop("some unique_names are duplicated:\n",
+             paste(collapse = "\n",
+                   unique(unique_names[duplicated(unique_names)])))
+    }
+    qgr = prepare_fetch_GRanges(qgr = qgr,
+                                win_size = win_size,
+                                target_size = NULL)
+    nam_load_signal = function(nam){
+        f = file_paths[nam]
+        load_signal(f, nam, qgr)
+    }
+    bw_list = lapply(names(file_paths), nam_load_signal)
+    out = data.table::rbindlist(bw_list)
+    if(!return_data.table){
+        out = GRanges(out)
+    }
+    return(out)
+}
+
 #' get a windowed sampling of score_gr
 #'
 #' This method is appropriate when all GRanges in qgr are identical width
@@ -42,8 +132,8 @@
 #'     bw_dt = viewGRangesWinSample_dt(bw_gr, qgr, 50)
 #' }
 viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
-                                  x0 = c("center", "center_unstranded",
-                                         "left", "left_unstranded")[1]){
+                                   x0 = c("center", "center_unstranded",
+                                          "left", "left_unstranded")[1]){
     x = id = NULL
     stopifnot(class(score_gr) == "GRanges")
     stopifnot(!is.null(score_gr$score))
@@ -83,6 +173,143 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
     score_dt = data.table::as.data.table(windows)
 
     return(shift_x0(score_dt, window_size, x0))
+}
+
+
+#' Summarizes signal in bins.  The same number of bins per region in qgr
+#' is used and widths can vary in qgr, in contrast to
+#' \code{\link{viewGRangesWinSample_dt}} where width must be constant across
+#' regions.
+#'
+#' This function is most appropriate where features are expected to vary
+#' greatly in size and feature boundaries are important, ie. gene bodies,
+#' enhancers or TADs.
+#'
+#' Columns in output data.table are:
+#' standard GRanges columns: seqnames, start, end, width, strand
+#' id - matched to names(score_gr). if names(score_gr) is missing,
+#' added as 1:length(score_gr)
+#' y - value of score from score_gr
+#' x - relative bp position
+#' @param score_gr GRanges with a "score" metadata column.
+#' @param qgr regions to view by window.
+#' @param x0 character. controls how x value is derived from position for
+#' each region in qgr.  0 may be the left side or center.  If not unstranded,
+#' x coordinates are flipped for (-) strand. One of c("center",
+#' "center_unstranded", "left", "left_unstranded"). Default is "left".
+#' @param summary_FUN function. used to aggregate score by tile.  must accept
+#' x=score and w=width numeric vectors as only arguments. default is
+#' weighted.mean.  limma::weighted.median is a good alternative.
+#' @return data.table that is GRanges compatible
+#' @export
+#' @examples
+#' bam_file = system.file("extdata/test.bam",
+#'     package = "seqsetvis")
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' # unlike viewGRangesWinSample_dt, width is not fixed
+#' # qgr = GenomicRanges::resize(qgr, width = 500, fix = "center")
+#' bam_gr = fetchBam(bam_file, qgr)
+#' bam_dt = viewGRangesWinSummary_dt(bam_gr, qgr, 50)
+#'
+#' if(Sys.info()['sysname'] != "Windows"){
+#'     bw_file = system.file("extdata/MCF10A_CTCF_FE_random100.bw",
+#'         package = "seqsetvis")
+#'     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
+#'     bw_dt = viewGRangesWinSummary_dt(bw_gr, qgr, 50)
+#' }
+viewGRangesWinSummary_dt = function (score_gr,
+                                qgr,
+                                n_tiles = 100,
+                                x0 = c("center", "center_unstranded",
+                                       "left", "left_unstranded")[3],
+                                summary_FUN = weighted.mean){
+    x = id = NULL
+    stopifnot(class(score_gr) == "GRanges")
+    stopifnot(!is.null(score_gr$score))
+    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is.numeric(n_tiles))
+    stopifnot(n_tiles >= 1)
+    stopifnot(n_tiles%%1 == 0)
+    stopifnot(x0 %in% c("center", "center_unstranded", "left",
+                        "left_unstranded"))
+
+    tiles = tile(qgr, n_tiles)
+    # lapply(seq_len(tqgr), function(i)as.data.table(tqgr[[i]]))
+
+    if (is.null(qgr$id)) {
+        if (!is.null(names(qgr))) {
+            qgr$id = names(qgr)
+        }
+        else {
+            qgr$id = paste0("region_", seq_along(qgr))
+        }
+    }
+    names(tiles) = qgr$id
+    tiles = unlist(tiles)
+    tiles$id = names(tiles)
+
+
+    olaps = suppressWarnings(data.table::as.data.table(findOverlaps(query = tiles,
+                                                                    subject = score_gr)))
+    #fill in gaps with zeroes
+    missing_idx = setdiff(seq_along(tiles), olaps$queryHits)
+    if (length(missing_idx) > 0) {
+        olaps = rbind(olaps, data.table::data.table(queryHits = missing_idx,
+                                                    subjectHits = length(score_gr) + 1))[order(queryHits)]
+        score_gr = c(score_gr, GRanges(seqnames(score_gr)[length(score_gr)],
+                                       IRanges::IRanges(1, 1), score = 0))
+    }
+    cov_dt = cbind(
+        as.data.table(score_gr[olaps$subjectHits])[,-c(1, 4:5)],
+        as.data.table(tiles[olaps$queryHits])[,-c(1, 4:5)],
+        tile_id = olaps$queryHits
+    )
+
+    #trim score regions to fit in tiles so score weighting is accurate
+    colnames(cov_dt)[4:5] = c("tile_start", "tile_end")
+    cov_dt[start < tile_start, start := tile_start]
+    cov_dt[end > tile_end, end := tile_end]
+    cov_dt[, width := end - start + 1]
+
+    # check for incompletely retrieved regions (zeroes omitted for instance)
+    check_dt = cov_dt[, .(scored_width = sum(width)), by = .(tile_id, id)]
+    check_dt$tile_widths = width(tiles)
+    #add a dummy interval of score zero to correct width
+    repair_dt = check_dt[tile_widths != scored_width, .(
+        start = -1,
+        end = -1,
+        score = 0,
+        tile_start = -1,
+        tile_end = -1,
+        id = id,
+        tile_id = tile_id,
+        width = tile_widths - scored_width
+    )]
+    cov_dt = rbind(cov_dt, repair_dt)
+
+    density_dt = cov_dt[, .(tile_density = summary_FUN(score, width)),
+                        by = .(tile_id, id)]
+
+    density_dt[, x := (1:.N-.5)/.N, by = id]
+    if(!all(tiles$id == density_dt$id))
+        stop("something bad happened when merging density ",
+             "data.table back to tiles GRanges.")
+    score_dt = cbind(as.data.table(tiles), density_dt[, .(y = tile_density, x = x)])
+
+    #slightly different than summary,
+    #x is already set and regions are already contiguous.
+    #just need to flip x or center as needed.
+    switch(x0, center = {
+        score_dt[, x := x - round(mean(x)), by = id]
+        score_dt[strand == "-", x := -1 * x]
+    }, center_unstranded = {
+        score_dt[, x := x - round(mean(x)), by = id]
+    }, left = {
+        score_dt[strand == "-", x := 1 - 1 * x, by = id]
+    }, left_unstranded = {
+
+    })
+    score_dt
 }
 
 #' orients the relative position of x's zero value and
@@ -244,92 +471,4 @@ setGRangesWidth = function(qgr, fwidth, anchor = c("center", "start")[1]){
 }
 
 
-#' Generic signal loading function
-#'
-#' Does nothing unless load_signal is overridden to carry out reading
-#' data from file_paths (likely via the appropriate fetchWindowed function,
-#' ie. \code{\link{fetchWindowedBigwig}} or \code{\link{fetchWindowedBam}}
-#'
-#' @param file_paths character vector of file_paths to load from
-#' @param qgr GRanges of intervals to return from each file
-#' @param unique_names unique file ids for each file in file_paths.  Default
-#' is names of file_paths vector
-#' @param names_variable character, variable name for column containing
-#' unique_names entries.  Default is "sample"
-#' @param win_size numeric/integer window size resolution to load signal at.
-#' Default is 50.
-#' @param return_data.table logical. If TRUE data.table is returned instead of
-#' GRanges, the default.
-#' @param load_signal function taking f, nam, and qgr arguments.  f is from
-#' file_paths, nam is from unique_names, and qgr is qgr. See details.
-#' @details load_signal is passed f, nam, and qgr and is executed in the
-#' environment where load_signal is defined. See
-#' \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBam}}
-#'  for examples.
-#' @return A GRanges with values read from file_paths at intervals of win_size.
-#' Originating file is coded by unique_names and assigned to column of name
-#' names_variable.  Output is data.table is return_data.table is TRUE.
-#' @export
-#' @examples
-#' library(GenomicRanges)
-#' bam_f = system.file("extdata/test.bam",
-#'     package = "seqsetvis", mustWork = TRUE)
-#' bam_files = c("a" = bam_f, "b" = bam_f)
-#' qgr = CTCF_in_10a_overlaps_gr[1:5]
-#'
-#' load_bam = function(f, nam, qgr) {
-#'     message("loading ", f, " ...")
-#'     dt = fetchWindowedBam(bam_f = f,
-#'                       qgr = qgr,
-#'                       win_size = 50,
-#'                       fragLen = NULL,
-#'                       target_strand = "*",
-#'                       return_data.table = TRUE)
-#'     dt[["sample"]] = nam
-#'     message("finished loading ", nam, ".")
-#'     dt
-#' }
-#' fetchWindowedSignalList(bam_files, qgr, load_signal = load_bam)
-fetchWindowedSignalList = function(file_paths,
-                                   qgr,
-                                   unique_names = names(file_paths),
-                                   names_variable = "sample",
-                                   win_size = 50,
-                                   return_data.table = FALSE,
-                                   load_signal = function(f, nam) {
-                                       message("loading ", nam, " ...")
-                                       warning("nothing happened, ",
-                                               "add code here to load files")
-                                       message("finished loading ", nam, ".")
-                                   }){
-    if(is.list(file_paths)){
-        file_paths = unlist(file_paths)
-    }
-    if (is.null(unique_names)) {
-        unique_names = basename(file_paths)
-    }
-    names(file_paths) = unique_names
-    stopifnot(is.character(file_paths))
-    stopifnot(class(qgr) == "GRanges")
-    stopifnot(is.character(unique_names))
-    stopifnot(is.character(names_variable))
-    stopifnot(is.numeric(win_size))
-    if (any(duplicated(unique_names))) {
-        stop("some unique_names are duplicated:\n",
-             paste(collapse = "\n",
-                   unique(unique_names[duplicated(unique_names)])))
-    }
-    qgr = prepare_fetch_GRanges(qgr = qgr,
-                                win_size = win_size,
-                                target_size = NULL)
-    nam_load_signal = function(nam){
-        f = file_paths[nam]
-        load_signal(f, nam, qgr)
-    }
-    bw_list = lapply(names(file_paths), nam_load_signal)
-    out = data.table::rbindlist(bw_list)
-    if(!return_data.table){
-        out = GRanges(out)
-    }
-    return(out)
-}
+
