@@ -234,7 +234,7 @@ fetchWindowedBam = function(bam_f,
                             return_data.table = FALSE) {
     qgr = prepare_fetch_GRanges(qgr, win_size)
     score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
-    out = viewGRangesWindowed_dt(score_gr, qgr, win_size)
+    out = viewGRangesWinSample_dt(score_gr, qgr, win_size)
     if(!return_data.table){
         out = GRanges(out)
     }

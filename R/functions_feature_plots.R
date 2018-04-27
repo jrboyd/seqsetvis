@@ -146,10 +146,12 @@ ssvFeatureVenn = function(object,
 #' @param object A membership table
 #' @param line_width numeric, passed to size aesthetic to control line width
 #' @param shape shape argument passed to eulerr::euler
-#' @param n_points number of points to use for drawing ellipses, passed to  eulerr:::ellipse
+#' @param n_points number of points to use for drawing ellipses, passed to
+#' eulerr:::ellipse
 #' @param fill_alpha numeric [0,1], alpha value for circle fill
 #' @param line_alpha numeric [0,1], alpha value for circle line
-#' @param circle_colors colors to choose from for circles.  passed to ggplot2 color scales.
+#' @param circle_colors colors to choose from for circles.  passed to ggplot2
+#' color scales.
 #' @return ggplot of venneuler results
 #' @import ggplot2
 #' @import eulerr
@@ -245,81 +247,6 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL) {
                          label = hit_counts)
     return(p)
 }
-
-
-# bar plots of set sizes, does fancy facetting
-#
-# @param object passed to ssvMakeMembTable for conversion to membership table
-# @param peak_gr peak sets before overlapping
-# @param flip_group_stage logical, different facetting.  default is FALSE
-#
-# @return ggplot of bar plot of set sizes
-# ssvFeatureBars2 = function(object, peak_gr, flip_group_stage = FALSE) {
-#   x = count = group = stage = NULL#declare binding for data.table
-#   object = ssvMakeMembTable(object)
-#   hit_counts = colSums(object)
-#   hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)), stage = "merged")
-#   raw_counts = sapply(peak_gr, length)
-#   raw_counts_df = data.frame(count = raw_counts, group = factor(names(raw_counts), levels = names(raw_counts)), stage = "raw")
-#   counts_df = rbind(hit_counts_df, raw_counts_df)
-#   counts_df$stage = factor(counts_df$stage, levels = c("raw", "merged"))
-#   counts_df$x = paste(counts_df$group, counts_df$stage)
-#   counts_df$x = factor(counts_df$x, levels = counts_df$x[order(counts_df$stage)][order(counts_df$group)])
-#   bar_width = 0.8
-#   if (!flip_group_stage) {
-#     p <- ggplot(counts_df, aes(x = x, y = count, fill = group)) + labs(x = "") + geom_bar(width = bar_width, stat = "identity",
-#                                                                                           position = "dodge") + scale_x_discrete(labels = counts_df$stage[order(counts_df$x)]) + theme_bw() + theme(axis.text.x = element_text(angle = 90,
-#                                                                                                                                                                                                                                hjust = 1, vjust = 0.5), panel.grid.major.x = element_blank(), panel.grid.minor.x = element_blank())
-#     p = p + annotate("text", y = (counts_df$count[order(counts_df$x)])/2, x = seq_along(counts_df$count), label = counts_df$count[order(counts_df$x)])
-#   } else {
-#     p <- ggplot(counts_df, aes(x = group, y = count, fill = stage)) + labs(x = "") + geom_bar(width = bar_width, stat = "identity",
-#                                                                                               position = "dodge") + theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), panel.grid.major.x = element_blank(),
-#                                                                                                                                        panel.grid.minor.x = element_blank())
-#     xs = rep(seq_along(levels(counts_df$group)), each = 2) + rep(c(-1, 1), length(levels(counts_df$group))) * bar_width/4
-#     p = p + annotate("text", y = (counts_df$count[order(counts_df$x)])/2, x = xs, label = counts_df$count[order(counts_df$x)])
-#   }
-#   {
-#     p <- ggplot(counts_df, aes(x = stage, y = count, fill = group)) + labs(x = "") + geom_bar(width = bar_width, stat = "identity") +
-#       theme_bw() + theme(axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5), panel.grid.major.x = element_blank(),
-#                          panel.grid.minor.x = element_blank())
-#   }
-#   p
-#   return(p)
-# }
-
-# pie plot with facetting
-# @param object passed to ssvMakeMembTable
-# @param peak_gr peak sets before overlapping
-#
-# @return ggplot of pie charts
-# ssvFeaturePie2 = function(object, peak_gr) {
-#   stage = count = group = NULL#declare binding for data.table
-#   object = ssvMakeMembTable(object)
-#   hit_counts = colSums(object)
-#   hit_counts_df = data.frame(count = hit_counts, group = factor(names(hit_counts), levels = names(hit_counts)), stage = "merged")
-#   raw_counts = sapply(peak_gr, length)
-#   raw_counts_df = data.frame(count = raw_counts, group = factor(names(raw_counts), levels = names(raw_counts)), stage = "raw")
-#   counts_df = rbind(hit_counts_df, raw_counts_df)
-#   counts_df$stage = factor(counts_df$stage, levels = c("raw", "merged"))
-#   counts_df$x = paste(counts_df$group, counts_df$stage)
-#   counts_df$x = factor(counts_df$x, levels = counts_df$x[order(counts_df$stage)][order(counts_df$group)])
-#
-#   counts_df = counts_df[rev(order(counts_df$group)), ]
-#   counts_df = counts_df[order(counts_df$stage), ]
-#   p <- ggplot(counts_df, aes(x = stage, y = count, fill = (group))) + labs(x = "") + geom_bar(width = 1, stat = "identity") +
-#     guides(x = "none") + theme(axis.text.x = element_blank(), panel.background = element_blank(), axis.ticks = element_blank()) +
-#     coord_polar("y", start = 0) + scale_y_reverse()
-#   ys = unlist(lapply(levels(counts_df$stage), function(x) {
-#     stage_df = counts_df[counts_df$stage == x, ]
-#     hc = (stage_df$count)/sum(stage_df$count)
-#     hc = c(0, cumsum(hc)[-length(hc)]) + hc/2
-#     hc * sum(stage_df$count)
-#   }))
-#   xs = rep(c(1.1, 2.1), each = length(levels(counts_df$group)))
-#   txt = counts_df$count
-#   p = p + annotate(geom = "text", y = ys, x = xs, label = txt)
-#   return(p)
-# }
 
 #' pie plot of set sizes
 #' @export

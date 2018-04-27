@@ -1,3 +1,9 @@
+# seqsetvis 0.99.19
+
+* added viewGRangesWinSummary_dt() -  allows summary statistic to be appled over
+windows in contrast to sampling method. qgr may be varying sizes.
+* renamed viewGRangesWindowed_dt() to viewGRangesWinSample_dt()
+
 # seqsetvis 0.99.18
 
 * updated package title

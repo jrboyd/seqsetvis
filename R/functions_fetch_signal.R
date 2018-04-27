@@ -3,6 +3,12 @@
 
 #' get a windowed sampling of score_gr
 #'
+#' This method is appropriate when all GRanges in qgr are identical width
+#' and when it is practical to use a window_size smaller than features in
+#' genomic signal.  For instance, when retrieving signal around peaks or
+#' promoters this method maintains a fixed genomic scale across regions.  This
+#' allows meaingful comparison of peak widths can be made.
+#'
 #' Summarizes score_gr by grabbing value of "score" every window_size bp.
 #' Columns in output data.table are:
 #' standard GRanges columns: seqnames, start, end, width, strand
@@ -11,13 +17,14 @@
 #' y - value of score from score_gr
 #' x - relative bp position
 #'
-#' @param score_gr GRanges with a "score" metadata columns.
+#' @param score_gr GRanges with a "score" metadata column.
 #' @param qgr regions to view by window.
 #' @param window_size qgr will be represented by value from score_gr every
 #' window_size bp.
 #' @param x0 character. controls how x value is derived from position for
 #' each region in qgr.  0 may be the left side or center.  If not unstranded,
-#' x coordinates are flipped for (-) strand.
+#' x coordinates are flipped for (-) strand. One of c("center",
+#' "center_unstranded", "left", "left_unstranded"). Default is "center".
 #' @return data.table that is GRanges compatible
 #' @export
 #' @examples
@@ -26,15 +33,15 @@
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
 #' qgr = GenomicRanges::resize(qgr, width = 500, fix = "center")
 #' bam_gr = fetchBam(bam_file, qgr)
-#' bam_dt = viewGRangesWindowed_dt(bam_gr, qgr, 50)
+#' bam_dt = viewGRangesWinSample_dt(bam_gr, qgr, 50)
 #'
 #' if(Sys.info()['sysname'] != "Windows"){
 #'     bw_file = system.file("extdata/MCF10A_CTCF_FE_random100.bw",
 #'         package = "seqsetvis")
 #'     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
-#'     bw_dt = viewGRangesWindowed_dt(bw_gr, qgr, 50)
+#'     bw_dt = viewGRangesWinSample_dt(bw_gr, qgr, 50)
 #' }
-viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
+viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
                                   x0 = c("center", "center_unstranded",
                                          "left", "left_unstranded")[1]){
     x = id = NULL
@@ -75,36 +82,47 @@ viewGRangesWindowed_dt = function(score_gr, qgr, window_size,
     windows$y = score_gr[olaps$subjectHits]$score
     score_dt = data.table::as.data.table(windows)
 
+    return(shift_x0(score_dt, window_size, x0))
+}
+
+#' orients the relative position of x's zero value and
+#' extends ranges to be contiguous
+#'
+#' @param score_dt data.table, GRanges() sufficient
+#' @param window_size numeric, window size used to generate socre_dt
+#' @param x0 character, one of c("center", "center_unstranded",
+#' "left", "left_unstranded")
+#' @return score_dt with x values shifted appropriately and start and end
+#' extended to make ranges contiguous
+shift_x0 = function(score_dt, window_size, x0){
+    x = id = NULL
     shift = round(window_size/2)
     switch(x0,
            center = {
-               score_dt[, `:=`(x, start - min(start) + shift), by = id]
-               score_dt[, `:=`(x, x - round(mean(x))), by = id]
+               score_dt[, x := start - min(start) + shift, by = id]
+               score_dt[, x := x - round(mean(x)), by = id]
                score_dt[strand == "-", x := -1*x]
            },
            center_unstranded = {
-               score_dt[, `:=`(x, start - min(start) + shift), by = id]
-               score_dt[, `:=`(x, x - round(mean(x))), by = id]
+               score_dt[, x := start - min(start) + shift, by = id]
+               score_dt[, x := x - round(mean(x)), by = id]
            },
            left = {
                score_dt[, x := -1]
-               score_dt[strand != "-", `:=`(x, start - min(start) + shift),
+               score_dt[strand != "-", x := start - min(start) + shift,
                         by = id]
                #flip negative
-               score_dt[strand == "-", `:=`(x, -1*(end - max(end) - shift)),
+               score_dt[strand == "-", x := -1*(end - max(end) - shift),
                         by = id]
            },
            left_unstranded = {
-               score_dt[, `:=`(x, start - min(start) + shift), by = id]
+               score_dt[, x := start - min(start) + shift, by = id]
            }
     )
 
-    score_dt[, `:=`(start, start - shift + 1)]
-    score_dt[, `:=`(end, end + window_size - shift)]
-    if(x0 == "center"){
-
-    }
-    score_dt
+    score_dt[, start := start - shift + 1]
+    score_dt[, end := end + window_size - shift]
+    return(score_dt)
 }
 
 #' prepares GRanges for windowed fetching.

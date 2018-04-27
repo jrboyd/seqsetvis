@@ -38,7 +38,7 @@ fetchWindowedBigwig = function(bw_file,
                                 win_size = win_size,
                                 target_size = NULL)
     score_gr = rtracklayer::import.bw(bw_file, which = qgr)
-    out = viewGRangesWindowed_dt(score_gr, qgr, win_size)
+    out = viewGRangesWinSample_dt(score_gr, qgr, win_size)
     if(!return_data.table){
         out = GRanges(out)
     }
