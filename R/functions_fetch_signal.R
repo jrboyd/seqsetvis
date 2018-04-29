@@ -40,7 +40,7 @@
 #' qgr = resize(qgr, 500, "center")
 #' load_bam = function(f, nam, qgr) {
 #'     message("loading ", f, " ...")
-#'     dt = ssvFetchBam(bam_f = f,
+#'     dt = ssvFetchBam.single(bam_f = f,
 #'                       qgr = qgr,
 #'                       win_size = 50,
 #'                       fragLen = NULL,
