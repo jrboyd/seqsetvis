@@ -31,7 +31,7 @@ original.
 }
 \description{
 \code{applySpline} Is intended for two-dimensional tidy data.tables, as
-retured by \code{fetchWindowedBigwig}
+retured by \code{ssvFetchBigwig}
 }
 \details{
 by_ is quite powerful.  If \code{by_ = c('gene_id', 'sample_id')},
@@ -53,5 +53,5 @@ ggplot(splined_smooth[, list(y = mean(y)), by = list(sample, x)]) +
     geom_line(aes(x = x, y = y, color = sample))
 }
 \seealso{
-\code{\link{fetchWindowedBigwig}}
+\code{\link{ssvFetchBigwig}}
 }

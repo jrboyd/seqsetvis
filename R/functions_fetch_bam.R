@@ -235,7 +235,7 @@ fetchBam = function(bam_f,
 #' bam_gr = ssvFetchBam.single(bam_file, qgr, fragLen = 180,
 #'     win_size = 10, target_strand = "+")
 #'
-#' bam_dt = ssvFetchBam.sigb(bam_file, qgr,
+#' bam_dt = ssvFetchBam.single(bam_file, qgr,
 #'     return_data.table = TRUE)
 ssvFetchBam.single = function(bam_f,
                             qgr,

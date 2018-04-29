@@ -70,9 +70,9 @@ test_that("viewGRangesWinSummary_dt left", {
 # bams
 bams = c("A" = bam_file, "B" = bam_file)
 
-test_that("ssvFetchBamList anchor", {
-    gr = ssvFetchBamList(bams, qgr, win_size = 50, anchor = "center")
-    gr_uns = ssvFetchBamList(bams, qgr, win_size = 50, anchor = "center_unstranded")
+test_that("ssvFetchBam anchor", {
+    gr = ssvFetchBam(bams, qgr, win_size = 50, anchor = "center")
+    gr_uns = ssvFetchBam(bams, qgr, win_size = 50, anchor = "center_unstranded")
     is_pos = as.character(strand(gr)) == "+"
     # plot(gr_uns$x[is_pos], gr$x[is_pos])
     # plot(gr_uns$x[!is_pos], gr$x[!is_pos])
@@ -81,8 +81,8 @@ test_that("ssvFetchBamList anchor", {
     expect_lt(min(gr$x), 0)
     expect_lt(min(gr_uns$x), 0)
 
-    dt = ssvFetchBamList(bams, qgr, win_size = 50, anchor = "left", return_data.table = TRUE)
-    dt_uns = ssvFetchBamList(bams, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE)
+    dt = ssvFetchBam(bams, qgr, win_size = 50, anchor = "left", return_data.table = TRUE)
+    dt_uns = ssvFetchBam(bams, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE)
 
     is_pos = dt$strand == "+"
     # plot(dt_uns$x[is_pos], dt$x[is_pos])
@@ -96,9 +96,9 @@ test_that("ssvFetchBamList anchor", {
 
 #bigwigs
 bigwigs = dir(system.file("extdata", package = "seqsetvis"), pattern = "random100.bw$", full.names = TRUE)
-test_that("ssvFetchBigwigList anchor", {
-    gr = ssvFetchBigwigList(bigwigs, qgr, win_size = 50, anchor = "center")
-    gr_uns = ssvFetchBigwigList(bigwigs, qgr, win_size = 50, anchor = "center_unstranded")
+test_that("ssvFetchBigwig anchor", {
+    gr = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "center")
+    gr_uns = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "center_unstranded")
     is_pos = as.character(strand(gr)) == "+"
     # plot(gr_uns$x[is_pos], gr$x[is_pos])
     # plot(gr_uns$x[!is_pos], gr$x[!is_pos])
@@ -107,8 +107,8 @@ test_that("ssvFetchBigwigList anchor", {
     expect_lt(min(gr$x), 0)
     expect_lt(min(gr_uns$x), 0)
 
-    dt = ssvFetchBigwigList(bigwigs, qgr, win_size = 50, anchor = "left", return_data.table = TRUE)
-    dt_uns = ssvFetchBigwigList(bigwigs, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE)
+    dt = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "left", return_data.table = TRUE)
+    dt_uns = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE)
 
     is_pos = dt$strand == "+"
     # plot(dt_uns$x[is_pos], dt$x[is_pos])
@@ -123,9 +123,9 @@ test_that("ssvFetchBigwigList anchor", {
 # bams
 bams = c("A" = bam_file, "B" = bam_file)
 
-test_that("ssvFetchBamList anchor - summary", {
-    gr = ssvFetchBamList(bams, qgr, win_size = 50, anchor = "center", win_method = "summary")
-    gr_uns = ssvFetchBamList(bams, qgr, win_size = 50, anchor = "center_unstranded", win_method = "summary")
+test_that("ssvFetchBam anchor - summary", {
+    gr = ssvFetchBam(bams, qgr, win_size = 50, anchor = "center", win_method = "summary")
+    gr_uns = ssvFetchBam(bams, qgr, win_size = 50, anchor = "center_unstranded", win_method = "summary")
     is_pos = as.character(strand(gr)) == "+"
     # plot(gr_uns$x[is_pos], gr$x[is_pos])
     # plot(gr_uns$x[!is_pos], gr$x[!is_pos])
@@ -134,8 +134,8 @@ test_that("ssvFetchBamList anchor - summary", {
     expect_lt(min(gr$x), 0)
     expect_lt(min(gr_uns$x), 0)
 
-    dt = ssvFetchBamList(bams, qgr, win_size = 50, anchor = "left", return_data.table = TRUE, win_method = "summary")
-    dt_uns = ssvFetchBamList(bams, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE, win_method = "summary")
+    dt = ssvFetchBam(bams, qgr, win_size = 50, anchor = "left", return_data.table = TRUE, win_method = "summary")
+    dt_uns = ssvFetchBam(bams, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE, win_method = "summary")
 
     is_pos = dt$strand == "+"
     # plot(dt_uns$x[is_pos], dt$x[is_pos])
@@ -149,9 +149,9 @@ test_that("ssvFetchBamList anchor - summary", {
 
 #bigwigs
 bigwigs = dir(system.file("extdata", package = "seqsetvis"), pattern = "random100.bw$", full.names = TRUE)
-test_that("ssvFetchBigwigList anchor - summary", {
-    gr = ssvFetchBigwigList(bigwigs, qgr, win_size = 50, anchor = "center", win_method = "summary")
-    gr_uns = ssvFetchBigwigList(bigwigs, qgr, win_size = 50, anchor = "center_unstranded", win_method = "summary")
+test_that("ssvFetchBigwig anchor - summary", {
+    gr = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "center", win_method = "summary")
+    gr_uns = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "center_unstranded", win_method = "summary")
     is_pos = as.character(strand(gr)) == "+"
     # plot(gr_uns$x[is_pos], gr$x[is_pos])
     # plot(gr_uns$x[!is_pos], gr$x[!is_pos])
@@ -160,8 +160,8 @@ test_that("ssvFetchBigwigList anchor - summary", {
     expect_lt(min(gr$x), 0)
     expect_lt(min(gr_uns$x), 0)
 
-    dt = ssvFetchBigwigList(bigwigs, qgr, win_size = 50, anchor = "left", return_data.table = TRUE, win_method = "summary")
-    dt_uns = ssvFetchBigwigList(bigwigs, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE, win_method = "summary")
+    dt = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "left", return_data.table = TRUE, win_method = "summary")
+    dt_uns = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE, win_method = "summary")
 
     is_pos = dt$strand == "+"
     # plot(dt_uns$x[is_pos], dt$x[is_pos])

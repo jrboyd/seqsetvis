@@ -12,7 +12,7 @@ ssvSignalBandedQuantiles(bw_data, y_ = "y", x_ = "x", by_ = "fake",
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
-As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}}
+As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 
 \item{y_}{the variable name in bw_data for y axis in plot}
 

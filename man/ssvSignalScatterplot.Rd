@@ -11,7 +11,7 @@ ssvSignalScatterplot(bw_data, x_name, y_name, color_table = NULL,
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
-As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}}
+As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 
 \item{x_name}{sample name to map to x-axis, must be stored in variable specified in \code{xy_variable}}
 

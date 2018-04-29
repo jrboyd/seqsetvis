@@ -1,5 +1,15 @@
 # seqsetvis 0.99.19
 
+Impacts existing scripts
+
+* fetchWindowedBam is now ssvFetchBam.single
+* fetchWindowedBamList is now ssvFetchBam
+* fetchWindowedBigwig is now ssvFetchBigwig.single
+* fetchWindowedBigwigList is now ssvFetchBigwig
+* fetchWindowedSignalList is now ssvFetchSignal
+
+Independent addititions
+
 * anchor parameter for all fetch functions.  allows strand sensitive x assignment
 and left or center reference point.
 * added viewGRangesWinSummary_dt() -  allows summary statistic to be appled over

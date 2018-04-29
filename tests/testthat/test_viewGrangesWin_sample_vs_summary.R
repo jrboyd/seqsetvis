@@ -46,15 +46,15 @@ test_that("can fetch bam summary", {
     expect_true(all(summary_dt[, .N, by = id]$N == 50))
 })
 
-test_that("can fetch bamList summary", {
+test_that("can fetch bam summary", {
     bams = c("A" = bam_file, "B" = bam_file)
-    bams_sample_dt = ssvFetchBamList(bams, vgr)
+    bams_sample_dt = ssvFetchBam(bams, vgr)
     expect_gte(max(abs(range(bams_sample_dt$x))), 100)
-    bams_summary_dt = ssvFetchBamList(bams, vgr, win_method = "summary")
+    bams_summary_dt = ssvFetchBam(bams, vgr, win_method = "summary")
     expect_lte(max(abs(range(bams_summary_dt$x))), .5)
-    bams_summary_dt10 = ssvFetchBamList(bams, vgr, win_method = "summary",
+    bams_summary_dt10 = ssvFetchBam(bams, vgr, win_method = "summary",
                                              win_size = 10, return_data.table = TRUE)
-    bams_summary_grFUN = ssvFetchBamList(bams, vgr, win_method = "summary",
+    bams_summary_grFUN = ssvFetchBam(bams, vgr, win_method = "summary",
                                               summary_FUN = function(x, w){min(w)})
     expect_false(all(bams_summary_dt$y == bams_summary_grFUN$y))
     expect_true(all(bams_summary_dt10[, .N, by = id]$N == 10*length(bams)))
@@ -83,15 +83,15 @@ test_that("can fetch bigwig summary", {
     expect_true(all(summary_dt[, .N, by = id]$N == 50))
 })
 
-test_that("can fetch bigwigList summary", {
+test_that("can fetch bigwig summary", {
     bigwigs = c("A" = bigwig_file, "B" = bigwig_file)
-    bigwigs_sample_dt = ssvFetchBigwigList(bigwigs, vgr)
+    bigwigs_sample_dt = ssvFetchBigwig(bigwigs, vgr)
     expect_gte(max(abs(range(bigwigs_sample_dt$x))), 100)
-    bigwigs_summary_dt = ssvFetchBigwigList(bigwigs, vgr, win_method = "summary")
+    bigwigs_summary_dt = ssvFetchBigwig(bigwigs, vgr, win_method = "summary")
     expect_lte(max(abs(range(bigwigs_summary_dt$x))), .5)
-    bigwigs_summary_dt10 = ssvFetchBigwigList(bigwigs, vgr, win_method = "summary",
+    bigwigs_summary_dt10 = ssvFetchBigwig(bigwigs, vgr, win_method = "summary",
                                              win_size = 10, return_data.table = TRUE)
-    bigwigs_summary_dtFUN = ssvFetchBigwigList(bigwigs, vgr, win_method = "summary",
+    bigwigs_summary_dtFUN = ssvFetchBigwig(bigwigs, vgr, win_method = "summary",
                                               summary_FUN = function(x, w){min(w)})
     expect_false(all(bigwigs_summary_dt$y == bigwigs_summary_dtFUN$y))
     expect_true(all(bigwigs_summary_dt10[, .N, by = id]$N == 10*length(bigwigs)))

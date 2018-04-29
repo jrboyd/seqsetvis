@@ -1,7 +1,7 @@
 #' plot profiles from bigwigs
 #' @export
 #' @param bw_data a GRanges or data.table of bigwig signal.
-#' As returned from \code{\link{ssvFetchBigwig}} and \code{\link{fetchWindowedBigwigList}}
+#' As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
 #' @param y_ the variable name in bw_data for y axis in plot
 #' @param x_ the variable name in bw_data for x axis in plot
 #' @param by_ the variable name in bw_data to facet on
@@ -148,7 +148,7 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
 #' maps signal from 2 sample profiles to the x and y axis. axes are standard or "volcano" min XY vs fold-change Y/X
 #' @export
 #' @param bw_data a GRanges or data.table of bigwig signal.
-#' As returned from \code{\link{ssvFetchBigwig}} and \code{\link{fetchWindowedBigwigList}}
+#' As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
 #' @param x_name sample name to map to x-axis, must be stored in variable specified in \code{xy_variable}
 #' @param y_name sample name to map to y-axis, must be stored in variable specified in \code{xy_variable}
 #' @param color_table data.frame with 2 columns, one of which must be named "group" and gets mapped to color.
@@ -295,7 +295,7 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
 #' clustering as for a heatmap
 #' @export
 #' @param bw_data a GRanges or data.table of bigwig signal.
-#' As returned from \code{\link{ssvFetchBigwig}} and \code{\link{fetchWindowedBigwigList}}
+#' As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
 #' @param nclust number of clusters
 #' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
 #' @param column_ varaible mapped to column, likely bp position for ngs data
@@ -436,7 +436,7 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
 #' instead of clustering, each column is sorted starting from the left.
 #' @export
 #' @param bw_data a GRanges or data.table of bigwig signal.
-#' As returned from \code{\link{ssvFetchBigwig}} and \code{\link{fetchWindowedBigwigList}}
+#' As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
 #' @param nclust number of clusters
 #' @param perform_clustering should clustering be done? default is auto.
 #' auto considers if row_ has been ordered by being a factor and if cluster_ is a numeric.
@@ -555,7 +555,7 @@ ssvSignalHeatmap = function(bw_data,
 #' construct line type plots where each region in each sample is represented
 #' @export
 #' @param bw_data a GRanges or data.table of bigwig signal.
-#' As returned from \code{\link{ssvFetchBigwig}} and \code{\link{fetchWindowedBigwigList}}
+#' As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
 #' @param x_ variable name mapped to x aesthetic, x by default.
 #' @param y_ variable name mapped to y aesthetic, y by default.
 #' @param color_ variable name mapped to color aesthetic, sample by default.
@@ -631,7 +631,7 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
 #' aggregate line signals in a single line plot
 #' @export
 #' @param bw_data a GRanges or data.table of bigwig signal.
-#' As returned from \code{\link{ssvFetchBigwig}} and \code{\link{fetchWindowedBigwigList}}
+#' As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
 #' @param x_ variable name mapped to x aesthetic, x by default.
 #' @param y_ variable name mapped to y aesthetic, y by default.
 #' @param sample_ variable name, along with region_ used to group by default,

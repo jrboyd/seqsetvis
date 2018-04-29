@@ -11,7 +11,7 @@ ssvSignalLineplot(bw_data, x_ = "x", y_ = "y", color_ = "sample",
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
-As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}}
+As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 
 \item{x_}{variable name mapped to x aesthetic, x by default.}
 

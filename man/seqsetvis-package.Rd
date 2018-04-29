@@ -10,7 +10,7 @@ seqsetvis allows you to...}
 \description{
 2 steps
 \code{\link{ssvOverlapIntervalSets}}.
-\code{\link{fetchWindowedBigwig}}.
+\code{\link{ssvFetchBigwig}}.
 Otherwise refer to the vignettes to see
 }
 \author{

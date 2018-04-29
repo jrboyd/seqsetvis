@@ -9,11 +9,11 @@ test_qgr = GRanges("chrTest", IRanges(pos+1, pos + region_size))
 exp_colnames = c("seqnames", "start", "end", "width", "strand", "id", "y", "x")
 
 
-test_that("ssvFetchBigwig return expected for valid even win_size", {
+test_that("ssvFetchBigwig.single return expected for valid even win_size", {
     skip_on_os("windows")
     #these should all work cleanly
     for(win in c(2, 6, 10, 30)){
-        bw_dt = ssvFetchBigwig(bw_file = test_bw, win_size = win, qgr = test_qgr, return_data.table = TRUE)
+        bw_dt = ssvFetchBigwig.single(bw_file = test_bw, win_size = win, qgr = test_qgr, return_data.table = TRUE)
         expect_is(bw_dt, "data.table")
         expect_equal(colnames(bw_dt), exp_colnames)
         for(tid in unique(bw_dt$id)){
@@ -25,10 +25,10 @@ test_that("ssvFetchBigwig return expected for valid even win_size", {
     }
 })
 
-test_that("ssvFetchBigwig return expected for valid odd win_size", {
+test_that("ssvFetchBigwig.single return expected for valid odd win_size", {
     skip_on_os("windows")
     for(win in c(1, 3, 5, 15)){
-        bw_dt = ssvFetchBigwig(bw_file = test_bw, win_size = win, qgr = test_qgr, return_data.table = TRUE)
+        bw_dt = ssvFetchBigwig.single(bw_file = test_bw, win_size = win, qgr = test_qgr, return_data.table = TRUE)
         expect_is(bw_dt, "data.table")
         expect_equal(colnames(bw_dt), exp_colnames)
         for(tid in unique(bw_dt$id)){
@@ -40,12 +40,12 @@ test_that("ssvFetchBigwig return expected for valid odd win_size", {
     }
 })
 
-test_that("ssvFetchBigwig use GRanges names as id", {
+test_that("ssvFetchBigwig.single use GRanges names as id", {
     skip_on_os("windows")
     for(win in c(1, 3, 5, 15)){
         qgr = test_qgr
         names(qgr) = paste0("myNames_", seq_along(qgr))
-        bw_dt = ssvFetchBigwig(bw_file = test_bw, win_size = win, qgr = qgr, return_data.table = TRUE)
+        bw_dt = ssvFetchBigwig.single(bw_file = test_bw, win_size = win, qgr = qgr, return_data.table = TRUE)
         expect_is(bw_dt, "data.table")
         expect_equal(colnames(bw_dt), exp_colnames)
         expect_true(all(grepl("myNames", bw_dt$id)))
@@ -58,68 +58,68 @@ test_that("ssvFetchBigwig use GRanges names as id", {
     }
 })
 
-test_that("ssvFetchBigwig patches missing values", {
+test_that("ssvFetchBigwig.single patches missing values", {
     skip_on_os("windows")
     for(win in c(1, 5, 20)){
         qgr = GRanges("chrTest", IRanges(1, 2000))
-        bw_dt = ssvFetchBigwig(bw_file = test_bw, win_size = win, qgr = qgr, return_data.table = TRUE)
+        bw_dt = ssvFetchBigwig.single(bw_file = test_bw, win_size = win, qgr = qgr, return_data.table = TRUE)
         expect_is(bw_dt, "data.table")
         expect_equal(colnames(bw_dt), exp_colnames)
     }
 })
 
-test_that("ssvFetchBigwig throws message if widths aren't divisble by win_size", {
+test_that("ssvFetchBigwig.single throws message if widths aren't divisble by win_size", {
     skip_on_os("windows")
     mix_width_gr = test_qgr
     end(mix_width_gr) =  end(mix_width_gr) + seq_along(mix_width_gr)
     for(win in c(7, 31)){
         expect_message(regexp = "widths of qgr were not identical and evenly divisible by win_size", {
-            ssvFetchBigwig(bw_file = test_bw, win_size = win, qgr = mix_width_gr, return_data.table = TRUE)
+            ssvFetchBigwig.single(bw_file = test_bw, win_size = win, qgr = mix_width_gr, return_data.table = TRUE)
         })
     }
 })
 
 
 
-test_that("ssvFetchBigwig throws message if widths vary", {
+test_that("ssvFetchBigwig.single throws message if widths vary", {
     skip_on_os("windows")
     mix_width_gr = test_qgr
     end(mix_width_gr) =  end(mix_width_gr) + seq_along(mix_width_gr)*3
     for(win in c(1, 3)){
         expect_message(regexp = "widths of qgr were not identical and evenly divisible by win_size", {
-            ssvFetchBigwig(bw_file = test_bw, win_size = win, qgr = mix_width_gr, return_data.table = TRUE)
+            ssvFetchBigwig.single(bw_file = test_bw, win_size = win, qgr = mix_width_gr, return_data.table = TRUE)
         })
     }
 })
 
-test_that("ssvFetchBigwigList works with character vector bw_files", {
+test_that("ssvFetchBigwig works with character vector bw_files", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
-    hidden = capture_output({res = ssvFetchBigwigList(file_paths = bw_files,
+    hidden = capture_output({res = ssvFetchBigwig(file_paths = bw_files,
                                                            win_size = 3,
                                                            qgr = test_qgr, return_data.table = TRUE)})
     expect_s3_class(res, "data.table")
     expect_equal(colnames(res), c(exp_colnames, "sample"))
 })
 
-test_that("ssvFetchBigwigList works with list bw_files", {
+test_that("ssvFetchBigwig works with list bw_files", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
     bw_files = as.list(bw_files)
-    hidden = capture_output({res = ssvFetchBigwigList(file_paths = bw_files,
+    hidden = capture_output({res = ssvFetchBigwig(file_paths = bw_files,
                                                            win_size = 3,
                                                            qgr = test_qgr, return_data.table = TRUE)})
     expect_s3_class(res, "data.table")
     expect_equal(colnames(res), c(exp_colnames, "sample"))
 })
 
-test_that("ssvFetchBigwigList can set variable name", {
+test_that("ssvFetchBigwig can set variable name", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
-    hidden = capture_output({res = ssvFetchBigwigList(file_paths = bw_files,
+    hidden = capture_output({res = ssvFetchBigwig(file_paths = bw_files,
                                                            win_size = 3,
                                                            qgr = test_qgr,
                                                            names_variable = "group", return_data.table = TRUE)})
@@ -127,11 +127,11 @@ test_that("ssvFetchBigwigList can set variable name", {
     expect_equal(colnames(res), c(exp_colnames, "group"))
 })
 
-test_that("ssvFetchBigwigList duplicate names throws error", {
+test_that("ssvFetchBigwig duplicate names throws error", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     expect_error(
-        ssvFetchBigwigList(file_paths = bw_files,
+        ssvFetchBigwig(file_paths = bw_files,
                                 win_size = 3,
                                 qgr = test_qgr, return_data.table = TRUE)
     )

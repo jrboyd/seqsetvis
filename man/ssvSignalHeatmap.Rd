@@ -12,7 +12,7 @@ ssvSignalHeatmap(bw_data, nclust = 6, perform_clustering = c("auto", "yes",
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
-As returned from \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBigwigList}}}
+As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 
 \item{nclust}{number of clusters}
 
