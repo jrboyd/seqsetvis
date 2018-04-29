@@ -1,6 +1,6 @@
 #' Fetch values from a bigwig appropriate for heatmaps etc.
 #'
-#' \code{fetchWindowedBigwig.single} Gets values for each region of the query
+#' \code{ssvFetchBigwig.single} Gets values for each region of the query
 #' GRanges (\code{qgr}). Values correspond to the center of each window of
 #' size \code{win_size}.  A tidy formatted data.table
 #' object is returned suitable for plotting using ggplots.
@@ -30,12 +30,12 @@
 #' bw_f = system.file("extdata/test_loading.bw",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' qgr = GRanges("chrTest", IRanges(1, 30))
-#' bw_gr = fetchWindowedBigwig.single(bw_f, qgr, win_size = 10)
+#' bw_gr = ssvFetchBigwig.single(bw_f, qgr, win_size = 10)
 #'
-#' bw_dt = fetchWindowedBigwig.single(bw_f, qgr, win_size = 10,
+#' bw_dt = ssvFetchBigwig.single(bw_f, qgr, win_size = 10,
 #'     return_data.table = TRUE)
 #' }
-fetchWindowedBigwig.single = function(bw_file,
+ssvFetchBigwig.single = function(bw_file,
                                qgr,
                                win_size = 50,
                                win_method = c("sample", "summary")[1],
@@ -69,11 +69,11 @@ fetchWindowedBigwig.single = function(bw_file,
 
 
 #' Iterates a character vector (ideally named) and calls
-#' \code{fetchWindowedBigwig.single} on each.  Appends grouping variable to each
+#' \code{ssvFetchBigwig.single} on each.  Appends grouping variable to each
 #' resulting data.table and uses rbindlist to efficiently combine results.
 #'
-#' \code{fetchWindowedBigwig} iteratively calls \code{fetchWindowedBigwig.single}.
-#' See \code{\link{fetchWindowedBigwig.single}} for more info.
+#' \code{ssvFetchBigwig} iteratively calls \code{fetchWindowedBigwig.single}.
+#' See \code{\link{ssvFetchBigwig.single}} for more info.
 #' @export
 #' @param file_paths The character vector or list of paths to bigwig files to
 #'  read from.
@@ -107,13 +107,13 @@ fetchWindowedBigwig.single = function(bw_file,
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bw_files = c("a" = bw_f, "b" = bw_f)
 #' qgr = GRanges("chrTest", IRanges(1, 30))
-#' bw_gr = fetchWindowedBigwig(bw_files, qgr, win_size = 10)
-#' bw_gr2 = fetchWindowedBigwig(as.list(bw_files), qgr, win_size = 10)
+#' bw_gr = ssvFetchBigwig(bw_files, qgr, win_size = 10)
+#' bw_gr2 = ssvFetchBigwig(as.list(bw_files), qgr, win_size = 10)
 #'
-#' bw_dt = fetchWindowedBigwig(bw_files, qgr, win_size = 10,
+#' bw_dt = ssvFetchBigwig(bw_files, qgr, win_size = 10,
 #'     return_data.table = TRUE)
 #' }
-fetchWindowedBigwig = function(file_paths,
+ssvFetchBigwig = function(file_paths,
                                    qgr,
                                    unique_names = names(file_paths),
                                    names_variable = "sample",
@@ -126,7 +126,7 @@ fetchWindowedBigwig = function(file_paths,
 
     load_bw = function(f, nam, qgr) {
         message("loading ", f, " ...")
-        dt = fetchWindowedBigwig.single(bw_file = f,
+        dt = ssvFetchBigwig.single(bw_file = f,
                                  qgr = qgr,
                                  win_size = win_size,
                                  win_method = win_method,
@@ -138,7 +138,7 @@ fetchWindowedBigwig = function(file_paths,
         dt
     }
 
-    fetchWindowedSignalList(file_paths = file_paths,
+    ssvFetchSignal(file_paths = file_paths,
                             qgr = qgr,
                             load_signal = load_bw,
                             unique_names = unique_names,

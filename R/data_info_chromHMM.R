@@ -92,7 +92,7 @@ NULL
 #' MCF10A CTCF profiles at 20 windows per chromHMM state, hg38.
 #'
 #' @details part of \code{\link{chromHMM_demo_data}}
-#' @details the result of fetchWindowedBigwig() on the MCF10A_CTCF_FE.bw
+#' @details the result of ssvFetchBigwig() on the MCF10A_CTCF_FE.bw
 #' near 20 randomly selected windows per chromHMM state.
 #'
 #' @docType data

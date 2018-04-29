@@ -31,7 +31,7 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #' applies a spline smoothing to a tidy data.table containing x and y values.
 #'
 #' \code{applySpline} Is intended for two-dimensional tidy data.tables, as
-#' retured by \code{fetchWindowedBigwig}
+#' retured by \code{ssvFetchBigwig}
 #' @export
 #' @param dt a tidy data.table containing two-dimensional data
 #' @param n the number of interpolation points to use per input point, see
@@ -52,7 +52,7 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #' splines
 #' will be calculated individually for each gene in each sample. alternatively
 #' if \code{by_ = c('gene_id')}
-#' @seealso \code{\link{fetchWindowedBigwig}}
+#' @seealso \code{\link{ssvFetchBigwig}}
 #' @importFrom stats spline
 #' @examples
 #' #data may be blockier than we'd like

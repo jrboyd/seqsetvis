@@ -231,13 +231,13 @@ fetchBam = function(bam_f,
 #' bam_file = system.file("extdata/test.bam",
 #'     package = "seqsetvis")
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
-#' bam_gr = fetchWindowedBam.single(bam_file, qgr)
-#' bam_gr = fetchWindowedBam.single(bam_file, qgr, fragLen = 180,
+#' bam_gr = ssvFetchBam.single(bam_file, qgr)
+#' bam_gr = ssvFetchBam.single(bam_file, qgr, fragLen = 180,
 #'     win_size = 10, target_strand = "+")
 #'
-#' bam_dt = fetchWindowedBam.sigb(bam_file, qgr,
+#' bam_dt = ssvFetchBam.sigb(bam_file, qgr,
 #'     return_data.table = TRUE)
-fetchWindowedBam.single = function(bam_f,
+ssvFetchBam.single = function(bam_f,
                             qgr,
                             win_size = 50,
                             win_method = c("sample", "summary")[1],
@@ -273,12 +273,12 @@ fetchWindowedBam.single = function(bam_f,
     return(out)
 }
 
-#' Iterates a character vector (ideally named) and calls \code{fetchWindowedBam.single}
+#' Iterates a character vector (ideally named) and calls \code{ssvFetchBam.single}
 #' on each.  Appends grouping variable to each resulting data.table and uses
 #' rbindlist to efficiently combine results
 #'
-#' \code{fetchWindowedBam} iteratively calls \code{fetchWindowedBam.single}.
-#' See \code{\link{fetchWindowedBam.single}} for more info.
+#' \code{ssvFetchBam} iteratively calls \code{fetchWindowedBam.single}.
+#' See \code{\link{ssvFetchBam.single}} for more info.
 #' @export
 #' @param file_paths The character vector or list of paths to bigwig files to
 #'  read from.
@@ -317,13 +317,13 @@ fetchWindowedBam.single = function(bam_f,
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bam_files = c("a" = bam_f, "b" = bam_f)
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
-#' bw_gr = fetchWindowedBam(bam_files, qgr, win_size = 10)
-#' bw_gr2 = fetchWindowedBam(as.list(bam_files), qgr, win_size = 10)
+#' bw_gr = ssvFetchBam(bam_files, qgr, win_size = 10)
+#' bw_gr2 = ssvFetchBam(as.list(bam_files), qgr, win_size = 10)
 #'
-#' bw_dt = fetchWindowedBam(bam_files, qgr, win_size = 10,
+#' bw_dt = ssvFetchBam(bam_files, qgr, win_size = 10,
 #'     return_data.table = TRUE)
 #' }
-fetchWindowedBam = function(file_paths,
+ssvFetchBam = function(file_paths,
                                 qgr,
                                 unique_names = names(file_paths),
                                 win_size = 50,
@@ -348,7 +348,7 @@ fetchWindowedBam = function(file_paths,
         if(fl == "auto"){
             fl = NULL
         }
-        dt = fetchWindowedBam.single(bam_f = f,
+        dt = ssvFetchBam.single(bam_f = f,
                               qgr = qgr,
                               win_size = win_size,
                               win_method = win_method,
@@ -362,7 +362,7 @@ fetchWindowedBam = function(file_paths,
         dt
     }
 
-    fetchWindowedSignalList(file_paths = file_paths,
+    ssvFetchSignal(file_paths = file_paths,
                             qgr = qgr,
                             load_signal = load_bam,
                             unique_names = unique_names,

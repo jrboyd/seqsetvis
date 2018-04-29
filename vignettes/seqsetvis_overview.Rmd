@@ -220,8 +220,8 @@ ssvFeatureBinaryHeatmap(olaps)
 The ssvSignal* family of functions all take as input continuous signal data 
 mapped to the genome.  This type of data is generally stored in bedGraph, 
 wiggle, or bigWig format.  At this time, *seqsetvis* only directly supports the
-bigWig format.  This is done via the `fetchWindowedBigwig()` and 
-`fetchWindowedBigwigList()` functions.
+bigWig format.  This is done via the `ssvFetchBigwig()` and 
+`ssvFetchBigwigList()` functions.
 
 If you don't have .bigWig (or .bigwig or .bw) files you should be able to 
 easily generate some using `r Biocpkg("rtracklayer")` `export.bw()` 
@@ -229,7 +229,7 @@ alongside `import.bedGraph()`
 or `import.wig()` as appropriate.
 
 ## Loading bigwig data
-```{r fetchWindowedBigwig, eval = FALSE}
+```{r ssvFetchBigwig, eval = FALSE}
 bigwig_files = c(
     system.file("extdata", "MCF10A_CTCF_FE_random100.bw", 
                 package = "seqsetvis"),
@@ -245,7 +245,7 @@ target_size = quantile(width(olap_gr), .75)
 window_size = 50
 target_size = round(target_size / window_size) * window_size
 olap_gr = resize(olap_gr, target_size, fix = "center")
-bw_gr = fetchWindowedBigwigList(bigwig_files, olap_gr, win_size = window_size)
+bw_gr = ssvFetchBigwigList(bigwig_files, olap_gr, win_size = window_size)
 
 bw_gr
 ```
@@ -602,7 +602,7 @@ the nearest multiple of window size.  This is a bit arbitrary but a good fit in
 practice.  We'll fully capture 75% of peak regions 
 and not be influenced by outliers.
 
-This is the same procedure `fetchWindowedBigwig()` uses to automatically
+This is the same procedure `ssvFetchBigwig()` uses to automatically
 set a fixed width.
 
 ```{r set fixed width, fig.height=3, fig.width=3}
@@ -628,7 +628,7 @@ This code chunk results in identical data to that stored in the
 
 ```{r fetch package bw}
 if(use_full_data){
-    bw_gr = fetchWindowedBigwigList(file_paths = bw_files, 
+    bw_gr = ssvFetchBigwigList(file_paths = bw_files, 
                                     qgr = olaps_fixedSize,
                                     win_size = 50)
 }
@@ -850,7 +850,7 @@ if(use_full_data){
     state_gr = resize(state_gr, width = chmm_win + 2 * flank_size, 
                       fix = "center")
     
-    bw_states_gr = fetchWindowedBigwig(bw_file = chmm_bw_file, 
+    bw_states_gr = ssvFetchBigwig(bw_file = chmm_bw_file, 
                                        qgr = state_gr, 
                                        win_size = 50)
     bw_states_gr$grp = sub("\\..+", "", bw_states_gr$id)

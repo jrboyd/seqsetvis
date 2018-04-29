@@ -8,7 +8,7 @@ qgr = centerFixedSizeGRanges(qgr, 500)
 bam_file = system.file("extdata/test.bam", package = "seqsetvis")
 xls_file = system.file("extdata/test_peaks.xls", package = "seqsetvis")
 
-# fetchWindowedBam(bam_file, qgr)
+# ssvFetchBam(bam_file, qgr)
 
 test_that("fragLen_fromMacs2Xls", {
     fl = fragLen_fromMacs2Xls(xls_file)

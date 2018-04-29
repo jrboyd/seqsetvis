@@ -28,18 +28,18 @@ test_that("viewGRangesWinSample_dt sizes vary, viewGRangesWinSummary_dt don't", 
 
 test_that("can fetch bam summary", {
     #sample is bp scale
-    sample_dt = fetchWindowedBam(bam_file, vgr, return_data.table = TRUE)
+    sample_dt = ssvFetchBam(bam_file, vgr, return_data.table = TRUE)
     expect_gte(max(abs(range(sample_dt$x))), 100)
     #summaries have range of x < .5 for center anchor
-    summary_dt = fetchWindowedBam(bam_file, vgr, win_method = "summary", return_data.table = TRUE)
+    summary_dt = ssvFetchBam(bam_file, vgr, win_method = "summary", return_data.table = TRUE)
     expect_lte(max(abs(range(summary_dt$x))), .5)
-    summary_dt.med = fetchWindowedBam(bam_file, vgr[5], win_method = "summary",
+    summary_dt.med = ssvFetchBam(bam_file, vgr[5], win_method = "summary",
                                       summary_FUN = function(x, w){min(w)}, return_data.table = TRUE)
     expect_lte(max(abs(range(summary_dt.med$x))), .5)
     #summary fun did something
     expect_false(all(summary_dt$y == summary_dt.med$y))
     #win size did something
-    summary_dt10 = fetchWindowedBam(bam_file, vgr, win_method = "summary",
+    summary_dt10 = ssvFetchBam(bam_file, vgr, win_method = "summary",
                                   win_size = 10,
                                   return_data.table = TRUE)
     expect_true(all(summary_dt10[, .N, by = id]$N == 10))
@@ -48,13 +48,13 @@ test_that("can fetch bam summary", {
 
 test_that("can fetch bamList summary", {
     bams = c("A" = bam_file, "B" = bam_file)
-    bams_sample_dt = fetchWindowedBamList(bams, vgr)
+    bams_sample_dt = ssvFetchBamList(bams, vgr)
     expect_gte(max(abs(range(bams_sample_dt$x))), 100)
-    bams_summary_dt = fetchWindowedBamList(bams, vgr, win_method = "summary")
+    bams_summary_dt = ssvFetchBamList(bams, vgr, win_method = "summary")
     expect_lte(max(abs(range(bams_summary_dt$x))), .5)
-    bams_summary_dt10 = fetchWindowedBamList(bams, vgr, win_method = "summary",
+    bams_summary_dt10 = ssvFetchBamList(bams, vgr, win_method = "summary",
                                              win_size = 10, return_data.table = TRUE)
-    bams_summary_grFUN = fetchWindowedBamList(bams, vgr, win_method = "summary",
+    bams_summary_grFUN = ssvFetchBamList(bams, vgr, win_method = "summary",
                                               summary_FUN = function(x, w){min(w)})
     expect_false(all(bams_summary_dt$y == bams_summary_grFUN$y))
     expect_true(all(bams_summary_dt10[, .N, by = id]$N == 10*length(bams)))
@@ -65,18 +65,18 @@ bigwig_file = system.file("extdata/MCF10A_CTCF_FE_random100.bw", package = "seqs
 
 test_that("can fetch bigwig summary", {
     #sample is bp scale
-    sample_dt = fetchWindowedBigwig(bigwig_file, vgr, return_data.table = TRUE)
+    sample_dt = ssvFetchBigwig(bigwig_file, vgr, return_data.table = TRUE)
     expect_gte(max(abs(range(sample_dt$x))), 100)
     #summaries have range of x < .5 for center anchor
-    summary_dt = fetchWindowedBigwig(bigwig_file, vgr, win_method = "summary", return_data.table = TRUE)
+    summary_dt = ssvFetchBigwig(bigwig_file, vgr, win_method = "summary", return_data.table = TRUE)
     expect_lte(max(abs(range(summary_dt$x))), .5)
-    summary_dt.med = fetchWindowedBigwig(bigwig_file, vgr[5], win_method = "summary",
+    summary_dt.med = ssvFetchBigwig(bigwig_file, vgr[5], win_method = "summary",
                                       summary_FUN = function(x, w){min(w)}, return_data.table = TRUE)
     expect_lte(max(abs(range(summary_dt.med$x))), .5)
     #summary fun did something
     expect_false(all(summary_dt$y == summary_dt.med$y))
     #win size did something
-    summary_dt10 = fetchWindowedBigwig(bigwig_file, vgr, win_method = "summary",
+    summary_dt10 = ssvFetchBigwig(bigwig_file, vgr, win_method = "summary",
                                     win_size = 10,
                                     return_data.table = TRUE)
     expect_true(all(summary_dt10[, .N, by = id]$N == 10))
@@ -85,13 +85,13 @@ test_that("can fetch bigwig summary", {
 
 test_that("can fetch bigwigList summary", {
     bigwigs = c("A" = bigwig_file, "B" = bigwig_file)
-    bigwigs_sample_dt = fetchWindowedBigwigList(bigwigs, vgr)
+    bigwigs_sample_dt = ssvFetchBigwigList(bigwigs, vgr)
     expect_gte(max(abs(range(bigwigs_sample_dt$x))), 100)
-    bigwigs_summary_dt = fetchWindowedBigwigList(bigwigs, vgr, win_method = "summary")
+    bigwigs_summary_dt = ssvFetchBigwigList(bigwigs, vgr, win_method = "summary")
     expect_lte(max(abs(range(bigwigs_summary_dt$x))), .5)
-    bigwigs_summary_dt10 = fetchWindowedBigwigList(bigwigs, vgr, win_method = "summary",
+    bigwigs_summary_dt10 = ssvFetchBigwigList(bigwigs, vgr, win_method = "summary",
                                              win_size = 10, return_data.table = TRUE)
-    bigwigs_summary_dtFUN = fetchWindowedBigwigList(bigwigs, vgr, win_method = "summary",
+    bigwigs_summary_dtFUN = ssvFetchBigwigList(bigwigs, vgr, win_method = "summary",
                                               summary_FUN = function(x, w){min(w)})
     expect_false(all(bigwigs_summary_dt$y == bigwigs_summary_dtFUN$y))
     expect_true(all(bigwigs_summary_dt10[, .N, by = id]$N == 10*length(bigwigs)))

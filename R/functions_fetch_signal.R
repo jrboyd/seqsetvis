@@ -5,7 +5,7 @@
 #'
 #' Does nothing unless load_signal is overridden to carry out reading
 #' data from file_paths (likely via the appropriate fetchWindowed function,
-#' ie. \code{\link{fetchWindowedBigwig}} or \code{\link{fetchWindowedBam}}
+#' ie. \code{\link{ssvFetchBigwig}} or \code{\link{ssvFetchBam}}
 #'
 #' @param file_paths character vector of file_paths to load from
 #' @param qgr GRanges of intervals to return from each file
@@ -25,7 +25,7 @@
 #' file_paths, nam is from unique_names, and qgr is qgr. See details.
 #' @details load_signal is passed f, nam, and qgr and is executed in the
 #' environment where load_signal is defined. See
-#' \code{\link{fetchWindowedBigwig}} and \code{\link{fetchWindowedBam}}
+#' \code{\link{ssvFetchBigwig}} and \code{\link{ssvFetchBam}}
 #'  for examples.
 #' @return A GRanges with values read from file_paths at intervals of win_size.
 #' Originating file is coded by unique_names and assigned to column of name
@@ -40,7 +40,7 @@
 #' qgr = resize(qgr, 500, "center")
 #' load_bam = function(f, nam, qgr) {
 #'     message("loading ", f, " ...")
-#'     dt = fetchWindowedBam(bam_f = f,
+#'     dt = ssvFetchBam(bam_f = f,
 #'                       qgr = qgr,
 #'                       win_size = 50,
 #'                       fragLen = NULL,
@@ -50,8 +50,8 @@
 #'     message("finished loading ", nam, ".")
 #'     dt
 #' }
-#' fetchWindowedSignalList(bam_files, qgr, load_signal = load_bam)
-fetchWindowedSignalList = function(file_paths,
+#' ssvFetchSignal(bam_files, qgr, load_signal = load_bam)
+ssvFetchSignal = function(file_paths,
                                    qgr,
                                    unique_names = names(file_paths),
                                    names_variable = "sample",
