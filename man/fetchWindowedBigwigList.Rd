@@ -7,7 +7,8 @@
 resulting data.table and uses rbindlist to efficiently combine results.}
 \usage{
 fetchWindowedBigwigList(file_paths, qgr, unique_names = names(file_paths),
-  names_variable = "sample", win_size = 50, x0 = c("left",
+  names_variable = "sample", win_size = 50, win_method = c("sample",
+  "summary")[1], summary_FUN = stats::weighted.mean, x0 = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
   return_data.table = FALSE)
 }
@@ -25,6 +26,14 @@ bigwig.}
 Default is 'sample'}
 
 \item{win_size}{The window size that evenly divides widths in \code{qgr}.}
+
+\item{win_method}{character.  one of c("sample", "summary").  Determines
+if \code{\link{viewGRangesWinSample_dt}} or
+\code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+qgr.}
+
+\item{summary_FUN}{function.  only relevant if win_method is "summary".
+passed to \code{\link{viewGRangesWinSummary_dt}}.}
 
 \item{x0}{character, one of c("center", "center_unstranded",
 "left", "left_unstranded")}

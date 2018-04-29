@@ -1,5 +1,7 @@
 # seqsetvis 0.99.19
 
+* anchor parameter for all fetch functions.  allows strand sensitive x assignment
+and left or center reference point.
 * added viewGRangesWinSummary_dt() -  allows summary statistic to be appled over
 windows in contrast to sampling method. allows qgr to be varying width.
 * renamed viewGRangesWindowed_dt() to viewGRangesWinSample_dt()

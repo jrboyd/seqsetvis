@@ -400,7 +400,7 @@ prepare_fetch_GRanges = function(qgr,
         }
 
         qgr = centerFixedSizeGRanges(qgr, fixed_size = target_size)
-        warning("widths of qgr were not ",
+        message("widths of qgr were not ",
                 "identical and evenly divisible by win_size.",
                 "\nA fixed width of ",
                 target_size, " was applied based on the data provided.")

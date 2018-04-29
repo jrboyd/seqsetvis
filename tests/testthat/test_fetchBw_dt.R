@@ -68,12 +68,12 @@ test_that("fetchWindowedBigwig patches missing values", {
     }
 })
 
-test_that("fetchWindowedBigwig throws error if widths aren't divisble by win_size", {
+test_that("fetchWindowedBigwig throws message if widths aren't divisble by win_size", {
     skip_on_os("windows")
     mix_width_gr = test_qgr
     end(mix_width_gr) =  end(mix_width_gr) + seq_along(mix_width_gr)
     for(win in c(7, 31)){
-        expect_warning(regexp = "widths of qgr were not identical and evenly divisible by win_size", {
+        expect_message(regexp = "widths of qgr were not identical and evenly divisible by win_size", {
             fetchWindowedBigwig(bw_file = test_bw, win_size = win, qgr = mix_width_gr, return_data.table = TRUE)
         })
     }
@@ -81,12 +81,12 @@ test_that("fetchWindowedBigwig throws error if widths aren't divisble by win_siz
 
 
 
-test_that("fetchWindowedBigwig throws warning if widths vary", {
+test_that("fetchWindowedBigwig throws message if widths vary", {
     skip_on_os("windows")
     mix_width_gr = test_qgr
     end(mix_width_gr) =  end(mix_width_gr) + seq_along(mix_width_gr)*3
     for(win in c(1, 3)){
-        expect_warning({
+        expect_message(regexp = "widths of qgr were not identical and evenly divisible by win_size", {
             fetchWindowedBigwig(bw_file = test_bw, win_size = win, qgr = mix_width_gr, return_data.table = TRUE)
         })
     }
