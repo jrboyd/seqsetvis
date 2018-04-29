@@ -37,7 +37,7 @@
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bam_files = c("a" = bam_f, "b" = bam_f)
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
-#'
+#' qgr = resize(qgr, 500, "center")
 #' load_bam = function(f, nam, qgr) {
 #'     message("loading ", f, " ...")
 #'     dt = fetchWindowedBam(bam_f = f,
@@ -58,11 +58,9 @@ fetchWindowedSignalList = function(file_paths,
                                    win_size = 50,
                                    win_method = c("sample", "summary")[1],
                                    return_data.table = FALSE,
-                                   load_signal = function(f, nam) {
-                                       message("loading ", nam, " ...")
+                                   load_signal = function(f, nam, qgr) {
                                        warning("nothing happened, ",
                                                "add code here to load files")
-                                       message("finished loading ", nam, ".")
                                    }){
     if(is.list(file_paths)){
         file_paths = unlist(file_paths)
@@ -201,6 +199,8 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
 #' x - relative bp position
 #' @param score_gr GRanges with a "score" metadata column.
 #' @param qgr regions to view by window.
+#' @param n_tiles numeric >= 1, the number of tiles to use for every region in
+#' qgr.
 #' @param x0 character. controls how x value is derived from position for
 #' each region in qgr.  0 may be the left side or center.  If not unstranded,
 #' x coordinates are flipped for (-) strand. One of c("center",
@@ -210,6 +210,7 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
 #' weighted.mean.  limma::weighted.median is a good alternative.
 #' @return data.table that is GRanges compatible
 #' @export
+#' @importFrom stats weighted.mean
 #' @examples
 #' bam_file = system.file("extdata/test.bam",
 #'     package = "seqsetvis")
@@ -230,8 +231,10 @@ viewGRangesWinSummary_dt = function (score_gr,
                                 n_tiles = 100,
                                 x0 = c("center", "center_unstranded",
                                        "left", "left_unstranded")[3],
-                                summary_FUN = weighted.mean){
-    x = id = NULL
+                                summary_FUN = stats::weighted.mean){
+    #reserve bindings for data.table
+    x = id = tile_start = tile_end = tile_id =
+        tile_widths = scored_width = tile_density = NULL
     stopifnot(class(score_gr) == "GRanges")
     stopifnot(!is.null(score_gr$score))
     stopifnot(class(qgr) == "GRanges")
@@ -274,7 +277,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     )
     colnames(cov_dt)[4:5] = c("tile_start", "tile_end")
 
-    cov_dt[start == 1 & end == 1, c("start", "end") := .(tile_start, tile_end)]
+    cov_dt[start == 1 & end == 1, c("start", "end") := list(tile_start, tile_end)]
     #trim score regions to fit in tiles so score weighting is accurate
 
     cov_dt[start < tile_start, start := tile_start]
@@ -282,10 +285,10 @@ viewGRangesWinSummary_dt = function (score_gr,
     cov_dt[, width := end - start + 1]
 
     # check for incompletely retrieved regions (zeroes omitted for instance)
-    check_dt = cov_dt[, .(scored_width = sum(width)), by = .(tile_id, id)]
+    check_dt = cov_dt[, list(scored_width = sum(width)), by = list(tile_id, id)]
     check_dt$tile_widths = width(tiles)
     #add a dummy interval of score zero to correct width
-    repair_dt = check_dt[tile_widths != scored_width, .(
+    repair_dt = check_dt[tile_widths != scored_width, list(
         start = -1,
         end = -1,
         score = 0,
@@ -297,14 +300,14 @@ viewGRangesWinSummary_dt = function (score_gr,
     )]
     cov_dt = rbind(cov_dt, repair_dt)
 
-    density_dt = cov_dt[, .(tile_density = summary_FUN(score, width)),
-                        by = .(tile_id, id)]
+    density_dt = cov_dt[, list(tile_density = summary_FUN(score, width)),
+                        by = list(tile_id, id)]
 
     density_dt[, x := (1:.N-.5)/.N, by = id]
     if(!all(tiles$id == density_dt$id))
         stop("something bad happened when merging density ",
              "data.table back to tiles GRanges.")
-    score_dt = cbind(as.data.table(tiles), density_dt[, .(y = tile_density, x = x)])
+    score_dt = cbind(as.data.table(tiles), density_dt[, list(y = tile_density, x = x)])
 
     #slightly different than summary,
     #x is already set and regions are already contiguous.

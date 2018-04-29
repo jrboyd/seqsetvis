@@ -226,6 +226,7 @@ fetchBam = function(bam_f,
 #' @return tidy GRanges (or data.table if specified) with pileups from bam
 #' file.  pileup is calculated only every win_size bp.
 #' @export
+#' @importFrom stats weighted.mean
 #' @examples
 #' bam_file = system.file("extdata/test.bam",
 #'     package = "seqsetvis")
@@ -240,7 +241,7 @@ fetchWindowedBam = function(bam_f,
                             qgr,
                             win_size = 50,
                             win_method = c("sample", "summary")[1],
-                            summary_FUN = weighted.mean,
+                            summary_FUN = stats::weighted.mean,
                             fragLen = NULL,
                             target_strand = c("*", "+", "-")[1],
                             x0 = c("left", "left_unstranded", "center",
@@ -248,6 +249,7 @@ fetchWindowedBam = function(bam_f,
                             return_data.table = FALSE) {
     stopifnot(is.character(win_method))
     stopifnot(length(win_method) == 1)
+    stopifnot(class(qgr) == "GRanges")
     stopifnot(win_method %in% c("sample", "summary"))
     stopifnot(is.function(summary_FUN))
     switch (win_method,
@@ -307,6 +309,7 @@ fetchWindowedBam = function(bam_f,
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
 #' 10, values from positions chr1 5,15,25...85, and 95 will be
 #' retrieved from \code{bw_file}
+#' @importFrom stats weighted.mean
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
 #' library(GenomicRanges)
@@ -325,7 +328,7 @@ fetchWindowedBamList = function(file_paths,
                                 unique_names = names(file_paths),
                                 win_size = 50,
                                 win_method = c("sample", "summary")[1],
-                                summary_FUN = weighted.mean,
+                                summary_FUN = stats::weighted.mean,
                                 fragLens = "auto",
                                 target_strand = c("*", "+", "-")[1],
                                 x0 = c("left", "left_unstranded", "center",
@@ -338,6 +341,7 @@ fetchWindowedBamList = function(file_paths,
         fragLens = rep(fragLens[1], length(file_paths))
     }
     names(fragLens) = file_paths
+
     load_bam = function(f, nam, qgr) {
         message("loading ", f, " ...")
         fl = fragLens[f]
@@ -351,6 +355,7 @@ fetchWindowedBamList = function(file_paths,
                               summary_FUN = summary_FUN,
                               fragLen = fl,
                               target_strand = target_strand,
+                              x0 = x0,
                               return_data.table = TRUE)
         dt[[names_variable]] = nam
         message("finished loading ", nam, ".")

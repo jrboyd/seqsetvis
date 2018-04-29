@@ -9,6 +9,12 @@
 #' @param qgr Set of GRanges to query.  For valid results the width of each
 #' interval should be identical and evenly divisible by \code{win_size}.
 #' @param win_size The window size that evenly divides widths in \code{qgr}.
+#' @param win_method character.  one of c("sample", "summary").  Determines
+#' if \code{\link{viewGRangesWinSample_dt}} or
+#' \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+#' qgr.
+#' @param summary_FUN function.  only relevant if win_method is "summary".
+#' passed to \code{\link{viewGRangesWinSummary_dt}}.
 #' @param x0 character, one of c("center", "center_unstranded",
 #' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
@@ -32,17 +38,29 @@
 fetchWindowedBigwig = function(bw_file,
                                qgr,
                                win_size = 50,
+                               win_method = c("sample", "summary")[1],
+                               summary_FUN = stats::weighted.mean,
                                x0 = c("left", "left_unstranded", "center",
                                       "center_unstranded")[3],
                                return_data.table = FALSE) {
     stopifnot(is.character(bw_file))
     stopifnot(class(qgr) == "GRanges")
     stopifnot(is.numeric(win_size))
-    qgr = prepare_fetch_GRanges(qgr = qgr,
-                                win_size = win_size,
-                                target_size = NULL)
-    score_gr = rtracklayer::import.bw(bw_file, which = qgr)
-    out = viewGRangesWinSample_dt(score_gr, qgr, win_size)
+
+    switch (win_method,
+            sample = {
+                qgr = prepare_fetch_GRanges(qgr, win_size)
+                score_gr = rtracklayer::import.bw(bw_file, which = qgr)
+                out = viewGRangesWinSample_dt(score_gr, qgr, win_size, x0 = x0)
+            },
+            summary = {
+                score_gr = rtracklayer::import.bw(bw_file, which = qgr)
+                out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
+                                               summary_FUN = summary_FUN,
+                                               x0 = x0)
+            }
+    )
+
     if(!return_data.table){
         out = GRanges(out)
     }
@@ -66,6 +84,12 @@ fetchWindowedBigwig = function(bw_file,
 #' @param names_variable The column name where unique_names are stored.
 #' Default is 'sample'
 #' @param win_size The window size that evenly divides widths in \code{qgr}.
+#' @param win_method character.  one of c("sample", "summary").  Determines
+#' if \code{\link{viewGRangesWinSample_dt}} or
+#' \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+#' qgr.
+#' @param summary_FUN function.  only relevant if win_method is "summary".
+#' passed to \code{\link{viewGRangesWinSummary_dt}}.
 #' @param x0 character, one of c("center", "center_unstranded",
 #' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
@@ -94,6 +118,8 @@ fetchWindowedBigwigList = function(file_paths,
                                    unique_names = names(file_paths),
                                    names_variable = "sample",
                                    win_size = 50,
+                                   win_method = c("sample", "summary")[1],
+                                   summary_FUN = stats::weighted.mean,
                                    x0 = c("left", "left_unstranded", "center",
                                           "center_unstranded")[3],
                                    return_data.table = FALSE) {
@@ -101,8 +127,11 @@ fetchWindowedBigwigList = function(file_paths,
     load_bw = function(f, nam, qgr) {
         message("loading ", f, " ...")
         dt = fetchWindowedBigwig(bw_file = f,
-                                 win_size = win_size,
                                  qgr = qgr,
+                                 win_size = win_size,
+                                 win_method = win_method,
+                                 summary_FUN = summary_FUN,
+                                 x0 = x0,
                                  return_data.table = TRUE)
         dt[[names_variable]] = nam
         message("finished loading ", nam, ".")

@@ -9,12 +9,15 @@ regions.}
 \usage{
 viewGRangesWinSummary_dt(score_gr, qgr, n_tiles = 100, x0 = c("center",
   "center_unstranded", "left", "left_unstranded")[3],
-  summary_FUN = weighted.mean)
+  summary_FUN = stats::weighted.mean)
 }
 \arguments{
 \item{score_gr}{GRanges with a "score" metadata column.}
 
 \item{qgr}{regions to view by window.}
+
+\item{n_tiles}{numeric >= 1, the number of tiles to use for every region in
+qgr.}
 
 \item{x0}{character. controls how x value is derived from position for
 each region in qgr.  0 may be the left side or center.  If not unstranded,

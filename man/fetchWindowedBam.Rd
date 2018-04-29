@@ -5,7 +5,7 @@
 \title{fetch a windowed version of a bam file, returns GRanges}
 \usage{
 fetchWindowedBam(bam_f, qgr, win_size = 50, win_method = c("sample",
-  "summary")[1], summary_FUN = weighted.mean, fragLen = NULL,
+  "summary")[1], summary_FUN = stats::weighted.mean, fragLen = NULL,
   target_strand = c("*", "+", "-")[1], x0 = c("left", "left_unstranded",
   "center", "center_unstranded")[3], return_data.table = FALSE)
 }

@@ -6,9 +6,8 @@
 \usage{
 fetchWindowedSignalList(file_paths, qgr, unique_names = names(file_paths),
   names_variable = "sample", win_size = 50, win_method = c("sample",
-  "summary")[1], return_data.table = FALSE, load_signal = function(f, nam) {
-      message("loading ", nam, " ...")     warning("nothing happened, ",
-  "add code here to load files")     message("finished loading ", nam, ".") })
+  "summary")[1], return_data.table = FALSE, load_signal = function(f, nam,
+  qgr) {     warning("nothing happened, ", "add code here to load files") })
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from}
@@ -57,7 +56,7 @@ bam_f = system.file("extdata/test.bam",
     package = "seqsetvis", mustWork = TRUE)
 bam_files = c("a" = bam_f, "b" = bam_f)
 qgr = CTCF_in_10a_overlaps_gr[1:5]
-
+qgr = resize(qgr, 500, "center")
 load_bam = function(f, nam, qgr) {
     message("loading ", f, " ...")
     dt = fetchWindowedBam(bam_f = f,
