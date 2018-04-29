@@ -1,14 +1,14 @@
 Package: seqsetvis
 Type: Package
 Title: Set Based Visualizations for Next-Gen Sequencing Data
-Version: 0.99.19
+Version: 0.99.20
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
 Description: seqsetvis enables the visualization and analysis of multiple 
     genomic datasets. Although seqsetvis was designed for the comparison of 
     mulitple ChIP-seq datasets, this package is domain-agnostic and allows the 
     processing of multiple genomic coordinate files (bed-like files) and 
-    signal files (bigwig files).
+    signal files (bigwig files or bam pileups).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -21,7 +21,7 @@ Suggests:
     knitr, 
     rmarkdown, 
     testthat 
-Depends: R (>= 3.4), ggplot2
+Depends: R (>= 3.5), ggplot2
 Imports: 
     data.table, 
     eulerr, 
