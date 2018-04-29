@@ -7,7 +7,7 @@ is used and widths can vary in qgr, in contrast to
 \code{\link{viewGRangesWinSample_dt}} where width must be constant across
 regions.}
 \usage{
-viewGRangesWinSummary_dt(score_gr, qgr, n_tiles = 100, x0 = c("center",
+viewGRangesWinSummary_dt(score_gr, qgr, n_tiles = 100, anchor = c("center",
   "center_unstranded", "left", "left_unstranded")[3],
   summary_FUN = stats::weighted.mean)
 }
@@ -19,7 +19,7 @@ viewGRangesWinSummary_dt(score_gr, qgr, n_tiles = 100, x0 = c("center",
 \item{n_tiles}{numeric >= 1, the number of tiles to use for every region in
 qgr.}
 
-\item{x0}{character. controls how x value is derived from position for
+\item{anchor}{character. controls how x value is derived from position for
 each region in qgr.  0 may be the left side or center.  If not unstranded,
 x coordinates are flipped for (-) strand. One of c("center",
 "center_unstranded", "left", "left_unstranded"). Default is "left".}

@@ -8,7 +8,7 @@ resulting data.table and uses rbindlist to efficiently combine results.}
 \usage{
 fetchWindowedBigwigList(file_paths, qgr, unique_names = names(file_paths),
   names_variable = "sample", win_size = 50, win_method = c("sample",
-  "summary")[1], summary_FUN = stats::weighted.mean, x0 = c("left",
+  "summary")[1], summary_FUN = stats::weighted.mean, anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
   return_data.table = FALSE)
 }
@@ -35,7 +35,7 @@ qgr.}
 \item{summary_FUN}{function.  only relevant if win_method is "summary".
 passed to \code{\link{viewGRangesWinSummary_dt}}.}
 
-\item{x0}{character, one of c("center", "center_unstranded",
+\item{anchor}{character, one of c("center", "center_unstranded",
 "left", "left_unstranded")}
 
 \item{return_data.table}{logical. If TRUE the internal data.table is

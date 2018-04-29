@@ -51,17 +51,17 @@ test_that("viewGRangesWinSample_dt strand and position functions", {
     bam_score = fetchBam(bam_file, qgr = qgr)
     score_gr = bam_score
     window_size = 50
-    x0 = "center"
+    anchor = "center"
     qgr_stranded = qgr
     GenomicRanges::strand(qgr_stranded) = c(rep("+", 2), rep("-", 3))
 
-    b_dt_center = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, x0 = "center")
+    b_dt_center = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, anchor = "center")
 
-    b_dt_center_uns = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, x0 = "center_unstranded")
+    b_dt_center_uns = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, anchor = "center_unstranded")
 
-    b_dt_left = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, x0 = "left")
+    b_dt_left = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, anchor = "left")
 
-    b_dt_left_uns = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, x0 = "left_unstranded")
+    b_dt_left_uns = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, anchor = "left_unstranded")
 
     # b_dt = rbindlist(list(center = b_dt_center,
     #                       center_unstranded = b_dt_center_uns,

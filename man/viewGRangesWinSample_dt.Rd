@@ -4,7 +4,7 @@
 \alias{viewGRangesWinSample_dt}
 \title{get a windowed sampling of score_gr}
 \usage{
-viewGRangesWinSample_dt(score_gr, qgr, window_size, x0 = c("center",
+viewGRangesWinSample_dt(score_gr, qgr, window_size, anchor = c("center",
   "center_unstranded", "left", "left_unstranded")[1])
 }
 \arguments{
@@ -15,7 +15,7 @@ viewGRangesWinSample_dt(score_gr, qgr, window_size, x0 = c("center",
 \item{window_size}{qgr will be represented by value from score_gr every
 window_size bp.}
 
-\item{x0}{character. controls how x value is derived from position for
+\item{anchor}{character. controls how x value is derived from position for
 each region in qgr.  0 may be the left side or center.  If not unstranded,
 x coordinates are flipped for (-) strand. One of c("center",
 "center_unstranded", "left", "left_unstranded"). Default is "center".}

@@ -1,6 +1,6 @@
 #' Fetch values from a bigwig appropriate for heatmaps etc.
 #'
-#' \code{fetchWindowedBigwig} Gets values for each region of the query
+#' \code{fetchWindowedBigwig.single} Gets values for each region of the query
 #' GRanges (\code{qgr}). Values correspond to the center of each window of
 #' size \code{win_size}.  A tidy formatted data.table
 #' object is returned suitable for plotting using ggplots.
@@ -15,7 +15,7 @@
 #' qgr.
 #' @param summary_FUN function.  only relevant if win_method is "summary".
 #' passed to \code{\link{viewGRangesWinSummary_dt}}.
-#' @param x0 character, one of c("center", "center_unstranded",
+#' @param anchor character, one of c("center", "center_unstranded",
 #' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
@@ -30,17 +30,17 @@
 #' bw_f = system.file("extdata/test_loading.bw",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' qgr = GRanges("chrTest", IRanges(1, 30))
-#' bw_gr = fetchWindowedBigwig(bw_f, qgr, win_size = 10)
+#' bw_gr = fetchWindowedBigwig.single(bw_f, qgr, win_size = 10)
 #'
-#' bw_dt = fetchWindowedBigwig(bw_f, qgr, win_size = 10,
+#' bw_dt = fetchWindowedBigwig.single(bw_f, qgr, win_size = 10,
 #'     return_data.table = TRUE)
 #' }
-fetchWindowedBigwig = function(bw_file,
+fetchWindowedBigwig.single = function(bw_file,
                                qgr,
                                win_size = 50,
                                win_method = c("sample", "summary")[1],
                                summary_FUN = stats::weighted.mean,
-                               x0 = c("left", "left_unstranded", "center",
+                               anchor = c("left", "left_unstranded", "center",
                                       "center_unstranded")[3],
                                return_data.table = FALSE) {
     stopifnot(is.character(bw_file))
@@ -51,13 +51,13 @@ fetchWindowedBigwig = function(bw_file,
             sample = {
                 qgr = prepare_fetch_GRanges(qgr, win_size)
                 score_gr = rtracklayer::import.bw(bw_file, which = qgr)
-                out = viewGRangesWinSample_dt(score_gr, qgr, win_size, x0 = x0)
+                out = viewGRangesWinSample_dt(score_gr, qgr, win_size, anchor = anchor)
             },
             summary = {
                 score_gr = rtracklayer::import.bw(bw_file, which = qgr)
                 out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
                                                summary_FUN = summary_FUN,
-                                               x0 = x0)
+                                               anchor = anchor)
             }
     )
 
@@ -69,11 +69,11 @@ fetchWindowedBigwig = function(bw_file,
 
 
 #' Iterates a character vector (ideally named) and calls
-#' \code{fetchWindowedBigwig} on each.  Appends grouping variable to each
+#' \code{fetchWindowedBigwig.single} on each.  Appends grouping variable to each
 #' resulting data.table and uses rbindlist to efficiently combine results.
 #'
-#' \code{fetchWindowedBigwigList} iteratively calls \code{fetchWindowedBigwig}.
-#' See \code{\link{fetchWindowedBigwig}} for more info.
+#' \code{fetchWindowedBigwig} iteratively calls \code{fetchWindowedBigwig.single}.
+#' See \code{\link{fetchWindowedBigwig.single}} for more info.
 #' @export
 #' @param file_paths The character vector or list of paths to bigwig files to
 #'  read from.
@@ -90,7 +90,7 @@ fetchWindowedBigwig = function(bw_file,
 #' qgr.
 #' @param summary_FUN function.  only relevant if win_method is "summary".
 #' passed to \code{\link{viewGRangesWinSummary_dt}}.
-#' @param x0 character, one of c("center", "center_unstranded",
+#' @param anchor character, one of c("center", "center_unstranded",
 #' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
@@ -107,31 +107,31 @@ fetchWindowedBigwig = function(bw_file,
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bw_files = c("a" = bw_f, "b" = bw_f)
 #' qgr = GRanges("chrTest", IRanges(1, 30))
-#' bw_gr = fetchWindowedBigwigList(bw_files, qgr, win_size = 10)
-#' bw_gr2 = fetchWindowedBigwigList(as.list(bw_files), qgr, win_size = 10)
+#' bw_gr = fetchWindowedBigwig(bw_files, qgr, win_size = 10)
+#' bw_gr2 = fetchWindowedBigwig(as.list(bw_files), qgr, win_size = 10)
 #'
-#' bw_dt = fetchWindowedBigwigList(bw_files, qgr, win_size = 10,
+#' bw_dt = fetchWindowedBigwig(bw_files, qgr, win_size = 10,
 #'     return_data.table = TRUE)
 #' }
-fetchWindowedBigwigList = function(file_paths,
+fetchWindowedBigwig = function(file_paths,
                                    qgr,
                                    unique_names = names(file_paths),
                                    names_variable = "sample",
                                    win_size = 50,
                                    win_method = c("sample", "summary")[1],
                                    summary_FUN = stats::weighted.mean,
-                                   x0 = c("left", "left_unstranded", "center",
+                                   anchor = c("left", "left_unstranded", "center",
                                           "center_unstranded")[3],
                                    return_data.table = FALSE) {
 
     load_bw = function(f, nam, qgr) {
         message("loading ", f, " ...")
-        dt = fetchWindowedBigwig(bw_file = f,
+        dt = fetchWindowedBigwig.single(bw_file = f,
                                  qgr = qgr,
                                  win_size = win_size,
                                  win_method = win_method,
                                  summary_FUN = summary_FUN,
-                                 x0 = x0,
+                                 anchor = anchor,
                                  return_data.table = TRUE)
         dt[[names_variable]] = nam
         message("finished loading ", nam, ".")

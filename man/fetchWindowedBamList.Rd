@@ -9,7 +9,7 @@ rbindlist to efficiently combine results}
 fetchWindowedBamList(file_paths, qgr, unique_names = names(file_paths),
   win_size = 50, win_method = c("sample", "summary")[1],
   summary_FUN = stats::weighted.mean, fragLens = "auto",
-  target_strand = c("*", "+", "-")[1], x0 = c("left", "left_unstranded",
+  target_strand = c("*", "+", "-")[1], anchor = c("left", "left_unstranded",
   "center", "center_unstranded")[3], names_variable = "sample",
   return_data.table = FALSE)
 }
@@ -40,7 +40,7 @@ qgr.}
 \item{target_strand}{character. One of c("*", "+", "-"). Controls
 filtering of reads by strand.  Default of "*" combines both strands.}
 
-\item{x0}{character, one of c("center", "center_unstranded",
+\item{anchor}{character, one of c("center", "center_unstranded",
 "left", "left_unstranded")}
 
 \item{names_variable}{The column name where unique_names are stored.}

@@ -15,9 +15,9 @@ bam_gr = fetchBam(bam_file, qgr)
 
 #sampling
 test_that("viewGRangesWinSample_dt center", {
-    dt = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 50, x0 = "center")
+    dt = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 50, anchor = "center")
     # dt$group = "stranded"
-    dt_us = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 50, x0 = "center_unstranded")
+    dt_us = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 50, anchor = "center_unstranded")
     # dt_us$group = "unstranded"
     # ssvSignalLineplot(rbind(dt, dt_us), sample_ = "id", color_ = "strand", group_ = "group")
     expect_true(all(dt[strand == "+"][order(x)]$y == dt_us[strand == "+"][order(x)]$y))
@@ -29,9 +29,9 @@ test_that("viewGRangesWinSample_dt center", {
 })
 
 test_that("viewGRangesWinSample_dt left", {
-    dt = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 50, x0 = "left")
+    dt = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 50, anchor = "left")
     # dt$group = "stranded"
-    dt_us = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 50, x0 = "left_unstranded")
+    dt_us = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 50, anchor = "left_unstranded")
     # dt_us$group = "unstranded"
     # ssvSignalLineplot(rbind(dt, dt_us), sample_ = "id", color_ = "strand", group_ = "group")
     expect_equal(dt[strand == "+"][order(x)]$y, dt_us[strand == "+"][order(x)]$y)
@@ -42,9 +42,9 @@ test_that("viewGRangesWinSample_dt left", {
 
 #summary
 test_that("viewGRangesWinSummary_dt center", {
-    dt = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, x0 = "center")
+    dt = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, anchor = "center")
     # dt$group = "stranded"
-    dt_us = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, x0 = "center_unstranded")
+    dt_us = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, anchor = "center_unstranded")
     # dt_us$group = "unstranded"
     # ssvSignalLineplot(rbind(dt, dt_us), sample_ = "id", color_ = "strand", group_ = "group")
     expect_equal(dt[strand == "+"][order(x)]$y, dt_us[strand == "+"][order(x)]$y)
@@ -56,9 +56,9 @@ test_that("viewGRangesWinSummary_dt center", {
 })
 
 test_that("viewGRangesWinSummary_dt left", {
-    dt = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, x0 = "left")
+    dt = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, anchor = "left")
     # dt$group = "stranded"
-    dt_us = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, x0 = "left_unstranded")
+    dt_us = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 10, anchor = "left_unstranded")
     # dt_us$group = "unstranded"
     # ssvSignalLineplot(rbind(dt, dt_us), sample_ = "id", color_ = "strand", group_ = "group")
     expect_equal(dt[strand == "+"][order(x)]$y, dt_us[strand == "+"][order(x)]$y)
@@ -70,9 +70,9 @@ test_that("viewGRangesWinSummary_dt left", {
 # bams
 bams = c("A" = bam_file, "B" = bam_file)
 
-test_that("fetchWindowedBamList x0", {
-    gr = fetchWindowedBamList(bams, qgr, win_size = 50, x0 = "center")
-    gr_uns = fetchWindowedBamList(bams, qgr, win_size = 50, x0 = "center_unstranded")
+test_that("fetchWindowedBamList anchor", {
+    gr = fetchWindowedBamList(bams, qgr, win_size = 50, anchor = "center")
+    gr_uns = fetchWindowedBamList(bams, qgr, win_size = 50, anchor = "center_unstranded")
     is_pos = as.character(strand(gr)) == "+"
     # plot(gr_uns$x[is_pos], gr$x[is_pos])
     # plot(gr_uns$x[!is_pos], gr$x[!is_pos])
@@ -81,8 +81,8 @@ test_that("fetchWindowedBamList x0", {
     expect_lt(min(gr$x), 0)
     expect_lt(min(gr_uns$x), 0)
 
-    dt = fetchWindowedBamList(bams, qgr, win_size = 50, x0 = "left", return_data.table = TRUE)
-    dt_uns = fetchWindowedBamList(bams, qgr, win_size = 50, x0 = "left_unstranded", return_data.table = TRUE)
+    dt = fetchWindowedBamList(bams, qgr, win_size = 50, anchor = "left", return_data.table = TRUE)
+    dt_uns = fetchWindowedBamList(bams, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE)
 
     is_pos = dt$strand == "+"
     # plot(dt_uns$x[is_pos], dt$x[is_pos])
@@ -96,9 +96,9 @@ test_that("fetchWindowedBamList x0", {
 
 #bigwigs
 bigwigs = dir(system.file("extdata", package = "seqsetvis"), pattern = "random100.bw$", full.names = TRUE)
-test_that("fetchWindowedBigwigList x0", {
-    gr = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, x0 = "center")
-    gr_uns = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, x0 = "center_unstranded")
+test_that("fetchWindowedBigwigList anchor", {
+    gr = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, anchor = "center")
+    gr_uns = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, anchor = "center_unstranded")
     is_pos = as.character(strand(gr)) == "+"
     # plot(gr_uns$x[is_pos], gr$x[is_pos])
     # plot(gr_uns$x[!is_pos], gr$x[!is_pos])
@@ -107,8 +107,8 @@ test_that("fetchWindowedBigwigList x0", {
     expect_lt(min(gr$x), 0)
     expect_lt(min(gr_uns$x), 0)
 
-    dt = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, x0 = "left", return_data.table = TRUE)
-    dt_uns = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, x0 = "left_unstranded", return_data.table = TRUE)
+    dt = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, anchor = "left", return_data.table = TRUE)
+    dt_uns = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE)
 
     is_pos = dt$strand == "+"
     # plot(dt_uns$x[is_pos], dt$x[is_pos])
@@ -123,9 +123,9 @@ test_that("fetchWindowedBigwigList x0", {
 # bams
 bams = c("A" = bam_file, "B" = bam_file)
 
-test_that("fetchWindowedBamList x0 - summary", {
-    gr = fetchWindowedBamList(bams, qgr, win_size = 50, x0 = "center", win_method = "summary")
-    gr_uns = fetchWindowedBamList(bams, qgr, win_size = 50, x0 = "center_unstranded", win_method = "summary")
+test_that("fetchWindowedBamList anchor - summary", {
+    gr = fetchWindowedBamList(bams, qgr, win_size = 50, anchor = "center", win_method = "summary")
+    gr_uns = fetchWindowedBamList(bams, qgr, win_size = 50, anchor = "center_unstranded", win_method = "summary")
     is_pos = as.character(strand(gr)) == "+"
     # plot(gr_uns$x[is_pos], gr$x[is_pos])
     # plot(gr_uns$x[!is_pos], gr$x[!is_pos])
@@ -134,8 +134,8 @@ test_that("fetchWindowedBamList x0 - summary", {
     expect_lt(min(gr$x), 0)
     expect_lt(min(gr_uns$x), 0)
 
-    dt = fetchWindowedBamList(bams, qgr, win_size = 50, x0 = "left", return_data.table = TRUE, win_method = "summary")
-    dt_uns = fetchWindowedBamList(bams, qgr, win_size = 50, x0 = "left_unstranded", return_data.table = TRUE, win_method = "summary")
+    dt = fetchWindowedBamList(bams, qgr, win_size = 50, anchor = "left", return_data.table = TRUE, win_method = "summary")
+    dt_uns = fetchWindowedBamList(bams, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE, win_method = "summary")
 
     is_pos = dt$strand == "+"
     # plot(dt_uns$x[is_pos], dt$x[is_pos])
@@ -149,9 +149,9 @@ test_that("fetchWindowedBamList x0 - summary", {
 
 #bigwigs
 bigwigs = dir(system.file("extdata", package = "seqsetvis"), pattern = "random100.bw$", full.names = TRUE)
-test_that("fetchWindowedBigwigList x0 - summary", {
-    gr = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, x0 = "center", win_method = "summary")
-    gr_uns = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, x0 = "center_unstranded", win_method = "summary")
+test_that("fetchWindowedBigwigList anchor - summary", {
+    gr = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, anchor = "center", win_method = "summary")
+    gr_uns = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, anchor = "center_unstranded", win_method = "summary")
     is_pos = as.character(strand(gr)) == "+"
     # plot(gr_uns$x[is_pos], gr$x[is_pos])
     # plot(gr_uns$x[!is_pos], gr$x[!is_pos])
@@ -160,8 +160,8 @@ test_that("fetchWindowedBigwigList x0 - summary", {
     expect_lt(min(gr$x), 0)
     expect_lt(min(gr_uns$x), 0)
 
-    dt = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, x0 = "left", return_data.table = TRUE, win_method = "summary")
-    dt_uns = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, x0 = "left_unstranded", return_data.table = TRUE, win_method = "summary")
+    dt = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, anchor = "left", return_data.table = TRUE, win_method = "summary")
+    dt_uns = fetchWindowedBigwigList(bigwigs, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE, win_method = "summary")
 
     is_pos = dt$strand == "+"
     # plot(dt_uns$x[is_pos], dt$x[is_pos])

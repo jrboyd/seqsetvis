@@ -117,7 +117,7 @@ fetchWindowedSignalList = function(file_paths,
 #' @param qgr regions to view by window.
 #' @param window_size qgr will be represented by value from score_gr every
 #' window_size bp.
-#' @param x0 character. controls how x value is derived from position for
+#' @param anchor character. controls how x value is derived from position for
 #' each region in qgr.  0 may be the left side or center.  If not unstranded,
 #' x coordinates are flipped for (-) strand. One of c("center",
 #' "center_unstranded", "left", "left_unstranded"). Default is "center".
@@ -138,7 +138,7 @@ fetchWindowedSignalList = function(file_paths,
 #'     bw_dt = viewGRangesWinSample_dt(bw_gr, qgr, 50)
 #' }
 viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
-                                   x0 = c("center", "center_unstranded",
+                                   anchor = c("center", "center_unstranded",
                                           "left", "left_unstranded")[1]){
     x = id = NULL
     stopifnot(class(score_gr) == "GRanges")
@@ -147,7 +147,7 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
     stopifnot(is.numeric(window_size))
     stopifnot(window_size >= 1)
     stopifnot(window_size %% 1 == 0)
-    stopifnot(x0 %in% c("center", "center_unstranded",
+    stopifnot(anchor %in% c("center", "center_unstranded",
                         "left", "left_unstranded"))
     windows = slidingWindows(qgr, width = window_size, step = window_size)
     if (is.null(qgr$id)) {
@@ -178,7 +178,7 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
     windows$y = score_gr[olaps$subjectHits]$score
     score_dt = data.table::as.data.table(windows)
 
-    return(shift_x0(score_dt, window_size, x0))
+    return(shift_anchor(score_dt, window_size, anchor))
 }
 
 
@@ -201,7 +201,7 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
 #' @param qgr regions to view by window.
 #' @param n_tiles numeric >= 1, the number of tiles to use for every region in
 #' qgr.
-#' @param x0 character. controls how x value is derived from position for
+#' @param anchor character. controls how x value is derived from position for
 #' each region in qgr.  0 may be the left side or center.  If not unstranded,
 #' x coordinates are flipped for (-) strand. One of c("center",
 #' "center_unstranded", "left", "left_unstranded"). Default is "left".
@@ -229,7 +229,7 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
 viewGRangesWinSummary_dt = function (score_gr,
                                 qgr,
                                 n_tiles = 100,
-                                x0 = c("center", "center_unstranded",
+                                anchor = c("center", "center_unstranded",
                                        "left", "left_unstranded")[3],
                                 summary_FUN = stats::weighted.mean){
     #reserve bindings for data.table
@@ -241,7 +241,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     stopifnot(is.numeric(n_tiles))
     stopifnot(n_tiles >= 1)
     stopifnot(n_tiles%%1 == 0)
-    stopifnot(x0 %in% c("center", "center_unstranded", "left",
+    stopifnot(anchor %in% c("center", "center_unstranded", "left",
                         "left_unstranded"))
 
     tiles = tile(qgr, n_tiles)
@@ -312,7 +312,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     #slightly different than summary,
     #x is already set and regions are already contiguous.
     #just need to flip x or center as needed.
-    switch(x0, center = {
+    switch(anchor, center = {
         score_dt[, x := x - (mean(x)), by = id]
         score_dt[strand == "-", x := (- 1 * x)]
     }, center_unstranded = {
@@ -330,14 +330,14 @@ viewGRangesWinSummary_dt = function (score_gr,
 #'
 #' @param score_dt data.table, GRanges() sufficient
 #' @param window_size numeric, window size used to generate socre_dt
-#' @param x0 character, one of c("center", "center_unstranded",
+#' @param anchor character, one of c("center", "center_unstranded",
 #' "left", "left_unstranded")
 #' @return score_dt with x values shifted appropriately and start and end
 #' extended to make ranges contiguous
-shift_x0 = function(score_dt, window_size, x0){
+shift_anchor = function(score_dt, window_size, anchor){
     x = id = NULL
     shift = round(window_size/2)
-    switch(x0,
+    switch(anchor,
            center = {
                score_dt[, x := start - min(start) + shift, by = id]
                score_dt[, x := x - round(mean(x)), by = id]

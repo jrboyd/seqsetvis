@@ -219,7 +219,7 @@ fetchBam = function(bam_f,
 #' if NA, raw bam pileup with no cross strand shift is returned.
 #' @param target_strand character. if one of "+" or "-", reads are filtered
 #' accordingly. ignored if any other value.
-#' @param x0 character, one of c("center", "center_unstranded",
+#' @param anchor character, one of c("center", "center_unstranded",
 #' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
@@ -231,20 +231,20 @@ fetchBam = function(bam_f,
 #' bam_file = system.file("extdata/test.bam",
 #'     package = "seqsetvis")
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
-#' bam_gr = fetchWindowedBam(bam_file, qgr)
-#' bam_gr = fetchWindowedBam(bam_file, qgr, fragLen = 180,
+#' bam_gr = fetchWindowedBam.single(bam_file, qgr)
+#' bam_gr = fetchWindowedBam.single(bam_file, qgr, fragLen = 180,
 #'     win_size = 10, target_strand = "+")
 #'
-#' bam_dt = fetchWindowedBam(bam_file, qgr,
+#' bam_dt = fetchWindowedBam.sigb(bam_file, qgr,
 #'     return_data.table = TRUE)
-fetchWindowedBam = function(bam_f,
+fetchWindowedBam.single = function(bam_f,
                             qgr,
                             win_size = 50,
                             win_method = c("sample", "summary")[1],
                             summary_FUN = stats::weighted.mean,
                             fragLen = NULL,
                             target_strand = c("*", "+", "-")[1],
-                            x0 = c("left", "left_unstranded", "center",
+                            anchor = c("left", "left_unstranded", "center",
                                    "center_unstranded")[3],
                             return_data.table = FALSE) {
     stopifnot(is.character(win_method))
@@ -256,13 +256,13 @@ fetchWindowedBam = function(bam_f,
             sample = {
                 qgr = prepare_fetch_GRanges(qgr, win_size)
                 score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
-                out = viewGRangesWinSample_dt(score_gr, qgr, win_size, x0 = x0)
+                out = viewGRangesWinSample_dt(score_gr, qgr, win_size, anchor = anchor)
             },
             summary = {
                 score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
                 out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
                                                summary_FUN = summary_FUN,
-                                               x0 = x0)
+                                               anchor = anchor)
             }
     )
 
@@ -273,12 +273,12 @@ fetchWindowedBam = function(bam_f,
     return(out)
 }
 
-#' Iterates a character vector (ideally named) and calls \code{fetchWindowedBam}
+#' Iterates a character vector (ideally named) and calls \code{fetchWindowedBam.single}
 #' on each.  Appends grouping variable to each resulting data.table and uses
 #' rbindlist to efficiently combine results
 #'
-#' \code{fetchWindowedBamList} iteratively calls \code{fetchWindowedBam}.
-#' See \code{\link{fetchWindowedBam}} for more info.
+#' \code{fetchWindowedBam} iteratively calls \code{fetchWindowedBam.single}.
+#' See \code{\link{fetchWindowedBam.single}} for more info.
 #' @export
 #' @param file_paths The character vector or list of paths to bigwig files to
 #'  read from.
@@ -298,7 +298,7 @@ fetchWindowedBam = function(bam_f,
 #' qgr.
 #' @param target_strand character. One of c("*", "+", "-"). Controls
 #' filtering of reads by strand.  Default of "*" combines both strands.
-#' @param x0 character, one of c("center", "center_unstranded",
+#' @param anchor character, one of c("center", "center_unstranded",
 #' "left", "left_unstranded")
 #' @param names_variable The column name where unique_names are stored.
 #' @param return_data.table logical. If TRUE the internal data.table is
@@ -317,13 +317,13 @@ fetchWindowedBam = function(bam_f,
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bam_files = c("a" = bam_f, "b" = bam_f)
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
-#' bw_gr = fetchWindowedBamList(bam_files, qgr, win_size = 10)
-#' bw_gr2 = fetchWindowedBamList(as.list(bam_files), qgr, win_size = 10)
+#' bw_gr = fetchWindowedBam(bam_files, qgr, win_size = 10)
+#' bw_gr2 = fetchWindowedBam(as.list(bam_files), qgr, win_size = 10)
 #'
-#' bw_dt = fetchWindowedBamList(bam_files, qgr, win_size = 10,
+#' bw_dt = fetchWindowedBam(bam_files, qgr, win_size = 10,
 #'     return_data.table = TRUE)
 #' }
-fetchWindowedBamList = function(file_paths,
+fetchWindowedBam = function(file_paths,
                                 qgr,
                                 unique_names = names(file_paths),
                                 win_size = 50,
@@ -331,7 +331,7 @@ fetchWindowedBamList = function(file_paths,
                                 summary_FUN = stats::weighted.mean,
                                 fragLens = "auto",
                                 target_strand = c("*", "+", "-")[1],
-                                x0 = c("left", "left_unstranded", "center",
+                                anchor = c("left", "left_unstranded", "center",
                                        "center_unstranded")[3],
                                 names_variable = "sample",
                                 return_data.table = FALSE){
@@ -348,14 +348,14 @@ fetchWindowedBamList = function(file_paths,
         if(fl == "auto"){
             fl = NULL
         }
-        dt = fetchWindowedBam(bam_f = f,
+        dt = fetchWindowedBam.single(bam_f = f,
                               qgr = qgr,
                               win_size = win_size,
                               win_method = win_method,
                               summary_FUN = summary_FUN,
                               fragLen = fl,
                               target_strand = target_strand,
-                              x0 = x0,
+                              anchor = anchor,
                               return_data.table = TRUE)
         dt[[names_variable]] = nam
         message("finished loading ", nam, ".")

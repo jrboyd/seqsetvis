@@ -6,7 +6,7 @@
 \usage{
 fetchWindowedBam(bam_f, qgr, win_size = 50, win_method = c("sample",
   "summary")[1], summary_FUN = stats::weighted.mean, fragLen = NULL,
-  target_strand = c("*", "+", "-")[1], x0 = c("left", "left_unstranded",
+  target_strand = c("*", "+", "-")[1], anchor = c("left", "left_unstranded",
   "center", "center_unstranded")[3], return_data.table = FALSE)
 }
 \arguments{
@@ -33,7 +33,7 @@ if NA, raw bam pileup with no cross strand shift is returned.}
 \item{target_strand}{character. if one of "+" or "-", reads are filtered
 accordingly. ignored if any other value.}
 
-\item{x0}{character, one of c("center", "center_unstranded",
+\item{anchor}{character, one of c("center", "center_unstranded",
 "left", "left_unstranded")}
 
 \item{return_data.table}{logical. If TRUE the internal data.table is

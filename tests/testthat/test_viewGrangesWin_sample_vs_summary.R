@@ -18,9 +18,9 @@ vgr = qgr
 end(vgr) = end(vgr) + 0:4*100
 
 test_that("viewGRangesWinSample_dt sizes vary, viewGRangesWinSummary_dt don't", {
-    sample_dt = viewGRangesWinSample_dt(bam_gr, vgr, window_size = 100, x0 = "left")
+    sample_dt = viewGRangesWinSample_dt(bam_gr, vgr, window_size = 100, anchor = "left")
     expect_gt(length(unique(sample_dt[, .N, by = id]$N)), 1)
-    summary_dt = viewGRangesWinSummary_dt(bam_gr, vgr, n_tiles = 10, x0 = "left")
+    summary_dt = viewGRangesWinSummary_dt(bam_gr, vgr, n_tiles = 10, anchor = "left")
     summary_dt[, .N, by = id]
     expect_equal(length(unique(summary_dt[, .N, by = id]$N)), 1)
 })
@@ -30,7 +30,7 @@ test_that("can fetch bam summary", {
     #sample is bp scale
     sample_dt = fetchWindowedBam(bam_file, vgr, return_data.table = TRUE)
     expect_gte(max(abs(range(sample_dt$x))), 100)
-    #summaries have range of x < .5 for center x0
+    #summaries have range of x < .5 for center anchor
     summary_dt = fetchWindowedBam(bam_file, vgr, win_method = "summary", return_data.table = TRUE)
     expect_lte(max(abs(range(summary_dt$x))), .5)
     summary_dt.med = fetchWindowedBam(bam_file, vgr[5], win_method = "summary",
@@ -67,7 +67,7 @@ test_that("can fetch bigwig summary", {
     #sample is bp scale
     sample_dt = fetchWindowedBigwig(bigwig_file, vgr, return_data.table = TRUE)
     expect_gte(max(abs(range(sample_dt$x))), 100)
-    #summaries have range of x < .5 for center x0
+    #summaries have range of x < .5 for center anchor
     summary_dt = fetchWindowedBigwig(bigwig_file, vgr, win_method = "summary", return_data.table = TRUE)
     expect_lte(max(abs(range(summary_dt$x))), .5)
     summary_dt.med = fetchWindowedBigwig(bigwig_file, vgr[5], win_method = "summary",
