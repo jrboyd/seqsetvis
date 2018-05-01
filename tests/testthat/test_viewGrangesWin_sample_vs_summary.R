@@ -64,6 +64,7 @@ test_that("can fetch bam summary", {
 bigwig_file = system.file("extdata/MCF10A_CTCF_FE_random100.bw", package = "seqsetvis", mustWork = TRUE)
 
 test_that("can fetch bigwig summary", {
+    skip_on_os("windows")
     #sample is bp scale
     sample_dt = ssvFetchBigwig(bigwig_file, vgr, return_data.table = TRUE)
     expect_gte(max(abs(range(sample_dt$x))), 100)
@@ -84,6 +85,7 @@ test_that("can fetch bigwig summary", {
 })
 
 test_that("can fetch bigwig summary", {
+    skip_on_os("windows")
     bigwigs = c("A" = bigwig_file, "B" = bigwig_file)
     bigwigs_sample_dt = ssvFetchBigwig(bigwigs, vgr)
     expect_gte(max(abs(range(bigwigs_sample_dt$x))), 100)
