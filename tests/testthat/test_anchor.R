@@ -97,6 +97,7 @@ test_that("ssvFetchBam anchor", {
 #bigwigs
 bigwigs = dir(system.file("extdata", package = "seqsetvis"), pattern = "random100.bw$", full.names = TRUE)
 test_that("ssvFetchBigwig anchor", {
+    skip_on_os("windows")
     gr = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "center")
     gr_uns = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "center_unstranded")
     is_pos = as.character(strand(gr)) == "+"
@@ -150,6 +151,7 @@ test_that("ssvFetchBam anchor - summary", {
 #bigwigs
 bigwigs = dir(system.file("extdata", package = "seqsetvis"), pattern = "random100.bw$", full.names = TRUE)
 test_that("ssvFetchBigwig anchor - summary", {
+    skip_on_os("windows")
     gr = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "center", win_method = "summary")
     gr_uns = ssvFetchBigwig(bigwigs, qgr, win_size = 50, anchor = "center_unstranded", win_method = "summary")
     is_pos = as.character(strand(gr)) == "+"
