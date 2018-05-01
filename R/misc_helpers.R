@@ -215,11 +215,14 @@ ggellipse = function(xcentres,
         not_hex = substr(circle_colors, 0, 1) != "#"
         circle_colors[not_hex] = col2hex(circle_colors[not_hex])
     }
+    is_hex = substr(circle_colors, 0, 1) == "#"
+    stopifnot(all(is_hex))
+    circle_colors = substr(circle_colors, 1, 7)
+    stopifnot(all(nchar(circle_colors) == 7))
     stopifnot(length(circle_colors) == 1 || length(circle_colors) == n_circles)
     if (length(circle_colors) < n_circles)
         circle_colors <- rep(circle_colors, length.out = n_circles)
 
-    if(length(circle_colors) == 1) circle_colors = rep(circle_colors, n_circles)
     # make scales
     names(circle_colors) = group_names
 
@@ -236,9 +239,6 @@ ggellipse = function(xcentres,
     # make plot
     p = ggplot() +
         labs(fill = "", color = "") +
-        scale_color_manual(values = line_scale) +
-        scale_size_identity() +
-        scale_fill_manual(values = fill_scale) +
         theme_minimal() +
         theme(plot.background = element_blank(),
               axis.title = element_blank(),
@@ -251,8 +251,7 @@ ggellipse = function(xcentres,
         geom_polygon(data = ell_dt, aes(x = x,
                                         y = y,
                                         fill = group,
-                                        col = NA,
-                                        alpha = fill_alpha
+                                        col = NA
         )) +
         geom_polygon(data = ell_dt, aes(x = x,
                                         y = y,
@@ -260,7 +259,11 @@ ggellipse = function(xcentres,
                                         col = group,
                                         size = line_width
         )) +
-        scale_alpha_identity() + guides(alpha = "none")
+        scale_alpha_identity() +
+        guides(alpha = "none") +
+        scale_fill_manual(values = fill_scale) +
+        scale_color_manual(values = line_scale) +
+        scale_size_identity()
     p
 }
 
