@@ -7,8 +7,11 @@
 #' col2hex(c("red", "green", "blue"))
 #' col2hex(c("lightgray", "gray", "darkgray"))
 col2hex = function(color_name) {
+    cnames = names(color_name)
     stopifnot(is.character(color_name))
-    grDevices::rgb(t(grDevices::col2rgb(color_name))/255)
+    out = grDevices::rgb(t(grDevices::col2rgb(color_name))/255)
+    names(out) = cnames
+    out
 }
 
 #' convert a list of sets, each list item should be a character vector
