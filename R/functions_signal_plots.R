@@ -638,7 +638,8 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
 #' @param color_ variable name mapped to color aesthetic, sample_ by default.
 #' change group_ to override.
 #' @param group_ group aesthetic keeps lines of geom_path from mis-connecting.
-#' auto_grp by default uses sample_. probably shouldn't change.
+#' Most useful if you need to supply a
+#' variable to later facet upon. Defaults to value of sample_.
 #' @param agg_fun the aggregation function to apply by sample_ and x_,
 #' default is mean
 #' @param spline_n if not NULL, applySpline will be called with n = spline_n.
@@ -660,9 +661,10 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
 ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
                                 sample_ = "sample",
                                 color_ = sample_,
-                                group_ = "auto_grp", agg_fun = mean,
+                                group_ = sample_,
+                                agg_fun = mean,
                                 spline_n = NULL){
-    auto_grp = NULL
+    group_var = NULL # reserve for data.table
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
     }
@@ -677,7 +679,6 @@ ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
     stopifnot(is.function(agg_fun))
     stopifnot(is.numeric(spline_n) || is.null(spline_n))
 
-    bw_data[, auto_grp := paste(get(sample_))]
     agg_dt = bw_data[, list(y = agg_fun(get(y_))),
                      by = c(unique(c(group_, color_, sample_, x_)))]
 
@@ -688,8 +689,9 @@ ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
         p_dt = agg_dt
     }
     p_dt = p_dt[order(get(x_))]
+    p_dt[, group_var := paste(mget(unique(c(group_, sample_, color_))), collapse = "-"), by = 1:nrow(p_dt) ]
     ggplot(p_dt) +
-        geom_path(aes_string(x = x_, y = y_, col = color_, group = group_))
+        geom_path(aes_string(x = x_, y = y_, col = color_, group = "group_var"))
 }
 
 

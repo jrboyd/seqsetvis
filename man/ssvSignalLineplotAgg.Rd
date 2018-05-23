@@ -5,8 +5,7 @@
 \title{aggregate line signals in a single line plot}
 \usage{
 ssvSignalLineplotAgg(bw_data, x_ = "x", y_ = "y", sample_ = "sample",
-  color_ = sample_, group_ = "auto_grp", agg_fun = mean,
-  spline_n = NULL)
+  color_ = sample_, group_ = sample_, agg_fun = mean, spline_n = NULL)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
@@ -22,7 +21,8 @@ As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 change group_ to override.}
 
 \item{group_}{group aesthetic keeps lines of geom_path from mis-connecting.
-auto_grp by default uses sample_. probably shouldn't change.}
+Most useful if you need to supply a
+variable to later facet upon. Defaults to value of sample_.}
 
 \item{agg_fun}{the aggregation function to apply by sample_ and x_,
 default is mean}
