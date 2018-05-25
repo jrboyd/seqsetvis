@@ -1,3 +1,19 @@
+# seqsetvis 1.0.2
+
+* bugfix: viewGrangesWinSample/Summary_dt were both erroring when 0 reads were in window.
+* bugfix: ggplot2 2.3.0 compatibility fix in ssvSignalLinePlotAgg()
+* bugfix: col2hex now properly preserves character vector names
+* bugfix: ssvFetch now properly allows NA for fragLens to disable fragment extension
+* bugfix: ggellipse line_scale and color_scale were being ignored
+
+# seqsetvis 1.0.1
+
+* bugfix: skip rtracklayer::import.bw depedent tests on Windows OS
+
+# seqsetvis 1.0.0
+
+* seqsetvis is released!
+
 # seqsetvis 0.99.20
 
 Impacts existing scripts

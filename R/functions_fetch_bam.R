@@ -294,8 +294,8 @@ ssvFetchBam.single = function(bam_f,
 #' @param summary_FUN function.  only relevant if win_method is "summary".
 #' passed to \code{\link{viewGRangesWinSummary_dt}}.
 #' @param fragLens numeric. The fragment length to use to extend reads.  The
-#' default value NULL causes an automatical calculation from 100 regions in
-#' qgr.
+#' default value "auto" causes an automatic calculation from 100 regions in
+#' qgr.  NA causes no extension of reads to fragment size.
 #' @param target_strand character. One of c("*", "+", "-"). Controls
 #' filtering of reads by strand.  Default of "*" combines both strands.
 #' @param anchor character, one of c("center", "center_unstranded",
@@ -335,7 +335,7 @@ ssvFetchBam = function(file_paths,
                                        "center_unstranded")[3],
                                 names_variable = "sample",
                                 return_data.table = FALSE){
-    stopifnot(all(is.character(fragLens) | is.numeric(fragLens)))
+    stopifnot(all(is.character(fragLens) | is.numeric(fragLens) | is.na(fragLens)))
     stopifnot(length(fragLens) == 1 || length(fragLens) == length(file_paths))
     if(length(fragLens == 1)){
         fragLens = rep(fragLens[1], length(file_paths))
@@ -345,6 +345,7 @@ ssvFetchBam = function(file_paths,
     load_bam = function(f, nam, qgr) {
         message("loading ", f, " ...")
         fl = fragLens[f]
+        if(!is.na(fl))
         if(fl == "auto"){
             fl = NULL
         }
