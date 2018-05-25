@@ -4,6 +4,7 @@
 * bugfix: ggplot2 2.3.0 compatibility fix in ssvSignalLinePlotAgg()
 * bugfix: col2hex now properly preserves character vector names
 * bugfix: ssvFetch now properly allows NA for fragLens to disable fragment extension
+* bugfix: ggellipse line_scale and color_scale were being ignored
 
 # seqsetvis 1.0.1
 
