@@ -302,6 +302,7 @@ ssvSignalLineplotAgg(bw_data = bw_gr, spline_n = 10)
 By adding some info to `bw_gr`, tweaking the group_ parameter, and adding a 
 facet call we can apply the aggregation function by peak call set and plot them 
 separately.
+
 ```{r lineplot}
 # append set info, modify aggregation group_ and add facet
 olap_2groups = ssvFactorizeMembTable(ssvMakeMembTable(olap_gr)[, 1:2])
