@@ -170,9 +170,11 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
         olaps = rbind(olaps, data.table::data.table(
             queryHits = missing_idx,
             subjectHits = length(score_gr) + 1))[order(queryHits)]
-        score_gr = c(score_gr,
-                     GRanges(seqnames(score_gr)[length(score_gr)],
-                             IRanges::IRanges(1, 1), score = 0))
+        suppressWarnings({
+            score_gr = c(score_gr,
+                         GRanges("chrPatchZero",
+                                 IRanges::IRanges(1, 1), score = 0))
+        })
     }
     # set y and output windows = windows[olaps$queryHits]
     windows$y = score_gr[olaps$subjectHits]$score
@@ -267,8 +269,11 @@ viewGRangesWinSummary_dt = function (score_gr,
     if (length(missing_idx) > 0) {
         olaps = rbind(olaps, data.table::data.table(queryHits = missing_idx,
                                                     subjectHits = length(score_gr) + 1))[order(queryHits)]
-        score_gr = c(score_gr, GRanges(seqnames(score_gr)[length(score_gr)],
-                                       IRanges::IRanges(1, 1), score = 0))
+        suppressWarnings({
+            score_gr = c(score_gr,
+                         GRanges("chrPatchZero",
+                                 IRanges::IRanges(1, 1), score = 0))
+        })
     }
     cov_dt = cbind(
         as.data.table(score_gr[olaps$subjectHits])[,-c(1, 4:5)],
