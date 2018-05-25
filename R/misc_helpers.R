@@ -126,6 +126,8 @@ movingAverage <- function(x, n = 1, centered = TRUE) {
 #' returns a ggplot with ellipses drawn using specified parameters
 #' used by ssvFeatureVenn and ssvFeatureEuler
 #'
+#' uses eulerr's non-exported ellipse drawing coordinate function
+#'
 #' @param xcentres numeric x-coord of centers of ellipses
 #' @param ycentres numeric y-coord of centers of ellipses, must have same
 #' length as xcentres

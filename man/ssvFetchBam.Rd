@@ -34,8 +34,8 @@ qgr.}
 passed to \code{\link{viewGRangesWinSummary_dt}}.}
 
 \item{fragLens}{numeric. The fragment length to use to extend reads.  The
-default value NULL causes an automatical calculation from 100 regions in
-qgr.}
+default value "auto" causes an automatic calculation from 100 regions in
+qgr.  NA causes no extension of reads to fragment size.}
 
 \item{target_strand}{character. One of c("*", "+", "-"). Controls
 filtering of reads by strand.  Default of "*" combines both strands.}

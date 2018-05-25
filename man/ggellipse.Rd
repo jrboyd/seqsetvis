@@ -43,8 +43,7 @@ letters by default.}
 a ggplot containing ellipses
 }
 \description{
-returns a ggplot with ellipses drawn using specified parameters
-used by ssvFeatureVenn and ssvFeatureEuler
+uses eulerr's non-exported ellipse drawing coordinate function
 }
 \examples{
 ggellipse(xcentres = c(1, 1, 2),
