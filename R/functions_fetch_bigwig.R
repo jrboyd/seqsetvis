@@ -143,6 +143,7 @@ ssvFetchBigwig = function(file_paths,
                             load_signal = load_bw,
                             unique_names = unique_names,
                             names_variable = names_variable,
+                            win_method = win_method,
                             win_size = win_size,
                             return_data.table = return_data.table)
 }
