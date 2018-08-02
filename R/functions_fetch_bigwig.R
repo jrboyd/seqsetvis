@@ -50,11 +50,11 @@ ssvFetchBigwig.single = function(bw_file,
     switch (win_method,
             sample = {
                 qgr = prepare_fetch_GRanges(qgr, win_size)
-                score_gr = rtracklayer::import.bw(bw_file, which = qgr)
+                score_gr = rtracklayer::import.bw(bw_file, qgr)
                 out = viewGRangesWinSample_dt(score_gr, qgr, win_size, anchor = anchor)
             },
             summary = {
-                score_gr = rtracklayer::import.bw(bw_file, which = qgr)
+                score_gr = rtracklayer::import.bw(bw_file, qgr)
                 out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
                                                summary_FUN = summary_FUN,
                                                anchor = anchor)
