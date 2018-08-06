@@ -17,6 +17,51 @@ bam_gr = fetchBam(bam_file, qgr)
 vgr = qgr
 end(vgr) = end(vgr) + 0:4*100
 
+test_that("viewGrangeWinSample_dt ids match input", {
+    names(qgr) = paste0("peak_", seq_along(qgr))
+    sample_dt = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 100)
+    expect_equal(sort(unique(names(qgr))), sort(unique(sample_dt$id)))
+})
+
+test_that("viewGrangeWinSummary_dt ids match input", {
+    names(qgr) = paste0("peak_", seq_along(qgr))
+    summary_dt = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 100)
+    expect_equal(sort(unique(names(qgr))), sort(unique(summary_dt$id)))
+})
+
+test_that("viewGrangeWinSample_dt unnamed qgr still creates id", {
+    names(qgr) = NULL
+    sample_dt = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 100)
+    expect_true(!is.null(sample_dt$id))
+})
+
+test_that("viewGrangeWinSummary_dt unnamed qgr still creates id", {
+    names(qgr) = NULL
+    summary_dt = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 100)
+    expect_true(!is.null(sample_dt$id))
+})
+
+test_that("viewGrangeWinSample_dt ids match input", {
+    names(qgr) = paste0("peak_", seq_along(qgr))
+    summary_dt = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 100)
+    expect_equal(sort(unique(names(qgr))), sort(unique(summary_dt$id)))
+
+    names(qgr) = seq_along(qgr)
+    summary_dt = viewGRangesWinSample_dt(bam_gr, qgr, window_size = 100)
+    expect_equal(sort(unique(names(qgr))), sort(unique(summary_dt$id)))
+})
+
+test_that("viewGrangeWinSummary_dt ids match input", {
+    names(qgr) = paste0("peak_", seq_along(qgr))
+    summary_dt = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 100)
+    expect_equal(sort(unique(names(qgr))), sort(unique(summary_dt$id)))
+
+    names(qgr) = seq_along(qgr)
+    summary_dt = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 100)
+    expect_equal(sort(unique(names(qgr))), sort(unique(summary_dt$id)))
+})
+
+
 test_that("viewGRangesWinSample_dt sizes vary, viewGRangesWinSummary_dt don't", {
     sample_dt = viewGRangesWinSample_dt(bam_gr, vgr, window_size = 100, anchor = "left")
     expect_gt(length(unique(sample_dt[, .N, by = id]$N)), 1)
@@ -34,14 +79,14 @@ test_that("can fetch bam summary", {
     summary_dt = ssvFetchBam(bam_file, vgr, win_method = "summary", return_data.table = TRUE)
     expect_lte(max(abs(range(summary_dt$x))), .5)
     summary_dt.med = ssvFetchBam(bam_file, vgr[5], win_method = "summary",
-                                      summary_FUN = function(x, w){min(w)}, return_data.table = TRUE)
+                                 summary_FUN = function(x, w){min(w)}, return_data.table = TRUE)
     expect_lte(max(abs(range(summary_dt.med$x))), .5)
     #summary fun did something
     expect_false(all(summary_dt$y == summary_dt.med$y))
     #win size did something
     summary_dt10 = ssvFetchBam(bam_file, vgr, win_method = "summary",
-                                  win_size = 10,
-                                  return_data.table = TRUE)
+                               win_size = 10,
+                               return_data.table = TRUE)
     expect_true(all(summary_dt10[, .N, by = id]$N == 10))
     expect_true(all(summary_dt[, .N, by = id]$N == 50))
 })
@@ -53,9 +98,9 @@ test_that("can fetch bam summary", {
     bams_summary_dt = ssvFetchBam(bams, vgr, win_method = "summary")
     expect_lte(max(abs(range(bams_summary_dt$x))), .5)
     bams_summary_dt10 = ssvFetchBam(bams, vgr, win_method = "summary",
-                                             win_size = 10, return_data.table = TRUE)
+                                    win_size = 10, return_data.table = TRUE)
     bams_summary_grFUN = ssvFetchBam(bams, vgr, win_method = "summary",
-                                              summary_FUN = function(x, w){min(w)})
+                                     summary_FUN = function(x, w){min(w)})
     expect_false(all(bams_summary_dt$y == bams_summary_grFUN$y))
     expect_true(all(bams_summary_dt10[, .N, by = id]$N == 10*length(bams)))
     expect_true(all(as.data.table(bams_summary_dt)[, .N, by = id]$N == 50*length(bams)))
@@ -72,14 +117,14 @@ test_that("can fetch bigwig summary", {
     summary_dt = ssvFetchBigwig(bigwig_file, vgr, win_method = "summary", return_data.table = TRUE)
     expect_lte(max(abs(range(summary_dt$x))), .5)
     summary_dt.med = ssvFetchBigwig(bigwig_file, vgr[5], win_method = "summary",
-                                      summary_FUN = function(x, w){min(w)}, return_data.table = TRUE)
+                                    summary_FUN = function(x, w){min(w)}, return_data.table = TRUE)
     expect_lte(max(abs(range(summary_dt.med$x))), .5)
     #summary fun did something
     expect_false(all(summary_dt$y == summary_dt.med$y))
     #win size did something
     summary_dt10 = ssvFetchBigwig(bigwig_file, vgr, win_method = "summary",
-                                    win_size = 10,
-                                    return_data.table = TRUE)
+                                  win_size = 10,
+                                  return_data.table = TRUE)
     expect_true(all(summary_dt10[, .N, by = id]$N == 10))
     expect_true(all(summary_dt[, .N, by = id]$N == 50))
 })
@@ -92,9 +137,9 @@ test_that("can fetch bigwig summary", {
     bigwigs_summary_dt = ssvFetchBigwig(bigwigs, vgr, win_method = "summary")
     expect_lte(max(abs(range(bigwigs_summary_dt$x))), .5)
     bigwigs_summary_dt10 = ssvFetchBigwig(bigwigs, vgr, win_method = "summary",
-                                             win_size = 10, return_data.table = TRUE)
+                                          win_size = 10, return_data.table = TRUE)
     bigwigs_summary_dtFUN = ssvFetchBigwig(bigwigs, vgr, win_method = "summary",
-                                              summary_FUN = function(x, w){min(w)})
+                                           summary_FUN = function(x, w){min(w)})
     expect_false(all(bigwigs_summary_dt$y == bigwigs_summary_dtFUN$y))
     expect_true(all(bigwigs_summary_dt10[, .N, by = id]$N == 10*length(bigwigs)))
     expect_true(all(as.data.table(bigwigs_summary_dt)[, .N, by = id]$N == 50*length(bigwigs)))

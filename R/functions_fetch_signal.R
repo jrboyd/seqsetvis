@@ -52,16 +52,16 @@
 #' }
 #' ssvFetchSignal(bam_files, qgr, load_signal = load_bam)
 ssvFetchSignal = function(file_paths,
-                                   qgr,
-                                   unique_names = names(file_paths),
-                                   names_variable = "sample",
-                                   win_size = 50,
-                                   win_method = c("sample", "summary")[1],
-                                   return_data.table = FALSE,
-                                   load_signal = function(f, nam, qgr) {
-                                       warning("nothing happened, ",
-                                               "add code here to load files")
-                                   }){
+                          qgr,
+                          unique_names = names(file_paths),
+                          names_variable = "sample",
+                          win_size = 50,
+                          win_method = c("sample", "summary")[1],
+                          return_data.table = FALSE,
+                          load_signal = function(f, nam, qgr) {
+                              warning("nothing happened, ",
+                                      "add code here to load files")
+                          }){
     if(is.list(file_paths)){
         file_paths = unlist(file_paths)
     }
@@ -139,7 +139,8 @@ ssvFetchSignal = function(file_paths,
 #' }
 viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
                                    anchor = c("center", "center_unstranded",
-                                          "left", "left_unstranded")[1]){
+                                              "left", "left_unstranded")[1]){
+    #reserve bindings for data.table
     x = id = NULL
     stopifnot(class(score_gr) == "GRanges")
     stopifnot(!is.null(score_gr$score))
@@ -148,16 +149,18 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
     stopifnot(window_size >= 1)
     stopifnot(window_size %% 1 == 0)
     stopifnot(anchor %in% c("center", "center_unstranded",
-                        "left", "left_unstranded"))
-    windows = slidingWindows(qgr, width = window_size, step = window_size)
+                            "left", "left_unstranded"))
     if (is.null(qgr$id)) {
-        if (!is.null(names(qgr))) {
-            qgr$id = names(qgr)
-        } else {
-            qgr$id = paste0("region_", seq_along(qgr))
+        if (is.null(names(qgr))) {
+            names(qgr) = paste0("region_", seq_along(qgr))
         }
+        qgr$id = names(qgr)
     }
-    names(windows) = qgr$id
+    windows = slidingWindows(qgr, width = window_size, step = window_size)
+
+    # names(windows) = qgr$id
+    # windows's handling of names seems to have changed and now every nest GRanges has parent's name
+    names(windows) = NULL
     windows = unlist(windows)
     windows$id = names(windows)
     windows = resize(windows, width = 1, fix = "center")
@@ -229,11 +232,11 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
 #'     bw_dt = viewGRangesWinSummary_dt(bw_gr, qgr, 50)
 #' }
 viewGRangesWinSummary_dt = function (score_gr,
-                                qgr,
-                                n_tiles = 100,
-                                anchor = c("center", "center_unstranded",
-                                       "left", "left_unstranded")[3],
-                                summary_FUN = stats::weighted.mean){
+                                     qgr,
+                                     n_tiles = 100,
+                                     anchor = c("center", "center_unstranded",
+                                                "left", "left_unstranded")[3],
+                                     summary_FUN = stats::weighted.mean){
     #reserve bindings for data.table
     x = id = tile_start = tile_end = tile_id =
         tile_widths = scored_width = tile_density = NULL
@@ -244,20 +247,20 @@ viewGRangesWinSummary_dt = function (score_gr,
     stopifnot(n_tiles >= 1)
     stopifnot(n_tiles%%1 == 0)
     stopifnot(anchor %in% c("center", "center_unstranded", "left",
-                        "left_unstranded"))
-
+                            "left_unstranded"))
+    if (is.null(qgr$id)) {
+        if (is.null(names(qgr))) {
+            names(qgr) = paste0("region_", seq_along(qgr))
+        }
+        qgr$id = names(qgr)
+    }
     tiles = tile(qgr, n_tiles)
     # lapply(seq_len(tqgr), function(i)as.data.table(tqgr[[i]]))
 
-    if (is.null(qgr$id)) {
-        if (!is.null(names(qgr))) {
-            qgr$id = names(qgr)
-        }
-        else {
-            qgr$id = paste0("region_", seq_along(qgr))
-        }
-    }
-    names(tiles) = qgr$id
+
+    # names(tiles) = qgr$id
+    # tile's handling of names seems to have changed and now every nest GRanges has  parent's name
+    names(tiles) = NULL
     tiles = unlist(tiles)
     tiles$id = names(tiles)
 
