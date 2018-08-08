@@ -5,10 +5,11 @@
 \title{heatmap style representation of membership table.
 instead of clustering, each column is sorted starting from the left.}
 \usage{
-ssvSignalHeatmap(bw_data, nclust = 6, perform_clustering = c("auto", "yes",
-  "no")[1], row_ = "id", column_ = "x", fill_ = "y", facet_ = "sample",
-  cluster_ = "cluster_id", max_rows = 500, max_cols = 100,
-  clustering_col_min = -Inf, clustering_col_max = Inf)
+ssvSignalHeatmap(bw_data, nclust = 6, perform_clustering = c("auto",
+  "yes", "no")[1], row_ = "id", column_ = "x", fill_ = "y",
+  facet_ = "sample", cluster_ = "cluster_id", max_rows = 500,
+  max_cols = 100, clustering_col_min = -Inf,
+  clustering_col_max = Inf)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.

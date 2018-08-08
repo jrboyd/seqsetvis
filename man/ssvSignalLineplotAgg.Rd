@@ -5,7 +5,8 @@
 \title{aggregate line signals in a single line plot}
 \usage{
 ssvSignalLineplotAgg(bw_data, x_ = "x", y_ = "y", sample_ = "sample",
-  color_ = sample_, group_ = sample_, agg_fun = mean, spline_n = NULL)
+  color_ = sample_, group_ = sample_, agg_fun = mean,
+  spline_n = NULL)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.

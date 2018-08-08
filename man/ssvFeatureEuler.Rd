@@ -4,8 +4,8 @@
 \alias{ssvFeatureEuler}
 \title{Try to load a bed-like file and convert it to a GRanges object}
 \usage{
-ssvFeatureEuler(object, line_width = 2, shape = c("circle", "ellipse")[1],
-  n_points = 200, fill_alpha = 0.3, line_alpha = 1,
+ssvFeatureEuler(object, line_width = 2, shape = c("circle",
+  "ellipse")[1], n_points = 200, fill_alpha = 0.3, line_alpha = 1,
   circle_colors = NULL)
 }
 \arguments{

@@ -6,8 +6,9 @@
 \usage{
 ssvFetchSignal(file_paths, qgr, unique_names = names(file_paths),
   names_variable = "sample", win_size = 50, win_method = c("sample",
-  "summary")[1], return_data.table = FALSE, load_signal = function(f, nam,
-  qgr) {     warning("nothing happened, ", "add code here to load files") })
+  "summary")[1], return_data.table = FALSE, load_signal = function(f,
+  nam, qgr) {     warning("nothing happened, ",
+  "add code here to load files") })
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from}

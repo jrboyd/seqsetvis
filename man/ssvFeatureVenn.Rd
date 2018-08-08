@@ -6,9 +6,9 @@
 at 3 sets}
 \usage{
 ssvFeatureVenn(object, group_names = NULL, counts_txt_size = 5,
-  counts_as_labels = FALSE, show_outside_count = FALSE, line_width = 3,
-  circle_colors = NULL, fill_alpha = 0.3, line_alpha = 1,
-  counts_color = NULL, n_points = 200)
+  counts_as_labels = FALSE, show_outside_count = FALSE,
+  line_width = 3, circle_colors = NULL, fill_alpha = 0.3,
+  line_alpha = 1, counts_color = NULL, n_points = 200)
 }
 \arguments{
 \item{object}{will be passed to \code{\link{ssvMakeMembTable}} for

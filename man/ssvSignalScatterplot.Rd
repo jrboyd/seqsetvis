@@ -6,8 +6,8 @@
 \usage{
 ssvSignalScatterplot(bw_data, x_name, y_name, color_table = NULL,
   value_variable = "y", xy_variable = "sample", value_function = max,
-  by_ = "id", plot_type = c("standard", "volcano")[1], show_help = FALSE,
-  fixed_coords = TRUE)
+  by_ = "id", plot_type = c("standard", "volcano")[1],
+  show_help = FALSE, fixed_coords = TRUE)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.

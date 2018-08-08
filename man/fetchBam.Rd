@@ -4,8 +4,8 @@
 \alias{fetchBam}
 \title{fetch a bam file pileup with the ability to consider cross strand correlation}
 \usage{
-fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+", "-")[1],
-  ...)
+fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+",
+  "-")[1], ...)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}
