@@ -139,12 +139,13 @@ ssvFetchBigwig = function(file_paths,
     }
 
     ssvFetchSignal(file_paths = file_paths,
-                            qgr = qgr,
-                            load_signal = load_bw,
-                            unique_names = unique_names,
-                            names_variable = names_variable,
-                            win_size = win_size,
-                            return_data.table = return_data.table)
+                   qgr = qgr,
+                   unique_names = unique_names,
+                   names_variable = names_variable,
+                   win_size = win_size,
+                   win_method = win_method,
+                   return_data.table = return_data.table,
+                   load_signal = load_bw)
 }
 
 

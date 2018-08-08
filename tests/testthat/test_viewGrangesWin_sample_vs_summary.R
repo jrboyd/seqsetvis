@@ -38,7 +38,7 @@ test_that("viewGrangeWinSample_dt unnamed qgr still creates id", {
 test_that("viewGrangeWinSummary_dt unnamed qgr still creates id", {
     names(qgr) = NULL
     summary_dt = viewGRangesWinSummary_dt(bam_gr, qgr, n_tiles = 100)
-    expect_true(!is.null(sample_dt$id))
+    expect_true(!is.null(summary_dt$id))
 })
 
 test_that("viewGrangeWinSample_dt ids match input", {

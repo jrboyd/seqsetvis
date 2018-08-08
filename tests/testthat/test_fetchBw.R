@@ -136,3 +136,32 @@ test_that("ssvFetchBigwig duplicate names throws error", {
     )
 })
 
+test_that("ssvFetchBigwig sample method correct bins", {
+    skip_on_os("windows")
+    test_qgr2 = test_qgr[c(1,2,5)]
+    gr_sample = ssvFetchBigwig(test_bw, win_size = 3, qgr = test_qgr2)
+    #for non-overlapping, all reduce granges width should be equal to input qgr
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    #for non-overlapping, all granges width should be equal to win_size
+    expect_true(all(width(gr_sample) == 3))
+
+    #same as above but width are auto adjusted to be divisible by win_size
+    gr_sample = ssvFetchBigwig(test_bw, win_size = 4, qgr = test_qgr2)
+    expect_true(all(width(reduce(gr_sample)) == 32))
+    expect_true(all(width(gr_sample) == 4))
+})
+
+test_that("ssvFetchBigwig summary method correct bins", {
+    skip_on_os("windows")
+    test_qgr2 = test_qgr[c(1,2,5)]
+    gr_sample = ssvFetchBigwig(test_bw, win_size = 3, qgr = test_qgr2, win_method = "summary")
+    #for non-overlapping, all reduce granges width should be equal to input qgr
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    #for non-overlapping, all granges width should be equal to win_size
+    expect_true(all(width(gr_sample) == 30 / 3))
+
+    #same as above but width are auto adjusted to be divisible by win_size
+    gr_sample = ssvFetchBigwig(test_bw, win_size = 4, qgr = test_qgr2, win_method = "summary")
+    expect_true(all(width(reduce(gr_sample)) == 30))
+    expect_true(all(width(gr_sample) %in% 7:8))
+})

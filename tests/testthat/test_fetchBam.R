@@ -1,5 +1,6 @@
 library(seqsetvis)
 library(testthat)
+library(GenomicRanges)
 
 qgr = CTCF_in_10a_overlaps_gr[1:5]
 qgr = centerFixedSizeGRanges(qgr, 500)
@@ -46,8 +47,6 @@ test_that("fragLen_calcStranded can force no which", {
 })
 
 test_that("viewGRangesWinSample_dt strand and position functions", {
-
-
     bam_score = fetchBam(bam_file, qgr = qgr)
     score_gr = bam_score
     window_size = 50
@@ -83,4 +82,76 @@ test_that("viewGRangesWinSample_dt strand and position functions", {
     #verify center and left ARE equal if minus min
     expect_true(all(b_dt_center$x - min(b_dt_center$x) == b_dt_left$x - min(b_dt_left$x)))
     expect_true(all(b_dt_center_uns$x - min(b_dt_center_uns$x) == b_dt_left_uns$x - min(b_dt_left_uns$x)))
+})
+
+# #strand of qgr should be ignored for pileup in favor of target strand
+# #strand of qgr should be used for feature orientation
+# test_that("viewGRangesWinSample_dt strand and position functions", {
+#     bam_score_unstranded = fetchBam(bam_file, qgr = qgr)
+#     score_gr = bam_score
+#     window_size = 50
+#
+#     qgr_stranded = qgr
+#     GenomicRanges::strand(qgr_stranded) = c(rep("+", 2), rep("-", 3))
+#
+#     bam_score_stranded = fetchBam(bam_file, qgr = qgr_stranded)
+#     plot(bam_score_unstranded$score, bam_score_stranded$score)
+# })
+
+test_that("ssvFetchBam sample method correct bins", {
+    skip_on_os("windows")
+    test_qgr2 = qgr
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_qgr2)
+    #for non-overlapping, all reduce granges width should be equal to input qgr
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    #for non-overlapping, all granges width should be equal to win_size
+    expect_true(all(width(gr_sample) == 5))
+
+    #same as above but width are auto adjusted to be divisible by win_size
+    gr_sample = ssvFetchBam(bam_file, win_size = 3, qgr = test_qgr2)
+    expect_true(all(width(reduce(gr_sample)) == 501))
+    expect_true(all(width(gr_sample) == 3))
+
+    ###varying widths
+    end(test_qgr2) = end(test_qgr2) + seq_along(test_qgr2)*2
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_qgr2, win_method = "sample")
+    #for non-overlapping, all reduce granges width should be equal to input qgr
+    expect_true(all(width(reduce(gr_sample)) == 510))
+    #for non-overlapping, all granges width should be equal to win_size
+    expect_true(all(width(gr_sample) == 5))
+
+    #same as above but individual widths now vary while total is unchanged
+    gr_sample = ssvFetchBam(bam_file, win_size = 4, qgr = test_qgr2, win_method = "sample")
+    expect_true(all(width(reduce(gr_sample)) == 508))
+    expect_true(all(width(gr_sample) == 4))
+})
+
+test_that("ssvFetchBam summary method correct bins", {
+    skip_on_os("windows")
+    test_qgr2 = qgr
+
+    ###invariant widths
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_qgr2, win_method = "summary")
+    #for non-overlapping, all reduce granges width should be equal to input qgr
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    #for non-overlapping, all granges width should be equal to win_size
+    expect_true(all(width(gr_sample) == 500 / 5))
+
+    #same as above but individual widths now vary while total is unchanged
+    gr_sample = ssvFetchBam(bam_file, win_size = 3, qgr = test_qgr2, win_method = "summary")
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    expect_true(all(width(gr_sample) %in% 166:167))
+
+    ###varying widths
+    end(test_qgr2) = end(test_qgr2) + seq_along(test_qgr2)*2
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_qgr2, win_method = "summary")
+    #for non-overlapping, all reduce granges width should be equal to input qgr
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    #for non-overlapping, all granges width should be equal to win_size
+    expect_true(all(width(gr_sample) %in% 100:102))
+
+    #same as above but individual widths now vary while total is unchanged
+    gr_sample = ssvFetchBam(bam_file, win_size = 3, qgr = test_qgr2, win_method = "summary")
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    expect_true(all(width(gr_sample) %in% 167:170))
 })
