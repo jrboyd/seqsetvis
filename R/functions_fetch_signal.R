@@ -413,6 +413,12 @@ prepare_fetch_GRanges = function(qgr,
                 "\nA fixed width of ",
                 target_size, " was applied based on the data provided.")
     }
+    if(any(start(qgr) < 1)){
+        warning("Some out of bounds GRanges had to be shifted back to start >= 1.")
+        fix_shift = 1 - start(qgr)
+        fix_shift = sapply(fix_shift, function(x)max(x, 0))
+        qgr = IRanges::shift(qgr, fix_shift)
+    }
     return(qgr)
 }
 
