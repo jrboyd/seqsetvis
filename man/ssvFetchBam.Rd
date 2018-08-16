@@ -11,7 +11,8 @@ ssvFetchBam(file_paths, qgr, unique_names = names(file_paths),
   summary_FUN = stats::weighted.mean, fragLens = "auto",
   target_strand = c("*", "+", "-")[1], anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
-  names_variable = "sample", return_data.table = FALSE)
+  names_variable = "sample", return_data.table = FALSE,
+  max_dupes = Inf)
 }
 \arguments{
 \item{file_paths}{The character vector or list of paths to bigwig files to
@@ -47,6 +48,9 @@ filtering of reads by strand.  Default of "*" combines both strands.}
 
 \item{return_data.table}{logical. If TRUE the internal data.table is
 returned instead of GRanges.  Default is FALSE.}
+
+\item{max_dupes}{numeric >= 1.  duplicate reads by strandd start position
+over this number are removed, Default is Inf.}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing

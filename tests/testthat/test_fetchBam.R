@@ -1,6 +1,7 @@
 library(seqsetvis)
 library(testthat)
 library(GenomicRanges)
+library(data.table)
 
 qgr = CTCF_in_10a_overlaps_gr[1:5]
 qgr = centerFixedSizeGRanges(qgr, 500)
@@ -154,4 +155,30 @@ test_that("ssvFetchBam summary method correct bins", {
     gr_sample = ssvFetchBam(bam_file, win_size = 3, qgr = test_qgr2, win_method = "summary")
     expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
     expect_true(all(width(gr_sample) %in% 167:170))
+})
+
+test_that(".rm_dupes removes duplicates", {
+    dt = data.table(which_label = 1:10, seqnames = "chr1", strand = c("+", "-"), start = 1:10, end = 1:10+10)
+    dt[, width := end - start + 1]
+    make_dupes = seq_len(nrow(dt))
+    make_dupes = rep(make_dupes, make_dupes)
+    dt = dt[make_dupes]
+    dtl = lapply(1:10, function(x)seqsetvis:::.rm_dupes(dt, max_dupes = x))
+    # max_dupes 1 should yield 10 unique entries
+    expect_true(all(dtl[[1]]$which_label == 1:10))
+    # max_dupes 10 should perform no dupe removal in this case
+    expect_true(all(dtl[[10]]$which_label == make_dupes))
+    lens = sapply(dtl, nrow)
+    # as max_dupes increases, returned entries increases
+    expect_true(all(lens[-length(lens)] - lens[-1] < 0))
+})
+
+test_that("ssvFetchBam removes duplicates if max_dupes set", {
+    rFull = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, win_method = "summary")$y
+    r1 = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, win_method = "summary", max_dupes = 1)$y
+    r2 = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, win_method = "summary", max_dupes = 2)$y
+    expect_true(all(r2 >= r1))
+    expect_true(all(!r2 < r1))
+    expect_true(all(rFull >= r1))
+    expect_true(all(!rFull < r1))
 })

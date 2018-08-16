@@ -132,7 +132,28 @@ fragLen_calcStranded = function(bam_f,
     }
 }
 
-#' fetch a bam file pileup with the ability to consider cross strand correlation
+#' Remove duplicate reads based on stranded start position.  This is an
+#' over-simplification.  For better duplicate handling, duplicates must be
+#' marked in bam and flag passed to fetchBam() ... for ScanBamParam
+#'
+#' flag = scanBamFlag(isDuplicate = FALSE)
+#'
+#' @param reads_dt
+#' @param max_dupes
+#'
+#' @return reads_dt with duplicated reads over max_dupes removed
+#'
+#' @examples
+.rm_dupes = function(reads_dt, max_dupes){
+    reads_dt[, N := 1L]
+    reads_dt[strand == "+", N := seq_len(.N)[order(width, decreasing = TRUE)], by = .(which_label, start)]
+    reads_dt[strand == "-", N := seq_len(.N)[order(width, decreasing = TRUE)], by = .(which_label, end)]
+    reads_dt = reads_dt[N <= max_dupes]
+    reads_dt$N = NULL
+    reads_dt
+}
+
+#' fetch a bam file pileup with the ability to consider read extension to fragment size (fragLen)
 #' @param bam_f character or BamFile to load
 #' @param qgr GRanges regions to fetchs
 #' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
@@ -153,7 +174,10 @@ fetchBam = function(bam_f,
                     qgr,
                     fragLen = NULL,
                     target_strand = c("*", "+", "-")[1],
+                    max_dupes = Inf,
                     ...){
+    stopifnot(is.numeric(max_dupes))
+    stopifnot(max_dupes >= 1)
     if(is.null(fragLen)){
         fragLen = fragLen_calcStranded(bam_f, qgr)
         message("fragLen was calculated as: ", fragLen)
@@ -163,6 +187,7 @@ fetchBam = function(bam_f,
         stopifnot(fragLen %% 1 == 0)
         stopifnot(fragLen >= 1)
     }
+
     sbParam = Rsamtools::ScanBamParam(
         which = qgr,
         what = c("rname", "strand", "pos", "qwidth"), ...)
@@ -176,21 +201,31 @@ fetchBam = function(bam_f,
                                    idcol = "which_label")
     bam_dt[, end := start + width - 1L]
 
-    ext_dt = copy(bam_dt)
-
     if(target_strand == "+"){
-        ext_dt = ext_dt[strand == "+"]
+        bam_dt = bam_dt[strand == "+"]
     }
     if(target_strand == "-"){
-        ext_dt = ext_dt[strand == "-"]
+        bam_dt = bam_dt[strand == "-"]
     }
+
+    if(max_dupes < Inf){
+        bam_dt = .rm_dupes(bam_dt, max_dupes)
+    }
+
+    #
+    # max_dupes = 2
+    # bam_dt[, N := 1L]
+    # bam_dt[strand == "+", N := seq_len(.N)[order(width, decreasing = TRUE)], by = .(which_label, start)]
+    # bam_dt[strand == "-", N := seq_len(.N)[order(width, decreasing = TRUE)], by = .(which_label, end)]
+    # bam_dt = bam_dt[N <= max_dupes]
 
     if(!is.na(fragLen)){#extension to fragLen
-        ext_dt[strand == "+", end := start + as.integer(fragLen) - 1L]
-        ext_dt[strand == "-", start := end - as.integer(fragLen) + 1L]
+        bam_dt[strand == "+", end := start + as.integer(fragLen) - 1L]
+        bam_dt[strand == "-", start := end - as.integer(fragLen) + 1L]
     }
 
-    ext_cov = coverage(split(GRanges(ext_dt), ext_dt$which_label))
+
+    ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))
     score_gr = GRanges(ext_cov)
     if(target_strand == "+"){
         strand(score_gr) = "+"
@@ -223,6 +258,8 @@ fetchBam = function(bam_f,
 #' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
+#' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
+#' over this number are removed, Default is Inf.
 #' @return tidy GRanges (or data.table if specified) with pileups from bam
 #' file.  pileup is calculated only every win_size bp.
 #' @export
@@ -238,15 +275,16 @@ fetchBam = function(bam_f,
 #' bam_dt = ssvFetchBam.single(bam_file, qgr,
 #'     return_data.table = TRUE)
 ssvFetchBam.single = function(bam_f,
-                            qgr,
-                            win_size = 50,
-                            win_method = c("sample", "summary")[1],
-                            summary_FUN = stats::weighted.mean,
-                            fragLen = NULL,
-                            target_strand = c("*", "+", "-")[1],
-                            anchor = c("left", "left_unstranded", "center",
-                                   "center_unstranded")[3],
-                            return_data.table = FALSE) {
+                              qgr,
+                              win_size = 50,
+                              win_method = c("sample", "summary")[1],
+                              summary_FUN = stats::weighted.mean,
+                              fragLen = NULL,
+                              target_strand = c("*", "+", "-")[1],
+                              anchor = c("left", "left_unstranded", "center",
+                                         "center_unstranded")[3],
+                              return_data.table = FALSE,
+                              max_dupes = Inf) {
     stopifnot(is.character(win_method))
     stopifnot(length(win_method) == 1)
     stopifnot(class(qgr) == "GRanges")
@@ -255,11 +293,11 @@ ssvFetchBam.single = function(bam_f,
     switch (win_method,
             sample = {
                 qgr = prepare_fetch_GRanges(qgr, win_size)
-                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
+                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes)
                 out = viewGRangesWinSample_dt(score_gr, qgr, win_size, anchor = anchor)
             },
             summary = {
-                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand)
+                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes)
                 out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
                                                summary_FUN = summary_FUN,
                                                anchor = anchor)
@@ -303,6 +341,8 @@ ssvFetchBam.single = function(bam_f,
 #' @param names_variable The column name where unique_names are stored.
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
+#' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
+#' over this number are removed, Default is Inf.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
 #' fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second))
@@ -324,17 +364,18 @@ ssvFetchBam.single = function(bam_f,
 #'     return_data.table = TRUE)
 #' }
 ssvFetchBam = function(file_paths,
-                                qgr,
-                                unique_names = names(file_paths),
-                                win_size = 50,
-                                win_method = c("sample", "summary")[1],
-                                summary_FUN = stats::weighted.mean,
-                                fragLens = "auto",
-                                target_strand = c("*", "+", "-")[1],
-                                anchor = c("left", "left_unstranded", "center",
-                                       "center_unstranded")[3],
-                                names_variable = "sample",
-                                return_data.table = FALSE){
+                       qgr,
+                       unique_names = names(file_paths),
+                       win_size = 50,
+                       win_method = c("sample", "summary")[1],
+                       summary_FUN = stats::weighted.mean,
+                       fragLens = "auto",
+                       target_strand = c("*", "+", "-")[1],
+                       anchor = c("left", "left_unstranded", "center",
+                                  "center_unstranded")[3],
+                       names_variable = "sample",
+                       return_data.table = FALSE,
+                       max_dupes = Inf){
     stopifnot(all(is.character(fragLens) | is.numeric(fragLens) | is.na(fragLens)))
     stopifnot(length(fragLens) == 1 || length(fragLens) == length(file_paths))
     if(length(fragLens == 1)){
@@ -346,30 +387,31 @@ ssvFetchBam = function(file_paths,
         message("loading ", f, " ...")
         fl = fragLens[f]
         if(!is.na(fl))
-        if(fl == "auto"){
-            fl = NULL
-        }
+            if(fl == "auto"){
+                fl = NULL
+            }
         dt = ssvFetchBam.single(bam_f = f,
-                              qgr = qgr,
-                              win_size = win_size,
-                              win_method = win_method,
-                              summary_FUN = summary_FUN,
-                              fragLen = fl,
-                              target_strand = target_strand,
-                              anchor = anchor,
-                              return_data.table = TRUE)
+                                qgr = qgr,
+                                win_size = win_size,
+                                win_method = win_method,
+                                summary_FUN = summary_FUN,
+                                fragLen = fl,
+                                target_strand = target_strand,
+                                anchor = anchor,
+                                return_data.table = TRUE,
+                                max_dupes = max_dupes)
         dt[[names_variable]] = nam
         message("finished loading ", nam, ".")
         dt
     }
 
     ssvFetchSignal(file_paths = file_paths,
-                            qgr = qgr,
-                            load_signal = load_bam,
-                            unique_names = unique_names,
-                            names_variable = names_variable,
-                            win_size = win_size,
-                            win_method = win_method,
-                            return_data.table = return_data.table)
+                   qgr = qgr,
+                   load_signal = load_bam,
+                   unique_names = unique_names,
+                   names_variable = names_variable,
+                   win_size = win_size,
+                   win_method = win_method,
+                   return_data.table = return_data.table)
 
 }

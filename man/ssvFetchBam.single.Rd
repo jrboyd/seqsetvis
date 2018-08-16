@@ -8,7 +8,7 @@ ssvFetchBam.single(bam_f, qgr, win_size = 50, win_method = c("sample",
   "summary")[1], summary_FUN = stats::weighted.mean, fragLen = NULL,
   target_strand = c("*", "+", "-")[1], anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
-  return_data.table = FALSE)
+  return_data.table = FALSE, max_dupes = Inf)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}
@@ -39,6 +39,9 @@ accordingly. ignored if any other value.}
 
 \item{return_data.table}{logical. If TRUE the internal data.table is
 returned instead of GRanges.  Default is FALSE.}
+
+\item{max_dupes}{numeric >= 1.  duplicate reads by strandd start position
+over this number are removed, Default is Inf.}
 }
 \value{
 tidy GRanges (or data.table if specified) with pileups from bam

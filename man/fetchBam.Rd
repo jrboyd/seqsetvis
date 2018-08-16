@@ -2,10 +2,10 @@
 % Please edit documentation in R/functions_fetch_bam.R
 \name{fetchBam}
 \alias{fetchBam}
-\title{fetch a bam file pileup with the ability to consider cross strand correlation}
+\title{fetch a bam file pileup with the ability to consider read extension to fragment size (fragLen)}
 \usage{
 fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+",
-  "-")[1], ...)
+  "-")[1], max_dupes = Inf, ...)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}
@@ -26,7 +26,7 @@ GRanges containing tag pileup values in score meta column.  tags are
 optionally extended to fragment length (fragLen) prior to pile up.
 }
 \description{
-fetch a bam file pileup with the ability to consider cross strand correlation
+fetch a bam file pileup with the ability to consider read extension to fragment size (fragLen)
 }
 \examples{
 bam_file = system.file("extdata/test.bam", package = "seqsetvis")
