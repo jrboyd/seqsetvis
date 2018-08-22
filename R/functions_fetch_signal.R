@@ -159,13 +159,16 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
     windows = slidingWindows(qgr, width = window_size, step = window_size)
 
     # names(windows) = qgr$id
-    # windows's handling of names seems to have changed and now every nest GRanges has parent's name
+    # windows's handling of names seems to have changed and now every nest
+    # GRanges has parent's name
     names(windows) = NULL
     windows = unlist(windows)
     windows$id = names(windows)
     windows = resize(windows, width = 1, fix = "center")
     olaps = suppressWarnings(data.table::as.data.table(
-        findOverlaps(query = windows, subject = score_gr)
+        findOverlaps(query = windows,
+                     subject = score_gr,
+                     ignore.strand = TRUE)
     ))
     # patch up missing/out of bound data with 0
     missing_idx = setdiff(seq_along(windows), olaps$queryHits)
@@ -259,19 +262,25 @@ viewGRangesWinSummary_dt = function (score_gr,
 
 
     # names(tiles) = qgr$id
-    # tile's handling of names seems to have changed and now every nest GRanges has  parent's name
+    # tile's handling of names seems to have changed and now every nest
+    # GRanges has  parent's name
     names(tiles) = NULL
     tiles = unlist(tiles)
     tiles$id = names(tiles)
 
 
-    olaps = suppressWarnings(data.table::as.data.table(findOverlaps(query = tiles,
-                                                                    subject = score_gr)))
+    olaps = suppressWarnings(
+        data.table::as.data.table(
+            findOverlaps(query = tiles,
+                         subject = score_gr,
+                         ignore.strand = TRUE)))
     #fill in gaps with zeroes
     missing_idx = setdiff(seq_along(tiles), olaps$queryHits)
     if (length(missing_idx) > 0) {
-        olaps = rbind(olaps, data.table::data.table(queryHits = missing_idx,
-                                                    subjectHits = length(score_gr) + 1))[order(queryHits)]
+        olaps = rbind(olaps,
+                      data.table::data.table(
+                          queryHits = missing_idx,
+                          subjectHits = length(score_gr) + 1))[order(queryHits)]
         suppressWarnings({
             score_gr = c(score_gr,
                          GRanges("chrPatchZero",

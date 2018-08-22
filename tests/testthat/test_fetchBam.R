@@ -182,3 +182,43 @@ test_that("ssvFetchBam removes duplicates if max_dupes set", {
     expect_true(all(rFull >= r1))
     expect_true(all(!rFull < r1))
 })
+
+test_that("ssvFetchBam strand of qgr doesn't matter", {
+    qres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200)
+    pgr = qgr
+    strand(pgr) = "+"
+    pres = ssvFetchBam(bam_file, win_size = 5, qgr = pgr, fragLens = 200)
+    ngr = qgr
+    strand(ngr) = "-"
+    nres = ssvFetchBam(bam_file, win_size = 5, qgr = ngr, fragLens = 200)
+    expect_true(all(pres$y == qres$y))
+    expect_true(all(nres$y == qres$y))
+})
+
+test_that("ssvFetchBam strand of targt_strand does matter", {
+    qres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "*")
+    pres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "+")
+    nres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "-")
+
+    expect_true(!all(pres$y == qres$y))
+    expect_true(!all(nres$y == qres$y))
+    expect_true(all(nres$y + pres$y == qres$y))
+
+    strand(qgr) = "+"
+    qres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "*")
+    pres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "+")
+    nres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "-")
+
+    expect_true(!all(pres$y == qres$y))
+    expect_true(!all(nres$y == qres$y))
+    expect_true(all(nres$y + pres$y == qres$y))
+
+    strand(qgr) = "-"
+    qres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "*")
+    pres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "+")
+    nres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "-")
+
+    expect_true(!all(pres$y == qres$y))
+    expect_true(!all(nres$y == qres$y))
+    expect_true(all(nres$y + pres$y == qres$y))
+})
