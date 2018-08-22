@@ -138,16 +138,17 @@ fragLen_calcStranded = function(bam_f,
 #'
 #' flag = scanBamFlag(isDuplicate = FALSE)
 #'
-#' @param reads_dt
-#' @param max_dupes
+#' @param reads_dt data.table of reads as loaded by fetchBam
+#' @param max_dupes maximum allowed positional duplicates
 #'
 #' @return reads_dt with duplicated reads over max_dupes removed
 #'
 #' @examples
 .rm_dupes = function(reads_dt, max_dupes){
+    N = which_label = NULL
     reads_dt[, N := 1L]
-    reads_dt[strand == "+", N := seq_len(.N)[order(width, decreasing = TRUE)], by = .(which_label, start)]
-    reads_dt[strand == "-", N := seq_len(.N)[order(width, decreasing = TRUE)], by = .(which_label, end)]
+    reads_dt[strand == "+", N := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, start)]
+    reads_dt[strand == "-", N := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, end)]
     reads_dt = reads_dt[N <= max_dupes]
     reads_dt$N = NULL
     reads_dt
@@ -161,6 +162,8 @@ fragLen_calcStranded = function(bam_f,
 #' if NA, raw bam pileup with no cross strand shift is returned.
 #' @param target_strand character. if one of "+" or "-", reads are filtered
 #' to match. ignored if any other value.
+#' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
+#' over this number are removed, Default is Inf.
 #' @param ... passed to ScanBamParam(), can't be which or what.
 #' @return GRanges containing tag pileup values in score meta column.  tags are
 #' optionally extended to fragment length (fragLen) prior to pile up.
@@ -187,9 +190,10 @@ fetchBam = function(bam_f,
         stopifnot(fragLen %% 1 == 0)
         stopifnot(fragLen >= 1)
     }
-
+    sbgr = qgr
+    strand(sbgr) = "*"
     sbParam = Rsamtools::ScanBamParam(
-        which = qgr,
+        which = sbgr,
         what = c("rname", "strand", "pos", "qwidth"), ...)
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
     bam_dt = lapply(bam_raw, function(x){

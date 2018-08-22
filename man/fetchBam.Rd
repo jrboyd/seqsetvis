@@ -19,6 +19,9 @@ if NA, raw bam pileup with no cross strand shift is returned.}
 \item{target_strand}{character. if one of "+" or "-", reads are filtered
 to match. ignored if any other value.}
 
+\item{max_dupes}{numeric >= 1.  duplicate reads by strandd start position
+over this number are removed, Default is Inf.}
+
 \item{...}{passed to ScanBamParam(), can't be which or what.}
 }
 \value{

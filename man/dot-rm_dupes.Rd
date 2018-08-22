@@ -9,7 +9,9 @@ marked in bam and flag passed to fetchBam() ... for ScanBamParam}
 .rm_dupes(reads_dt, max_dupes)
 }
 \arguments{
-\item{max_dupes}{}
+\item{reads_dt}{data.table of reads as loaded by fetchBam}
+
+\item{max_dupes}{maximum allowed positional duplicates}
 }
 \value{
 reads_dt with duplicated reads over max_dupes removed
