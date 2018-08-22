@@ -138,16 +138,17 @@ fragLen_calcStranded = function(bam_f,
 #'
 #' flag = scanBamFlag(isDuplicate = FALSE)
 #'
-#' @param reads_dt
-#' @param max_dupes
+#' @param reads_dt data.table of reads as loaded by fetchBam
+#' @param max_dupes maximum allowed positional duplicates
 #'
 #' @return reads_dt with duplicated reads over max_dupes removed
 #'
 #' @examples
 .rm_dupes = function(reads_dt, max_dupes){
+    N = which_label = NULL
     reads_dt[, N := 1L]
-    reads_dt[strand == "+", N := seq_len(.N)[order(width, decreasing = TRUE)], by = .(which_label, start)]
-    reads_dt[strand == "-", N := seq_len(.N)[order(width, decreasing = TRUE)], by = .(which_label, end)]
+    reads_dt[strand == "+", N := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, start)]
+    reads_dt[strand == "-", N := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, end)]
     reads_dt = reads_dt[N <= max_dupes]
     reads_dt$N = NULL
     reads_dt
@@ -187,9 +188,10 @@ fetchBam = function(bam_f,
         stopifnot(fragLen %% 1 == 0)
         stopifnot(fragLen >= 1)
     }
-
+    sbgr = qgr
+    strand(sbgr) = "*"
     sbParam = Rsamtools::ScanBamParam(
-        which = qgr,
+        which = sbgr,
         what = c("rname", "strand", "pos", "qwidth"), ...)
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
     bam_dt = lapply(bam_raw, function(x){
