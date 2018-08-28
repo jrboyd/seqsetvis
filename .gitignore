@@ -8,3 +8,7 @@
 run_cov.R
 dev*
 *.bu
+inst/extdata/test.sam
+inst/extdata/hg19ToHg38.over.chain
+cigared
+cigared.RDS

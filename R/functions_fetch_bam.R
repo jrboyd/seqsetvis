@@ -132,6 +132,76 @@ fragLen_calcStranded = function(bam_f,
     }
 }
 
+#' Expand intermediate bam fetch by cigar codes
+#'
+#' see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs}
+#' for cigar details
+#'
+#'
+#' @param cigar_dt data.table with 5 required named columns in any order.
+#' c("which_label", "seqnames", "strand", "start", "cigar")
+#'
+#' @return data.table with cigar entries expanded
+#'
+#' @examples
+.expand_cigar_dt_recursive = function(cigar_dt){
+    cigar_w = cigar = cigar_type = tmp = which_label = NULL #dt bindings
+    stopifnot(all(c("which_label", "seqnames",
+                    "strand", "start",
+                    "cigar") %in% colnames(cigar_dt)))
+    reg1 = regexpr("[MIDNSHP=X]", cigar_dt$cigar)
+    cigar_dt[, cigar_w := as.integer(substr(cigar, 1, reg1-1)) - 1L]
+    cigar_dt[, cigar_type :=
+                 substr(cigar, reg1, reg1+attr(reg1, "match.length")-1L)]
+    cigar_dt[, tmp := substring(cigar, reg1 + 1)]
+    # these do not consume reference
+    cigar_dt[cigar_type %in% c("I", "S", "H", "P"), cigar_w := 0L]
+
+
+    ass1 = cigar_dt[, list(which_label, seqnames, strand,
+                        start, end  = start + cigar_w, cigar_type)]
+
+
+    next_dt = cigar_dt[tmp != "", list(which_label,
+                                    seqnames,
+                                    strand,
+                                    start = end + cigar_w + 1L,
+                                    end = end + cigar_w + 1L,
+                                    cigar = tmp)]
+    if(nrow(next_dt) > 0){
+        return(rbind(ass1,
+                     .expand_cigar_dt_recursive(next_dt)))
+    }else{
+        return(ass1)
+    }
+}
+
+
+
+#' Expand intermediate bam fetch by cigar codes
+#'
+#' see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs}
+#' for cigar details
+#'
+#'
+#' @param cigar_dt data.table with 5 required named columns in any order.
+#' c("which_label", "seqnames", "strand", "start", "cigar")
+#' @param op_2count Cigar codes to count. Default is alignment (M), deletion (D),
+#' match (=), and mismatch (X).  Other useful codes may be skipped regions for
+#' RNA splicing (N).  The locations of any insterions (I) or clipping/padding (S, H, or P)
+#' will be a single bp immediately before the interval.
+#'
+#' @return data.table with cigar entries expanded
+#'
+#' @examples
+.expand_cigar_dt = function(cigar_dt, op_2count = c("M", "D", "=", "X")){
+    cigar_type = NULL
+    cigar_dt = copy(cigar_dt)
+    cigar_dt[, end := start]
+    exp_dt = .expand_cigar_dt_recursive(cigar_dt)
+    exp_dt[cigar_type %in% op_2count]
+}
+
 #' Remove duplicate reads based on stranded start position.  This is an
 #' over-simplification.  For better duplicate handling, duplicates must be
 #' marked in bam and flag passed to fetchBam() ... for ScanBamParam
@@ -145,12 +215,13 @@ fragLen_calcStranded = function(bam_f,
 #'
 #' @examples
 .rm_dupes = function(reads_dt, max_dupes){
-    N = which_label = NULL
-    reads_dt[, N := 1L]
-    reads_dt[strand == "+", N := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, start)]
-    reads_dt[strand == "-", N := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, end)]
-    reads_dt = reads_dt[N <= max_dupes]
-    reads_dt$N = NULL
+    # browser()
+    ndupe = which_label = NULL
+    reads_dt[, ndupe := 1L]
+    reads_dt[strand == "+", ndupe := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, start)]
+    reads_dt[strand == "-", ndupe := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, end)]
+    reads_dt = reads_dt[ndupe <= max_dupes]
+    reads_dt$ndupe = NULL
     reads_dt
 }
 
@@ -158,12 +229,18 @@ fragLen_calcStranded = function(bam_f,
 #' @param bam_f character or BamFile to load
 #' @param qgr GRanges regions to fetchs
 #' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
-#' if NULL, value is calculated with fragLen_calcStranded
+#' if NULL, value is calculated with fragLen_calcStranded (default)
 #' if NA, raw bam pileup with no cross strand shift is returned.
 #' @param target_strand character. if one of "+" or "-", reads are filtered
 #' to match. ignored if any other value.
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
 #' over this number are removed, Default is Inf.
+#' @param splice_strategy character, one of c("ignore", "add", "only"). Default
+#' is "none" and spliced alignment are asssumed not present.
+#' fragLen must be NA for any other value to be valid.  "ignore" will not count
+#' spliced regions.  add" counts spliced
+#' regions along with others, "only" will only count spliced regions and ignore
+#' others.
 #' @param ... passed to ScanBamParam(), can't be which or what.
 #' @return GRanges containing tag pileup values in score meta column.  tags are
 #' optionally extended to fragment length (fragLen) prior to pile up.
@@ -178,9 +255,13 @@ fetchBam = function(bam_f,
                     fragLen = NULL,
                     target_strand = c("*", "+", "-")[1],
                     max_dupes = Inf,
+                    splice_strategy = c("none", "ignore", "add", "only")[1],
                     ...){
     stopifnot(is.numeric(max_dupes))
     stopifnot(max_dupes >= 1)
+    if(!is.na(fragLen) && splice_strategy != "none"){
+        stop("fragLen must be NA if splice_strategy is not 'none'.")
+    }
     if(is.null(fragLen)){
         fragLen = fragLen_calcStranded(bam_f, qgr)
         message("fragLen was calculated as: ", fragLen)
@@ -194,16 +275,15 @@ fetchBam = function(bam_f,
     strand(sbgr) = "*"
     sbParam = Rsamtools::ScanBamParam(
         which = sbgr,
-        what = c("rname", "strand", "pos", "qwidth"), ...)
+        what = c("rname", "strand", "pos", "qwidth", "cigar"), ...)
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
     bam_dt = lapply(bam_raw, function(x){
         data.table(seqnames = x$rname, strand = x$strand,
-                   start = x$pos, width = x$qwidth)
+                   start = x$pos, width = x$qwidth, cigar = x$cigar)
     })
     bam_dt = data.table::rbindlist(bam_dt,
                                    use.names = TRUE,
                                    idcol = "which_label")
-    bam_dt[, end := start + width - 1L]
 
     if(target_strand == "+"){
         bam_dt = bam_dt[strand == "+"]
@@ -212,18 +292,20 @@ fetchBam = function(bam_f,
         bam_dt = bam_dt[strand == "-"]
     }
 
+    bam_dt[, end := start + width - 1L]
+
     if(max_dupes < Inf){
         bam_dt = .rm_dupes(bam_dt, max_dupes)
     }
 
-    #
-    # max_dupes = 2
-    # bam_dt[, N := 1L]
-    # bam_dt[strand == "+", N := seq_len(.N)[order(width, decreasing = TRUE)], by = .(which_label, start)]
-    # bam_dt[strand == "-", N := seq_len(.N)[order(width, decreasing = TRUE)], by = .(which_label, end)]
-    # bam_dt = bam_dt[N <= max_dupes]
-
-    if(!is.na(fragLen)){#extension to fragLen
+    if(is.na(fragLen)){
+        bam_dt = switch(splice_strategy,
+               none = {bam_dt},
+               ignore = {.expand_cigar_dt(bam_dt)},
+               add = {.expand_cigar_dt(bam_dt, op_2count = c("M", "D", "=", "X", "N"))},
+               only = {.expand_cigar_dt(bam_dt, op_2count = c("N"))})
+    }else{
+        # bam_dt[, end := start + width - 1L]
         bam_dt[strand == "+", end := start + as.integer(fragLen) - 1L]
         bam_dt[strand == "-", start := end - as.integer(fragLen) + 1L]
     }
@@ -264,6 +346,12 @@ fetchBam = function(bam_f,
 #' returned instead of GRanges.  Default is FALSE.
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
 #' over this number are removed, Default is Inf.
+#' @param splice_strategy character, one of c("ignore", "add", "only"). Default
+#' is "none" and spliced alignment are asssumed not present.
+#' fragLen must be NA for any other value to be valid.  "ignore" will not count
+#' spliced regions.  add" counts spliced
+#' regions along with others, "only" will only count spliced regions and ignore
+#' others.
 #' @return tidy GRanges (or data.table if specified) with pileups from bam
 #' file.  pileup is calculated only every win_size bp.
 #' @export
@@ -288,7 +376,8 @@ ssvFetchBam.single = function(bam_f,
                               anchor = c("left", "left_unstranded", "center",
                                          "center_unstranded")[3],
                               return_data.table = FALSE,
-                              max_dupes = Inf) {
+                              max_dupes = Inf,
+                              splice_strategy = c("none", "ignore", "add", "only")[1]) {
     stopifnot(is.character(win_method))
     stopifnot(length(win_method) == 1)
     stopifnot(class(qgr) == "GRanges")
@@ -297,11 +386,11 @@ ssvFetchBam.single = function(bam_f,
     switch (win_method,
             sample = {
                 qgr = prepare_fetch_GRanges(qgr, win_size)
-                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes)
+                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes, splice_strategy)
                 out = viewGRangesWinSample_dt(score_gr, qgr, win_size, anchor = anchor)
             },
             summary = {
-                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes)
+                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes, splice_strategy)
                 out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
                                                summary_FUN = summary_FUN,
                                                anchor = anchor)
@@ -347,6 +436,12 @@ ssvFetchBam.single = function(bam_f,
 #' returned instead of GRanges.  Default is FALSE.
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
 #' over this number are removed, Default is Inf.
+#' @param splice_strategy character, one of c("ignore", "add", "only"). Default
+#' is "none" and spliced alignment are asssumed not present.
+#' fragLen must be NA for any other value to be valid.  "ignore" will not count
+#' spliced regions.  add" counts spliced
+#' regions along with others, "only" will only count spliced regions and ignore
+#' others.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
 #' fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second))
@@ -379,7 +474,8 @@ ssvFetchBam = function(file_paths,
                                   "center_unstranded")[3],
                        names_variable = "sample",
                        return_data.table = FALSE,
-                       max_dupes = Inf){
+                       max_dupes = Inf,
+                       splice_strategy = c("none", "ignore", "add", "only")[1]){
     stopifnot(all(is.character(fragLens) | is.numeric(fragLens) | is.na(fragLens)))
     stopifnot(length(fragLens) == 1 || length(fragLens) == length(file_paths))
     if(length(fragLens == 1)){
@@ -403,7 +499,8 @@ ssvFetchBam = function(file_paths,
                                 target_strand = target_strand,
                                 anchor = anchor,
                                 return_data.table = TRUE,
-                                max_dupes = max_dupes)
+                                max_dupes = max_dupes,
+                                splice_strategy = splice_strategy)
         dt[[names_variable]] = nam
         message("finished loading ", nam, ".")
         dt

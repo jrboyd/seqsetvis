@@ -12,7 +12,8 @@ ssvFetchBam(file_paths, qgr, unique_names = names(file_paths),
   target_strand = c("*", "+", "-")[1], anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
   names_variable = "sample", return_data.table = FALSE,
-  max_dupes = Inf)
+  max_dupes = Inf, splice_strategy = c("none", "ignore", "add",
+  "only")[1])
 }
 \arguments{
 \item{file_paths}{The character vector or list of paths to bigwig files to
@@ -51,6 +52,13 @@ returned instead of GRanges.  Default is FALSE.}
 
 \item{max_dupes}{numeric >= 1.  duplicate reads by strandd start position
 over this number are removed, Default is Inf.}
+
+\item{splice_strategy}{character, one of c("ignore", "add", "only"). Default
+is "none" and spliced alignment are asssumed not present.
+fragLen must be NA for any other value to be valid.  "ignore" will not count
+spliced regions.  add" counts spliced
+regions along with others, "only" will only count spliced regions and ignore
+others.}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing

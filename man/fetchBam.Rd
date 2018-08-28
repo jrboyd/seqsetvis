@@ -5,7 +5,8 @@
 \title{fetch a bam file pileup with the ability to consider read extension to fragment size (fragLen)}
 \usage{
 fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+",
-  "-")[1], max_dupes = Inf, ...)
+  "-")[1], max_dupes = Inf, splice_strategy = c("none", "ignore",
+  "add", "only")[1], ...)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}
@@ -13,7 +14,7 @@ fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+",
 \item{qgr}{GRanges regions to fetchs}
 
 \item{fragLen}{numeric, NULL, or NA.  if numeric, supplied value is used.
-if NULL, value is calculated with fragLen_calcStranded
+if NULL, value is calculated with fragLen_calcStranded (default)
 if NA, raw bam pileup with no cross strand shift is returned.}
 
 \item{target_strand}{character. if one of "+" or "-", reads are filtered
@@ -21,6 +22,13 @@ to match. ignored if any other value.}
 
 \item{max_dupes}{numeric >= 1.  duplicate reads by strandd start position
 over this number are removed, Default is Inf.}
+
+\item{splice_strategy}{character, one of c("ignore", "add", "only"). Default
+is "none" and spliced alignment are asssumed not present.
+fragLen must be NA for any other value to be valid.  "ignore" will not count
+spliced regions.  add" counts spliced
+regions along with others, "only" will only count spliced regions and ignore
+others.}
 
 \item{...}{passed to ScanBamParam(), can't be which or what.}
 }
