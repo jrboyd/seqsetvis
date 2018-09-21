@@ -377,8 +377,8 @@ shift_anchor = function(score_dt, window_size, anchor){
            }
     )
 
-    score_dt[, start := start - shift + 1]
-    score_dt[, end := end + window_size - shift]
+    score_dt[, start := start - shift]
+    score_dt[, end := end + window_size - shift - 1]
     return(score_dt)
 }
 
