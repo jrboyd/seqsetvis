@@ -353,7 +353,7 @@ ssvSignalClustering = function(bw_data, nclust = 6,
             which.min(abs(v - old_scale))
         }, 1)
         kept = sort(unique(plot_dt[[column_]]))[kept]
-        plot_dt = plot_dt[x %in% kept]
+        plot_dt = plot_dt[get(column_) %in% kept]
         warning(raw_nc - max_cols,
                 " columns were discarded according to max_cols: ",
                 max_cols)
