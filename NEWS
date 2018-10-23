@@ -2,6 +2,7 @@
 
 * ssvFeature* and ssvSignal* added return_data paramter to skip plotting and
 return data used.
+* ssvFetchBam added target_strand = "both" support
 
 # seqsetvis 1.1.5
 

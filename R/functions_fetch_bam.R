@@ -157,15 +157,15 @@ fragLen_calcStranded = function(bam_f,
 
 
     ass1 = cigar_dt[, list(which_label, seqnames, strand,
-                        start, end  = start + cigar_w, cigar_type)]
+                           start, end  = start + cigar_w, cigar_type)]
 
 
     next_dt = cigar_dt[tmp != "", list(which_label,
-                                    seqnames,
-                                    strand,
-                                    start = end + cigar_w + 1L,
-                                    end = end + cigar_w + 1L,
-                                    cigar = tmp)]
+                                       seqnames,
+                                       strand,
+                                       start = end + cigar_w + 1L,
+                                       end = end + cigar_w + 1L,
+                                       cigar = tmp)]
     if(nrow(next_dt) > 0){
         return(rbind(ass1,
                      .expand_cigar_dt_recursive(next_dt)))
@@ -209,7 +209,6 @@ fragLen_calcStranded = function(bam_f,
 #'
 #' @return reads_dt with duplicated reads over max_dupes removed
 .rm_dupes = function(reads_dt, max_dupes){
-    # browser()
     ndupe = which_label = NULL
     reads_dt[, ndupe := 1L]
     reads_dt[strand == "+", ndupe := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, start)]
@@ -297,16 +296,15 @@ fetchBam = function(bam_f,
 
     if(is.na(fragLen)){
         bam_dt = switch(splice_strategy,
-               none = {bam_dt},
-               ignore = {.expand_cigar_dt(bam_dt)},
-               add = {.expand_cigar_dt(bam_dt, op_2count = c("M", "D", "=", "X", "N"))},
-               only = {.expand_cigar_dt(bam_dt, op_2count = c("N"))})
+                        none = {bam_dt},
+                        ignore = {.expand_cigar_dt(bam_dt)},
+                        add = {.expand_cigar_dt(bam_dt, op_2count = c("M", "D", "=", "X", "N"))},
+                        only = {.expand_cigar_dt(bam_dt, op_2count = c("N"))})
     }else{
         # bam_dt[, end := start + width - 1L]
         bam_dt[strand == "+", end := start + as.integer(fragLen) - 1L]
         bam_dt[strand == "-", start := end - as.integer(fragLen) + 1L]
     }
-
 
     ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))
     score_gr = GRanges(ext_cov)
@@ -369,7 +367,7 @@ ssvFetchBam.single = function(bam_f,
                               win_method = c("sample", "summary")[1],
                               summary_FUN = stats::weighted.mean,
                               fragLen = NULL,
-                              target_strand = c("*", "+", "-")[1],
+                              target_strand = c("*", "+", "-", "both")[1],
                               anchor = c("left", "left_unstranded", "center",
                                          "center_unstranded")[3],
                               return_data.table = FALSE,
@@ -380,21 +378,58 @@ ssvFetchBam.single = function(bam_f,
     stopifnot(class(qgr) == "GRanges")
     stopifnot(win_method %in% c("sample", "summary"))
     stopifnot(is.function(summary_FUN))
+    stopifnot(target_strand %in% c("*", "+", "-", "both"))
+    stopifnot(anchor %in% c("left", "left_unstranded", "center",
+                            "center_unstranded"))
+    stopifnot(splice_strategy %in% c("none", "ignore", "add", "only"))
     switch (win_method,
             sample = {
                 qgr = prepare_fetch_GRanges(qgr, win_size)
-                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes, splice_strategy)
-                out = viewGRangesWinSample_dt(score_gr, qgr, win_size, anchor = anchor)
+                if(target_strand == "both"){
+                    pos_gr = fetchBam(bam_f, qgr, fragLen, "+", max_dupes, splice_strategy)
+                    neg_gr = fetchBam(bam_f, qgr, fragLen, "-", max_dupes, splice_strategy)
+                    pos_dt = viewGRangesWinSample_dt(pos_gr, qgr, win_size, anchor = anchor)
+                    neg_dt = viewGRangesWinSample_dt(neg_gr, qgr, win_size, anchor = anchor)
+                    pos_dt[, strand := "+"]
+                    neg_dt[, strand := "-"]
+                    out = rbind(
+                        pos_dt,
+                        neg_dt
+                    )
+                }else{
+                    score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes, splice_strategy)
+                    out = viewGRangesWinSample_dt(score_gr, qgr, win_size, anchor = anchor)
+                    out[, strand := target_strand]
+                }
+
+
             },
             summary = {
-                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes, splice_strategy)
-                out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
-                                               summary_FUN = summary_FUN,
-                                               anchor = anchor)
+                if(target_strand == "both"){
+                    pos_gr = fetchBam(bam_f, qgr, fragLen, "+", max_dupes, splice_strategy)
+                    neg_gr = fetchBam(bam_f, qgr, fragLen, "-", max_dupes, splice_strategy)
+                    pos_dt = viewGRangesWinSummary_dt(pos_gr, qgr, win_size,
+                                                      summary_FUN = summary_FUN,
+                                                      anchor = anchor)
+
+                    neg_dt = viewGRangesWinSummary_dt(neg_gr, qgr, win_size,
+                                                      summary_FUN = summary_FUN,
+                                                      anchor = anchor)
+                    pos_dt[, strand := "+"]
+                    neg_dt[, strand := "-"]
+                    out = rbind(
+                        pos_dt,
+                        neg_dt
+                    )
+                }else{
+                    score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes, splice_strategy)
+                    out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
+                                                   summary_FUN = summary_FUN,
+                                                   anchor = anchor)
+                    out[, strand := target_strand]
+                }
             }
     )
-
-
     if(!return_data.table){
         out = GRanges(out)
     }
@@ -466,7 +501,7 @@ ssvFetchBam = function(file_paths,
                        win_method = c("sample", "summary")[1],
                        summary_FUN = stats::weighted.mean,
                        fragLens = "auto",
-                       target_strand = c("*", "+", "-")[1],
+                       target_strand = c("*", "+", "-", "both")[1],
                        anchor = c("left", "left_unstranded", "center",
                                   "center_unstranded")[3],
                        names_variable = "sample",

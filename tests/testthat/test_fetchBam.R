@@ -222,3 +222,42 @@ test_that("ssvFetchBam strand of targt_strand does matter", {
     expect_true(!all(nres$y == qres$y))
     expect_true(all(nres$y + pres$y == qres$y))
 })
+
+test_that("ssvFetchBam target_strand of both - sample", {
+    res_both = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+                           target_strand = "both", return_data.table = TRUE)
+    strand(qgr) = "+"
+    res_pos = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+                          target_strand = "both", return_data.table = TRUE)
+    strand(qgr) = "-"
+    res_neg = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+                          target_strand = "both", return_data.table = TRUE)
+    res_neg[, x := -x]
+
+    expect_true(nrow(res_both[strand == "+"]) == nrow(res_both[strand == "-"]))
+    expect_true(!all(res_both[strand == "+"]$y == res_both[strand == "-"]))
+    expect_true(all(res_both == res_pos))
+    expect_true(all(res_both == res_neg))
+
+})
+
+test_that("ssvFetchBam target_strand of both - summary", {
+    res_both = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+                           target_strand = "both", return_data.table = TRUE,
+                           win_method = "summary")
+    strand(qgr) = "+"
+    res_pos = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+                          target_strand = "both", return_data.table = TRUE,
+                          win_method = "summary")
+    strand(qgr) = "-"
+    res_neg = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+                          target_strand = "both", return_data.table = TRUE,
+                          win_method = "summary")
+    res_neg[, x := -x]
+
+    expect_true(nrow(res_both[strand == "+"]) == nrow(res_both[strand == "-"]))
+    expect_true(!all(res_both[strand == "+"]$y == res_both[strand == "-"]))
+    expect_true(all(res_both == res_pos))
+    expect_true(all(res_both == res_neg))
+
+})

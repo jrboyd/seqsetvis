@@ -635,7 +635,7 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
     bw_data[,auto_facet := paste(get(sample_), get(region_))]
     if(!is.null(spline_n)){
         plot_dt = applySpline(bw_data, n = spline_n, x_ = x_, y_ = y_,
-                           by_ = c(group_, sample_, region_, facet_))
+                           by_ = unique(c(group_, sample_, region_, facet_)))
     }else{
         plot_dt = bw_data
     }
