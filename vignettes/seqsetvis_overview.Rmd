@@ -94,7 +94,8 @@ functions
 
 ```{r bioc install, eval=FALSE}
 ## try http:// if https:// URLs are not supported
-install.packages("BiocManager")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
 BiocManager::install("seqsetvis")
 ```
 

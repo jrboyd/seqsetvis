@@ -7,15 +7,17 @@
 
 ```{r bioc install, eval=FALSE}
 ## try http:// if https:// URLs are not supported
-source("https://bioconductor.org/biocLite.R")
-biocLite("seqsetvis")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("seqsetvis")
 ```
 
 ## From github
 One dependency from bioconductor isn't getting installed automatically
 ```{r bioC missed dependency, eval=FALSE}
-source("https://bioconductor.org/biocLite.R")
-biocLite("GenomeInfoDbData")
+if (!requireNamespace("BiocManager", quietly=TRUE))
+    install.packages("BiocManager")
+BiocManager::install("GenomeInfoDbData")
 ```
 
 Install devtools if needed
