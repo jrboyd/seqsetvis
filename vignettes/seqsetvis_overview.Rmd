@@ -20,6 +20,8 @@ knitr::opts_chunk$set(
 ```
 
 # Synopsis
+seq - set - vis
+
 `r Githubpkg("jrboyd/seqsetvis")` enables the visualization and analysis of 
 multiple genomic datasets. Although seqsetvis was designed for the comparison 
 of mulitple ChIP-seq datasets, this package is domain-agnostic and allows the 

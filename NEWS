@@ -1,15 +1,25 @@
-# seqsetvis 1.2.0
+# seqsetvis 1.1.6
 
-* ssvBamFetch - added max_dupes paramter, default is Inf and shouldn't change
+* ssvFeature* and ssvSignal* added return_data paramter to skip plotting and
+return data used.
+
+# seqsetvis 1.1.5
+
+* ssvBamFetch - added max_dupes parameter, default is Inf and shouldn't change
 behavior. uses .rm_dupes() internally.
-* ssvBamFetch - added splice_strategy parameter to control split reads for RNA-
-seq data.  Defaults is "none" and shouldn't change behavior.
-Uses .expand_cigar_dt() internally.
-* BiocManager added to suggests
 * bugfix: shift_anchor was causing a 1bp shift per call.
 * bugfix: ssvBamFetch, strand of qgr and target_strand interacted incorrectly and
 led to empty results for mismatches.
 
+# seqsetvis 1.1.4
+
+* ssvBamFetch - added splice_strategy parameter to control split reads for RNA-
+seq data.  Defaults is "none" and shouldn't change behavior.
+Uses .expand_cigar_dt() internally.
+
+# seqsetvis 1.1.3
+
+* BiocManager added to suggests and vignette.
 
 # seqsetvis 1.1.2
 
