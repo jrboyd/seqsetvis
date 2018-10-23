@@ -44,7 +44,8 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
                                     hsv_saturation = 1, hsv_value = 1,
                                     hsv_grayscale = FALSE,
                                     hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = FALSE,
-                                    n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95
+                                    n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95,
+                                    return_data_only = FALSE
 ) {
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -130,6 +131,10 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
     if(is.factor(bw_data[, get(by_)])){
         plot_dt$facet_group = factor(plot_dt$facet_group, levels = levels(bw_data[, get(by_)]))
     }
+
+    if(return_data_only){
+        return(plot_dt)
+    }
     p = ggplot(plot_dt) + geom_ribbon(aes_(x = ~V1, ymin = ~low, ymax = ~high, fill = ~q_range)) +
         labs(fill = "quantile band",
              y = y_, x = "bp",
@@ -186,7 +191,8 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
                                 value_function = max,
                                 by_ = "id",
                                 plot_type = c("standard", "volcano")[1],
-                                show_help = FALSE, fixed_coords = TRUE){
+                                show_help = FALSE, fixed_coords = TRUE,
+                                return_data_only = FALSE){
     xval = yval = xvolcano = id = yvolcano = group = NULL #declare binding for data.table
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -288,6 +294,9 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
     # if(is.null(plotting_group)){
     #     p = p + guides(color = "none")
     # }
+    if(return_data_only){
+        return(plot_dt)
+    }
     if(fixed_coords) p = p + coord_fixed()
     p
 }
@@ -327,7 +336,8 @@ ssvSignalClustering = function(bw_data, nclust = 6,
                                column_ = "x", fill_ = "y", facet_ = "sample",
                                cluster_ = "cluster_id",
                                max_rows = 500, max_cols = 100,
-                               clustering_col_min = -Inf, clustering_col_max = Inf){
+                               clustering_col_min = -Inf,
+                               clustering_col_max = Inf){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
     output_GRanges = FALSE
     if(class(bw_data)[1] == "GRanges"){
@@ -470,7 +480,8 @@ ssvSignalHeatmap = function(bw_data,
                             max_rows = 500,
                             max_cols = 100,
                             clustering_col_min = -Inf,
-                            clustering_col_max = Inf){
+                            clustering_col_max = Inf,
+                            return_data_only = FALSE){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -548,7 +559,9 @@ ssvSignalHeatmap = function(bw_data,
                                xleft = xleft,
                                xright = xright,
                                lowAtTop = TRUE)
-
+    if(return_data_only){
+        return(plot_dt)
+    }
     p
 }
 
@@ -593,7 +606,8 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
                              sample_ = "sample", region_ = "id",
                              group_ = "auto_grp", line_alpha = 1,
                              facet_ = "auto_facet",
-                             facet_method = facet_wrap, spline_n = NULL){
+                             facet_method = facet_wrap, spline_n = NULL,
+                             return_data_only = FALSE){
     auto_grp = auto_facet = NULL
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -615,12 +629,15 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
     bw_data[,auto_grp := paste(get(sample_), get(region_))]
     bw_data[,auto_facet := paste(get(sample_), get(region_))]
     if(!is.null(spline_n)){
-        p_dt = applySpline(bw_data, n = spline_n, x_ = x_, y_ = y_,
+        plot_dt = applySpline(bw_data, n = spline_n, x_ = x_, y_ = y_,
                            by_ = c(group_, sample_, region_, facet_))
     }else{
-        p_dt = bw_data
+        plot_dt = bw_data
     }
-    ggplot(p_dt) + geom_path(aes_string(x = x_,
+    if(return_data_only){
+        return(plot_dt)
+    }
+    ggplot(plot_dt) + geom_path(aes_string(x = x_,
                                         y = y_,
                                         col = color_,
                                         group = group_),
@@ -663,7 +680,8 @@ ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
                                 color_ = sample_,
                                 group_ = sample_,
                                 agg_fun = mean,
-                                spline_n = NULL){
+                                spline_n = NULL,
+                                return_data_only = FALSE){
     group_var = NULL # reserve for data.table
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -683,14 +701,17 @@ ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
                      by = c(unique(c(group_, color_, sample_, x_)))]
 
     if(!is.null(spline_n)){
-        p_dt = applySpline(agg_dt, n = spline_n, x_ = x_, y_ = y_,
+        plot_dt = applySpline(agg_dt, n = spline_n, x_ = x_, y_ = y_,
                            by_ = c(group_, sample_))
     }else{
-        p_dt = agg_dt
+        plot_dt = agg_dt
     }
-    p_dt = p_dt[order(get(x_))]
-    p_dt[, group_var := paste(mget(unique(c(group_, sample_, color_))), collapse = "-"), by = 1:nrow(p_dt) ]
-    ggplot(p_dt) +
+    plot_dt = plot_dt[order(get(x_))]
+    plot_dt[, group_var := paste(mget(unique(c(group_, sample_, color_))), collapse = "-"), by = 1:nrow(plot_dt) ]
+    if(return_data_only){
+        return(plot_dt)
+    }
+    ggplot(plot_dt) +
         geom_path(aes_string(x = x_, y = y_, col = color_, group = "group_var"))
 }
 
