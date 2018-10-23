@@ -6,7 +6,7 @@
 \usage{
 ssvFetchBam.single(bam_f, qgr, win_size = 50, win_method = c("sample",
   "summary")[1], summary_FUN = stats::weighted.mean, fragLen = NULL,
-  target_strand = c("*", "+", "-")[1], anchor = c("left",
+  target_strand = c("*", "+", "-", "both")[1], anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
   return_data.table = FALSE, max_dupes = Inf,
   splice_strategy = c("none", "ignore", "add", "only")[1])

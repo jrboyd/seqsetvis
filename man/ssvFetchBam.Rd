@@ -9,7 +9,7 @@ rbindlist to efficiently combine results}
 ssvFetchBam(file_paths, qgr, unique_names = names(file_paths),
   win_size = 50, win_method = c("sample", "summary")[1],
   summary_FUN = stats::weighted.mean, fragLens = "auto",
-  target_strand = c("*", "+", "-")[1], anchor = c("left",
+  target_strand = c("*", "+", "-", "both")[1], anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
   names_variable = "sample", return_data.table = FALSE,
   max_dupes = Inf, splice_strategy = c("none", "ignore", "add",
