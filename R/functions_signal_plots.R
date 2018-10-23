@@ -714,7 +714,7 @@ ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
         plot_dt = agg_dt
     }
     plot_dt = plot_dt[order(get(x_))]
-    plot_dt[, group_var := paste(mget(unique(c(group_, sample_, color_))), collapse = "-"), by = 1:nrow(plot_dt) ]
+    plot_dt[, group_var := paste(mget(unique(c(group_, sample_, color_))), collapse = "-"), by = seq_len(nrow(plot_dt))]
     if(return_data){
         return(plot_dt)
     }

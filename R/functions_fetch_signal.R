@@ -320,7 +320,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     density_dt = cov_dt[, list(tile_density = summary_FUN(score, width)),
                         by = list(tile_id, id)]
 
-    density_dt[, x := (1:.N-.5)/.N, by = id]
+    density_dt[, x := (seq_len(.N)-.5)/.N, by = id]
     if(!all(tiles$id == density_dt$id))
         stop("something bad happened when merging density ",
              "data.table back to tiles GRanges.")
@@ -425,7 +425,7 @@ prepare_fetch_GRanges = function(qgr,
     if(any(start(qgr) < 1)){
         warning("Some out of bounds GRanges had to be shifted back to start >= 1.")
         fix_shift = 1 - start(qgr)
-        fix_shift = sapply(fix_shift, function(x)max(x, 0))
+        fix_shift = vapply(fix_shift, function(x)max(x, 0), FUN.VALUE = 1)
         qgr = IRanges::shift(qgr, fix_shift)
     }
     return(qgr)
