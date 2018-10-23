@@ -10,15 +10,16 @@
 \item{cigar_dt}{data.table with 5 required named columns in any order.
 c("which_label", "seqnames", "strand", "start", "cigar")}
 
-\item{op_2count}{Cigar codes to count. Default is alignment (M), deletion (D),
-match (=), and mismatch (X).  Other useful codes may be skipped regions for
-RNA splicing (N).  The locations of any insterions (I) or clipping/padding (S, H, or P)
-will be a single bp immediately before the interval.}
+\item{op_2count}{Cigar codes to count. Default is alignment (M), deletion
+(D), match (=), and mismatch (X).  Other useful codes may be skipped
+regions for RNA splicing (N).  The locations of any insterions (I) or
+clipping/padding (S, H, or P) will be a single bp immediately before the
+interval.}
 }
 \value{
 data.table with cigar entries expanded
 }
 \description{
-see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs}
-for cigar details
+see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs} for
+cigar details
 }

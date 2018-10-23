@@ -2,7 +2,8 @@
 % Please edit documentation in R/functions_fetch_bam.R
 \name{fetchBam}
 \alias{fetchBam}
-\title{fetch a bam file pileup with the ability to consider read extension to fragment size (fragLen)}
+\title{fetch a bam file pileup with the ability to consider read extension to
+fragment size (fragLen)}
 \usage{
 fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+",
   "-")[1], max_dupes = Inf, splice_strategy = c("none", "ignore",
@@ -13,31 +14,31 @@ fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+",
 
 \item{qgr}{GRanges regions to fetchs}
 
-\item{fragLen}{numeric, NULL, or NA.  if numeric, supplied value is used.
-if NULL, value is calculated with fragLen_calcStranded (default)
-if NA, raw bam pileup with no cross strand shift is returned.}
+\item{fragLen}{numeric, NULL, or NA.  if numeric, supplied value is used. if
+NULL, value is calculated with fragLen_calcStranded (default) if NA, raw
+bam pileup with no cross strand shift is returned.}
 
-\item{target_strand}{character. if one of "+" or "-", reads are filtered
-to match. ignored if any other value.}
+\item{target_strand}{character. if one of "+" or "-", reads are filtered to
+match. ignored if any other value.}
 
 \item{max_dupes}{numeric >= 1.  duplicate reads by strandd start position
 over this number are removed, Default is Inf.}
 
-\item{splice_strategy}{character, one of c("none", "ignore", "add", "only"). Default
-is "none" and split read alignments are asssumed not present.
-fragLen must be NA for any other value to be valid.  "ignore" will not count
-spliced regions.  "add" counts spliced
-regions along with others, "only" will only count spliced regions and ignore
-others.}
+\item{splice_strategy}{character, one of c("none", "ignore", "add", "only").
+Default is "none" and split read alignments are asssumed not present.
+fragLen must be NA for any other value to be valid.  "ignore" will not
+count spliced regions.  "add" counts spliced regions along with others,
+"only" will only count spliced regions and ignore others.}
 
 \item{...}{passed to ScanBamParam(), can't be which or what.}
 }
 \value{
 GRanges containing tag pileup values in score meta column.  tags are
-optionally extended to fragment length (fragLen) prior to pile up.
+  optionally extended to fragment length (fragLen) prior to pile up.
 }
 \description{
-fetch a bam file pileup with the ability to consider read extension to fragment size (fragLen)
+fetch a bam file pileup with the ability to consider read extension to
+fragment size (fragLen)
 }
 \examples{
 bam_file = system.file("extdata/test.bam", package = "seqsetvis")

@@ -14,6 +14,6 @@ c("which_label", "seqnames", "strand", "start", "cigar")}
 data.table with cigar entries expanded
 }
 \description{
-see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs}
-for cigar details
+see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs} for
+cigar details
 }

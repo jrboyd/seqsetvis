@@ -285,10 +285,11 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL,
 
 #' pie plot of set sizes
 #' @export
-#' @param object object that ssvMakeMembTable can convert to logical matrix membership
+#' @param object object that ssvMakeMembTable can convert to logical matrix
+#'   membership
 #' @param slice_colors colors to use for pie slices
-#' @param return_data logical.  If TRUE, return value is no longer ggplot and
-#' is instead the data used to generate that plot. Default is FALSE.
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and is
+#'   instead the data used to generate that plot. Default is FALSE.
 #' @import ggplot2
 #' @import S4Vectors
 #' @return ggplot pie graph of set sizes
@@ -395,9 +396,11 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
     if (raster_approximation) {
         stopifnot(is.numeric(raster_width_min), is.numeric(raster_height_min))
         dmat = as.matrix(
-            data.table::dcast(hdt,
-                              value.var = "value",
-                              formula = rev(row) ~ groups))[, 1 + seq_len(ncol(object)), drop = FALSE]
+            data.table::dcast(
+                hdt,
+                value.var = "value",
+                formula = rev(row) ~ groups))[, 1 + seq_len(ncol(object)),
+                                              drop = FALSE]
         low_v = 1
         dmat = ifelse(dmat > low_v, low_v, dmat)
         # dmat = -1*(dmat - low_v)
@@ -407,7 +410,8 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
             comp_col = rep(seq_len(ncol(dmat)), each = raster_width_multiplier)
         } else {
             # evenly spaced sample down to target
-            comp_col = round(seq_len(raster_width_min)/raster_width_min * ncol(dmat))
+            comp_col = round(seq_len(raster_width_min)/raster_width_min *
+                                 ncol(dmat))
         }
         if (raster_height_min >= nrow(dmat)) {
             # expand rows as necessary to meet target
@@ -415,7 +419,8 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
             comp_row = rep(seq_len(nrow(dmat)), each = raster_height_multiplier)
         } else {
             # evenly spaced sample down to target
-            comp_row = round(seq_len(raster_height_min)/raster_height_min * nrow(dmat))
+            comp_row = round(seq_len(raster_height_min)/raster_height_min *
+                                 nrow(dmat))
         }
         # dmat = (dmat * -.95 + .95)
         comp_mat = dmat[comp_row, comp_col]

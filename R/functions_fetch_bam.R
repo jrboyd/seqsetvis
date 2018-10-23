@@ -134,12 +134,12 @@ fragLen_calcStranded = function(bam_f,
 
 #' Expand intermediate bam fetch by cigar codes
 #'
-#' see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs}
-#' for cigar details
+#' see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs} for
+#' cigar details
 #'
 #'
 #' @param cigar_dt data.table with 5 required named columns in any order.
-#' c("which_label", "seqnames", "strand", "start", "cigar")
+#'   c("which_label", "seqnames", "strand", "start", "cigar")
 #'
 #' @return data.table with cigar entries expanded
 .expand_cigar_dt_recursive = function(cigar_dt){
@@ -178,16 +178,17 @@ fragLen_calcStranded = function(bam_f,
 
 #' Expand intermediate bam fetch by cigar codes
 #'
-#' see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs}
-#' for cigar details
+#' see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs} for
+#' cigar details
 #'
 #'
 #' @param cigar_dt data.table with 5 required named columns in any order.
-#' c("which_label", "seqnames", "strand", "start", "cigar")
-#' @param op_2count Cigar codes to count. Default is alignment (M), deletion (D),
-#' match (=), and mismatch (X).  Other useful codes may be skipped regions for
-#' RNA splicing (N).  The locations of any insterions (I) or clipping/padding (S, H, or P)
-#' will be a single bp immediately before the interval.
+#'   c("which_label", "seqnames", "strand", "start", "cigar")
+#' @param op_2count Cigar codes to count. Default is alignment (M), deletion
+#'   (D), match (=), and mismatch (X).  Other useful codes may be skipped
+#'   regions for RNA splicing (N).  The locations of any insterions (I) or
+#'   clipping/padding (S, H, or P) will be a single bp immediately before the
+#'   interval.
 #'
 #' @return data.table with cigar entries expanded
 .expand_cigar_dt = function(cigar_dt, op_2count = c("M", "D", "=", "X")){
@@ -211,32 +212,36 @@ fragLen_calcStranded = function(bam_f,
 .rm_dupes = function(reads_dt, max_dupes){
     ndupe = which_label = NULL
     reads_dt[, ndupe := 1L]
-    reads_dt[strand == "+", ndupe := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, start)]
-    reads_dt[strand == "-", ndupe := seq_len(.N)[order(width, decreasing = TRUE)], by = list(which_label, end)]
+    reads_dt[strand == "+",
+             ndupe := seq_len(.N)[order(width, decreasing = TRUE)],
+             by = list(which_label, start)]
+    reads_dt[strand == "-",
+             ndupe := seq_len(.N)[order(width, decreasing = TRUE)],
+             by = list(which_label, end)]
     reads_dt = reads_dt[ndupe <= max_dupes]
     reads_dt$ndupe = NULL
     reads_dt
 }
 
-#' fetch a bam file pileup with the ability to consider read extension to fragment size (fragLen)
+#' fetch a bam file pileup with the ability to consider read extension to
+#' fragment size (fragLen)
 #' @param bam_f character or BamFile to load
 #' @param qgr GRanges regions to fetchs
-#' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
-#' if NULL, value is calculated with fragLen_calcStranded (default)
-#' if NA, raw bam pileup with no cross strand shift is returned.
-#' @param target_strand character. if one of "+" or "-", reads are filtered
-#' to match. ignored if any other value.
+#' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used. if
+#'   NULL, value is calculated with fragLen_calcStranded (default) if NA, raw
+#'   bam pileup with no cross strand shift is returned.
+#' @param target_strand character. if one of "+" or "-", reads are filtered to
+#'   match. ignored if any other value.
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
-#' over this number are removed, Default is Inf.
-#' @param splice_strategy character, one of c("none", "ignore", "add", "only"). Default
-#' is "none" and split read alignments are asssumed not present.
-#' fragLen must be NA for any other value to be valid.  "ignore" will not count
-#' spliced regions.  "add" counts spliced
-#' regions along with others, "only" will only count spliced regions and ignore
-#' others.
+#'   over this number are removed, Default is Inf.
+#' @param splice_strategy character, one of c("none", "ignore", "add", "only").
+#'   Default is "none" and split read alignments are asssumed not present.
+#'   fragLen must be NA for any other value to be valid.  "ignore" will not
+#'   count spliced regions.  "add" counts spliced regions along with others,
+#'   "only" will only count spliced regions and ignore others.
 #' @param ... passed to ScanBamParam(), can't be which or what.
 #' @return GRanges containing tag pileup values in score meta column.  tags are
-#' optionally extended to fragment length (fragLen) prior to pile up.
+#'   optionally extended to fragment length (fragLen) prior to pile up.
 #' @export
 #' @examples
 #' bam_file = system.file("extdata/test.bam", package = "seqsetvis")
@@ -295,11 +300,13 @@ fetchBam = function(bam_f,
     }
 
     if(is.na(fragLen)){
-        bam_dt = switch(splice_strategy,
-                        none = {bam_dt},
-                        ignore = {.expand_cigar_dt(bam_dt)},
-                        add = {.expand_cigar_dt(bam_dt, op_2count = c("M", "D", "=", "X", "N"))},
-                        only = {.expand_cigar_dt(bam_dt, op_2count = c("N"))})
+        bam_dt = switch(
+            splice_strategy,
+            none = {bam_dt},
+            ignore = {.expand_cigar_dt(bam_dt)},
+            add = {.expand_cigar_dt(bam_dt,
+                                    op_2count = c("M", "D", "=", "X", "N"))},
+            only = {.expand_cigar_dt(bam_dt, op_2count = c("N"))})
     }else{
         # bam_dt[, end := start + width - 1L]
         bam_dt[strand == "+", end := start + as.integer(fragLen) - 1L]
@@ -322,33 +329,32 @@ fetchBam = function(bam_f,
 #' @param bam_f character or BamFile to load
 #' @param qgr GRanges regions to fetchs
 #' @param win_size numeric >=1.  pileup grabbed every win_size bp for win_method
-#' sample.  If win_method is summary, this is the number of windows used
-#' (confusing, sorry).
-#' @param win_method character.  one of c("sample", "summary").  Determines
-#' if \code{\link{viewGRangesWinSample_dt}} or
-#' \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
-#' qgr.
+#'   sample.  If win_method is summary, this is the number of windows used
+#'   (confusing, sorry).
+#' @param win_method character.  one of c("sample", "summary").  Determines if
+#'   \code{\link{viewGRangesWinSample_dt}} or
+#'   \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+#'   qgr.
 #' @param summary_FUN function.  only relevant if win_method is "summary".
-#' passed to \code{\link{viewGRangesWinSummary_dt}}.
-#' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used.
-#' if NULL, value is calculated with fragLen_calcStranded
-#' if NA, raw bam pileup with no cross strand shift is returned.
+#'   passed to \code{\link{viewGRangesWinSummary_dt}}.
+#' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used. if
+#'   NULL, value is calculated with fragLen_calcStranded if NA, raw bam pileup
+#'   with no cross strand shift is returned.
 #' @param target_strand character. if one of "+" or "-", reads are filtered
-#' accordingly. ignored if any other value.
-#' @param anchor character, one of c("center", "center_unstranded",
-#' "left", "left_unstranded")
-#' @param return_data.table logical. If TRUE the internal data.table is
-#' returned instead of GRanges.  Default is FALSE.
+#'   accordingly. ignored if any other value.
+#' @param anchor character, one of c("center", "center_unstranded", "left",
+#'   "left_unstranded")
+#' @param return_data.table logical. If TRUE the internal data.table is returned
+#'   instead of GRanges.  Default is FALSE.
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
-#' over this number are removed, Default is Inf.
+#'   over this number are removed, Default is Inf.
 #' @param splice_strategy character, one of c("ignore", "add", "only"). Default
-#' is "none" and spliced alignment are asssumed not present.
-#' fragLen must be NA for any other value to be valid.  "ignore" will not count
-#' spliced regions.  add" counts spliced
-#' regions along with others, "only" will only count spliced regions and ignore
-#' others.
-#' @return tidy GRanges (or data.table if specified) with pileups from bam
-#' file.  pileup is calculated only every win_size bp.
+#'   is "none" and spliced alignment are asssumed not present. fragLen must be
+#'   NA for any other value to be valid.  "ignore" will not count spliced
+#'   regions.  add" counts spliced regions along with others, "only" will only
+#'   count spliced regions and ignore others.
+#' @return tidy GRanges (or data.table if specified) with pileups from bam file.
+#'   pileup is calculated only every win_size bp.
 #' @export
 #' @importFrom stats weighted.mean
 #' @examples
@@ -382,53 +388,63 @@ ssvFetchBam.single = function(bam_f,
     stopifnot(anchor %in% c("left", "left_unstranded", "center",
                             "center_unstranded"))
     stopifnot(splice_strategy %in% c("none", "ignore", "add", "only"))
-    switch (win_method,
-            sample = {
-                qgr = prepare_fetch_GRanges(qgr, win_size)
-                if(target_strand == "both"){
-                    pos_gr = fetchBam(bam_f, qgr, fragLen, "+", max_dupes, splice_strategy)
-                    neg_gr = fetchBam(bam_f, qgr, fragLen, "-", max_dupes, splice_strategy)
-                    pos_dt = viewGRangesWinSample_dt(pos_gr, qgr, win_size, anchor = anchor)
-                    neg_dt = viewGRangesWinSample_dt(neg_gr, qgr, win_size, anchor = anchor)
-                    pos_dt[, strand := "+"]
-                    neg_dt[, strand := "-"]
-                    out = rbind(
-                        pos_dt,
-                        neg_dt
-                    )
-                }else{
-                    score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes, splice_strategy)
-                    out = viewGRangesWinSample_dt(score_gr, qgr, win_size, anchor = anchor)
-                    out[, strand := target_strand]
-                }
-
-
-            },
-            summary = {
-                if(target_strand == "both"){
-                    pos_gr = fetchBam(bam_f, qgr, fragLen, "+", max_dupes, splice_strategy)
-                    neg_gr = fetchBam(bam_f, qgr, fragLen, "-", max_dupes, splice_strategy)
-                    pos_dt = viewGRangesWinSummary_dt(pos_gr, qgr, win_size,
-                                                      summary_FUN = summary_FUN,
-                                                      anchor = anchor)
-
-                    neg_dt = viewGRangesWinSummary_dt(neg_gr, qgr, win_size,
-                                                      summary_FUN = summary_FUN,
-                                                      anchor = anchor)
-                    pos_dt[, strand := "+"]
-                    neg_dt[, strand := "-"]
-                    out = rbind(
-                        pos_dt,
-                        neg_dt
-                    )
-                }else{
-                    score_gr = fetchBam(bam_f, qgr, fragLen, target_strand, max_dupes, splice_strategy)
-                    out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
-                                                   summary_FUN = summary_FUN,
-                                                   anchor = anchor)
-                    out[, strand := target_strand]
-                }
+    switch (
+        win_method,
+        sample = {
+            qgr = prepare_fetch_GRanges(qgr, win_size)
+            if(target_strand == "both"){
+                pos_gr = fetchBam(bam_f, qgr, fragLen, "+",
+                                  max_dupes, splice_strategy)
+                neg_gr = fetchBam(bam_f, qgr, fragLen, "-",
+                                  max_dupes, splice_strategy)
+                pos_dt = viewGRangesWinSample_dt(pos_gr, qgr,
+                                                 win_size, anchor = anchor)
+                neg_dt = viewGRangesWinSample_dt(neg_gr, qgr,
+                                                 win_size, anchor = anchor)
+                pos_dt[, strand := "+"]
+                neg_dt[, strand := "-"]
+                out = rbind(
+                    pos_dt,
+                    neg_dt
+                )
+            }else{
+                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand,
+                                    max_dupes, splice_strategy)
+                out = viewGRangesWinSample_dt(score_gr, qgr,
+                                              win_size, anchor = anchor)
+                out[, strand := target_strand]
             }
+
+
+        },
+        summary = {
+            if(target_strand == "both"){
+                pos_gr = fetchBam(bam_f, qgr, fragLen, "+",
+                                  max_dupes, splice_strategy)
+                neg_gr = fetchBam(bam_f, qgr, fragLen, "-",
+                                  max_dupes, splice_strategy)
+                pos_dt = viewGRangesWinSummary_dt(pos_gr, qgr, win_size,
+                                                  summary_FUN = summary_FUN,
+                                                  anchor = anchor)
+
+                neg_dt = viewGRangesWinSummary_dt(neg_gr, qgr, win_size,
+                                                  summary_FUN = summary_FUN,
+                                                  anchor = anchor)
+                pos_dt[, strand := "+"]
+                neg_dt[, strand := "-"]
+                out = rbind(
+                    pos_dt,
+                    neg_dt
+                )
+            }else{
+                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand,
+                                    max_dupes, splice_strategy)
+                out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
+                                               summary_FUN = summary_FUN,
+                                               anchor = anchor)
+                out[, strand := target_strand]
+            }
+        }
     )
     if(!return_data.table){
         out = GRanges(out)
@@ -436,50 +452,49 @@ ssvFetchBam.single = function(bam_f,
     return(out)
 }
 
-#' Iterates a character vector (ideally named) and calls \code{ssvFetchBam.single}
-#' on each.  Appends grouping variable to each resulting data.table and uses
-#' rbindlist to efficiently combine results
+#' Iterates a character vector (ideally named) and calls
+#' \code{ssvFetchBam.single} on each.  Appends grouping variable to each
+#' resulting data.table and uses rbindlist to efficiently combine results
 #'
-#' \code{ssvFetchBam} iteratively calls \code{fetchWindowedBam.single}.
-#' See \code{\link{ssvFetchBam.single}} for more info.
+#' \code{ssvFetchBam} iteratively calls \code{fetchWindowedBam.single}. See
+#' \code{\link{ssvFetchBam.single}} for more info.
 #' @export
 #' @param file_paths The character vector or list of paths to bigwig files to
-#'  read from.
+#'   read from.
 #' @param qgr Set of GRanges to query.  For valid results the width of each
-#' interval should be identical and evenly divisible by \code{win_size}.
+#'   interval should be identical and evenly divisible by \code{win_size}.
 #' @param unique_names names to use in final data.table to designate source
-#' bigwig. Default is 'sample'
+#'   bigwig. Default is 'sample'
 #' @param win_size The window size that evenly divides widths in \code{qgr}.
-#' @param win_method character.  one of c("sample", "summary").  Determines
-#' if \code{\link{viewGRangesWinSample_dt}} or
-#' \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
-#' qgr.
+#' @param win_method character.  one of c("sample", "summary").  Determines if
+#'   \code{\link{viewGRangesWinSample_dt}} or
+#'   \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+#'   qgr.
 #' @param summary_FUN function.  only relevant if win_method is "summary".
-#' passed to \code{\link{viewGRangesWinSummary_dt}}.
+#'   passed to \code{\link{viewGRangesWinSummary_dt}}.
 #' @param fragLens numeric. The fragment length to use to extend reads.  The
-#' default value "auto" causes an automatic calculation from 100 regions in
-#' qgr.  NA causes no extension of reads to fragment size.
-#' @param target_strand character. One of c("*", "+", "-"). Controls
-#' filtering of reads by strand.  Default of "*" combines both strands.
-#' @param anchor character, one of c("center", "center_unstranded",
-#' "left", "left_unstranded")
+#'   default value "auto" causes an automatic calculation from 100 regions in
+#'   qgr.  NA causes no extension of reads to fragment size.
+#' @param target_strand character. One of c("*", "+", "-"). Controls filtering
+#'   of reads by strand.  Default of "*" combines both strands.
+#' @param anchor character, one of c("center", "center_unstranded", "left",
+#'   "left_unstranded")
 #' @param names_variable The column name where unique_names are stored.
-#' @param return_data.table logical. If TRUE the internal data.table is
-#' returned instead of GRanges.  Default is FALSE.
+#' @param return_data.table logical. If TRUE the internal data.table is returned
+#'   instead of GRanges.  Default is FALSE.
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
-#' over this number are removed, Default is Inf.
+#'   over this number are removed, Default is Inf.
 #' @param splice_strategy character, one of c("ignore", "add", "only"). Default
-#' is "none" and spliced alignment are asssumed not present.
-#' fragLen must be NA for any other value to be valid.  "ignore" will not count
-#' spliced regions.  add" counts spliced
-#' regions along with others, "only" will only count spliced regions and ignore
-#' others.
+#'   is "none" and spliced alignment are asssumed not present. fragLen must be
+#'   NA for any other value to be valid.  "ignore" will not count spliced
+#'   regions.  add" counts spliced regions along with others, "only" will only
+#'   count spliced regions and ignore others.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
-#' fetched values.
+#'   fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second))
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
-#' 10, values from positions chr1 5,15,25...85, and 95 will be
-#' retrieved from \code{bw_file}
+#'   10, values from positions chr1 5,15,25...85, and 95 will be retrieved from
+#'   \code{bw_file}
 #' @importFrom stats weighted.mean
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
@@ -508,7 +523,9 @@ ssvFetchBam = function(file_paths,
                        return_data.table = FALSE,
                        max_dupes = Inf,
                        splice_strategy = c("none", "ignore", "add", "only")[1]){
-    stopifnot(all(is.character(fragLens) | is.numeric(fragLens) | is.na(fragLens)))
+    stopifnot(all(is.character(fragLens) |
+                      is.numeric(fragLens) |
+                      is.na(fragLens)))
     stopifnot(length(fragLens) == 1 || length(fragLens) == length(file_paths))
     if(length(fragLens == 1)){
         fragLens = rep(fragLens[1], length(file_paths))

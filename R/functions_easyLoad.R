@@ -18,8 +18,8 @@ easyLoad_narrowPeak = function(file_paths, file_names = NULL){
     extraCols_narrowPeak <- c(signalValue = "numeric", pValue = "numeric",
                               qValue = "numeric", relSummit = "integer")
     easyLoad_bed(file_paths = file_paths,
-                     file_names = file_names,
-                     extraCols = extraCols_narrowPeak)
+                 file_names = file_names,
+                 extraCols = extraCols_narrowPeak)
 }
 
 #' easyLoad_broadPeak takes a character vector of file paths to narrowPeak
@@ -40,8 +40,8 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL){
     extraCols_broadPeak <- c(signalValue = "numeric", pValue = "numeric",
                              qValue = "numeric")
     easyLoad_bed(file_paths = file_paths,
-                     file_names = file_names,
-                     extraCols = extraCols_broadPeak)
+                 file_names = file_names,
+                 extraCols = extraCols_broadPeak)
 }
 
 #' easyLoad_bed takes a character vector of file paths to bed plus files and

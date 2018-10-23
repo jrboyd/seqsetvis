@@ -20,40 +20,39 @@ ssvFetchBam.single(bam_f, qgr, win_size = 50, win_method = c("sample",
 sample.  If win_method is summary, this is the number of windows used
 (confusing, sorry).}
 
-\item{win_method}{character.  one of c("sample", "summary").  Determines
-if \code{\link{viewGRangesWinSample_dt}} or
+\item{win_method}{character.  one of c("sample", "summary").  Determines if
+\code{\link{viewGRangesWinSample_dt}} or
 \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
 qgr.}
 
 \item{summary_FUN}{function.  only relevant if win_method is "summary".
 passed to \code{\link{viewGRangesWinSummary_dt}}.}
 
-\item{fragLen}{numeric, NULL, or NA.  if numeric, supplied value is used.
-if NULL, value is calculated with fragLen_calcStranded
-if NA, raw bam pileup with no cross strand shift is returned.}
+\item{fragLen}{numeric, NULL, or NA.  if numeric, supplied value is used. if
+NULL, value is calculated with fragLen_calcStranded if NA, raw bam pileup
+with no cross strand shift is returned.}
 
 \item{target_strand}{character. if one of "+" or "-", reads are filtered
 accordingly. ignored if any other value.}
 
-\item{anchor}{character, one of c("center", "center_unstranded",
-"left", "left_unstranded")}
+\item{anchor}{character, one of c("center", "center_unstranded", "left",
+"left_unstranded")}
 
-\item{return_data.table}{logical. If TRUE the internal data.table is
-returned instead of GRanges.  Default is FALSE.}
+\item{return_data.table}{logical. If TRUE the internal data.table is returned
+instead of GRanges.  Default is FALSE.}
 
 \item{max_dupes}{numeric >= 1.  duplicate reads by strandd start position
 over this number are removed, Default is Inf.}
 
 \item{splice_strategy}{character, one of c("ignore", "add", "only"). Default
-is "none" and spliced alignment are asssumed not present.
-fragLen must be NA for any other value to be valid.  "ignore" will not count
-spliced regions.  add" counts spliced
-regions along with others, "only" will only count spliced regions and ignore
-others.}
+is "none" and spliced alignment are asssumed not present. fragLen must be
+NA for any other value to be valid.  "ignore" will not count spliced
+regions.  add" counts spliced regions along with others, "only" will only
+count spliced regions and ignore others.}
 }
 \value{
-tidy GRanges (or data.table if specified) with pileups from bam
-file.  pileup is calculated only every win_size bp.
+tidy GRanges (or data.table if specified) with pileups from bam file.
+  pileup is calculated only every win_size bp.
 }
 \description{
 fetch a windowed version of a bam file, returns GRanges

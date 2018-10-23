@@ -2,9 +2,9 @@
 % Please edit documentation in R/functions_fetch_bam.R
 \name{ssvFetchBam}
 \alias{ssvFetchBam}
-\title{Iterates a character vector (ideally named) and calls \code{ssvFetchBam.single}
-on each.  Appends grouping variable to each resulting data.table and uses
-rbindlist to efficiently combine results}
+\title{Iterates a character vector (ideally named) and calls
+\code{ssvFetchBam.single} on each.  Appends grouping variable to each
+resulting data.table and uses rbindlist to efficiently combine results}
 \usage{
 ssvFetchBam(file_paths, qgr, unique_names = names(file_paths),
   win_size = 50, win_method = c("sample", "summary")[1],
@@ -27,8 +27,8 @@ bigwig. Default is 'sample'}
 
 \item{win_size}{The window size that evenly divides widths in \code{qgr}.}
 
-\item{win_method}{character.  one of c("sample", "summary").  Determines
-if \code{\link{viewGRangesWinSample_dt}} or
+\item{win_method}{character.  one of c("sample", "summary").  Determines if
+\code{\link{viewGRangesWinSample_dt}} or
 \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
 qgr.}
 
@@ -39,39 +39,38 @@ passed to \code{\link{viewGRangesWinSummary_dt}}.}
 default value "auto" causes an automatic calculation from 100 regions in
 qgr.  NA causes no extension of reads to fragment size.}
 
-\item{target_strand}{character. One of c("*", "+", "-"). Controls
-filtering of reads by strand.  Default of "*" combines both strands.}
+\item{target_strand}{character. One of c("*", "+", "-"). Controls filtering
+of reads by strand.  Default of "*" combines both strands.}
 
-\item{anchor}{character, one of c("center", "center_unstranded",
-"left", "left_unstranded")}
+\item{anchor}{character, one of c("center", "center_unstranded", "left",
+"left_unstranded")}
 
 \item{names_variable}{The column name where unique_names are stored.}
 
-\item{return_data.table}{logical. If TRUE the internal data.table is
-returned instead of GRanges.  Default is FALSE.}
+\item{return_data.table}{logical. If TRUE the internal data.table is returned
+instead of GRanges.  Default is FALSE.}
 
 \item{max_dupes}{numeric >= 1.  duplicate reads by strandd start position
 over this number are removed, Default is Inf.}
 
 \item{splice_strategy}{character, one of c("ignore", "add", "only"). Default
-is "none" and spliced alignment are asssumed not present.
-fragLen must be NA for any other value to be valid.  "ignore" will not count
-spliced regions.  add" counts spliced
-regions along with others, "only" will only count spliced regions and ignore
-others.}
+is "none" and spliced alignment are asssumed not present. fragLen must be
+NA for any other value to be valid.  "ignore" will not count spliced
+regions.  add" counts spliced regions along with others, "only" will only
+count spliced regions and ignore others.}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing
-fetched values.
+  fetched values.
 }
 \description{
-\code{ssvFetchBam} iteratively calls \code{fetchWindowedBam.single}.
-See \code{\link{ssvFetchBam.single}} for more info.
+\code{ssvFetchBam} iteratively calls \code{fetchWindowedBam.single}. See
+\code{\link{ssvFetchBam.single}} for more info.
 }
 \details{
 if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
-10, values from positions chr1 5,15,25...85, and 95 will be
-retrieved from \code{bw_file}
+  10, values from positions chr1 5,15,25...85, and 95 will be retrieved from
+  \code{bw_file}
 }
 \examples{
 if(Sys.info()['sysname'] != "Windows"){
