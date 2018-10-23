@@ -142,8 +142,6 @@ fragLen_calcStranded = function(bam_f,
 #' c("which_label", "seqnames", "strand", "start", "cigar")
 #'
 #' @return data.table with cigar entries expanded
-#'
-#' @examples
 .expand_cigar_dt_recursive = function(cigar_dt){
     cigar_w = cigar = cigar_type = tmp = which_label = NULL #dt bindings
     stopifnot(all(c("which_label", "seqnames",
@@ -192,8 +190,6 @@ fragLen_calcStranded = function(bam_f,
 #' will be a single bp immediately before the interval.
 #'
 #' @return data.table with cigar entries expanded
-#'
-#' @examples
 .expand_cigar_dt = function(cigar_dt, op_2count = c("M", "D", "=", "X")){
     cigar_type = NULL
     cigar_dt = copy(cigar_dt)
@@ -212,8 +208,6 @@ fragLen_calcStranded = function(bam_f,
 #' @param max_dupes maximum allowed positional duplicates
 #'
 #' @return reads_dt with duplicated reads over max_dupes removed
-#'
-#' @examples
 .rm_dupes = function(reads_dt, max_dupes){
     # browser()
     ndupe = which_label = NULL
@@ -235,10 +229,10 @@ fragLen_calcStranded = function(bam_f,
 #' to match. ignored if any other value.
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
 #' over this number are removed, Default is Inf.
-#' @param splice_strategy character, one of c("ignore", "add", "only"). Default
-#' is "none" and spliced alignment are asssumed not present.
+#' @param splice_strategy character, one of c("none", "ignore", "add", "only"). Default
+#' is "none" and split read alignments are asssumed not present.
 #' fragLen must be NA for any other value to be valid.  "ignore" will not count
-#' spliced regions.  add" counts spliced
+#' spliced regions.  "add" counts spliced
 #' regions along with others, "only" will only count spliced regions and ignore
 #' others.
 #' @param ... passed to ScanBamParam(), can't be which or what.
@@ -261,6 +255,9 @@ fetchBam = function(bam_f,
     stopifnot(max_dupes >= 1)
     if(!is.na(fragLen) && splice_strategy != "none"){
         stop("fragLen must be NA if splice_strategy is not 'none'.")
+    }
+    if( ! splice_strategy %in% c("none", "ignore", "add", "only")){
+        stop('splice_strategy must be one of: "none", "ignore", "add", "only"')
     }
     if(is.null(fragLen)){
         fragLen = fragLen_calcStranded(bam_f, qgr)
