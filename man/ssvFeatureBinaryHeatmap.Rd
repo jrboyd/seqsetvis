@@ -8,7 +8,8 @@ change column order to reveal patterns}
 \usage{
 ssvFeatureBinaryHeatmap(object, raster_approximation = FALSE,
   true_color = "black", false_color = "#EFEFEF",
-  raster_width_min = 1000, raster_height_min = 1000)
+  raster_width_min = 1000, raster_height_min = 1000,
+  return_data = FALSE)
 }
 \arguments{
 \item{object}{passed to ssvMakeMembTable}
@@ -28,6 +29,9 @@ columns over this number.  ignored if raster_approximation is FALSE.}
 
 \item{raster_height_min}{raster height will be minimum multiple of number of
 rows over this number  ignored if raster_approximation is FALSE}
+
+\item{return_data}{logical.  If TRUE, return value is no longer ggplot and
+is instead the data used to generate that plot. Default is FALSE.}
 }
 \value{
 ggplot using geom_tile of membership table sorted from left to right.

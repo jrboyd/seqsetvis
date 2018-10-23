@@ -8,7 +8,7 @@ ssvSignalBandedQuantiles(bw_data, y_ = "y", x_ = "x", by_ = "fake",
   hsv_reverse = FALSE, hsv_saturation = 1, hsv_value = 1,
   hsv_grayscale = FALSE, hsv_hue_min = 0, hsv_hue_max = 0.7,
   hsv_symmetric = FALSE, n_quantile = 18, quantile_min = 0.05,
-  quantile_max = 0.95)
+  quantile_max = 0.95, return_data = FALSE)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
@@ -39,6 +39,9 @@ As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 \item{quantile_min}{the lowest quantile start}
 
 \item{quantile_max}{the highest quantile end}
+
+\item{return_data}{logical.  If TRUE, return value is no longer ggplot and
+is instead the data used to generate that plot. Default is FALSE.}
 }
 \value{
 ggplot object using ribbon plots to show quantile distributions

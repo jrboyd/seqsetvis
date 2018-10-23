@@ -8,7 +8,8 @@ at 3 sets}
 ssvFeatureVenn(object, group_names = NULL, counts_txt_size = 5,
   counts_as_labels = FALSE, show_outside_count = FALSE,
   line_width = 3, circle_colors = NULL, fill_alpha = 0.3,
-  line_alpha = 1, counts_color = NULL, n_points = 200)
+  line_alpha = 1, counts_color = NULL, n_points = 200,
+  return_data = FALSE)
 }
 \arguments{
 \item{object}{will be passed to \code{\link{ssvMakeMembTable}} for
@@ -38,6 +39,9 @@ from RColorBrewer by default.}
 
 \item{n_points}{integer.  number of points to approximate circle with.
 default is 200.}
+
+\item{return_data}{logical.  If TRUE, return value is no longer ggplot and
+is instead the data used to generate that plot. Default is FALSE.}
 }
 \value{
 ggplot venn diagram

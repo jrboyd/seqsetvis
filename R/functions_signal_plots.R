@@ -15,7 +15,8 @@
 #' @param n_quantile number of evenly size quantile bins
 #' @param quantile_min the lowest quantile start
 #' @param quantile_max the highest quantile end
-#'
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
 #' @return ggplot object using ribbon plots to show quantile distributions
 #' @import ggplot2
 #' @importFrom grDevices gray rainbow
@@ -45,7 +46,7 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
                                     hsv_grayscale = FALSE,
                                     hsv_hue_min = 0, hsv_hue_max = 0.7, hsv_symmetric = FALSE,
                                     n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95,
-                                    return_data_only = FALSE
+                                    return_data = FALSE
 ) {
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -132,7 +133,7 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
         plot_dt$facet_group = factor(plot_dt$facet_group, levels = levels(bw_data[, get(by_)]))
     }
 
-    if(return_data_only){
+    if(return_data){
         return(plot_dt)
     }
     p = ggplot(plot_dt) + geom_ribbon(aes_(x = ~V1, ymin = ~low, ymax = ~high, fill = ~q_range)) +
@@ -165,7 +166,8 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
 #' @param plot_type standard or volcano, default is "standard"
 #' @param show_help if TRUE overlay labels to aid plot interpretation, default is FALSE
 #' @param fixed_coords if TRUE coordinate system is 1:1 ratio, default is TRUE
-#'
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
 #' @import ggplot2
 #' @return ggplot of points comparing signal from 2 samples
 #' @examples
@@ -192,7 +194,7 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
                                 by_ = "id",
                                 plot_type = c("standard", "volcano")[1],
                                 show_help = FALSE, fixed_coords = TRUE,
-                                return_data_only = FALSE){
+                                return_data = FALSE){
     xval = yval = xvolcano = id = yvolcano = group = NULL #declare binding for data.table
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -294,7 +296,7 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
     # if(is.null(plotting_group)){
     #     p = p + guides(color = "none")
     # }
-    if(return_data_only){
+    if(return_data){
         return(plot_dt)
     }
     if(fixed_coords) p = p + coord_fixed()
@@ -459,7 +461,8 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
-#'
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
 #' @import ggplot2
 #' @return ggplot heatmap of signal profiles, facetted by sample
 #' @examples
@@ -481,7 +484,7 @@ ssvSignalHeatmap = function(bw_data,
                             max_cols = 100,
                             clustering_col_min = -Inf,
                             clustering_col_max = Inf,
-                            return_data_only = FALSE){
+                            return_data = FALSE){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -559,7 +562,7 @@ ssvSignalHeatmap = function(bw_data,
                                xleft = xleft,
                                xright = xright,
                                lowAtTop = TRUE)
-    if(return_data_only){
+    if(return_data){
         return(plot_dt)
     }
     p
@@ -588,6 +591,8 @@ ssvSignalHeatmap = function(bw_data,
 #' facet_wrap by default.
 #' @param spline_n if not NULL, applySpline will be called with n = spline_n.
 #' default is NULL.
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
 #' @import ggplot2
 #' @return ggplot of signal potentially facetted by region and sample
 #' @examples
@@ -607,7 +612,7 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
                              group_ = "auto_grp", line_alpha = 1,
                              facet_ = "auto_facet",
                              facet_method = facet_wrap, spline_n = NULL,
-                             return_data_only = FALSE){
+                             return_data = FALSE){
     auto_grp = auto_facet = NULL
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -634,7 +639,7 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
     }else{
         plot_dt = bw_data
     }
-    if(return_data_only){
+    if(return_data){
         return(plot_dt)
     }
     ggplot(plot_dt) + geom_path(aes_string(x = x_,
@@ -661,6 +666,8 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
 #' default is mean
 #' @param spline_n if not NULL, applySpline will be called with n = spline_n.
 #' default is NULL.
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
 #' @import ggplot2
 #' @return ggplot of signal aggregated with agg_fun() by sample.
 #' @examples
@@ -681,7 +688,7 @@ ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
                                 group_ = sample_,
                                 agg_fun = mean,
                                 spline_n = NULL,
-                                return_data_only = FALSE){
+                                return_data = FALSE){
     group_var = NULL # reserve for data.table
     if(class(bw_data)[1] == "GRanges"){
         bw_data = data.table::as.data.table(bw_data)
@@ -708,7 +715,7 @@ ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
     }
     plot_dt = plot_dt[order(get(x_))]
     plot_dt[, group_var := paste(mget(unique(c(group_, sample_, color_))), collapse = "-"), by = 1:nrow(plot_dt) ]
-    if(return_data_only){
+    if(return_data){
         return(plot_dt)
     }
     ggplot(plot_dt) +

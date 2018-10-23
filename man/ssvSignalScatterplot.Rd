@@ -7,7 +7,7 @@
 ssvSignalScatterplot(bw_data, x_name, y_name, color_table = NULL,
   value_variable = "y", xy_variable = "sample", value_function = max,
   by_ = "id", plot_type = c("standard", "volcano")[1],
-  show_help = FALSE, fixed_coords = TRUE)
+  show_help = FALSE, fixed_coords = TRUE, return_data = FALSE)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
@@ -33,6 +33,9 @@ The other column must be the same as by_ parameter and is used for merging.}
 \item{show_help}{if TRUE overlay labels to aid plot interpretation, default is FALSE}
 
 \item{fixed_coords}{if TRUE coordinate system is 1:1 ratio, default is TRUE}
+
+\item{return_data}{logical.  If TRUE, return value is no longer ggplot and
+is instead the data used to generate that plot. Default is FALSE.}
 }
 \value{
 ggplot of points comparing signal from 2 samples

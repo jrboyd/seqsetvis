@@ -6,7 +6,7 @@
 \usage{
 ssvSignalLineplotAgg(bw_data, x_ = "x", y_ = "y", sample_ = "sample",
   color_ = sample_, group_ = sample_, agg_fun = mean,
-  spline_n = NULL)
+  spline_n = NULL, return_data = FALSE)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
@@ -30,6 +30,9 @@ default is mean}
 
 \item{spline_n}{if not NULL, applySpline will be called with n = spline_n.
 default is NULL.}
+
+\item{return_data}{logical.  If TRUE, return value is no longer ggplot and
+is instead the data used to generate that plot. Default is FALSE.}
 }
 \value{
 ggplot of signal aggregated with agg_fun() by sample.

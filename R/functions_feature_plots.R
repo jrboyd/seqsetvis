@@ -29,6 +29,8 @@
 #' @param counts_color character. single color to use for displaying counts
 #' @param n_points integer.  number of points to approximate circle with.
 #' default is 200.
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
 #' @return ggplot venn diagram
 #' @import ggplot2
 #' @import S4Vectors
@@ -48,7 +50,7 @@ ssvFeatureVenn = function(object,
                           line_alpha = 1,
                           counts_color = NULL,
                           n_points = 200,
-                          return_data_only = FALSE) {
+                          return_data = FALSE) {
     size = group = x = y = label = NULL#declare binding for data.table
 
     object = ssvMakeMembTable(object)
@@ -138,15 +140,15 @@ ssvFeatureVenn = function(object,
     p = p + counts_method(data = df_text,
                           mapping = aes(x = x, y = y,
                                         label = label, size = size))
-    if(return_data_only){
+    if(return_data){
         return(
-            data.frame(xcentres = xcentres,
+
+            data.table(xcentres = xcentres,
                        ycentres = ycentres,
                        r = r,
                        r2 = r,
                        phi = rep(0,
                                  length(xcentres)),
-                       circle_colors = circle_colors,
                        group_names = group_names)
         )
     }
@@ -165,6 +167,8 @@ ssvFeatureVenn = function(object,
 #' @param line_alpha numeric [0,1], alpha value for circle line
 #' @param circle_colors colors to choose from for circles.  passed to ggplot2
 #' color scales.
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
 #' @return ggplot of venneuler results
 #' @import ggplot2
 #' @import eulerr
@@ -180,7 +184,7 @@ ssvFeatureEuler = function(object,
                            fill_alpha = .3,
                            line_alpha = 1,
                            circle_colors = NULL,
-                           return_data_only = FALSE) {
+                           return_data = FALSE) {
     x = y = group = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     stopifnot(is.numeric(line_width),
@@ -198,14 +202,13 @@ ssvFeatureEuler = function(object,
     b <- dd$b
     phi <- dd$phi
 
-    if(return_data_only){
+    if(return_data){
         return(
-            data.frame(xcentres = h,
+            data.table(xcentres = h,
                        ycentres = k,
                        r = a,
                        r2 = b,
                        phi = phi,
-                       circle_colors = circle_colors,
                        group_names = cn)
         )
     }
@@ -232,6 +235,8 @@ ssvFeatureEuler = function(object,
 #' bar. default is TRUE
 #' @param bar_colors character. rcolor or hex colors. default of NULL
 #' uses RColorBrewer Dark2.
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
 #' @return ggplot of bar plot of set sizes
 #' @import ggplot2
 #' @import S4Vectors
@@ -240,7 +245,7 @@ ssvFeatureEuler = function(object,
 #' ssvFeatureBars(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL,
-                          return_data_only = FALSE) {
+                          return_data = FALSE) {
     group = count = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     stopifnot(is.logical(show_counts))
@@ -259,8 +264,8 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL,
     hit_counts_df = data.frame(count = hit_counts,
                                group = factor(names(hit_counts),
                                               levels = names(hit_counts)))
-    if(return_data_only){
-        return(hit_counts_df)
+    if(return_data){
+        return(as.data.table(hit_counts_df))
     }
     p <- ggplot(hit_counts_df, aes(x = group, y = count, fill = group)) +
         labs(x = "") +
@@ -282,6 +287,8 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL,
 #' @export
 #' @param object object that ssvMakeMembTable can convert to logical matrix membership
 #' @param slice_colors colors to use for pie slices
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
 #' @import ggplot2
 #' @import S4Vectors
 #' @return ggplot pie graph of set sizes
@@ -289,7 +296,7 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL,
 #' ssvFeaturePie(list(1:3, 2:6))
 #' ssvFeaturePie(CTCF_in_10a_overlaps_gr)
 #' ssvFeaturePie(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
-ssvFeaturePie = function(object, slice_colors = NULL, return_data_only = FALSE) {
+ssvFeaturePie = function(object, slice_colors = NULL, return_data = FALSE) {
     count = group = NULL#declare binding for data.table
 
     stopifnot(is.null(slice_colors) || all(is.character(slice_colors)))
@@ -311,8 +318,8 @@ ssvFeaturePie = function(object, slice_colors = NULL, return_data_only = FALSE) 
         slice_colors <- rep(slice_colors, length.out = n_slices)
     names(slice_colors) = colnames(object)
 
-    if(return_data_only){
-        return(hit_counts_df)
+    if(return_data){
+        return(as.data.table(hit_counts_df))
     }
 
     p <- ggplot(hit_counts_df, aes(x = "", y = count, fill = group)) +
@@ -353,6 +360,8 @@ ssvFeaturePie = function(object, slice_colors = NULL, return_data_only = FALSE) 
 #' columns over this number.  ignored if raster_approximation is FALSE.
 #' @param raster_height_min raster height will be minimum multiple of number of
 #' rows over this number  ignored if raster_approximation is FALSE
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
 #' @rawNamespace import(data.table, except = c(shift, first, second))
 #' @return ggplot using geom_tile of membership table sorted from left to right.
 #' @import png
@@ -371,7 +380,7 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
                                    false_color = "#EFEFEF",
                                    raster_width_min = 1000,
                                    raster_height_min = 1000,
-                                   return_data_only = FALSE) {
+                                   return_data = FALSE) {
     groups = bool = value = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     stopifnot(is.logical(raster_approximation))
@@ -468,8 +477,8 @@ ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
                 axis.title = element_blank()
             )
     }
-    if(return_data_only){
-        return(as.data.frame(hdt))
+    if(return_data){
+        return(hdt)
     }
     return(p)
 }

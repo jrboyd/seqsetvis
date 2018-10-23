@@ -23,10 +23,10 @@ to match. ignored if any other value.}
 \item{max_dupes}{numeric >= 1.  duplicate reads by strandd start position
 over this number are removed, Default is Inf.}
 
-\item{splice_strategy}{character, one of c("ignore", "add", "only"). Default
-is "none" and spliced alignment are asssumed not present.
+\item{splice_strategy}{character, one of c("none", "ignore", "add", "only"). Default
+is "none" and split read alignments are asssumed not present.
 fragLen must be NA for any other value to be valid.  "ignore" will not count
-spliced regions.  add" counts spliced
+spliced regions.  "add" counts spliced
 regions along with others, "only" will only count spliced regions and ignore
 others.}
 

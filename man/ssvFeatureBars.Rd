@@ -4,7 +4,8 @@
 \alias{ssvFeatureBars}
 \title{bar plots of set sizes}
 \usage{
-ssvFeatureBars(object, show_counts = TRUE, bar_colors = NULL)
+ssvFeatureBars(object, show_counts = TRUE, bar_colors = NULL,
+  return_data = FALSE)
 }
 \arguments{
 \item{object}{passed to ssvMakeMembTable for conversion to membership table}
@@ -14,6 +15,9 @@ bar. default is TRUE}
 
 \item{bar_colors}{character. rcolor or hex colors. default of NULL
 uses RColorBrewer Dark2.}
+
+\item{return_data}{logical.  If TRUE, return value is no longer ggplot and
+is instead the data used to generate that plot. Default is FALSE.}
 }
 \value{
 ggplot of bar plot of set sizes

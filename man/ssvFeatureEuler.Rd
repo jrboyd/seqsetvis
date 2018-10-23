@@ -6,7 +6,7 @@
 \usage{
 ssvFeatureEuler(object, line_width = 2, shape = c("circle",
   "ellipse")[1], n_points = 200, fill_alpha = 0.3, line_alpha = 1,
-  circle_colors = NULL)
+  circle_colors = NULL, return_data = FALSE)
 }
 \arguments{
 \item{object}{A membership table}
@@ -24,6 +24,9 @@ eulerr:::ellipse}
 
 \item{circle_colors}{colors to choose from for circles.  passed to ggplot2
 color scales.}
+
+\item{return_data}{logical.  If TRUE, return value is no longer ggplot and
+is instead the data used to generate that plot. Default is FALSE.}
 }
 \value{
 ggplot of venneuler results

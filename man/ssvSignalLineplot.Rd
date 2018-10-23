@@ -7,7 +7,7 @@
 ssvSignalLineplot(bw_data, x_ = "x", y_ = "y", color_ = "sample",
   sample_ = "sample", region_ = "id", group_ = "auto_grp",
   line_alpha = 1, facet_ = "auto_facet", facet_method = facet_wrap,
-  spline_n = NULL)
+  spline_n = NULL, return_data = FALSE)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
@@ -41,6 +41,9 @@ facet_wrap by default.}
 
 \item{spline_n}{if not NULL, applySpline will be called with n = spline_n.
 default is NULL.}
+
+\item{return_data}{logical.  If TRUE, return value is no longer ggplot and
+is instead the data used to generate that plot. Default is FALSE.}
 }
 \value{
 ggplot of signal potentially facetted by region and sample
