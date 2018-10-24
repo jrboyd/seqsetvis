@@ -1,3 +1,7 @@
+# seqsetvis 1.1.7
+
+* minor documenation improvement
+
 # seqsetvis 1.1.6
 
 * ssvFeature* and ssvSignal* added return_data paramter to skip plotting and
