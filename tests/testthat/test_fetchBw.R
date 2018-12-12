@@ -137,6 +137,15 @@ test_that("ssvFetchBigwig query GRanges output id set", {
 
 })
 
+test_that("ssvFetchBam query GRanges $name gets used", {
+    bw_files = rep(test_bw, 3)
+    names(bw_files) = paste0("bw_", 1:3)
+    test_gr = test_qgr
+    test_gr$name = paste("peak", seq_along(test_gr))
+    gr_sample = ssvFetchBigwig(bw_files, win_size = 5, qgr = test_gr, return_data.table = TRUE)
+    expect_true(all(unique(gr_sample$id) == unique(test_gr$name)))
+})
+
 test_that("ssvFetchBigwig can set variable name", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)

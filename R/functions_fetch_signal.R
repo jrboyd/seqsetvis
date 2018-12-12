@@ -98,6 +98,9 @@ ssvFetchSignal = function(file_paths,
 }
 
 .check_qgr = function(qgr){
+    if(!is.null(qgr$name) && is.null(names(qgr))){
+        names(qgr) = qgr$name
+    }
     if (is.null(qgr$id)) {#id not set
         if (is.null(names(qgr))) {#id and names not set - make names
             names(qgr) = paste0("region_", seq_along(qgr))

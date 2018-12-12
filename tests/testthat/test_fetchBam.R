@@ -121,6 +121,12 @@ test_that("ssvFetchBam query GRanges output id set", {
 
 })
 
+test_that("ssvFetchBam query GRanges $name gets used", {
+    test_gr = CTCF_in_10a_narrowPeak_grs$MCF10A_CTCF
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_gr, return_data.table = TRUE)
+    expect_true(all(unique(gr_sample$id) == unique(test_gr$name)))
+})
+
 test_that("ssvFetchBam sample method correct bins", {
     skip_on_os("windows")
     test_qgr2 = qgr

@@ -242,7 +242,6 @@ fragLen_calcStranded = function(bam_f,
 #' @param ... passed to ScanBamParam(), can't be which or what.
 #' @return GRanges containing tag pileup values in score meta column.  tags are
 #'   optionally extended to fragment length (fragLen) prior to pile up.
-#' @export
 #' @examples
 #' bam_file = system.file("extdata/test.bam", package = "seqsetvis")
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
@@ -359,7 +358,6 @@ fetchBam = function(bam_f,
 #'   "only" will only count spliced regions and ignore others.
 #' @return tidy GRanges (or data.table if specified) with pileups from bam file.
 #'   pileup is calculated only every win_size bp.
-#' @export
 #' @importFrom stats weighted.mean
 #' @examples
 #' bam_file = system.file("extdata/test.bam",

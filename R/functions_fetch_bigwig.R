@@ -4,7 +4,6 @@
 #' GRanges (\code{qgr}). Values correspond to the center of each window of
 #' size \code{win_size}.  A tidy formatted data.table
 #' object is returned suitable for plotting using ggplots.
-#' @export
 #' @param bw_file The character vector path to bigwig files to read from.
 #' @param qgr Set of GRanges to query.  For valid results the width of each
 #' interval should be identical and evenly divisible by \code{win_size}.
