@@ -99,6 +99,28 @@ test_that("viewGRangesWinSample_dt strand and position functions", {
 #     plot(bam_score_unstranded$score, bam_score_stranded$score)
 # })
 
+
+test_that("ssvFetchBam query GRanges output id set", {
+    skip_on_os("windows")
+    test_gr = qgr
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_gr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+    names(test_gr) = NULL
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_gr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+    test_gr$id = seq_along(test_gr) #when id set, id in output is missing
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_gr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+    test_gr = qgr
+    test_gr$id = seq_along(test_gr) #when id set, id in output is missing
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_gr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+})
+
 test_that("ssvFetchBam sample method correct bins", {
     skip_on_os("windows")
     test_qgr2 = qgr

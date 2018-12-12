@@ -253,7 +253,7 @@ fetchBam = function(bam_f,
                     fragLen = NULL,
                     target_strand = c("*", "+", "-")[1],
                     max_dupes = Inf,
-                    splice_strategy = c("none", "ignore", "add", "only")[1],
+                    splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1],
                     ...){
     stopifnot(is.numeric(max_dupes))
     stopifnot(max_dupes >= 1)
@@ -298,7 +298,6 @@ fetchBam = function(bam_f,
     if(max_dupes < Inf){
         bam_dt = .rm_dupes(bam_dt, max_dupes)
     }
-
     if(is.na(fragLen)){
         bam_dt = switch(
             splice_strategy,
@@ -306,13 +305,17 @@ fetchBam = function(bam_f,
             ignore = {.expand_cigar_dt(bam_dt)},
             add = {.expand_cigar_dt(bam_dt,
                                     op_2count = c("M", "D", "=", "X", "N"))},
-            only = {.expand_cigar_dt(bam_dt, op_2count = c("N"))})
+            only = {.expand_cigar_dt(bam_dt, op_2count = c("N"))},
+            splice_count = {.expand_cigar_dt(bam_dt, op_2count = c("N"))}
+            )
     }else{
         # bam_dt[, end := start + width - 1L]
         bam_dt[strand == "+", end := start + as.integer(fragLen) - 1L]
         bam_dt[strand == "-", start := end - as.integer(fragLen) + 1L]
     }
-
+    if(splice_strategy == "splice_count"){
+        return(bam_dt[, .N, by = .(which_label, seqnames, start, end, strand)])
+    }
     ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))
     score_gr = GRanges(ext_cov)
     if(target_strand == "+"){
@@ -387,7 +390,11 @@ ssvFetchBam.single = function(bam_f,
     stopifnot(target_strand %in% c("*", "+", "-", "both"))
     stopifnot(anchor %in% c("left", "left_unstranded", "center",
                             "center_unstranded"))
-    stopifnot(splice_strategy %in% c("none", "ignore", "add", "only"))
+    stopifnot(splice_strategy %in% c("none", "ignore", "add", "only", "splice_count"))
+    if(splice_strategy == "splice_count"){
+        return(fetchBam(bam_f, qgr, NA, "*",
+                 max_dupes, splice_strategy))
+    }
     switch (
         win_method,
         sample = {

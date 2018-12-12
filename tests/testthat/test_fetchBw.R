@@ -114,6 +114,29 @@ test_that("ssvFetchBigwig works with list bw_files", {
     expect_equal(colnames(mcols(res)), c(exp_colnames, "sample"))
 })
 
+test_that("ssvFetchBigwig query GRanges output id set", {
+    skip_on_os("windows")
+    bw_files = rep(test_bw, 3)
+    names(bw_files) = paste0("bw_", 1:3)
+    test_gr = test_qgr
+    gr_sample = ssvFetchBigwig(bw_files, win_size = 5, qgr = test_gr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+    names(test_gr) = NULL
+    gr_sample = ssvFetchBigwig(bw_files, win_size = 5, qgr = test_gr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+    test_gr$id = seq_along(test_gr) #when id set, id in output is missing
+    gr_sample = ssvFetchBigwig(bw_files, win_size = 5, qgr = test_gr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+    test_gr = test_qgr
+    test_gr$id = seq_along(test_gr) #when id set, id in output is missing
+    gr_sample = ssvFetchBigwig(bw_files, win_size = 5, qgr = test_gr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+})
+
 test_that("ssvFetchBigwig can set variable name", {
     skip_on_os("windows")
     bw_files = rep(test_bw, 3)
