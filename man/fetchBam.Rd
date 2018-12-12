@@ -7,7 +7,7 @@ fragment size (fragLen)}
 \usage{
 fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+",
   "-")[1], max_dupes = Inf, splice_strategy = c("none", "ignore",
-  "add", "only")[1], ...)
+  "add", "only", "splice_count")[1], ...)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}

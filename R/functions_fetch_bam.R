@@ -255,6 +255,7 @@ fetchBam = function(bam_f,
                     max_dupes = Inf,
                     splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1],
                     ...){
+    which_label = NULL #reserve binding
     stopifnot(is.numeric(max_dupes))
     stopifnot(max_dupes >= 1)
     if(!is.na(fragLen) && splice_strategy != "none"){
@@ -314,7 +315,7 @@ fetchBam = function(bam_f,
         bam_dt[strand == "-", start := end - as.integer(fragLen) + 1L]
     }
     if(splice_strategy == "splice_count"){
-        return(bam_dt[, .N, by = .(which_label, seqnames, start, end, strand)])
+        return(bam_dt[, .N, by = list(which_label, seqnames, start, end, strand)])
     }
     ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))
     score_gr = GRanges(ext_cov)
@@ -351,11 +352,11 @@ fetchBam = function(bam_f,
 #'   instead of GRanges.  Default is FALSE.
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
 #'   over this number are removed, Default is Inf.
-#' @param splice_strategy character, one of c("ignore", "add", "only"). Default
-#'   is "none" and spliced alignment are asssumed not present. fragLen must be
-#'   NA for any other value to be valid.  "ignore" will not count spliced
-#'   regions.  add" counts spliced regions along with others, "only" will only
-#'   count spliced regions and ignore others.
+#' @param splice_strategy character, one of c("none", "ignore", "add", "only",
+#'   "splice_count"). Default is "none" and spliced alignment are asssumed not
+#'   present. fragLen must be NA for any other value to be valid.  "ignore" will
+#'   not count spliced regions.  add" counts spliced regions along with others,
+#'   "only" will only count spliced regions and ignore others.
 #' @return tidy GRanges (or data.table if specified) with pileups from bam file.
 #'   pileup is calculated only every win_size bp.
 #' @export
@@ -381,7 +382,7 @@ ssvFetchBam.single = function(bam_f,
                                          "center_unstranded")[3],
                               return_data.table = FALSE,
                               max_dupes = Inf,
-                              splice_strategy = c("none", "ignore", "add", "only")[1]) {
+                              splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1]) {
     stopifnot(is.character(win_method))
     stopifnot(length(win_method) == 1)
     stopifnot(class(qgr) == "GRanges")
@@ -491,11 +492,11 @@ ssvFetchBam.single = function(bam_f,
 #'   instead of GRanges.  Default is FALSE.
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
 #'   over this number are removed, Default is Inf.
-#' @param splice_strategy character, one of c("ignore", "add", "only"). Default
-#'   is "none" and spliced alignment are asssumed not present. fragLen must be
-#'   NA for any other value to be valid.  "ignore" will not count spliced
-#'   regions.  add" counts spliced regions along with others, "only" will only
-#'   count spliced regions and ignore others.
+#' @param splice_strategy character, one of c("none", "ignore", "add", "only",
+#'   "splice_count"). Default is "none" and spliced alignment are asssumed not
+#'   present. fragLen must be NA for any other value to be valid.  "ignore" will
+#'   not count spliced regions.  add" counts spliced regions along with others,
+#'   "only" will only count spliced regions and ignore others.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
 #'   fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second))
@@ -529,7 +530,7 @@ ssvFetchBam = function(file_paths,
                        names_variable = "sample",
                        return_data.table = FALSE,
                        max_dupes = Inf,
-                       splice_strategy = c("none", "ignore", "add", "only")[1]){
+                       splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1]){
     stopifnot(all(is.character(fragLens) |
                       is.numeric(fragLens) |
                       is.na(fragLens)))
