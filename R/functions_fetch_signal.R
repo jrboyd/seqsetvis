@@ -97,6 +97,18 @@ ssvFetchSignal = function(file_paths,
     return(out)
 }
 
+.check_qgr = function(qgr){
+    if (is.null(qgr$id)) {#id not set
+        if (is.null(names(qgr))) {#id and names not set - make names
+            names(qgr) = paste0("region_", seq_along(qgr))
+        }
+        qgr$id = names(qgr)#names is used for id
+    }else if (is.null(names(qgr))){#id is used for names if id set but not names
+        names(qgr) = qgr$id
+    }
+    qgr
+}
+
 #' get a windowed sampling of score_gr
 #'
 #' This method is appropriate when all GRanges in qgr are identical width
@@ -150,12 +162,7 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
     stopifnot(window_size %% 1 == 0)
     stopifnot(anchor %in% c("center", "center_unstranded",
                             "left", "left_unstranded"))
-    if (is.null(qgr$id)) {
-        if (is.null(names(qgr))) {
-            names(qgr) = paste0("region_", seq_along(qgr))
-        }
-        qgr$id = names(qgr)
-    }
+    qgr = .check_qgr(qgr)
     windows = slidingWindows(qgr, width = window_size, step = window_size)
 
     # names(windows) = qgr$id
@@ -251,12 +258,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     stopifnot(n_tiles%%1 == 0)
     stopifnot(anchor %in% c("center", "center_unstranded", "left",
                             "left_unstranded"))
-    if (is.null(qgr$id)) {
-        if (is.null(names(qgr))) {
-            names(qgr) = paste0("region_", seq_along(qgr))
-        }
-        qgr$id = names(qgr)
-    }
+    qgr = .check_qgr(qgr)
     tiles = tile(qgr, n_tiles)
     # lapply(seq_len(tqgr), function(i)as.data.table(tqgr[[i]]))
 

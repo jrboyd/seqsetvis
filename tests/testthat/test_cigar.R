@@ -1,6 +1,7 @@
 library(data.table)
 library(testthat)
 library(GenomicRanges)
+library(seqsetvis)
 
 
 
