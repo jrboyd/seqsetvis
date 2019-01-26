@@ -260,7 +260,7 @@ fetchBam = function(bam_f,
     if(!is.na(fragLen) && splice_strategy != "none"){
         stop("fragLen must be NA if splice_strategy is not 'none'.")
     }
-    if( ! splice_strategy %in% c("none", "ignore", "add", "only")){
+    if( ! splice_strategy %in% c("none", "ignore", "add", "only", "splice_count")){
         stop('splice_strategy must be one of: "none", "ignore", "add", "only"')
     }
     if(is.null(fragLen)){
@@ -307,7 +307,7 @@ fetchBam = function(bam_f,
                                     op_2count = c("M", "D", "=", "X", "N"))},
             only = {.expand_cigar_dt(bam_dt, op_2count = c("N"))},
             splice_count = {.expand_cigar_dt(bam_dt, op_2count = c("N"))}
-            )
+        )
     }else{
         # bam_dt[, end := start + width - 1L]
         bam_dt[strand == "+", end := start + as.integer(fragLen) - 1L]
