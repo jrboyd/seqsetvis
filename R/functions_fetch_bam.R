@@ -556,7 +556,7 @@ ssvFetchBam = function(file_paths,
                                 return_data.table = TRUE,
                                 max_dupes = max_dupes,
                                 splice_strategy = splice_strategy)
-        dt[[names_variable]] = nam
+        dt[[names_variable]] = rep(nam, nrow(dt))
         message("finished loading ", nam, ".")
         dt
     }
