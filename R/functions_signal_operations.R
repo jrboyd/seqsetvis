@@ -160,6 +160,7 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "",
 #' x_ for a by_ instance.
 #' if this is not the case and you want to disable warnings about set this
 #' to FALSE.
+#' @param x_precision numerical precision of x, default is 3.
 #' @details character.  by_ controls at the level of the data centering is
 #' applied.  If by_ is "" or NULL, a single max position will be determined
 #' for the entire dataset.  If by is "id" (the default) then each region will be
@@ -179,7 +180,7 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "",
 #' centerAtMax(CTCF_in_10a_profiles_gr, y_ = 'y', view_size = 100, by_ = 'id',
 #' check_by_dupes = FALSE)
 centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL,
-                       trim_to_valid = TRUE, check_by_dupes = TRUE,
+                       trim_to_valid = TRUE, check_by_dupes = TRUE, x_precision = 3,
                        replace_x = TRUE) {
     ymax = xsummit = xnew = N = NULL  #reserve data.table variables
     output_GRanges = FALSE
@@ -197,6 +198,9 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL,
     stopifnot(is.logical(trim_to_valid),
               is.logical(check_by_dupes),
               is.logical(replace_x))
+    if(length(unique(dt[[x_]])) != length(unique(round(dt[[x_]], x_precision)))){
+        stop("x_precision,", x_precision, " , is too low, how many decimal places is x defined to?")
+    }
     if (!any(x_ == colnames(dt))) {
         stop("centerAtMax : x_ (", x_,
              ") not found in colnames of input data.table")
@@ -240,6 +244,7 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL,
                                     get(x_) >= min(view_size)])), by = by_]
     dt[, `:=`(xsummit, closestToZero(get(x_)[get(y_) == ymax])), by = by_]
     dt[, `:=`(xnew, get(x_) - xsummit)]
+    dt$xnew = round(dt$xnew, x_precision)
     dt[, `:=`(ymax, NULL)]
     dt[, `:=`(xsummit, NULL)]
     if (trim_to_valid) {
