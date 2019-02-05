@@ -68,7 +68,6 @@ ssvFetchSignal = function(file_paths,
     if (is.null(unique_names)) {
         unique_names = basename(file_paths)
     }
-    names(file_paths) = unique_names
     stopifnot(is.character(file_paths))
     stopifnot(class(qgr) == "GRanges")
     stopifnot(is.character(unique_names))
@@ -79,6 +78,7 @@ ssvFetchSignal = function(file_paths,
              paste(collapse = "\n",
                    unique(unique_names[duplicated(unique_names)])))
     }
+    names(file_paths) = unique_names
     if(win_method == "sample"){
         qgr = prepare_fetch_GRanges(qgr = qgr,
                                     win_size = win_size,
