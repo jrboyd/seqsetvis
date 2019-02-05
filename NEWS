@@ -1,4 +1,4 @@
-# seqsetvis 1.1.8
+# seqsetvis 1.3.1
 
 * FEATURE - ssvFetchGRanges - retreives coverage of a list of GRanges in
 form parallel to existing ssvFetch*.
