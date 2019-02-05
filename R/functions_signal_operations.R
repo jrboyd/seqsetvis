@@ -198,9 +198,7 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL,
     stopifnot(is.logical(trim_to_valid),
               is.logical(check_by_dupes),
               is.logical(replace_x))
-    if(length(unique(dt[[x_]])) != length(unique(round(dt[[x_]], x_precision)))){
-        stop("x_precision,", x_precision, " , is too low, how many decimal places is x defined to?")
-    }
+
     if (!any(x_ == colnames(dt))) {
         stop("centerAtMax : x_ (", x_,
              ") not found in colnames of input data.table")
@@ -208,6 +206,9 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL,
     if (!any(y_ == colnames(dt))) {
         stop("centerAtMax : y_ (", y_,
              ") not found in colnames of input data.table")
+    }
+    if(length(unique(dt[[x_]])) != length(unique(round(dt[[x_]], x_precision)))){
+        stop("centerAtMax : x_precision,", x_precision, " , is too low, how many decimal places is x defined to?")
     }
     # check_by_dupes = FALSE
     if (is.null(by_)) {

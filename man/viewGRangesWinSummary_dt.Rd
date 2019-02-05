@@ -9,7 +9,7 @@ regions.}
 \usage{
 viewGRangesWinSummary_dt(score_gr, qgr, n_tiles = 100,
   anchor = c("center", "center_unstranded", "left",
-  "left_unstranded")[3], summary_FUN = stats::weighted.mean)
+  "left_unstranded")[1], summary_FUN = stats::weighted.mean)
 }
 \arguments{
 \item{score_gr}{GRanges with a "score" metadata column.}
@@ -22,7 +22,7 @@ qgr.}
 \item{anchor}{character. controls how x value is derived from position for
 each region in qgr.  0 may be the left side or center.  If not unstranded,
 x coordinates are flipped for (-) strand. One of c("center",
-"center_unstranded", "left", "left_unstranded"). Default is "left".}
+"center_unstranded", "left", "left_unstranded"). Default is "center".}
 
 \item{summary_FUN}{function. used to aggregate score by tile.  must accept
 x=score and w=width numeric vectors as only arguments. default is

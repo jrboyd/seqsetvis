@@ -6,7 +6,8 @@
 samples.}
 \usage{
 centerAtMax(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL,
-  trim_to_valid = TRUE, check_by_dupes = TRUE, replace_x = TRUE)
+  trim_to_valid = TRUE, check_by_dupes = TRUE, x_precision = 3,
+  replace_x = TRUE)
 }
 \arguments{
 \item{dt}{data.table}
@@ -31,6 +32,8 @@ value in all \code{by_} combinations}
 x_ for a by_ instance.
 if this is not the case and you want to disable warnings about set this
 to FALSE.}
+
+\item{x_precision}{numerical precision of x, default is 3.}
 
 \item{replace_x}{logical, default TRUE.
 if TRUE x_ will be replaced with position relative to summit.

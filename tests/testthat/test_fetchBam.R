@@ -18,7 +18,7 @@ test_that("fragLen_fromMacs2Xls", {
 })
 
 test_that("fetchBam auto fragLen", {
-    expect_message(fetchBam(bam_file, qgr = qgr), "fragLen was calculated as:")
+    expect_message(seqsetvis:::fetchBam(bam_file, qgr = qgr), "fragLen was calculated as:")
 })
 
 test_that("fragLen_calcStranded parameters matter", {
@@ -48,7 +48,7 @@ test_that("fragLen_calcStranded can force no which", {
 })
 
 test_that("viewGRangesWinSample_dt strand and position functions", {
-    bam_score = fetchBam(bam_file, qgr = qgr)
+    bam_score = seqsetvis:::fetchBam(bam_file, qgr = qgr)
     score_gr = bam_score
     window_size = 50
     anchor = "center"

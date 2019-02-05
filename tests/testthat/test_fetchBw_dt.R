@@ -8,6 +8,7 @@ region_size = 30
 test_qgr = GRanges("chrTest", IRanges(pos+1, pos + region_size))
 exp_colnames = c("seqnames", "start", "end", "width", "strand", "id", "y", "x")
 
+ssvFetchBigwig.single = seqsetvis:::ssvFetchBigwig.single
 
 test_that("ssvFetchBigwig.single return expected for valid even win_size", {
     skip_on_os("windows")

@@ -11,6 +11,8 @@ strand(qgr) = c("+", "-", "-", "+", "-")
 # rtracklayer::export.bed(qgr, con = "ctcf_5.bed")
 bam_file = system.file("extdata/test.bam", package = "seqsetvis")
 
+fetchBam = seqsetvis:::fetchBam
+
 bam_gr = fetchBam(bam_file, qgr)
 
 #test varying size regions
