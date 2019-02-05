@@ -32,6 +32,7 @@ Imports:
     IRanges, 
     limma,
     methods, 
+    parallel,
     png, 
     RColorBrewer, 
     Rsamtools,

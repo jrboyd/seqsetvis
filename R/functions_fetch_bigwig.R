@@ -35,13 +35,13 @@
 #'     return_data.table = TRUE)
 #' }
 ssvFetchBigwig.single = function(bw_file,
-                               qgr,
-                               win_size = 50,
-                               win_method = c("sample", "summary")[1],
-                               summary_FUN = stats::weighted.mean,
-                               anchor = c("left", "left_unstranded", "center",
-                                      "center_unstranded")[3],
-                               return_data.table = FALSE) {
+                                 qgr,
+                                 win_size = 50,
+                                 win_method = c("sample", "summary")[1],
+                                 summary_FUN = stats::weighted.mean,
+                                 anchor = c("left", "left_unstranded", "center",
+                                            "center_unstranded")[3],
+                                 return_data.table = FALSE) {
     stopifnot(is.character(bw_file))
     stopifnot(class(qgr) == "GRanges")
     stopifnot(is.numeric(win_size))
@@ -93,6 +93,8 @@ ssvFetchBigwig.single = function(bw_file,
 #' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
+#' @param n_cores integer number of cores to use.
+#' Uses mc.cores option if not supplied.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
 #' fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second))
@@ -113,25 +115,26 @@ ssvFetchBigwig.single = function(bw_file,
 #'     return_data.table = TRUE)
 #' }
 ssvFetchBigwig = function(file_paths,
-                                   qgr,
-                                   unique_names = names(file_paths),
-                                   names_variable = "sample",
-                                   win_size = 50,
-                                   win_method = c("sample", "summary")[1],
-                                   summary_FUN = stats::weighted.mean,
-                                   anchor = c("left", "left_unstranded", "center",
-                                          "center_unstranded")[3],
-                                   return_data.table = FALSE) {
+                          qgr,
+                          unique_names = names(file_paths),
+                          names_variable = "sample",
+                          win_size = 50,
+                          win_method = c("sample", "summary")[1],
+                          summary_FUN = stats::weighted.mean,
+                          anchor = c("left", "left_unstranded", "center",
+                                     "center_unstranded")[3],
+                          return_data.table = FALSE,
+                          n_cores = getOption("mc.cores", 1)) {
 
     load_bw = function(f, nam, qgr) {
         message("loading ", f, " ...")
         dt = ssvFetchBigwig.single(bw_file = f,
-                                 qgr = qgr,
-                                 win_size = win_size,
-                                 win_method = win_method,
-                                 summary_FUN = summary_FUN,
-                                 anchor = anchor,
-                                 return_data.table = TRUE)
+                                   qgr = qgr,
+                                   win_size = win_size,
+                                   win_method = win_method,
+                                   summary_FUN = summary_FUN,
+                                   anchor = anchor,
+                                   return_data.table = TRUE)
         dt[[names_variable]] = nam
         message("finished loading ", nam, ".")
         dt
@@ -144,7 +147,8 @@ ssvFetchBigwig = function(file_paths,
                    win_size = win_size,
                    win_method = win_method,
                    return_data.table = return_data.table,
-                   load_signal = load_bw)
+                   load_signal = load_bw,
+                   n_cores = n_cores)
 }
 
 

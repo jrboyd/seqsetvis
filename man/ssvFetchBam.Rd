@@ -13,7 +13,7 @@ ssvFetchBam(file_paths, qgr, unique_names = names(file_paths),
   "left_unstranded", "center", "center_unstranded")[3],
   names_variable = "sample", return_data.table = FALSE,
   max_dupes = Inf, splice_strategy = c("none", "ignore", "add", "only",
-  "splice_count")[1])
+  "splice_count")[1], n_cores = getOption("mc.cores", 1))
 }
 \arguments{
 \item{file_paths}{The character vector or list of paths to bigwig files to
@@ -58,6 +58,9 @@ over this number are removed, Default is Inf.}
 present. fragLen must be NA for any other value to be valid.  "ignore" will
 not count spliced regions.  add" counts spliced regions along with others,
 "only" will only count spliced regions and ignore others.}
+
+\item{n_cores}{integer number of cores to use.
+Uses mc.cores option if not supplied.}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing

@@ -8,7 +8,7 @@ ssvFetchSignal(file_paths, qgr, unique_names = names(file_paths),
   names_variable = "sample", win_size = 50, win_method = c("sample",
   "summary")[1], return_data.table = FALSE, load_signal = function(f,
   nam, qgr) {     warning("nothing happened, ",
-  "add code here to load files") })
+  "add code here to load files") }, n_cores = getOption("mc.cores", 1))
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from}
@@ -34,6 +34,9 @@ GRanges, the default.}
 
 \item{load_signal}{function taking f, nam, and qgr arguments.  f is from
 file_paths, nam is from unique_names, and qgr is qgr. See details.}
+
+\item{n_cores}{integer number of cores to use.
+Uses mc.cores option if not supplied.}
 }
 \value{
 A GRanges with values read from file_paths at intervals of win_size.

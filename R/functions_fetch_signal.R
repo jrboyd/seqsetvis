@@ -23,6 +23,8 @@
 #' GRanges, the default.
 #' @param load_signal function taking f, nam, and qgr arguments.  f is from
 #' file_paths, nam is from unique_names, and qgr is qgr. See details.
+#' @param n_cores integer number of cores to use.
+#' Uses mc.cores option if not supplied.
 #' @details load_signal is passed f, nam, and qgr and is executed in the
 #' environment where load_signal is defined. See
 #' \code{\link{ssvFetchBigwig}} and \code{\link{ssvFetchBam}}
@@ -31,6 +33,7 @@
 #' Originating file is coded by unique_names and assigned to column of name
 #' names_variable.  Output is data.table is return_data.table is TRUE.
 #' @export
+#' @import parallel
 #' @examples
 #' library(GenomicRanges)
 #' bam_f = system.file("extdata/test.bam",
@@ -61,7 +64,8 @@ ssvFetchSignal = function(file_paths,
                           load_signal = function(f, nam, qgr) {
                               warning("nothing happened, ",
                                       "add code here to load files")
-                          }){
+                          },
+                          n_cores = getOption("mc.cores", 1)){
     if(is.list(file_paths)){
         file_paths = unlist(file_paths)
     }
@@ -89,7 +93,9 @@ ssvFetchSignal = function(file_paths,
         f = file_paths[nam]
         load_signal(f, nam, qgr)
     }
-    bw_list = lapply(names(file_paths), nam_load_signal)
+    # bw_list = lapply(names(file_paths), nam_load_signal)
+    bw_list = parallel::mclapply(names(file_paths),
+                                 nam_load_signal, mc.cores = n_cores)
     out = data.table::rbindlist(bw_list)
     if(!return_data.table){
         out = GRanges(out)

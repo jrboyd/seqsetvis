@@ -495,6 +495,8 @@ ssvFetchBam.single = function(bam_f,
 #'   present. fragLen must be NA for any other value to be valid.  "ignore" will
 #'   not count spliced regions.  add" counts spliced regions along with others,
 #'   "only" will only count spliced regions and ignore others.
+#' @param n_cores integer number of cores to use.
+#' Uses mc.cores option if not supplied.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
 #'   fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second))
@@ -528,7 +530,8 @@ ssvFetchBam = function(file_paths,
                        names_variable = "sample",
                        return_data.table = FALSE,
                        max_dupes = Inf,
-                       splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1]){
+                       splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1],
+                       n_cores = getOption("mc.cores", 1)){
     stopifnot(all(is.character(fragLens) |
                       is.numeric(fragLens) |
                       is.na(fragLens)))
@@ -568,6 +571,7 @@ ssvFetchBam = function(file_paths,
                    names_variable = names_variable,
                    win_size = win_size,
                    win_method = win_method,
-                   return_data.table = return_data.table)
+                   return_data.table = return_data.table,
+                   n_cores = n_cores)
 
 }

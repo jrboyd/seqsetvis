@@ -2,14 +2,14 @@
 % Please edit documentation in R/functions_fetch_GRanges.R
 \name{ssvFetchGRanges}
 \alias{ssvFetchGRanges}
-\title{Title}
+\title{Fetch coverage values for a list of GRanges.}
 \usage{
 ssvFetchGRanges(grs, qgr, unique_names = names(file_paths),
-  win_size = 50, win_method = c("sample", "summary")[1],
-  summary_FUN = function(x, w) max(x), target_strand = c("*", "+", "-",
-  "both")[1], anchor = c("left", "left_unstranded", "center",
-  "center_unstranded")[3], names_variable = "sample",
-  return_data.table = FALSE)
+  names_variable = "sample", win_size = 50, win_method = c("sample",
+  "summary")[1], summary_FUN = function(x, w) max(x),
+  target_strand = c("*", "+", "-", "both")[1], anchor = c("left",
+  "left_unstranded", "center", "center_unstranded")[3],
+  return_data.table = FALSE, n_cores = getOption("mc.cores", 1))
 }
 \arguments{
 \item{grs}{a list of GRanges for which to calculate coverage.}
@@ -17,8 +17,44 @@ ssvFetchGRanges(grs, qgr, unique_names = names(file_paths),
 \item{qgr}{Set of GRanges to query.  For valid results the width of each
 interval should be identical and evenly divisible by \code{win_size}.}
 
-\item{return_data.table}{}
+\item{unique_names}{The column name where unique_names are stored.
+Default is 'sample'}
+
+\item{names_variable}{The column name where unique_names are stored.
+Default is 'sample'}
+
+\item{win_size}{The window size that evenly divides widths in \code{qgr}.}
+
+\item{win_method}{character.  one of c("sample", "summary").  Determines
+if \code{\link{viewGRangesWinSample_dt}} or
+\code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+qgr.}
+
+\item{summary_FUN}{function.  only relevant if win_method is "summary".
+passed to \code{\link{viewGRangesWinSummary_dt}}.}
+
+\item{anchor}{character, one of c("center", "center_unstranded",
+"left", "left_unstranded")}
+
+\item{return_data.table}{logical. If TRUE the internal data.table is
+returned instead of GRanges.  Default is FALSE.}
+
+\item{n_cores}{integer number of cores to use.
+Uses mc.cores option if not supplied.}
+
+\item{return_data.table}{logical. If TRUE the internal data.table is
+returned instead of GRanges.  Default is FALSE.}
+}
+\value{
+A tidy formatted GRanges (or data.table if specified) containing
+fetched values.
 }
 \description{
-Title
+\code{ssvFetchGRanges} Gets coverage values for each region of the query
+GRanges (\code{qgr}). Values correspond to the center of each window of
+size \code{win_size}.  A tidy formatted data.table
+object is returned suitable for plotting using ggplots.
+}
+\examples{
+ssvFetchGRanges(CTCF_in_10a_narrowPeak_grs, CTCF_in_10a_overlaps_gr, win_size = 200)
 }

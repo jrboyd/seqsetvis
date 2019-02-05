@@ -10,7 +10,7 @@ ssvFetchBigwig(file_paths, qgr, unique_names = names(file_paths),
   names_variable = "sample", win_size = 50, win_method = c("sample",
   "summary")[1], summary_FUN = stats::weighted.mean, anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
-  return_data.table = FALSE)
+  return_data.table = FALSE, n_cores = getOption("mc.cores", 1))
 }
 \arguments{
 \item{file_paths}{The character vector or list of paths to bigwig files to
@@ -40,6 +40,9 @@ passed to \code{\link{viewGRangesWinSummary_dt}}.}
 
 \item{return_data.table}{logical. If TRUE the internal data.table is
 returned instead of GRanges.  Default is FALSE.}
+
+\item{n_cores}{integer number of cores to use.
+Uses mc.cores option if not supplied.}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing
