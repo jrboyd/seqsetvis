@@ -64,7 +64,12 @@ ssvFetchGRanges = function(grs, qgr,
                            neg_dt
                        )
                    }else{
-                       score_gr = GRanges(coverage(subset(x, strand == target_strand)))
+                       if(target_strand == "*"){
+                           score_gr = GRanges(coverage(x))
+                       }else{
+                           score_gr = GRanges(coverage(subset(x, strand == target_strand)))
+                       }
+
                        out = viewGRangesWinSample_dt(score_gr, qgr,
                                                      win_size, anchor = anchor)
                        out[, strand := target_strand]
@@ -89,7 +94,11 @@ ssvFetchGRanges = function(grs, qgr,
                            neg_dt
                        )
                    }else{
-                       score_gr = GRanges(coverage(subset(x, strand == target_strand)))
+                       if(target_strand == "*"){
+                           score_gr = GRanges(coverage(x))
+                       }else{
+                           score_gr = GRanges(coverage(subset(x, strand == target_strand)))
+                       }
                        out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
                                                       summary_FUN = summary_FUN,
                                                       anchor = anchor)
@@ -98,7 +107,13 @@ ssvFetchGRanges = function(grs, qgr,
                    out
                })
     })
-    gr_dt= rbindlist(gr_dt, use.names = TRUE, idcol = names_variable)
+    for(i in seq_along(gr_dt)){
+        for(attrib in colnames(file_attribs)){
+            gr_dt[[i]][[attrib]] = file_attribs[[attrib]][i]
+        }
+
+    }
+    gr_dt = rbindlist(gr_dt)#, use.names = TRUE, idcol = names_variable)
     if(!return_data.table){
         gr_dt = GRanges(gr_dt)
     }
