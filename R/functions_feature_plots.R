@@ -363,7 +363,7 @@ ssvFeaturePie = function(object, slice_colors = NULL, return_data = FALSE) {
 #' rows over this number  ignored if raster_approximation is FALSE
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and
 #' is instead the data used to generate that plot. Default is FALSE.
-#' @rawNamespace import(data.table, except = c(shift, first, second))
+#' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @return ggplot using geom_tile of membership table sorted from left to right.
 #' @import png
 #' @import ggplot2

@@ -111,7 +111,7 @@ test_that("ssvFetchBam query GRanges output id set", {
 
 })
 
-test_that("ssvFetchBam query GRanges names() gets used", {
+test_that("ssvFetchBam query GRanges name gets used", {
     test_gr = qgr
     names(test_gr) = paste("test_region", seq_along(test_gr))
     gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_gr, return_data.table = TRUE)

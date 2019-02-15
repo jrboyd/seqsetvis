@@ -26,6 +26,8 @@ Depends: R (>= 3.5), ggplot2
 Imports: 
     data.table, 
     eulerr, 
+    GenomeInfoDb,
+    GenomicAlignments,
     GenomicRanges, 
     grDevices, 
     grid, 
@@ -33,6 +35,7 @@ Imports:
     limma,
     methods, 
     parallel,
+    pbapply,
     png, 
     RColorBrewer, 
     Rsamtools,

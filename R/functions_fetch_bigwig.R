@@ -29,7 +29,7 @@
 #' Uses mc.cores option if not supplied.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
 #' fetched values.
-#' @rawNamespace import(data.table, except = c(shift, first, second))
+#' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
 #' 10, values from positions chr1 5,15,25...85, and 95 will be
 #' retrieved from \code{bw_file}
@@ -67,7 +67,7 @@ ssvFetchBigwig = function(file_paths,
                                    summary_FUN = summary_FUN,
                                    anchor = anchor,
                                    return_data.table = TRUE)
-        dt[[names_variable]] = nam
+        # dt[[names_variable]] = nam
         message("finished loading ", nam, ".")
         dt
     }

@@ -21,7 +21,7 @@
 #' @import ggplot2
 #' @importFrom grDevices gray rainbow
 #' @importFrom stats quantile
-#' @rawNamespace import(data.table, except = c(shift, first, second))
+#' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @examples
 #' #rainbow colors
 #' ssvSignalBandedQuantiles(CTCF_in_10a_profiles_gr)
@@ -317,7 +317,7 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
-#' @rawNamespace import(data.table, except = c(shift, first, second))
+#' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @return data.table of signal profiles, ready for ssvSignalHeatmap
 #' @examples
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr)

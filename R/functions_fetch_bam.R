@@ -25,22 +25,170 @@ fragLen_fromMacs2Xls = function(macs2xls_file){
     return(d)
 }
 
+#' Calculate cross correlation by using shiftApply on read coverage Rle
+#'
+#' @param bam_file character. Path to .bam file, must have index at .bam.bai.
+#' @param query_gr GRanges.  Regions to calculate cross correlation for.
+#' @param max_dupes integer.  Duplicate reads above this value will be removed.
+#' @param fragment_sizes integer.  fragment size range to search for maximum
+#'   correlation.
+#' @param read_length integer. Any values outside fragment_range that must be
+#'   searched.  If not supplied will be determined from bam_file.  Set as NA
+#'   to disable this behavior.
+#' @param show_progress logical. should pbapply progress bar be shown?
+#' Default is FALSE.
+#' @param ... arguments passed to ScanBamParam
+#' @return named list of results
+#' @export
+#' @import GenomicRanges GenomicAlignments pbapply Rsamtools S4Vectors
+#' @examples
+#' bam_f = system.file("extdata/test.bam",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' query_gr = CTCF_in_10a_overlaps_gr[1:2]
+#' crossCorrByRle(bam_f, query_gr[1:2], fragment_sizes = seq(50, 300, 50))
+crossCorrByRle = function(bam_file,
+                          query_gr,
+                          max_dupes = 1,
+                          fragment_sizes = 50:300,
+                          read_length = NULL,
+                          show_progress = FALSE,
+                          ...){
+    rn = NULL # reserve for data.table
+    if(is.null(query_gr$name)){
+        if(is.null(names(query_gr))){
+            query_gr$name = paste0("peak_", seq_along(query_gr))
+        }else{
+            query_gr$name = names(query_gr)
+        }
+    }else{
+        if(is.null(names(query_gr))){
+            names(query_gr) = query_gr$name
+        }else{
+            #both names() and $name are set, leave it alone
+        }
+
+    }
+    q_widths = apply(cbind(width(query_gr), max(fragment_sizes)*3), 1, max)
+    query_gr = resize(query_gr, q_widths, fix = "center")
+    names(query_gr) = query_gr$name
+    # query_gr = resize(query_gr, 500, fix = "center")
+
+    query_gr = harmonize_seqlengths(query_gr, bam_file)
+
+    Param <- ScanBamParam(
+        which=query_gr,
+        what=c("flag","mapq"), ...)
+    temp <- GenomicAlignments::readGAlignments(bam_file,param=Param)
+    dt = as.data.table(temp)
+    # browser()
+    if(is.null(read_length)){
+        read_length = getReadLength(bam_file, query_gr)
+    }
+    if(is.na(read_length)){
+        read_length = numeric()
+    }
+    fragment_sizes = sort(union(read_length, fragment_sizes))
+
+    PosCoverage <- coverage(GenomicRanges::shift(GRanges(temp[strand(temp)=="+"])), -read_length)
+    PosCoverage = PosCoverage[query_gr]
+    names(PosCoverage) = query_gr$name
+
+    NegCoverage <- coverage(GRanges(temp[strand(temp)=="-"]))
+    NegCoverage = NegCoverage[query_gr]
+    names(NegCoverage) = query_gr$name
+    if(show_progress){
+        app_FUN = pbapply::pbsapply
+    }else{
+        app_FUN = sapply
+    }
+    ShiftMatCor = app_FUN(seq_along(query_gr), simplify = FALSE, function(i){
+        ShiftsCorTemp <- S4Vectors::shiftApply(fragment_sizes,
+                                               PosCoverage[[i]],
+                                               NegCoverage[[i]],
+                                               cor, simplify = FALSE,
+                                               verbose = FALSE)
+    })
+    #necessary due to singleton query_gr or shift not resulting in matrix
+    ShiftMatCor = matrix(unlist(ShiftMatCor),
+                         byrow = FALSE,
+                         nrow = length(fragment_sizes),
+                         ncol = length(query_gr))
+    ShiftMatCor[is.nan(ShiftMatCor)] = 0
+
+    colnames(ShiftMatCor) = query_gr$name
+    rownames(ShiftMatCor) = fragment_sizes
+    shift_dt = as.data.table(ShiftMatCor, keep.rownames = TRUE)
+    shift_dt[, shift := as.numeric(rn)]
+    shift_dt$rn = NULL
+    shift_dt = melt(shift_dt, id.vars = "shift",
+                    variable.name = "id", value.name = "correlation")
+    return(shift_dt)
+}
+
+#' harmonize_seqlengths
+#'
+#' ensures compatibility between seqlength of gr and bam_file based on header
+#'
+#' @param gr GRanges, object to harmonize seqlengths for
+#' @param bam_file character, a path to a valid bam file
+#'
+#' @return gr with seqlengths matching bam_file
+#' @importFrom GenomeInfoDb seqlengths
+#'
+#' @examples
+#' gr = GRanges("chr1", IRanges(1, 100))
+#' #seqlengths has not been set
+#' GenomeInfoDb::seqlengths(gr)
+#' bam = system.file("extdata/test.bam", package = "seqsetvis")
+#' gr2 = harmonize_seqlengths(gr, bam)
+#' #seqlengths now set
+#' GenomeInfoDb::seqlengths(gr2)
+harmonize_seqlengths = function(gr, bam_file){
+    chr_lengths = scanBamHeader(bam_file)[[1]]$targets
+    GenomeInfoDb::seqlengths(gr) =
+        chr_lengths[names(GenomeInfoDb::seqlengths(gr))]
+    too_long = end(gr) >
+        GenomeInfoDb::seqlengths(gr)[as.character(seqnames(gr))]
+    if(any(too_long)){
+        message(sum(too_long),
+                " region shifted for extending beyond seqlengths")
+        fix_gr = gr[too_long]
+        shift_by = -(end(fix_gr) - GenomeInfoDb::seqlengths(fix_gr)[
+            as.character(seqnames(fix_gr))])
+        gr[too_long] = GenomicRanges::shift(fix_gr, shift_by)
+    }
+    too_short = start(gr) < 1
+    if(any(too_short)){
+        message(sum(too_short),
+                " region shifted for starting before seqlengths")
+        fix_gr = gr[too_short]
+        shift_by = 1 - start(fix_gr)
+        gr[too_short] = GenomicRanges::shift(fix_gr, shift_by)
+    }
+    gr
+}
+
+getReadLength = function(bam_file,
+                         query_gr){
+    Param <- Rsamtools::ScanBamParam(which=sample(query_gr,
+                                                  min(10, length(query_gr))),
+                                     what=c("flag","mapq"))
+    temp <- GenomicAlignments::readGAlignments(bam_file,param=Param)
+    readlength=as.numeric(names(sort(table(width(temp)), decreasing = TRUE))[1])
+    readlength
+}
+
 #' calculate fragLen from a bam file for specified regions
 #' @param bam_f character or BamFile. bam file to read from.
 #' .bai index file must be in same directory
 #' @param qgr GRanges.  used as which for ScanBamParam. Can be NULL if it's
 #' REALLY important to load the entire bam, force_no_which = TRUE also required.
-#' @param ma_distance numeric (integer)  range to use for movingRange.
-#' Default is 21.
 #' @param n_regions numeric (integer) it's generally overkill to pull all
 #' regions at this stage and will slow calculation down.  Default is 100.
-#' @param force_no_which logical. if TRUE and qgr is also NULL, the entire
-#' bam will be read.
 #' @param include_plot_in_output if TRUE ouptut is a list of fragLen and a
 #' ggplot showing values considered by calculation. Default is FALSE.
-#' @param max_fragLen numeric.  The maximum fragLen to calculate for.
-#' Calculation time is directly proportional to this number. Default
-#' is 300.
+#' @param test_fragLen numeric.  The set of fragment lenghts to gather
+#' strand cross correlation for.
 #' @param ... passed to Rsamtools::ScanBamParam, can't be which or what.
 #' @return numeric fragment length
 #' @import Rsamtools
@@ -55,80 +203,48 @@ fragLen_fromMacs2Xls = function(macs2xls_file){
 #'   include_plot_in_output = TRUE)[[2]]
 fragLen_calcStranded = function(bam_f,
                                 qgr,
-                                ma_distance = 21,
                                 n_regions = 100,
-                                force_no_which = FALSE,
                                 include_plot_in_output = FALSE,
-                                max_fragLen = 300, ...){
-    x = y = N = NULL #reserve bindings for data.table
-    if(is.null(qgr)){
-        if(force_no_which){
-            sbParam = Rsamtools::ScanBamParam(
-                what = c("rname", "strand", "pos", "qwidth"), ...)
-        }else{
-            stop("No qgr was set for ScanBamParam which arg.  ",
-                 "This will probably be very slow and uneccessary.  ",
-                 "Recall with :\nforce_no_which = TRUE\n if you're certain.")
-        }
-    }else{
-        set.seed(0)
-        sbParam = Rsamtools::ScanBamParam(
-            which =  sample(qgr, min(length(qgr), n_regions)),
-            what = c("rname", "strand", "pos", "qwidth"),
-            ...)
+                                test_fragLen = seq(100, 400, 5),
+                                ...){
+
+    x = y = N = correlation = id = NULL #reserve bindings for data.table
+    if(n_regions < length(qgr)){
+        qgr = sample(qgr, n_regions)
     }
-    bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
-    bam_dt = lapply(bam_raw, function(x){
-        data.table(seqnames = x$rname,
-                   strand = x$strand,
-                   start = x$pos,
-                   width = x$qwidth)
-    })
-    bam_dt = data.table::rbindlist(bam_dt,
-                                   use.names = TRUE,
-                                   idcol = "which_label")
-    bam_dt[, end := start + width - 1L]
-    bam_dt[, pos := start]
-    bam_dt[strand == "-", pos := end]
-
-    xs = 0:max_fragLen
-    perc = vapply(xs, function(x){
-        bam_dt[strand == "+", pos := pos + 1L]
-        tmp = bam_dt[, .N, by = list(seqnames, pos, strand) ]
-        tmp = tmp[, .N, by = list(seqnames, pos)]
-        (tmp[N > 1, .N] / nrow(tmp)) * 100
-    }, 1)
-    ma_perc21 = movingAverage(perc, n = ma_distance)
-    fragLenMa = which.max(ma_perc21)
+    cc_res = crossCorrByRle(bam_f, qgr, max_dupes = 1,
+                            fragment_sizes = test_fragLen, ...)
+    fragLen = cc_res[, list(shift = shift[which.max(correlation)]),
+                     by = list(id)][, mean(shift)]
+    fragLen = round(fragLen)
+    p_res = cc_res[, list(correlation = mean(correlation)), by = list(shift)]
     if(!include_plot_in_output){
-        return(fragLenMa)
+        return(fragLen)
     }else{
-        pdt = data.table(x = xs, raw = perc, moving_average = ma_perc21)
-
+        pdt = data.table(x = p_res$shift, raw = p_res$correlation,
+                         moving_average = movingAverage(p_res$correlation))
+        fragLen = pdt$x[which.max(pdt$moving_average)]
         pdt = data.table::melt(pdt, id.vars = "x",
                                variable.name = "transform", value.name = "y")
         p = ggplot(pdt) +
-            labs(x = "Fragment Length", y = "% strand match",
+            labs(x = "Fragment Length", y = "strand cross correlation",
                  title = paste(basename(bam_f)),
                  subtitle = paste("Fragment Length determined by",
-                                  "strand match maximization",
-                                  paste("Moving averge window",
-                                        ma_distance,
-                                        "applied"),
+                                  "strand cross correlation maximization",
                                   sep = "\n")) +
             geom_line(aes(x = x, y = y, color = transform)) +
-            scale_color_manual(values = c(raw = "black",
-                                          moving_average = "red")) +
+            # scale_color_manual(values = c(raw = "black",
+            #                               moving_average = "red")) +
             annotate("line",
-                     x = rep(fragLenMa, 2),
-                     y = range(perc),
+                     x = rep(fragLen, 2),
+                     y = range(pdt$y),
                      color = "green") +
             annotate("label",
-                     x = fragLenMa,
-                     y = mean(range(perc)),
-                     label = fragLenMa,
+                     x = fragLen,
+                     y = mean(range(pdt$y)),
+                     label = fragLen,
                      color = "black")
-        return(list(fragLenMa, p))
+        return(list(fragLen, p))
     }
 }
 
@@ -253,7 +369,8 @@ fetchBam = function(bam_f,
                     fragLen = NULL,
                     target_strand = c("*", "+", "-")[1],
                     max_dupes = Inf,
-                    splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1],
+                    splice_strategy = c("none", "ignore", "add",
+                                        "only", "splice_count")[1],
                     ...){
     which_label = NULL #reserve binding
     stopifnot(is.numeric(max_dupes))
@@ -261,7 +378,8 @@ fetchBam = function(bam_f,
     if(!is.na(fragLen) && splice_strategy != "none"){
         stop("fragLen must be NA if splice_strategy is not 'none'.")
     }
-    if( ! splice_strategy %in% c("none", "ignore", "add", "only", "splice_count")){
+    if( ! splice_strategy %in% c("none", "ignore", "add",
+                                 "only", "splice_count")){
         stop('splice_strategy must be one of: "none", "ignore", "add", "only"')
     }
     if(is.null(fragLen)){
@@ -315,7 +433,8 @@ fetchBam = function(bam_f,
         bam_dt[strand == "-", start := end - as.integer(fragLen) + 1L]
     }
     if(splice_strategy == "splice_count"){
-        return(bam_dt[, .N, by = list(which_label, seqnames, start, end, strand)])
+        return(bam_dt[, .N,
+                      by = list(which_label, seqnames, start, end, strand)])
     }
     ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))
     score_gr = GRanges(ext_cov)
@@ -381,7 +500,8 @@ ssvFetchBam.single = function(bam_f,
                                          "center_unstranded")[3],
                               return_data.table = FALSE,
                               max_dupes = Inf,
-                              splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1]) {
+                              splice_strategy = c("none", "ignore", "add",
+                                                  "only", "splice_count")[1]) {
     stopifnot(is.character(win_method))
     stopifnot(length(win_method) == 1)
     stopifnot(class(qgr) == "GRanges")
@@ -390,7 +510,8 @@ ssvFetchBam.single = function(bam_f,
     stopifnot(target_strand %in% c("*", "+", "-", "both"))
     stopifnot(anchor %in% c("left", "left_unstranded", "center",
                             "center_unstranded"))
-    stopifnot(splice_strategy %in% c("none", "ignore", "add", "only", "splice_count"))
+    stopifnot(splice_strategy %in% c("none", "ignore", "add",
+                                     "only", "splice_count"))
     if(splice_strategy == "splice_count"){
         return(fetchBam(bam_f, qgr, NA, "*",
                         max_dupes, splice_strategy))
@@ -501,7 +622,7 @@ ssvFetchBam.single = function(bam_f,
 #' Uses mc.cores option if not supplied.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
 #'   fetched values.
-#' @rawNamespace import(data.table, except = c(shift, first, second))
+#' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
 #'   10, values from positions chr1 5,15,25...85, and 95 will be retrieved from
 #'   \code{bw_file}
@@ -532,7 +653,8 @@ ssvFetchBam = function(file_paths,
                        names_variable = "sample",
                        return_data.table = FALSE,
                        max_dupes = Inf,
-                       splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1],
+                       splice_strategy = c("none", "ignore", "add",
+                                           "only", "splice_count")[1],
                        n_cores = getOption("mc.cores", 1)){
     stopifnot(all(is.character(fragLens) |
                       is.numeric(fragLens) |
@@ -561,7 +683,7 @@ ssvFetchBam = function(file_paths,
                                 return_data.table = TRUE,
                                 max_dupes = max_dupes,
                                 splice_strategy = splice_strategy)
-        dt[[names_variable]] = rep(nam, nrow(dt))
+        # dt[[names_variable]] = rep(nam, nrow(dt))
         message("finished loading ", nam, ".")
         dt
     }
