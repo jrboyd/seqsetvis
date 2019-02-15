@@ -61,11 +61,11 @@ library(GenomicRanges)
 bam_f = system.file("extdata/test.bam",
     package = "seqsetvis", mustWork = TRUE)
 bam_files = c("a" = bam_f, "b" = bam_f)
-qgr = CTCF_in_10a_overlaps_gr[1:5]
+qgr = CTCF_in_10a_overlaps_gr[1:2]
 qgr = resize(qgr, 500, "center")
 load_bam = function(f, nam, qgr) {
     message("loading ", f, " ...")
-    dt = ssvFetchBam.single(bam_f = f,
+    dt = seqsetvis:::ssvFetchBam.single(bam_f = f,
                       qgr = qgr,
                       win_size = 50,
                       fragLen = NULL,

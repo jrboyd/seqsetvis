@@ -50,7 +50,7 @@ bam_file = system.file("extdata/test.bam",
 qgr = CTCF_in_10a_overlaps_gr[1:5]
 # unlike viewGRangesWinSample_dt, width is not fixed
 # qgr = GenomicRanges::resize(qgr, width = 500, fix = "center")
-bam_gr = fetchBam(bam_file, qgr)
+bam_gr = seqsetvis:::fetchBam(bam_file, qgr)
 bam_dt = viewGRangesWinSummary_dt(bam_gr, qgr, 50)
 
 if(Sys.info()['sysname'] != "Windows"){

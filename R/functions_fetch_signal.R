@@ -41,11 +41,11 @@
 #' bam_f = system.file("extdata/test.bam",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bam_files = c("a" = bam_f, "b" = bam_f)
-#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' qgr = CTCF_in_10a_overlaps_gr[1:2]
 #' qgr = resize(qgr, 500, "center")
 #' load_bam = function(f, nam, qgr) {
 #'     message("loading ", f, " ...")
-#'     dt = ssvFetchBam.single(bam_f = f,
+#'     dt = seqsetvis:::ssvFetchBam.single(bam_f = f,
 #'                       qgr = qgr,
 #'                       win_size = 50,
 #'                       fragLen = NULL,
@@ -177,7 +177,7 @@ ssvFetchSignal = function(file_paths,
 #'     package = "seqsetvis")
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
 #' qgr = GenomicRanges::resize(qgr, width = 500, fix = "center")
-#' bam_gr = fetchBam(bam_file, qgr)
+#' bam_gr = seqsetvis:::fetchBam(bam_file, qgr)
 #' bam_dt = viewGRangesWinSample_dt(bam_gr, qgr, 50)
 #'
 #' if(Sys.info()['sysname'] != "Windows"){
@@ -269,7 +269,7 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
 #' # unlike viewGRangesWinSample_dt, width is not fixed
 #' # qgr = GenomicRanges::resize(qgr, width = 500, fix = "center")
-#' bam_gr = fetchBam(bam_file, qgr)
+#' bam_gr = seqsetvis:::fetchBam(bam_file, qgr)
 #' bam_dt = viewGRangesWinSummary_dt(bam_gr, qgr, 50)
 #'
 #' if(Sys.info()['sysname'] != "Windows"){

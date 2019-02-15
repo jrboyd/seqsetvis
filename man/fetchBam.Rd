@@ -40,10 +40,3 @@ GRanges containing tag pileup values in score meta column.  tags are
 fetch a bam file pileup with the ability to consider read extension to
 fragment size (fragLen)
 }
-\examples{
-bam_file = system.file("extdata/test.bam", package = "seqsetvis")
-qgr = CTCF_in_10a_overlaps_gr[1:2]
-#by default, fragLen is estimated by strand-cross-correlation
-fetchBam(bam_file, qgr)
-fetchBam(bam_file, qgr, fragLen = 180, target_strand = "+")
-}

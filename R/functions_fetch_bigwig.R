@@ -108,17 +108,6 @@ ssvFetchBigwig = function(file_paths,
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
 #' 10, values from positions chr1 5,15,25...85, and 95 will be retrieved
 #' from \code{bw_file}
-#' @examples
-#' if(Sys.info()['sysname'] != "Windows"){
-#' library(GenomicRanges)
-#' bw_f = system.file("extdata/test_loading.bw",
-#'     package = "seqsetvis", mustWork = TRUE)
-#' qgr = GRanges("chrTest", IRanges(1, 30))
-#' bw_gr = ssvFetchBigwig.single(bw_f, qgr, win_size = 10)
-#'
-#' bw_dt = ssvFetchBigwig.single(bw_f, qgr, win_size = 10,
-#'     return_data.table = TRUE)
-#' }
 ssvFetchBigwig.single = function(bw_file,
                                  qgr,
                                  win_size = 50,

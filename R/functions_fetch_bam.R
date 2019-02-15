@@ -35,8 +35,6 @@ fragLen_fromMacs2Xls = function(macs2xls_file){
 #' @param read_length integer. Any values outside fragment_range that must be
 #'   searched.  If not supplied will be determined from bam_file.  Set as NA
 #'   to disable this behavior.
-#' @param show_progress logical. should pbapply progress bar be shown?
-#' Default is FALSE.
 #' @param ... arguments passed to ScanBamParam
 #' @return named list of results
 #' @export
@@ -51,7 +49,6 @@ crossCorrByRle = function(bam_file,
                           max_dupes = 1,
                           fragment_sizes = 50:300,
                           read_length = NULL,
-                          show_progress = FALSE,
                           ...){
     rn = NULL # reserve for data.table
     if(is.null(query_gr$name)){
@@ -96,23 +93,29 @@ crossCorrByRle = function(bam_file,
     NegCoverage <- coverage(GRanges(temp[strand(temp)=="-"]))
     NegCoverage = NegCoverage[query_gr]
     names(NegCoverage) = query_gr$name
-    if(show_progress){
-        app_FUN = pbapply::pbsapply
-    }else{
-        app_FUN = sapply
-    }
-    ShiftMatCor = app_FUN(seq_along(query_gr), simplify = FALSE, function(i){
-        ShiftsCorTemp <- S4Vectors::shiftApply(fragment_sizes,
-                                               PosCoverage[[i]],
-                                               NegCoverage[[i]],
-                                               cor, simplify = FALSE,
-                                               verbose = FALSE)
-    })
+    # ShiftMatCor = vapply(as.list(seq_along(query_gr)), FUN.VALUE = as.list(seq(fragment_sizes)),
+    #                      function(i){
+    #     ShiftsCorTemp <- S4Vectors::shiftApply(fragment_sizes,
+    #                                            PosCoverage[[i]],
+    #                                            NegCoverage[[i]],
+    #                                            cor, simplify = FALSE,
+    #                                            verbose = FALSE)
+    # })
+
+    ShiftMatCor = vapply((seq_along(query_gr)), FUN.VALUE = numeric(length(fragment_sizes)),
+                         function(i){
+                             ShiftsCorTemp <- S4Vectors::shiftApply(fragment_sizes,
+                                                                    PosCoverage[[i]],
+                                                                    NegCoverage[[i]],
+                                                                    cor, simplify = FALSE,
+                                                                    verbose = FALSE)
+                             unlist(ShiftsCorTemp)
+                         })
     #necessary due to singleton query_gr or shift not resulting in matrix
-    ShiftMatCor = matrix(unlist(ShiftMatCor),
-                         byrow = FALSE,
-                         nrow = length(fragment_sizes),
-                         ncol = length(query_gr))
+    # ShiftMatCor = matrix(unlist(ShiftMatCor),
+    #                      byrow = FALSE,
+    #                      nrow = length(fragment_sizes),
+    #                      ncol = length(query_gr))
     ShiftMatCor[is.nan(ShiftMatCor)] = 0
 
     colnames(ShiftMatCor) = query_gr$name
@@ -134,17 +137,19 @@ crossCorrByRle = function(bam_file,
 #'
 #' @return gr with seqlengths matching bam_file
 #' @importFrom GenomeInfoDb seqlengths
-#'
+#' @importFrom Rsamtools scanBamHeader
+#' @export
 #' @examples
+#' library(GenomicRanges)
 #' gr = GRanges("chr1", IRanges(1, 100))
 #' #seqlengths has not been set
-#' GenomeInfoDb::seqlengths(gr)
+#' seqlengths(gr)
 #' bam = system.file("extdata/test.bam", package = "seqsetvis")
 #' gr2 = harmonize_seqlengths(gr, bam)
 #' #seqlengths now set
-#' GenomeInfoDb::seqlengths(gr2)
+#' seqlengths(gr2)
 harmonize_seqlengths = function(gr, bam_file){
-    chr_lengths = scanBamHeader(bam_file)[[1]]$targets
+    chr_lengths = Rsamtools::scanBamHeader(bam_file)[[1]]$targets
     GenomeInfoDb::seqlengths(gr) =
         chr_lengths[names(GenomeInfoDb::seqlengths(gr))]
     too_long = end(gr) >
@@ -358,12 +363,6 @@ fragLen_calcStranded = function(bam_f,
 #' @param ... passed to ScanBamParam(), can't be which or what.
 #' @return GRanges containing tag pileup values in score meta column.  tags are
 #'   optionally extended to fragment length (fragLen) prior to pile up.
-#' @examples
-#' bam_file = system.file("extdata/test.bam", package = "seqsetvis")
-#' qgr = CTCF_in_10a_overlaps_gr[1:2]
-#' #by default, fragLen is estimated by strand-cross-correlation
-#' fetchBam(bam_file, qgr)
-#' fetchBam(bam_file, qgr, fragLen = 180, target_strand = "+")
 fetchBam = function(bam_f,
                     qgr,
                     fragLen = NULL,
@@ -479,16 +478,6 @@ fetchBam = function(bam_f,
 #' @return tidy GRanges (or data.table if specified) with pileups from bam file.
 #'   pileup is calculated only every win_size bp.
 #' @importFrom stats weighted.mean
-#' @examples
-#' bam_file = system.file("extdata/test.bam",
-#'     package = "seqsetvis")
-#' qgr = CTCF_in_10a_overlaps_gr[1:5]
-#' bam_gr = ssvFetchBam.single(bam_file, qgr)
-#' bam_gr = ssvFetchBam.single(bam_file, qgr, fragLen = 180,
-#'     win_size = 10, target_strand = "+")
-#'
-#' bam_dt = ssvFetchBam.single(bam_file, qgr,
-#'     return_data.table = TRUE)
 ssvFetchBam.single = function(bam_f,
                               qgr,
                               win_size = 50,

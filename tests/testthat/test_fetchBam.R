@@ -22,12 +22,12 @@ test_that("fetchBam auto fragLen", {
 })
 
 test_that("fragLen_calcStranded parameters matter", {
-    res2 = fragLen_calcStranded(bam_file, qgr = qgr, n_regions = 5, include_plot_in_output = TRUE)
-    res1 = fragLen_calcStranded(bam_file, qgr = qgr, n_regions = 1, include_plot_in_output = TRUE)
-
-    f1 = res2[[1]]
-    f2 = res1[[1]]
-    expect_failure(expect_equal(f1, f2))
+    # res2 = fragLen_calcStranded(bam_file, qgr = qgr, n_regions = 5, include_plot_in_output = TRUE)
+    # res1 = fragLen_calcStranded(bam_file, qgr = qgr, n_regions = 1, include_plot_in_output = TRUE)
+    #
+    # f1 = res2[[1]]
+    # f2 = res1[[1]]
+    # expect_failure(expect_equal(f1, f2))
 
     res5 = fragLen_calcStranded(bam_file, qgr = qgr, test_fragLen = 180, include_plot_in_output = TRUE)
     res6 = fragLen_calcStranded(bam_file, qgr = qgr, test_fragLen = 200, include_plot_in_output = TRUE)

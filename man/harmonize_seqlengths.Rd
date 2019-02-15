@@ -18,11 +18,12 @@ gr with seqlengths matching bam_file
 ensures compatibility between seqlength of gr and bam_file based on header
 }
 \examples{
+library(GenomicRanges)
 gr = GRanges("chr1", IRanges(1, 100))
 #seqlengths has not been set
-GenomeInfoDb::seqlengths(gr)
+seqlengths(gr)
 bam = system.file("extdata/test.bam", package = "seqsetvis")
 gr2 = harmonize_seqlengths(gr, bam)
 #seqlengths now set
-GenomeInfoDb::seqlengths(gr2)
+seqlengths(gr2)
 }

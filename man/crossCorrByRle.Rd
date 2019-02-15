@@ -5,8 +5,7 @@
 \title{Calculate cross correlation by using shiftApply on read coverage Rle}
 \usage{
 crossCorrByRle(bam_file, query_gr, max_dupes = 1,
-  fragment_sizes = 50:300, read_length = NULL, show_progress = FALSE,
-  ...)
+  fragment_sizes = 50:300, read_length = NULL, ...)
 }
 \arguments{
 \item{bam_file}{character. Path to .bam file, must have index at .bam.bai.}
@@ -21,9 +20,6 @@ correlation.}
 \item{read_length}{integer. Any values outside fragment_range that must be
 searched.  If not supplied will be determined from bam_file.  Set as NA
 to disable this behavior.}
-
-\item{show_progress}{logical. should pbapply progress bar be shown?
-Default is FALSE.}
 
 \item{...}{arguments passed to ScanBamParam}
 }
