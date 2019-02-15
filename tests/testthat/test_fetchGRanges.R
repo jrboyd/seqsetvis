@@ -17,6 +17,13 @@ test_that("ssvFetchGRanges win_size", {
     expect_equal(300*5, length(res10))
 })
 
+
+test_that("ssvFetchGRanges attribs", {
+    res10 = ssvFetchGRanges(CTCF_in_10a_narrowPeak_grs, qgr, win_size = 10, file_attribs = data.frame("a" = 1:3, "bc" = 4:6))
+    expect_true(all(res10$a %in% 1:3))
+    expect_true(all(res10$bc %in% 4:6))
+})
+
 test_that("ssvFetchGRanges win_method", {
     res5sum = ssvFetchGRanges(CTCF_in_10a_narrowPeak_grs, qgr, win_size = 5, win_method = "summary")
     expect_equal(length(qgr)*length(CTCF_in_10a_narrowPeak_grs)*5, length(res5sum))

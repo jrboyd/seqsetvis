@@ -211,6 +211,12 @@ ggellipse = function(xcentres,
     ell_dt = lapply(e, function(ell)data.table::data.table(x = ell$x,
                                                            y = ell$y))
     ell_dt = data.table::rbindlist(ell_dt, use.names = TRUE, idcol = "group")
+    if(is.factor(group_names)){
+        ell_dt$group = factor(ell_dt$group, levels = levels(group_names))
+    }else{
+        ell_dt$group = factor(ell_dt$group, levels = group_names)
+    }
+
     #check colors
     stopifnot(is.null(circle_colors) || all(is.character(circle_colors)))
 
@@ -240,7 +246,6 @@ ggellipse = function(xcentres,
                                  alpha = line_alpha), start = 8, stop = 9)
     line_scale = paste0(circle_colors, ahex)
     names(line_scale) = names(circle_colors)
-
     # make plot
     p = ggplot() +
         labs(fill = "", color = "") +
@@ -255,15 +260,15 @@ ggellipse = function(xcentres,
     p = p +
         geom_polygon(data = ell_dt, aes(x = x,
                                         y = y,
-                                        fill = group,
-                                        col = NA
-        )) +
+                                        # col = NA,
+                                        fill = group
+        ), color = "#00000000") +
         geom_polygon(data = ell_dt, aes(x = x,
                                         y = y,
-                                        fill = NA,
+                                        # fill = NA,
                                         col = group,
                                         size = line_width
-        )) +
+        ), fill = "#00000000") +
         scale_alpha_identity() +
         guides(alpha = "none") +
         scale_fill_manual(values = fill_scale) +

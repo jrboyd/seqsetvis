@@ -13,8 +13,9 @@ ssvFetchBigwig(file_paths, qgr, unique_names = names(file_paths),
   return_data.table = FALSE, n_cores = getOption("mc.cores", 1))
 }
 \arguments{
-\item{file_paths}{The character vector or list of paths to bigwig files to
-read from.}
+\item{file_paths}{character vector of file_paths to load from. Alternatively,
+file_paths can be a data.frame or data.table whose first column is a
+character vector of paths and additial columns will be used as metadata.}
 
 \item{qgr}{Set of GRanges to query.  For valid results the width of each
 interval should be identical and evenly divisible by \code{win_size}.}

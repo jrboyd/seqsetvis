@@ -11,7 +11,9 @@ ssvFetchSignal(file_paths, qgr, unique_names = names(file_paths),
   "add code here to load files") }, n_cores = getOption("mc.cores", 1))
 }
 \arguments{
-\item{file_paths}{character vector of file_paths to load from}
+\item{file_paths}{character vector of file_paths to load from. Alternatively,
+file_paths can be a data.frame or data.table whose first column is a
+character vector of paths and additial columns will be used as metadata.}
 
 \item{qgr}{GRanges of intervals to return from each file}
 

@@ -22,29 +22,19 @@ test_that("fetchBam auto fragLen", {
 })
 
 test_that("fragLen_calcStranded parameters matter", {
-    res2 = fragLen_calcStranded(bam_file, qgr = qgr[1:2], n_regions = 2, include_plot_in_output = TRUE)
-    res1 = fragLen_calcStranded(bam_file, qgr = qgr[1:2], n_regions = 1, include_plot_in_output = TRUE)
+    res2 = fragLen_calcStranded(bam_file, qgr = qgr, n_regions = 5, include_plot_in_output = TRUE)
+    res1 = fragLen_calcStranded(bam_file, qgr = qgr, n_regions = 1, include_plot_in_output = TRUE)
 
     f1 = res2[[1]]
     f2 = res1[[1]]
     expect_failure(expect_equal(f1, f2))
 
-    f3 = fragLen_calcStranded(bam_file, qgr = qgr[1], n_regions = 1, include_plot_in_output = TRUE, ma_distance = 1)[[1]]
-    f4 = fragLen_calcStranded(bam_file, qgr = qgr[1], n_regions = 1, include_plot_in_output = TRUE, ma_distance = 33)[[1]]
-    expect_failure(expect_equal(f3, f4))
-
-    res5 = fragLen_calcStranded(bam_file, qgr = qgr, max_fragLen = 500, include_plot_in_output = TRUE)
-    res6 = fragLen_calcStranded(bam_file, qgr = qgr, max_fragLen = 100, include_plot_in_output = TRUE)
+    res5 = fragLen_calcStranded(bam_file, qgr = qgr, test_fragLen = 180, include_plot_in_output = TRUE)
+    res6 = fragLen_calcStranded(bam_file, qgr = qgr, test_fragLen = 200, include_plot_in_output = TRUE)
 
     f5 = res5[[1]]
     f6 = res6[[1]]
     expect_failure(expect_equal(f5, f6))
-})
-
-test_that("fragLen_calcStranded can force no which", {
-    expect_error({fragLen_calcStranded(bam_file, qgr = NULL)},
-                 regexp = "This will probably be very slow and uneccessary")
-    expect_failure(expect_error({fragLen_calcStranded(bam_file, qgr = NULL, force_no_which = TRUE)}))
 })
 
 test_that("viewGRangesWinSample_dt strand and position functions", {
@@ -121,10 +111,25 @@ test_that("ssvFetchBam query GRanges output id set", {
 
 })
 
-test_that("ssvFetchBam query GRanges $name gets used", {
-    test_gr = CTCF_in_10a_narrowPeak_grs$MCF10A_CTCF
+test_that("ssvFetchBam query GRanges names() gets used", {
+    test_gr = qgr
+    names(test_gr) = paste("test_region", seq_along(test_gr))
     gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_gr, return_data.table = TRUE)
-    expect_true(all(unique(gr_sample$id) == unique(test_gr$name)))
+    expect_true(all(unique(gr_sample$id) == unique(names(test_gr))))
+})
+
+test_that("ssvFetchBam bam_file as data.frame/table", {
+    test_gr = CTCF_in_10a_narrowPeak_grs$MCF10A_CTCF
+    gr_sample = ssvFetchBam(
+        data.frame(rep(bam_file,3),
+                   colors = c("red", "green", "blue"),
+                   sample = c("10a", "10b", "10c")),
+        win_size = 5, qgr = test_gr,
+        return_data.table = TRUE)
+    expect_true(all(levels(gr_sample$colors) %in%
+                        c("red", "green", "blue")))
+    expect_true(all(levels(gr_sample$sample) %in%
+                        c("10a", "10b", "10c")))
 })
 
 test_that("ssvFetchBam sample method correct bins", {

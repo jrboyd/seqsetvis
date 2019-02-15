@@ -244,7 +244,8 @@ fragLen_calcStranded = function(bam_f,
 #'   optionally extended to fragment length (fragLen) prior to pile up.
 #' @examples
 #' bam_file = system.file("extdata/test.bam", package = "seqsetvis")
-#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' qgr = CTCF_in_10a_overlaps_gr[1:2]
+#' #by default, fragLen is estimated by strand-cross-correlation
 #' fetchBam(bam_file, qgr)
 #' fetchBam(bam_file, qgr, fragLen = 180, target_strand = "+")
 fetchBam = function(bam_f,
@@ -392,7 +393,7 @@ ssvFetchBam.single = function(bam_f,
     stopifnot(splice_strategy %in% c("none", "ignore", "add", "only", "splice_count"))
     if(splice_strategy == "splice_count"){
         return(fetchBam(bam_f, qgr, NA, "*",
-                 max_dupes, splice_strategy))
+                        max_dupes, splice_strategy))
     }
     switch (
         win_method,
@@ -465,8 +466,9 @@ ssvFetchBam.single = function(bam_f,
 #' \code{ssvFetchBam} iteratively calls \code{fetchWindowedBam.single}. See
 #' \code{\link{ssvFetchBam.single}} for more info.
 #' @export
-#' @param file_paths The character vector or list of paths to bigwig files to
-#'   read from.
+#' @param file_paths character vector of file_paths to load from. Alternatively,
+#' file_paths can be a data.frame or data.table whose first column is a
+#' character vector of paths and additial columns will be used as metadata.
 #' @param qgr Set of GRanges to query.  For valid results the width of each
 #'   interval should be identical and evenly divisible by \code{win_size}.
 #' @param unique_names names to use in final data.table to designate source

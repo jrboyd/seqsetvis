@@ -97,8 +97,8 @@ test_that("ssvFetchBigwig works with character vector bw_files", {
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
     hidden = capture_output({res = ssvFetchBigwig(file_paths = bw_files,
-                                                           win_size = 3,
-                                                           qgr = test_qgr)})
+                                                  win_size = 3,
+                                                  qgr = test_qgr)})
     expect_is(res, "GRanges")
     expect_equal(colnames(mcols(res)), c(exp_colnames, "sample"))
 })
@@ -109,8 +109,8 @@ test_that("ssvFetchBigwig works with list bw_files", {
     names(bw_files) = paste0("bw_", 1:3)
     bw_files = as.list(bw_files)
     hidden = capture_output({res = ssvFetchBigwig(file_paths = bw_files,
-                                                           win_size = 3,
-                                                           qgr = test_qgr)})
+                                                  win_size = 3,
+                                                  qgr = test_qgr)})
     expect_is(res, "GRanges")
     expect_equal(colnames(mcols(res)), c(exp_colnames, "sample"))
 })
@@ -152,9 +152,9 @@ test_that("ssvFetchBigwig can set variable name", {
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
     hidden = capture_output({res = ssvFetchBigwig(file_paths = bw_files,
-                                                           win_size = 3,
-                                                           qgr = test_qgr,
-                                                           names_variable = "group")})
+                                                  win_size = 3,
+                                                  qgr = test_qgr,
+                                                  names_variable = "group")})
     expect_is(res, "GRanges")
     expect_equal(colnames(mcols(res)), c(exp_colnames, "group"))
 })
@@ -164,8 +164,8 @@ test_that("ssvFetchBigwig duplicate names throws error", {
     bw_files = rep(test_bw, 3)
     expect_error(
         ssvFetchBigwig(file_paths = bw_files,
-                                win_size = 3,
-                                qgr = test_qgr)
+                       win_size = 3,
+                       qgr = test_qgr)
     )
 })
 
@@ -197,4 +197,18 @@ test_that("ssvFetchBigwig summary method correct bins", {
     gr_sample = ssvFetchBigwig(test_bw, win_size = 4, qgr = test_qgr2, win_method = "summary")
     expect_true(all(width(reduce(gr_sample)) == 30))
     expect_true(all(width(gr_sample) %in% 7:8))
+})
+
+test_that("ssvFetchBigwig bam_file as data.frame/table", {
+    gr_sample = ssvFetchBigwig(
+        data.frame(rep(test_bw,3),
+                   colors = c("red", "green", "blue"),
+                   sample = c("10a", "10b", "10c")),
+        qgr = test_qgr,
+        win_size = 5,
+        return_data.table = TRUE)
+    expect_true(all(levels(gr_sample$colors) %in%
+                        c("red", "green", "blue")))
+    expect_true(all(levels(gr_sample$sample) %in%
+                        c("10a", "10b", "10c")))
 })

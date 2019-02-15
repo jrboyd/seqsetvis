@@ -7,7 +7,9 @@
 #' data from file_paths (likely via the appropriate fetchWindowed function,
 #' ie. \code{\link{ssvFetchBigwig}} or \code{\link{ssvFetchBam}}
 #'
-#' @param file_paths character vector of file_paths to load from
+#' @param file_paths character vector of file_paths to load from. Alternatively,
+#' file_paths can be a data.frame or data.table whose first column is a
+#' character vector of paths and additial columns will be used as metadata.
 #' @param qgr GRanges of intervals to return from each file
 #' @param unique_names unique file ids for each file in file_paths.  Default
 #' is names of file_paths vector
@@ -66,11 +68,30 @@ ssvFetchSignal = function(file_paths,
                                       "add code here to load files")
                           },
                           n_cores = getOption("mc.cores", 1)){
+    if(is.data.frame(file_paths) | is.data.table(file_paths)){
+        file_attribs = file_paths[,-1]
+        file_paths = file_paths[[1]]
+        unique_names = file_attribs[[names_variable]]
+
+    }else{ #file_paths is assumed to be a character vector
+        file_attribs = data.frame(data.frame(matrix(0, nrow = length(file_paths), ncol = 0)))
+        file_attribs[[names_variable]] = unique_names
+    }
     if(is.list(file_paths)){
         file_paths = unlist(file_paths)
     }
+    if(is.factor(file_paths)) file_paths = as.character(file_paths)
     if (is.null(unique_names)) {
         unique_names = basename(file_paths)
+    }
+    if(is.factor(unique_names)) unique_names = as.character(unique_names)
+    if(is.null(file_attribs[[names_variable]])){
+        file_attribs[[names_variable]] = unique_names
+    }
+
+
+    if(is.null(names(file_paths))){
+        names(file_paths) = unique_names
     }
     stopifnot(is.character(file_paths))
     stopifnot(class(qgr) == "GRanges")
@@ -82,7 +103,8 @@ ssvFetchSignal = function(file_paths,
              paste(collapse = "\n",
                    unique(unique_names[duplicated(unique_names)])))
     }
-    names(file_paths) = unique_names
+    stopifnot(file.exists(file_paths))
+    #names(file_paths) = unique_names
     if(win_method == "sample"){
         qgr = prepare_fetch_GRanges(qgr = qgr,
                                     win_size = win_size,
@@ -94,8 +116,14 @@ ssvFetchSignal = function(file_paths,
         load_signal(f, nam, qgr)
     }
     # bw_list = lapply(names(file_paths), nam_load_signal)
-    bw_list = parallel::mclapply(names(file_paths),
+    bw_list = parallel::mclapply(file_attribs[[names_variable]],
                                  nam_load_signal, mc.cores = n_cores)
+    for(i in seq_along(bw_list)){
+        for(attrib in colnames(file_attribs)){
+            bw_list[[i]][[attrib]] = file_attribs[[attrib]][i]
+        }
+
+    }
     out = data.table::rbindlist(bw_list)
     if(!return_data.table){
         out = GRanges(out)
@@ -350,6 +378,10 @@ viewGRangesWinSummary_dt = function (score_gr,
     }, left_unstranded = {
         #do nothing
     })
+
+    #ensure x is rounded and easily flippable
+    score_dt$x = round(score_dt$x, 9)
+
     score_dt
 }
 

@@ -4,7 +4,8 @@
 \alias{ssvFetchGRanges}
 \title{Fetch coverage values for a list of GRanges.}
 \usage{
-ssvFetchGRanges(grs, qgr, unique_names = names(file_paths),
+ssvFetchGRanges(grs, qgr, file_attribs = data.frame(matrix(0, nrow =
+  length(grs), ncol = 0)), unique_names = names(grs),
   names_variable = "sample", win_size = 50, win_method = c("sample",
   "summary")[1], summary_FUN = function(x, w) max(x),
   target_strand = c("*", "+", "-", "both")[1], anchor = c("left",
@@ -16,6 +17,9 @@ ssvFetchGRanges(grs, qgr, unique_names = names(file_paths),
 
 \item{qgr}{Set of GRanges to query.  For valid results the width of each
 interval should be identical and evenly divisible by \code{win_size}.}
+
+\item{file_attribs}{data.frame (1 row per item in grs) containing
+attributes to append to results.}
 
 \item{unique_names}{The column name where unique_names are stored.
 Default is 'sample'}
@@ -33,6 +37,9 @@ qgr.}
 \item{summary_FUN}{function.  only relevant if win_method is "summary".
 passed to \code{\link{viewGRangesWinSummary_dt}}.}
 
+\item{target_strand}{character. if one of "+" or "-", reads are filtered to
+match. ignored if any other value.}
+
 \item{anchor}{character, one of c("center", "center_unstranded",
 "left", "left_unstranded")}
 
@@ -41,9 +48,6 @@ returned instead of GRanges.  Default is FALSE.}
 
 \item{n_cores}{integer number of cores to use.
 Uses mc.cores option if not supplied.}
-
-\item{return_data.table}{logical. If TRUE the internal data.table is
-returned instead of GRanges.  Default is FALSE.}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing
