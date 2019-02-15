@@ -155,6 +155,8 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
             names(qgr) = paste0("region_", seq_along(qgr))
         }
         qgr$id = names(qgr)
+    }else{
+        names(qgr) = qgr$id
     }
     windows = slidingWindows(qgr, width = window_size, step = window_size)
 
@@ -256,6 +258,8 @@ viewGRangesWinSummary_dt = function (score_gr,
             names(qgr) = paste0("region_", seq_along(qgr))
         }
         qgr$id = names(qgr)
+    }else{
+        names(qgr) = qgr$id
     }
     tiles = tile(qgr, n_tiles)
     # lapply(seq_len(tqgr), function(i)as.data.table(tqgr[[i]]))

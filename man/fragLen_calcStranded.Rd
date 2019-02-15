@@ -4,9 +4,8 @@
 \alias{fragLen_calcStranded}
 \title{calculate fragLen from a bam file for specified regions}
 \usage{
-fragLen_calcStranded(bam_f, qgr, ma_distance = 21, n_regions = 100,
-  force_no_which = FALSE, include_plot_in_output = FALSE,
-  max_fragLen = 300, ...)
+fragLen_calcStranded(bam_f, qgr, n_regions = 100,
+  include_plot_in_output = FALSE, test_fragLen = seq(100, 400, 5), ...)
 }
 \arguments{
 \item{bam_f}{character or BamFile. bam file to read from.
@@ -15,21 +14,14 @@ fragLen_calcStranded(bam_f, qgr, ma_distance = 21, n_regions = 100,
 \item{qgr}{GRanges.  used as which for ScanBamParam. Can be NULL if it's
 REALLY important to load the entire bam, force_no_which = TRUE also required.}
 
-\item{ma_distance}{numeric (integer)  range to use for movingRange.
-Default is 21.}
-
 \item{n_regions}{numeric (integer) it's generally overkill to pull all
 regions at this stage and will slow calculation down.  Default is 100.}
-
-\item{force_no_which}{logical. if TRUE and qgr is also NULL, the entire
-bam will be read.}
 
 \item{include_plot_in_output}{if TRUE ouptut is a list of fragLen and a
 ggplot showing values considered by calculation. Default is FALSE.}
 
-\item{max_fragLen}{numeric.  The maximum fragLen to calculate for.
-Calculation time is directly proportional to this number. Default
-is 300.}
+\item{test_fragLen}{numeric.  The set of fragment lenghts to gather
+strand cross correlation for.}
 
 \item{...}{passed to Rsamtools::ScanBamParam, can't be which or what.}
 }

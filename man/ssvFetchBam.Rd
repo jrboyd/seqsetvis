@@ -12,8 +12,8 @@ ssvFetchBam(file_paths, qgr, unique_names = names(file_paths),
   target_strand = c("*", "+", "-", "both")[1], anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
   names_variable = "sample", return_data.table = FALSE,
-  max_dupes = Inf, splice_strategy = c("none", "ignore", "add",
-  "only")[1])
+  max_dupes = Inf, splice_strategy = c("none", "ignore", "add", "only",
+  "splice_count")[1])
 }
 \arguments{
 \item{file_paths}{The character vector or list of paths to bigwig files to

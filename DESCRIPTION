@@ -1,7 +1,7 @@
 Package: seqsetvis
 Type: Package
 Title: Set Based Visualizations for Next-Gen Sequencing Data
-Version: 1.2.0
+Version: 1.2.1
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
 Description: seqsetvis enables the visualization and analysis of multiple 
@@ -26,6 +26,8 @@ Depends: R (>= 3.5), ggplot2
 Imports: 
     data.table, 
     eulerr, 
+    GenomeInfoDb,
+    GenomicAlignments,
     GenomicRanges, 
     grDevices, 
     grid, 

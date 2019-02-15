@@ -9,7 +9,8 @@ ssvFetchBam.single(bam_f, qgr, win_size = 50, win_method = c("sample",
   target_strand = c("*", "+", "-", "both")[1], anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
   return_data.table = FALSE, max_dupes = Inf,
-  splice_strategy = c("none", "ignore", "add", "only")[1])
+  splice_strategy = c("none", "ignore", "add", "only",
+  "splice_count")[1])
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}

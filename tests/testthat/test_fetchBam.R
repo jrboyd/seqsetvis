@@ -5,6 +5,7 @@ library(data.table)
 
 qgr = CTCF_in_10a_overlaps_gr[1:5]
 qgr = centerFixedSizeGRanges(qgr, 500)
+names(qgr) = paste("region", seq_along(qgr))
 #bed used to intersect bam
 # rtracklayer::export.bed(qgr, con = "ctcf_5.bed")
 bam_file = system.file("extdata/test.bam", package = "seqsetvis")
@@ -18,37 +19,27 @@ test_that("fragLen_fromMacs2Xls", {
 })
 
 test_that("fetchBam auto fragLen", {
-    expect_message(fetchBam(bam_file, qgr = qgr), "fragLen was calculated as:")
+    expect_message(seqsetvis:::fetchBam(bam_file, qgr = qgr), "fragLen was calculated as:")
 })
 
 test_that("fragLen_calcStranded parameters matter", {
-    res2 = fragLen_calcStranded(bam_file, qgr = qgr[1:2], n_regions = 2, include_plot_in_output = TRUE)
-    res1 = fragLen_calcStranded(bam_file, qgr = qgr[1:2], n_regions = 1, include_plot_in_output = TRUE)
+    # res2 = fragLen_calcStranded(bam_file, qgr = qgr, n_regions = 5, include_plot_in_output = TRUE)
+    # res1 = fragLen_calcStranded(bam_file, qgr = qgr, n_regions = 1, include_plot_in_output = TRUE)
+    #
+    # f1 = res2[[1]]
+    # f2 = res1[[1]]
+    # expect_failure(expect_equal(f1, f2))
 
-    f1 = res2[[1]]
-    f2 = res1[[1]]
-    expect_failure(expect_equal(f1, f2))
-
-    f3 = fragLen_calcStranded(bam_file, qgr = qgr[1], n_regions = 1, include_plot_in_output = TRUE, ma_distance = 1)[[1]]
-    f4 = fragLen_calcStranded(bam_file, qgr = qgr[1], n_regions = 1, include_plot_in_output = TRUE, ma_distance = 33)[[1]]
-    expect_failure(expect_equal(f3, f4))
-
-    res5 = fragLen_calcStranded(bam_file, qgr = qgr, max_fragLen = 500, include_plot_in_output = TRUE)
-    res6 = fragLen_calcStranded(bam_file, qgr = qgr, max_fragLen = 100, include_plot_in_output = TRUE)
+    res5 = fragLen_calcStranded(bam_file, qgr = qgr, test_fragLen = 180, include_plot_in_output = TRUE)
+    res6 = fragLen_calcStranded(bam_file, qgr = qgr, test_fragLen = 200, include_plot_in_output = TRUE)
 
     f5 = res5[[1]]
     f6 = res6[[1]]
     expect_failure(expect_equal(f5, f6))
 })
 
-test_that("fragLen_calcStranded can force no which", {
-    expect_error({fragLen_calcStranded(bam_file, qgr = NULL)},
-                 regexp = "This will probably be very slow and uneccessary")
-    expect_failure(expect_error({fragLen_calcStranded(bam_file, qgr = NULL, force_no_which = TRUE)}))
-})
-
 test_that("viewGRangesWinSample_dt strand and position functions", {
-    bam_score = fetchBam(bam_file, qgr = qgr)
+    bam_score = seqsetvis:::fetchBam(bam_file, qgr = qgr)
     score_gr = bam_score
     window_size = 50
     anchor = "center"
@@ -98,6 +89,35 @@ test_that("viewGRangesWinSample_dt strand and position functions", {
 #     bam_score_stranded = fetchBam(bam_file, qgr = qgr_stranded)
 #     plot(bam_score_unstranded$score, bam_score_stranded$score)
 # })
+
+
+test_that("ssvFetchBam query GRanges output id set", {
+    skip_on_os("windows")
+    tgr = qgr
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = tgr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+    names(tgr) = NULL
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = tgr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+    tgr$id = seq_along(tgr) #when id set, id in output is missing
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = tgr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+    tgr = qgr
+    tgr$id = seq_along(tgr) #when id set, id in output is missing
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = tgr, return_data.table = TRUE)
+    expect_true("id" %in% colnames(gr_sample))
+
+})
+
+test_that("ssvFetchBam query GRanges name gets used", {
+    tgr = qgr
+    names(tgr) = paste("test_region", seq_along(tgr))
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = tgr, return_data.table = TRUE)
+    expect_true(all(unique(gr_sample$id) == unique(names(tgr))))
+})
 
 test_that("ssvFetchBam sample method correct bins", {
     skip_on_os("windows")
