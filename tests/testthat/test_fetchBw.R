@@ -139,6 +139,7 @@ test_that("ssvFetchBigwig query GRanges output id set", {
 })
 
 test_that("ssvFetchBam query GRanges $name gets used", {
+    skip_on_os("windows")
     bw_files = rep(test_bw, 3)
     names(bw_files) = paste0("bw_", 1:3)
     test_gr = test_qgr
@@ -200,6 +201,7 @@ test_that("ssvFetchBigwig summary method correct bins", {
 })
 
 test_that("ssvFetchBigwig bam_file as data.frame/table", {
+    skip_on_os("windows")
     gr_sample = ssvFetchBigwig(
         data.frame(rep(test_bw,3),
                    colors = c("red", "green", "blue"),
