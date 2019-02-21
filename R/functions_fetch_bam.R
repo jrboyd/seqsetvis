@@ -77,7 +77,6 @@ crossCorrByRle = function(bam_file,
         what=c("flag","mapq"), ...)
     temp <- GenomicAlignments::readGAlignments(bam_file,param=Param)
     dt = as.data.table(temp)
-    # browser()
     if(is.null(read_length)){
         read_length = getReadLength(bam_file, query_gr)
     }
@@ -403,12 +402,10 @@ fetchBam = function(bam_f,
     bam_dt = data.table::rbindlist(bam_dt,
                                    use.names = TRUE,
                                    idcol = "which_label")
-
-    if(target_strand == "+"){
-        bam_dt = bam_dt[strand == "+"]
-    }
-    if(target_strand == "-"){
-        bam_dt = bam_dt[strand == "-"]
+    toflip = sub(":-", "", as.character(subset(qgr, strand == "-")))
+    if(target_strand %in% c("+", "-")){
+        bam_dt = bam_dt[strand == target_strand & !(which_label %in% toflip) |
+                            strand != target_strand & which_label %in% toflip]
     }
 
     bam_dt[, end := start + width - 1L]
@@ -563,6 +560,12 @@ ssvFetchBam.single = function(bam_f,
             }
         }
     )
+    # if(any(strand(qgr) == "-")){
+    #     toflip = names(subset(qgr, strand == "-"))
+    #     out[id %in% toflip & strand != "*", strand := ifelse(strand == "+", "-", "+")]
+    # }
+    out = out[order(x)][order(id)][order(strand)]
+
     if(!return_data.table){
         out = GRanges(out)
     }

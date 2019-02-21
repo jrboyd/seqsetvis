@@ -217,18 +217,19 @@ test_that("ssvFetchBam removes duplicates if max_dupes set", {
 })
 
 test_that("ssvFetchBam strand of qgr doesn't matter", {
-    qres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200)
+    qres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 200)
     pgr = qgr
     strand(pgr) = "+"
-    pres = ssvFetchBam(bam_file, win_size = 5, qgr = pgr, fragLens = 200)
+    pres = ssvFetchBam(bam_file, win_size = 5, qgr = pgr[1], fragLens = 200)
     ngr = qgr
     strand(ngr) = "-"
-    nres = ssvFetchBam(bam_file, win_size = 5, qgr = ngr, fragLens = 200)
-    expect_true(all(pres$y == qres$y))
-    expect_true(all(nres$y == qres$y))
+    nres = ssvFetchBam(bam_file, win_size = 5, qgr = ngr[1], fragLens = 200)
+    expect_equal(pres$y,  qres$y)
+    expect_equal(nres$y,  rev(qres$y))
 })
 
 test_that("ssvFetchBam strand of targt_strand does matter", {
+    strand(qgr) = "*"
     qres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "*")
     pres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "+")
     nres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "-")
@@ -257,40 +258,48 @@ test_that("ssvFetchBam strand of targt_strand does matter", {
 })
 
 test_that("ssvFetchBam target_strand of both - sample", {
-    res_both = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+    strand(qgr) = "*"
+    res_both = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 200,
                            target_strand = "both", return_data.table = TRUE)
     strand(qgr) = "+"
-    res_pos = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+    res_pos = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 200,
                           target_strand = "both", return_data.table = TRUE)
     strand(qgr) = "-"
-    res_neg = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+    res_neg = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 200,
                           target_strand = "both", return_data.table = TRUE)
     res_neg[, x := -x]
+    res_neg = res_neg[order(x)][order(id)][order(strand)]
 
     expect_true(nrow(res_both[strand == "+"]) == nrow(res_both[strand == "-"]))
     expect_true(!all(res_both[strand == "+"]$y == res_both[strand == "-"]))
-    expect_true(all(res_both == res_pos))
-    expect_true(all(res_both == res_neg))
+    expect_true(all(res_both[strand == "+"] == res_pos[strand == "+"]))
+    expect_true(all(res_both[strand == "-"] == res_pos[strand == "-"]))
+    expect_true(all(res_both[strand == "+"]$y == res_neg[strand == "-"]$y))
+    expect_true(all(res_both[strand == "-"]$y == res_neg[strand == "+"]$y))
 
 })
 
 test_that("ssvFetchBam target_strand of both - summary", {
-    res_both = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+    strand(qgr) = "*"
+    res_both = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 200,
                            target_strand = "both", return_data.table = TRUE,
                            win_method = "summary")
     strand(qgr) = "+"
-    res_pos = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+    res_pos = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 200,
                           target_strand = "both", return_data.table = TRUE,
                           win_method = "summary")
     strand(qgr) = "-"
-    res_neg = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200,
+    res_neg = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 200,
                           target_strand = "both", return_data.table = TRUE,
                           win_method = "summary")
     res_neg[, x := -x]
+    res_neg = res_neg[order(x)][order(id)][order(strand)]
 
     expect_true(nrow(res_both[strand == "+"]) == nrow(res_both[strand == "-"]))
     expect_true(!all(res_both[strand == "+"]$y == res_both[strand == "-"]))
-    expect_true(all(res_both == res_pos))
-    expect_true(all(res_both == res_neg))
+    expect_true(all(res_both[strand == "+"] == res_pos[strand == "+"]))
+    expect_true(all(res_both[strand == "-"] == res_pos[strand == "-"]))
+    expect_true(all(res_both[strand == "+"]$y == res_neg[strand == "-"]$y))
+    expect_true(all(res_both[strand == "-"]$y == res_neg[strand == "+"]$y))
 
 })

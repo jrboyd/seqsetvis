@@ -72,25 +72,29 @@ test_that("viewGRangesWinSummary_dt left", {
 # bams
 bams = c("A" = bam_file, "B" = bam_file)
 
-test_that("ssvFetchBam anchor", {
+test_that("ssvFetchBam anchor GRanges", {
     gr = ssvFetchBam(bams, qgr, win_size = 50, anchor = "center")
     gr_uns = ssvFetchBam(bams, qgr, win_size = 50, anchor = "center_unstranded")
     is_pos = as.character(strand(gr)) == "+"
     # plot(gr_uns$x[is_pos], gr$x[is_pos])
     # plot(gr_uns$x[!is_pos], gr$x[!is_pos])
-    expect_equal(gr_uns$x[is_pos], gr$x[is_pos])
-    expect_failure(expect_equal(gr_uns$x[!is_pos], gr$x[!is_pos]))
+    expect_equal(start(gr_uns)[is_pos], start(gr)[is_pos])
+    expect_failure(expect_equal(start(gr_uns)[!is_pos], start(gr)[!is_pos]))
     expect_lt(min(gr$x), 0)
     expect_lt(min(gr_uns$x), 0)
+})
 
-    dt = ssvFetchBam(bams, qgr, win_size = 50, anchor = "left", return_data.table = TRUE)
-    dt_uns = ssvFetchBam(bams, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE)
+test_that("ssvFetchBam anchor data.table", {
+    dt = ssvFetchBam(bams, qgr, win_size = 50, anchor = "left",
+                     return_data.table = TRUE)
+    dt_uns = ssvFetchBam(bams, qgr, win_size = 50, anchor = "left_unstranded",
+                         return_data.table = TRUE)
 
     is_pos = dt$strand == "+"
     # plot(dt_uns$x[is_pos], dt$x[is_pos])
     # plot(dt_uns$x[!is_pos], dt$x[!is_pos])
-    expect_equal(dt_uns$x[is_pos], dt$x[is_pos])
-    expect_failure(expect_equal(dt_uns$x[!is_pos], dt$x[!is_pos]))
+    expect_equal(dt_uns$start[is_pos], dt$start[is_pos])
+    expect_failure(expect_equal(dt_uns$start[!is_pos], dt$start[!is_pos]))
     expect_gte(min(dt$x), 0)
     expect_gte(min(dt_uns$x), 0)
 
@@ -126,25 +130,26 @@ test_that("ssvFetchBigwig anchor", {
 # bams
 bams = c("A" = bam_file, "B" = bam_file)
 
-test_that("ssvFetchBam anchor - summary", {
+test_that("ssvFetchBam anchor - summary GRanges", {
     gr = ssvFetchBam(bams, qgr, win_size = 50, anchor = "center", win_method = "summary")
     gr_uns = ssvFetchBam(bams, qgr, win_size = 50, anchor = "center_unstranded", win_method = "summary")
     is_pos = as.character(strand(gr)) == "+"
     # plot(gr_uns$x[is_pos], gr$x[is_pos])
     # plot(gr_uns$x[!is_pos], gr$x[!is_pos])
-    expect_equal(gr_uns$x[is_pos], gr$x[is_pos])
-    expect_failure(expect_equal(gr_uns$x[!is_pos], gr$x[!is_pos]))
+    expect_equal(start(gr_uns)[is_pos], start(gr)[is_pos])
+    expect_failure(expect_equal(start(gr_uns)[!is_pos], start(gr)[!is_pos]))
     expect_lt(min(gr$x), 0)
     expect_lt(min(gr_uns$x), 0)
-
+})
+test_that("ssvFetchBam anchor - summary data.table", {
     dt = ssvFetchBam(bams, qgr, win_size = 50, anchor = "left", return_data.table = TRUE, win_method = "summary")
     dt_uns = ssvFetchBam(bams, qgr, win_size = 50, anchor = "left_unstranded", return_data.table = TRUE, win_method = "summary")
 
     is_pos = dt$strand == "+"
     # plot(dt_uns$x[is_pos], dt$x[is_pos])
     # plot(dt_uns$x[!is_pos], dt$x[!is_pos])
-    expect_equal(dt_uns$x[is_pos], dt$x[is_pos])
-    expect_failure(expect_equal(dt_uns$x[!is_pos], dt$x[!is_pos]))
+    expect_equal(dt_uns$start[is_pos], dt$start[is_pos])
+    expect_failure(expect_equal(dt_uns$start[!is_pos], dt$start[!is_pos]))
     expect_gte(min(dt$x), 0)
     expect_gte(min(dt_uns$x), 0)
 
