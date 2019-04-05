@@ -1,3 +1,4 @@
+testthat::context("StrandFlipping")
 library(seqsetvis)
 library(testthat)
 library(GenomicRanges)

@@ -315,6 +315,7 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
+#' @param dcast_fill value to supply to dcast fill argument. default is NA.
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @return data.table of signal profiles, ready for ssvSignalHeatmap
 #' @examples
@@ -337,7 +338,8 @@ ssvSignalClustering = function(bw_data, nclust = 6,
                                cluster_ = "cluster_id",
                                max_rows = 500, max_cols = 100,
                                clustering_col_min = -Inf,
-                               clustering_col_max = Inf){
+                               clustering_col_max = Inf,
+                               dcast_fill = NA){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
     output_GRanges = FALSE
     if(class(bw_data)[1] == "GRanges"){
@@ -384,11 +386,13 @@ ssvSignalClustering = function(bw_data, nclust = 6,
         dc_dt = data.table::dcast(plot_dt[get(column_) > clustering_col_min &
                                               get(column_) < clustering_col_max],
                                   formula = dc_formula,
-                                  value.var = fill_)
+                                  value.var = fill_,
+                                  fill = dcast_fill)
     }else{
         dc_dt = data.table::dcast(plot_dt,
                                   formula = dc_formula,
-                                  value.var = fill_)
+                                  value.var = fill_,
+                                  fill = dcast_fill)
     }
 
     dc_mat = as.matrix(dc_dt[,-1])

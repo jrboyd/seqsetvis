@@ -46,4 +46,4 @@ RoxygenNote: 6.1.0
 VignetteBuilder: knitr
 NeedsCompilation: no
 Packaged: 2018-01-08 17:54:19 UTC; joeboyd
-biocViews: Software, ChIPSeq, Sequencing, Visualization
+biocViews: Software, ChIPSeq, HighThroughputSequencing, Sequencing, Visualization

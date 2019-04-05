@@ -1,3 +1,4 @@
+testthat::context("MakeMembTable")
 library(seqsetvis)
 library(testthat)
 library(GenomicRanges)

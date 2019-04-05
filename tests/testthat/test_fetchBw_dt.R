@@ -1,3 +1,4 @@
+testthat::context("FetchBw_dt")
 library(seqsetvis)
 library(testthat)
 library(GenomicRanges)

@@ -1,3 +1,4 @@
+testthat::context("FetchBam")
 library(seqsetvis)
 library(testthat)
 library(GenomicRanges)

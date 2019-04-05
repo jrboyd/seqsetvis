@@ -472,6 +472,7 @@ fetchBam = function(bam_f,
 #'   present. fragLen must be NA for any other value to be valid.  "ignore" will
 #'   not count spliced regions.  add" counts spliced regions along with others,
 #'   "only" will only count spliced regions and ignore others.
+#' @param ... passed to Rsamtools::ScanBamParam()
 #' @return tidy GRanges (or data.table if specified) with pileups from bam file.
 #'   pileup is calculated only every win_size bp.
 #' @importFrom stats weighted.mean
@@ -487,7 +488,8 @@ ssvFetchBam.single = function(bam_f,
                               return_data.table = FALSE,
                               max_dupes = Inf,
                               splice_strategy = c("none", "ignore", "add",
-                                                  "only", "splice_count")[1]) {
+                                                  "only", "splice_count")[1],
+                              ...) {
     stopifnot(is.character(win_method))
     stopifnot(length(win_method) == 1)
     stopifnot(class(qgr) == "GRanges")
@@ -500,7 +502,7 @@ ssvFetchBam.single = function(bam_f,
                                      "only", "splice_count"))
     if(splice_strategy == "splice_count"){
         return(fetchBam(bam_f, qgr, NA, "*",
-                        max_dupes, splice_strategy))
+                        max_dupes, splice_strategy, ...))
     }
     switch (
         win_method,
@@ -508,9 +510,9 @@ ssvFetchBam.single = function(bam_f,
             qgr = prepare_fetch_GRanges(qgr, win_size)
             if(target_strand == "both"){
                 pos_gr = fetchBam(bam_f, qgr, fragLen, "+",
-                                  max_dupes, splice_strategy)
+                                  max_dupes, splice_strategy, ...)
                 neg_gr = fetchBam(bam_f, qgr, fragLen, "-",
-                                  max_dupes, splice_strategy)
+                                  max_dupes, splice_strategy, ...)
                 pos_dt = viewGRangesWinSample_dt(pos_gr, qgr,
                                                  win_size, anchor = anchor)
                 neg_dt = viewGRangesWinSample_dt(neg_gr, qgr,
@@ -523,7 +525,7 @@ ssvFetchBam.single = function(bam_f,
                 )
             }else{
                 score_gr = fetchBam(bam_f, qgr, fragLen, target_strand,
-                                    max_dupes, splice_strategy)
+                                    max_dupes, splice_strategy, ...)
                 out = viewGRangesWinSample_dt(score_gr, qgr,
                                               win_size, anchor = anchor)
                 out[, strand := target_strand]
@@ -534,9 +536,9 @@ ssvFetchBam.single = function(bam_f,
         summary = {
             if(target_strand == "both"){
                 pos_gr = fetchBam(bam_f, qgr, fragLen, "+",
-                                  max_dupes, splice_strategy)
+                                  max_dupes, splice_strategy, ...)
                 neg_gr = fetchBam(bam_f, qgr, fragLen, "-",
-                                  max_dupes, splice_strategy)
+                                  max_dupes, splice_strategy, ...)
                 pos_dt = viewGRangesWinSummary_dt(pos_gr, qgr, win_size,
                                                   summary_FUN = summary_FUN,
                                                   anchor = anchor)
@@ -552,7 +554,7 @@ ssvFetchBam.single = function(bam_f,
                 )
             }else{
                 score_gr = fetchBam(bam_f, qgr, fragLen, target_strand,
-                                    max_dupes, splice_strategy)
+                                    max_dupes, splice_strategy, ...)
                 out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
                                                summary_FUN = summary_FUN,
                                                anchor = anchor)
@@ -598,6 +600,7 @@ ssvFetchBam.single = function(bam_f,
 #'   qgr.  NA causes no extension of reads to fragment size.
 #' @param target_strand character. One of c("*", "+", "-"). Controls filtering
 #'   of reads by strand.  Default of "*" combines both strands.
+#' @param flip_strand boolean. if TRUE strands are flipped.
 #' @param anchor character, one of c("center", "center_unstranded", "left",
 #'   "left_unstranded")
 #' @param names_variable The column name where unique_names are stored.
@@ -611,6 +614,7 @@ ssvFetchBam.single = function(bam_f,
 #'   not count spliced regions.  add" counts spliced regions along with others,
 #'   "only" will only count spliced regions and ignore others.
 #' @param n_cores integer number of cores to use.
+#' @param ... passed to Rsamtools::ScanBamParam()
 #' Uses mc.cores option if not supplied.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
 #'   fetched values.
@@ -640,6 +644,7 @@ ssvFetchBam = function(file_paths,
                        summary_FUN = stats::weighted.mean,
                        fragLens = "auto",
                        target_strand = c("*", "+", "-", "both")[1],
+                       flip_strand = FALSE,
                        anchor = c("left", "left_unstranded", "center",
                                   "center_unstranded")[3],
                        names_variable = "sample",
@@ -647,7 +652,8 @@ ssvFetchBam = function(file_paths,
                        max_dupes = Inf,
                        splice_strategy = c("none", "ignore", "add",
                                            "only", "splice_count")[1],
-                       n_cores = getOption("mc.cores", 1)){
+                       n_cores = getOption("mc.cores", 1),
+                       ...){
     stopifnot(all(is.character(fragLens) |
                       is.numeric(fragLens) |
                       is.na(fragLens)))
@@ -659,6 +665,10 @@ ssvFetchBam = function(file_paths,
 
     load_bam = function(f, nam, qgr) {
         message("loading ", f, " ...")
+        if(!file.exists(paste0(f, ".bai"))){
+            warning("creating index for ", f)
+            Rsamtools::indexBam(f)
+        }
         fl = fragLens[f]
         if(!is.na(fl))
             if(fl == "auto"){
@@ -674,20 +684,91 @@ ssvFetchBam = function(file_paths,
                                 anchor = anchor,
                                 return_data.table = TRUE,
                                 max_dupes = max_dupes,
-                                splice_strategy = splice_strategy)
+                                splice_strategy = splice_strategy,
+                                ...)
         # dt[[names_variable]] = rep(nam, nrow(dt))
         message("finished loading ", nam, ".")
         dt
     }
 
-    ssvFetchSignal(file_paths = file_paths,
-                   qgr = qgr,
-                   load_signal = load_bam,
-                   unique_names = unique_names,
-                   names_variable = names_variable,
-                   win_size = win_size,
-                   win_method = win_method,
-                   return_data.table = return_data.table,
-                   n_cores = n_cores)
+    bdt = ssvFetchSignal(file_paths = file_paths,
+                         qgr = qgr,
+                         load_signal = load_bam,
+                         unique_names = unique_names,
+                         names_variable = names_variable,
+                         win_size = win_size,
+                         win_method = win_method,
+                         return_data.table = TRUE,
+                         n_cores = n_cores)
+    if(flip_strand){
+        if(target_strand == "*"){
+            warning('flip_strand is not compatible with target_strand="*", ignored.')
+        }else{
+            bdt[, strand := ifelse(strand == "+", "-", "+")]
+        }
+    }
+    if(!return_data.table){
+        bdt = GRanges(bdt)
+    }
+    bdt
 
+}
+
+#' ssvFetchBamPE
+#'
+#' wrapper to handle standard FR paired end data
+#'
+#' @param file_paths character vector of file_paths to load from. Alternatively,
+#' file_paths can be a data.frame or data.table whose first column is a
+#' character vector of paths and additial columns will be used as metadata.
+#' @param qgr Set of GRanges to query.  For valid results the width of each
+#'   interval should be identical and evenly divisible by \code{win_size}.
+#' @param win_size The window size that evenly divides widths in \code{qgr}.
+#' @param target_strand character. if one of "+" or "-", reads are filtered to
+#'   match. ignored if any other value.
+#' @param splice_strategy  character, one of c("none", "ignore", "add", "only",
+#'   "splice_count"). Default is "none" and spliced alignment are asssumed not
+#'   present. fragLen must be NA for any other value to be valid.  "ignore" will
+#'   not count spliced regions.  add" counts spliced regions along with others,
+#'   "only" will only count spliced regions and ignore others.
+#' @param return_data.table logical. If TRUE the internal data.table is returned
+#'   instead of GRanges.  Default is FALSE.
+#' @return a GRanges (or data.table if return_data.table == TRUE)
+#' @export
+#'
+#' @examples
+#' if(Sys.info()['sysname'] != "Windows"){
+#' library(GenomicRanges)
+#' bam_f = system.file("extdata/test.bam",
+#'     package = "seqsetvis", mustWork = TRUE)
+#' bam_files = c("a" = bam_f, "b" = bam_f)
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' bw_gr = ssvFetchBamPE(bam_files, qgr, win_size = 10)
+#' }
+ssvFetchBamPE = function(file_paths, qgr, win_size = 50, target_strand = "both", splice_strategy = "ignore",
+                         return_data.table = FALSE){
+    strand(qgr) = "*"
+    bam_r1 = ssvFetchBam(file_paths = file_paths, qgr = qgr, target_strand = target_strand, splice_strategy = splice_strategy,
+                         return_data.table = TRUE, fragLens = NA, win_size = win_size,
+                         flag = scanBamFlag(isFirstMateRead = TRUE))
+    cn = colnames(bam_r1)
+    bam_r1$read = "r1"
+    bam_r2 = ssvFetchBam(file_paths = file_paths, qgr = qgr, target_strand = target_strand,
+                         return_data.table = TRUE, fragLens = NA, win_size = win_size,
+                         flag = scanBamFlag(isSecondMateRead = TRUE), flip_strand = TRUE)
+    bam_r2$read = "r2"
+
+    # ggplot(rbind(bam_r1, bam_r2), aes(x = x, y = y, color = strand)) + geom_path() + facet_wrap("read")
+    # bam_r1[, strand := ifelse(strand == "+", "-", "+") ]
+    # ggplot(rbind(bam_r1, bam_r2), aes(x = x, y = y, color = strand)) + geom_path() + facet_wrap("read")
+    bam_dt = rbind(bam_r1, bam_r2)[, cn, with = FALSE]
+    bam_dt = bam_dt[, .(y = sum(y)), by = c(cn[cn != "y"])][, cn, with = FALSE]
+    # if(as.character(strand(qgr)) == "+"){
+    #     bam_dt[, strand := ifelse(strand == "+", "-", "+") ]
+    # }
+    # ggplot(bam_dt, aes(x = x, y = y, color = strand)) + geom_path()
+    if(!return_data.table){
+        bam_dt = GRanges(bam_dt)
+    }
+    bam_dt
 }

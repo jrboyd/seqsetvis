@@ -1,3 +1,4 @@
+testthat::context("Splines")
 library(testthat)
 library(seqsetvis)
 library(GenomicRanges)

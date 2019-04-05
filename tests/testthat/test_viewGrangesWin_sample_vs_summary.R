@@ -1,3 +1,4 @@
+testthat::context("ViewGrangesWin")
 # flipping viewGranges
 library(seqsetvis)
 library(GenomicRanges)

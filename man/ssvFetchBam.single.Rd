@@ -10,7 +10,7 @@ ssvFetchBam.single(bam_f, qgr, win_size = 50, win_method = c("sample",
   "left_unstranded", "center", "center_unstranded")[3],
   return_data.table = FALSE, max_dupes = Inf,
   splice_strategy = c("none", "ignore", "add", "only",
-  "splice_count")[1])
+  "splice_count")[1], ...)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}
@@ -50,6 +50,8 @@ over this number are removed, Default is Inf.}
 present. fragLen must be NA for any other value to be valid.  "ignore" will
 not count spliced regions.  add" counts spliced regions along with others,
 "only" will only count spliced regions and ignore others.}
+
+\item{...}{passed to Rsamtools::ScanBamParam()}
 }
 \value{
 tidy GRanges (or data.table if specified) with pileups from bam file.

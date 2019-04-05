@@ -1,3 +1,4 @@
+testthat::context("CenterAtMax")
 library(seqsetvis)
 library(testthat)
 library(data.table)

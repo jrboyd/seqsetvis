@@ -1,3 +1,4 @@
+testthat::context("FactorizeMembTable")
 library(seqsetvis)
 
 test_that("ssvFactorizeMembTable expected output format for GRanges", {

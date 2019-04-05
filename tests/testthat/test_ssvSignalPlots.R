@@ -1,3 +1,4 @@
+testthat::context("SignalPlots")
 #all ssvSignalPlots functions should accept GRanges in addition to data.table
 # as originally implemented
 library(seqsetvis)

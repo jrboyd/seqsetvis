@@ -1,3 +1,4 @@
+testthat::context("OverlapIntervalSets")
 library(seqsetvis)
 library(GenomicRanges)
 library(testthat)

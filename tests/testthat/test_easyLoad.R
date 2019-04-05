@@ -1,3 +1,4 @@
+testthat::context("EasyLoad")
 library(seqsetvis)
 library(testthat)
 library(GenomicRanges)

@@ -1,3 +1,4 @@
+testthat::context("FeaturePlots")
 library(seqsetvis)
 library(testthat)
 library(GenomicRanges)

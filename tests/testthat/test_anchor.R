@@ -1,3 +1,4 @@
+testthat::context("Anchor")
 # flipping viewGranges
 library(seqsetvis)
 library(GenomicRanges)

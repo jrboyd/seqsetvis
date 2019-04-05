@@ -1,3 +1,4 @@
+testthat::context("Cigar")
 library(data.table)
 library(testthat)
 library(GenomicRanges)

@@ -1,3 +1,4 @@
+testthat::context("FetchBw")
 #tests seqsetvis::ssvFetchBigwig.single and seqsetvis::ssvFetchBigwig
 #originally data.table version of each which may explain some strangeness
 library(seqsetvis)

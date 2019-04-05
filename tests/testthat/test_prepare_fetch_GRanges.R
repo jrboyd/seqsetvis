@@ -1,3 +1,4 @@
+testthat::context("PrepareFetch")
 # flipping viewGranges
 library(seqsetvis)
 library(GenomicRanges)

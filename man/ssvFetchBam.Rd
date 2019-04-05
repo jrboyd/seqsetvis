@@ -9,11 +9,12 @@ resulting data.table and uses rbindlist to efficiently combine results}
 ssvFetchBam(file_paths, qgr, unique_names = names(file_paths),
   win_size = 50, win_method = c("sample", "summary")[1],
   summary_FUN = stats::weighted.mean, fragLens = "auto",
-  target_strand = c("*", "+", "-", "both")[1], anchor = c("left",
-  "left_unstranded", "center", "center_unstranded")[3],
-  names_variable = "sample", return_data.table = FALSE,
-  max_dupes = Inf, splice_strategy = c("none", "ignore", "add", "only",
-  "splice_count")[1], n_cores = getOption("mc.cores", 1))
+  target_strand = c("*", "+", "-", "both")[1], flip_strand = FALSE,
+  anchor = c("left", "left_unstranded", "center",
+  "center_unstranded")[3], names_variable = "sample",
+  return_data.table = FALSE, max_dupes = Inf,
+  splice_strategy = c("none", "ignore", "add", "only",
+  "splice_count")[1], n_cores = getOption("mc.cores", 1), ...)
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from. Alternatively,
@@ -43,6 +44,8 @@ qgr.  NA causes no extension of reads to fragment size.}
 \item{target_strand}{character. One of c("*", "+", "-"). Controls filtering
 of reads by strand.  Default of "*" combines both strands.}
 
+\item{flip_strand}{boolean. if TRUE strands are flipped.}
+
 \item{anchor}{character, one of c("center", "center_unstranded", "left",
 "left_unstranded")}
 
@@ -60,7 +63,9 @@ present. fragLen must be NA for any other value to be valid.  "ignore" will
 not count spliced regions.  add" counts spliced regions along with others,
 "only" will only count spliced regions and ignore others.}
 
-\item{n_cores}{integer number of cores to use.
+\item{n_cores}{integer number of cores to use.}
+
+\item{...}{passed to Rsamtools::ScanBamParam()
 Uses mc.cores option if not supplied.}
 }
 \value{
