@@ -15,80 +15,172 @@ doTest_ssvSignalPlots = function(test_object){
     })
 
     test_that("ssvSignalBandedQuantiles different hsv setting", {
-        p_rev = ssvSignalBandedQuantiles(test_object, by_ = "sample", hsv_reverse = T)
+        p_rev = ssvSignalBandedQuantiles(test_object,
+                                         by_ = "sample", hsv_reverse = TRUE)
         expect_s3_class(p_rev, "ggplot")
 
-        p_symm = ssvSignalBandedQuantiles(test_object, by_ = "sample", hsv_symmetric = T)
+        p_symm = ssvSignalBandedQuantiles(test_object,
+                                          by_ = "sample", hsv_symmetric = TRUE)
         expect_s3_class(p_symm, "ggplot")
 
-        p_symmgray = ssvSignalBandedQuantiles(test_object, by_ = "sample", hsv_symmetric = T, hsv_grayscale = T)
+        p_symmgray = ssvSignalBandedQuantiles(
+            test_object,
+            by_ = "sample",
+            hsv_symmetric = TRUE,
+            hsv_grayscale = TRUE
+        )
         expect_s3_class(p_symmgray, "ggplot")
 
-        p_unsymmgray = ssvSignalBandedQuantiles(test_object, by_ = "sample", hsv_symmetric = F, hsv_grayscale = T)
+        p_unsymmgray = ssvSignalBandedQuantiles(
+            test_object,
+            by_ = "sample",
+            hsv_symmetric = FALSE,
+            hsv_grayscale = TRUE
+        )
         expect_s3_class(p_unsymmgray, "ggplot")
 
-        p_symmrev = ssvSignalBandedQuantiles(test_object, by_ = "sample", hsv_symmetric = T, hsv_reverse = T)
+        p_symmrev = ssvSignalBandedQuantiles(
+            test_object,
+            by_ = "sample",
+            hsv_symmetric = TRUE,
+            hsv_reverse = TRUE
+        )
         expect_s3_class(p_symmrev, "ggplot")
 
-        p_symmrev = ssvSignalBandedQuantiles(test_object, by_ = "sample", hsv_symmetric = T, hsv_reverse = T)
+        p_symmrev = ssvSignalBandedQuantiles(
+            test_object,
+            by_ = "sample",
+            hsv_symmetric = TRUE,
+            hsv_reverse = TRUE
+        )
         expect_s3_class(p_symmrev, "ggplot")
     })
 
 
     test_that("ssvSignalScatterplot works with basic inputs", {
-        p1 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF")
+        p1 = ssvSignalScatterplot(test_object,
+                                  x_name = "MCF10A_CTCF",
+                                  y_name = "MCF10AT1_CTCF")
         expect_s3_class(p1, "ggplot")
-        p2 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF", plot_type = "volcano")
+        p2 = ssvSignalScatterplot(
+            test_object,
+            x_name = "MCF10A_CTCF",
+            y_name = "MCF10AT1_CTCF",
+            plot_type = "volcano"
+        )
         expect_s3_class(p2, "ggplot")
     })
 
-    test_that("ssvSignalScatterplot throws correct error for bad x_name or y_name", {
-        expect_error(ssvSignalScatterplot(test_object, x_name = "badx", y_name = "MCF10AT1_CTCF",
-                                          value_variable = "x"), "badx")
-        expect_error(ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "bady",
-                                          value_variable = "x"))
-    })
+    test_that("ssvSignalScatterplot throws correct error for bad x_name or y_name",
+              {
+                  expect_error(
+                      ssvSignalScatterplot(
+                          test_object,
+                          x_name = "badx",
+                          y_name = "MCF10AT1_CTCF",
+                          value_variable = "x"
+                      ),
+                      "badx"
+                  )
+                  expect_error(
+                      ssvSignalScatterplot(
+                          test_object,
+                          x_name = "MCF10A_CTCF",
+                          y_name = "bady",
+                          value_variable = "x"
+                      )
+                  )
+              })
 
     test_that("ssvSignalScatterplot works with other inputs", {
-        p1 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF",
-                                  value_variable = "x")
+        p1 = ssvSignalScatterplot(
+            test_object,
+            x_name = "MCF10A_CTCF",
+            y_name = "MCF10AT1_CTCF",
+            value_variable = "x"
+        )
         expect_s3_class(p1, "ggplot")
-        p2 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10CA1_CTCF",
-                                  value_function = median)
+        p2 = ssvSignalScatterplot(
+            test_object,
+            x_name = "MCF10A_CTCF",
+            y_name = "MCF10CA1_CTCF",
+            value_function = median
+        )
         expect_s3_class(p2, "ggplot")
-        p3 = ssvSignalScatterplot(test_object, x_name = "1", y_name = "2",
-                                  value_function = median,
-                                  by_ = "sample", xy_variable = "id")
+        p3 = ssvSignalScatterplot(
+            test_object,
+            x_name = "1",
+            y_name = "2",
+            value_function = median,
+            by_ = "sample",
+            xy_variable = "id"
+        )
         memb = data.frame(id = unique(test_object$id),  group = letters[1:5])
-        p4 = ssvSignalScatterplot(bw_data = test_object, x_name = "MCF10A_CTCF", y_name = "MCF10A_CTCF",
-                                  color_table = memb)
+        p4 = ssvSignalScatterplot(
+            bw_data = test_object,
+            x_name = "MCF10A_CTCF",
+            y_name = "MCF10A_CTCF",
+            color_table = memb
+        )
         expect_s3_class(p4, "ggplot")
 
-        p5 = ssvSignalScatterplot(bw_data = test_object, x_name = "MCF10A_CTCF", y_name = "MCF10A_CTCF", fixed_coords = F,
-                                  color_table = memb)
+        p5 = ssvSignalScatterplot(
+            bw_data = test_object,
+            x_name = "MCF10A_CTCF",
+            y_name = "MCF10A_CTCF",
+            fixed_coords = FALSE,
+            color_table = memb
+        )
         expect_s3_class(p5, "ggplot")
     })
 
     test_that("ssvSignalScatterplot works with help enabled inputs", {
-        p1 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF",
-                                  value_variable = "x", show_help = T)
+        p1 = ssvSignalScatterplot(
+            test_object,
+            x_name = "MCF10A_CTCF",
+            y_name = "MCF10AT1_CTCF",
+            value_variable = "x",
+            show_help = TRUE
+        )
         expect_s3_class(p1, "ggplot")
 
-        p1v = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF",
-                                   value_variable = "x", show_help = T, plot_type = "volcano")
+        p1v = ssvSignalScatterplot(
+            test_object,
+            x_name = "MCF10A_CTCF",
+            y_name = "MCF10AT1_CTCF",
+            value_variable = "x",
+            show_help = TRUE,
+            plot_type = "volcano"
+        )
         expect_s3_class(p1v, "ggplot")
 
-        p2 = ssvSignalScatterplot(test_object, x_name = "MCF10A_CTCF", y_name = "MCF10CA1_CTCF",
-                                  value_function = median, show_help = T)
+        p2 = ssvSignalScatterplot(
+            test_object,
+            x_name = "MCF10A_CTCF",
+            y_name = "MCF10CA1_CTCF",
+            value_function = median,
+            show_help = TRUE
+        )
         expect_s3_class(p2, "ggplot")
 
-        p3 = ssvSignalScatterplot(test_object, x_name = "1", y_name = "2",
-                                  value_function = median,
-                                  by_ = "sample", xy_variable = "id", show_help = T)
+        p3 = ssvSignalScatterplot(
+            test_object,
+            x_name = "1",
+            y_name = "2",
+            value_function = median,
+            by_ = "sample",
+            xy_variable = "id",
+            show_help = TRUE
+        )
 
         memb = data.frame(id = unique(test_object$id),  group = letters[1:5])
-        p4 = ssvSignalScatterplot(bw_data = test_object, x_name = "MCF10A_CTCF", y_name = "MCF10A_CTCF",
-                                  color_table = memb, show_help = T)
+        p4 = ssvSignalScatterplot(
+            bw_data = test_object,
+            x_name = "MCF10A_CTCF",
+            y_name = "MCF10A_CTCF",
+            color_table = memb,
+            show_help = TRUE
+        )
         expect_s3_class(p4, "ggplot")
     })
 
@@ -127,16 +219,19 @@ doTest_ssvSignalPlots = function(test_object){
         test_plots = list(
             ssvSignalLineplot(sub_to, facet_ = "sample"),
             ssvSignalLineplot(sub_to,
-                               facet_ = "sample~.",
-                               facet_method = facet_grid),
-            ssvSignalLineplot(sub_to,
-                               facet_ = paste("sample", "~", "id"), facet_method = facet_grid),
+                              facet_ = "sample~.",
+                              facet_method = facet_grid),
+            ssvSignalLineplot(
+                sub_to,
+                facet_ = paste("sample", "~", "id"),
+                facet_method = facet_grid
+            ),
             ssvSignalLineplot(sub_to),
             ssvSignalLineplot(sub_to, facet_ = "id"),
             ssvSignalLineplot(sub_to,
-                               facet_ = "id", spline_n = 10)
+                              facet_ = "id", spline_n = 10)
         )
-        lapply(test_plots, function(p1){
+        lapply(test_plots, function(p1) {
             expect_s3_class(p1, "ggplot")
         })
     })
@@ -149,13 +244,18 @@ doTest_ssvSignalPlots = function(test_object){
             ssvSignalLineplotAgg(test_object, spline_n = 10) +
                 labs(title = "agg regions by sample, with spline smoothing."),
             ssvSignalLineplotAgg(test_object[test_object$id %in% 1:10],
-                                  sample_ = "id", color_ = "id") +
+                                 sample_ = "id", color_ = "id") +
                 labs(title = "agg samples by region id (weird)"),
-            ssvSignalLineplotAgg(test_object[test_object$id %in% 1:10], sample_ = "id",
-                                  color_ = "id", spline_n = 10) +
-                labs(title = "agg samples by region id (weird), with spline smoothing")
+            ssvSignalLineplotAgg(
+                test_object[test_object$id %in% 1:10],
+                sample_ = "id",
+                color_ = "id",
+                spline_n = 10
+            ) +
+                labs(title = paste("agg samples by region id",
+                                   "(weird), with spline smoothing"))
         )
-        lapply(test_plots, function(p1){
+        lapply(test_plots, function(p1) {
             expect_s3_class(p1, "ggplot")
         })
     })

@@ -26,25 +26,26 @@ test_that("ssvFeatureVenn various set sizes, no outside counts. 3.", {
 })
 
 test_that("ssvFeatureVenn various set sizes, with outside counts. 1.", {
-    p1 = ssvFeatureVenn(setL[1], show_outside_count = T)
+    p1 = ssvFeatureVenn(setL[1], show_outside_count = TRUE)
     p1
     expect_s3_class(p1, class = "ggplot")
 })
 
 test_that("ssvFeatureVenn various set sizes, with outside counts. 2.", {
-    p2 = ssvFeatureVenn(setL[1:2], show_outside_count = T)
+    p2 = ssvFeatureVenn(setL[1:2], show_outside_count = TRUE)
     p2
     expect_s3_class(p2, class = "ggplot")
 })
 
 test_that("ssvFeatureVenn various set sizes, with outside counts. 3.", {
-    p3 = ssvFeatureVenn(setL[1:3], show_outside_count = T)
+    p3 = ssvFeatureVenn(setL[1:3], show_outside_count = TRUE)
     p3
     expect_s3_class(p3, class = "ggplot")
 })
 
 test_that("ssvFeatureVenn can't plot more than 3 sets.", {
-    setL = list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c, "gr_d" = gr_c, "gr_e" = gr_a)
+    setL = list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" =
+                    gr_c, "gr_d" = gr_c, "gr_e" = gr_a)
     expect_error(ssvFeatureVenn(setL[1:4]))
     expect_error(ssvFeatureVenn(setL[1:5]))
 })
@@ -63,31 +64,54 @@ test_that("ssvFeatureEuler fill, no fill", {
 })
 
 test_that("ssvFeatureBinaryHeatmap no raster option", {
-    p1 = ssvFeatureBinaryHeatmap(setL, raster_approximation = F)
+    p1 = ssvFeatureBinaryHeatmap(setL, raster_approximation = FALSE)
     expect_s3_class(p1, class = "ggplot")
 })
 
 test_that("ssvFeatureBinaryHeatmap downsample", {
-    p1 = ssvFeatureBinaryHeatmap(setL, raster_approximation = T, raster_width_min = 2)
+    p1 = ssvFeatureBinaryHeatmap(setL,
+                                 raster_approximation = TRUE,
+                                 raster_width_min = 2)
     expect_s3_class(p1, class = "ggplot")
 
-    p2 = ssvFeatureBinaryHeatmap(setL, raster_approximation = T, raster_height_min = 3)
+    p2 = ssvFeatureBinaryHeatmap(setL,
+                                 raster_approximation = TRUE,
+                                 raster_height_min = 3)
     expect_s3_class(p2, class = "ggplot")
 
-    p3 = ssvFeatureBinaryHeatmap(setL, raster_approximation = T, raster_height_min = 3, raster_width_min = 2)
+    p3 = ssvFeatureBinaryHeatmap(
+        setL,
+        raster_approximation = TRUE,
+        raster_height_min = 3,
+        raster_width_min = 2
+    )
     expect_s3_class(p3, class = "ggplot")
 
 })
 
 test_that("ssvFeatureVenn various other paramters don't throw error", {
-    olap = ssvOverlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b, "gr_c" = gr_c))
-    p = ssvFeatureVenn(olap, circle_colors = c("red", "blue", "green"), fill_alpha = .1,
-                       counts_txt_size = 10, show_outside_count = T,
-                       counts_as_labels = T)
+    olap = ssvOverlapIntervalSets(list(
+        "gr_a" = gr_a,
+        "gr_b" = gr_b,
+        "gr_c" = gr_c
+    ))
+    p = ssvFeatureVenn(
+        olap,
+        circle_colors = c("red", "blue", "green"),
+        fill_alpha = .1,
+        counts_txt_size = 10,
+        show_outside_count = TRUE,
+        counts_as_labels = TRUE
+    )
     expect_s3_class(p, class = "ggplot")
-    p = ssvFeatureVenn(olap, circle_colors = c("red", "blue", "green"), fill_alpha = 0,
-                       counts_txt_size = 10, show_outside_count = T,
-                       counts_as_labels = T)
+    p = ssvFeatureVenn(
+        olap,
+        circle_colors = c("red", "blue", "green"),
+        fill_alpha = 0,
+        counts_txt_size = 10,
+        show_outside_count = TRUE,
+        counts_as_labels = TRUE
+    )
     expect_s3_class(p, class = "ggplot")
 })
 

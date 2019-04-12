@@ -17,7 +17,7 @@ test_dt2[sample == 2, xvals := xvals + 10]
 test_dt2[sample == 2, yvals := yvals + 300]
 ggplot(test_dt2, aes(x = xvals, y = yvals, col = locus)) + geom_line() + geom_point() + facet_grid(sample ~ .)
 #should set by
-cm_dt_noBy = centerAtMax(test_dt, x_ = "xvals", y_ = "yvals", by_ = "", check_by_dupes = F)
+cm_dt_noBy = centerAtMax(test_dt, x_ = "xvals", y_ = "yvals", by_ = "", check_by_dupes = FALSE)
 ggplot(cm_dt_noBy, aes(x = xvals, y = yvals, col = locus)) +
     geom_line() +
     geom_point() +
@@ -33,7 +33,7 @@ ggplot(cm_dt_wBy, aes(x = xvals, y = yvals, col = locus)) +
     geom_line(data = test_dt, aes(col = locus), alpha = .3) +
     labs(title = "With by_ set properly, all profiles are shifted to their individual maximum")
 #effect of trimming
-cm_dt_wBy_noTrim =centerAtMax(test_dt, x_ = "xvals", y_ = "yvals", by = "locus", trim_to_valid = F)
+cm_dt_wBy_noTrim =centerAtMax(test_dt, x_ = "xvals", y_ = "yvals", by = "locus", trim_to_valid = FALSE)
 ggplot(cm_dt_wBy, aes(x = xvals, y = yvals, col = locus)) +
     geom_line() +
     geom_point() +
@@ -62,9 +62,9 @@ doTests_centerAtMax = function(test_object, test_object2){
     })
 
     test_that("centerAtMax trimming reduces ranges", {
-        cm_noTrim = centerAtMax(test_object, x_ = "xvals", y_ = "yvals", by_ = "locus", trim_to_valid = F)
+        cm_noTrim = centerAtMax(test_object, x_ = "xvals", y_ = "yvals", by_ = "locus", trim_to_valid = FALSE)
         expect_equal(nrow(cm_noTrim), nrow(test_object))
-        cm_wTrim = centerAtMax(test_object, x_ = "xvals", y_ = "yvals", by_ = "locus", trim_to_valid = T)
+        cm_wTrim = centerAtMax(test_object, x_ = "xvals", y_ = "yvals", by_ = "locus", trim_to_valid = TRUE)
         nr_test = nrow(as.data.frame(test_object))
         nr_wTrim = nrow(as.data.frame(cm_wTrim))
         nr_noTrim = nrow(as.data.frame(test_object))
@@ -79,8 +79,24 @@ doTests_centerAtMax = function(test_object, test_object2){
     })
 
     test_that("centerAtMax viewSize", {
-        dt1 = centerAtMax(dt = test_object2, x_ = "xvals", y_ = "yvals", by_ = c("locus"), view_size = 5, trim_to_valid = F, check_by_dupes = F)
-        dt2 = centerAtMax(dt = test_object2, x_ = "xvals", y_ = "yvals", by_ = c("locus"), view_size = 10, trim_to_valid = F, check_by_dupes = F)
+        dt1 = centerAtMax(
+            dt = test_object2,
+            x_ = "xvals",
+            y_ = "yvals",
+            by_ = c("locus"),
+            view_size = 5,
+            trim_to_valid = FALSE,
+            check_by_dupes = FALSE
+        )
+        dt2 = centerAtMax(
+            dt = test_object2,
+            x_ = "xvals",
+            y_ = "yvals",
+            by_ = c("locus"),
+            view_size = 10,
+            trim_to_valid = FALSE,
+            check_by_dupes = FALSE
+        )
         nr1 = nrow(as.data.frame(dt1))
         nr2 = nrow(as.data.frame(dt2))
         expect_equal(nr1, nr2)
@@ -88,8 +104,22 @@ doTests_centerAtMax = function(test_object, test_object2){
     })
 
     test_that("centerAtMax viewSize", {
-        dt1 = centerAtMax(dt = test_object2, x_ = "xvals", y_ = "yvals", by_ = c("locus"), check_by_dupes = F, replace_x = F)
-        dt2 = centerAtMax(dt = test_object2, x_ = "xvals", y_ = "yvals", by_ = c("locus"), check_by_dupes = F, replace_x = T)
+        dt1 = centerAtMax(
+            dt = test_object2,
+            x_ = "xvals",
+            y_ = "yvals",
+            by_ = c("locus"),
+            check_by_dupes = FALSE,
+            replace_x = FALSE
+        )
+        dt2 = centerAtMax(
+            dt = test_object2,
+            x_ = "xvals",
+            y_ = "yvals",
+            by_ = c("locus"),
+            check_by_dupes = FALSE,
+            replace_x = TRUE
+        )
 
         dt1 = as.data.frame(dt1)
         dt2 = as.data.frame(dt2)
@@ -117,7 +147,7 @@ doTests_centerAtMax(as.data.table(test_gr), as.data.table(test_gr2))
 test_that("centerAtMax multiple by_ arguments", {
     pdt = copy(test_dt2)
     pdt$centered = "centered: no"
-    cm = centerAtMax(pdt, x_ = "xvals", y_ = "yvals", by_ = c("sample", "locus"), trim_to_valid = F)
+    cm = centerAtMax(pdt, x_ = "xvals", y_ = "yvals", by_ = c("sample", "locus"), trim_to_valid = FALSE)
     cm$centered = "centered: yes"
     pdt =  rbind(pdt, cm)
     p = ggplot(pdt, aes(x = xvals, y = yvals, col = locus)) +
@@ -132,7 +162,7 @@ test_that("centerAtMax multiple by_ arguments", {
 test_that("centerAtMax sample by_ argument", {
     pdt = copy(test_dt2)
     pdt$centered = "centered: no"
-    cm = centerAtMax(pdt, x_ = "xvals", y_ = "yvals", by_ = c("sample"), trim_to_valid = F, check_by_dupes = F)
+    cm = centerAtMax(pdt, x_ = "xvals", y_ = "yvals", by_ = c("sample"), trim_to_valid = FALSE, check_by_dupes = FALSE)
     cm$centered = "centered: yes"
     pdt =  rbind(pdt, cm)
     p = ggplot(pdt, aes(x = xvals, y = yvals, col = locus)) +
@@ -148,7 +178,7 @@ test_that("centerAtMax sample by_ argument", {
 test_that("centerAtMax locus by_ argument", {
     pdt = copy(test_dt2)
     pdt$centered = "centered: no"
-    cm = centerAtMax(pdt, x_ = "xvals", y_ = "yvals", by_ = c("locus"), trim_to_valid = F, check_by_dupes = F)
+    cm = centerAtMax(pdt, x_ = "xvals", y_ = "yvals", by_ = c("locus"), trim_to_valid = FALSE, check_by_dupes = FALSE)
     cm$centered = "centered: yes"
     pdt =  rbind(pdt, cm)
     p = ggplot(pdt, aes(x = xvals, y = yvals, col = locus)) +

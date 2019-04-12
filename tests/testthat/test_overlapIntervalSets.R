@@ -33,7 +33,7 @@ test_that("ssvOverlapIntervalSets grs input are valid. List of GRanges with non-
 })
 
 test_that("ssvOverlapIntervalSets useFirst.", {
-    ol = ssvOverlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b), use_first = T)
+    ol = ssvOverlapIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b), use_first = TRUE)
     expect_s4_class(ol, class = "GRanges")
     expect_equal(length(ol), length(gr_a))
 })
