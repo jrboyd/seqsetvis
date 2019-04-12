@@ -490,6 +490,7 @@ ssvFetchBam.single = function(bam_f,
                               splice_strategy = c("none", "ignore", "add",
                                                   "only", "splice_count")[1],
                               ...) {
+    x = id = y = NULL
     stopifnot(is.character(win_method))
     stopifnot(length(win_method) == 1)
     stopifnot(class(qgr) == "GRanges")
@@ -747,6 +748,7 @@ ssvFetchBam = function(file_paths,
 #' }
 ssvFetchBamPE = function(file_paths, qgr, win_size = 50, target_strand = "both", splice_strategy = "ignore",
                          return_data.table = FALSE){
+    y = cn = NULL #reserve bindings
     strand(qgr) = "*"
     bam_r1 = ssvFetchBam(file_paths = file_paths, qgr = qgr, target_strand = target_strand, splice_strategy = splice_strategy,
                          return_data.table = TRUE, fragLens = NA, win_size = win_size,
@@ -762,7 +764,7 @@ ssvFetchBamPE = function(file_paths, qgr, win_size = 50, target_strand = "both",
     # bam_r1[, strand := ifelse(strand == "+", "-", "+") ]
     # ggplot(rbind(bam_r1, bam_r2), aes(x = x, y = y, color = strand)) + geom_path() + facet_wrap("read")
     bam_dt = rbind(bam_r1, bam_r2)[, cn, with = FALSE]
-    bam_dt = bam_dt[, .(y = sum(y)), by = c(cn[cn != "y"])][, cn, with = FALSE]
+    bam_dt = bam_dt[, list(y = sum(y)), by = c(cn[cn != "y"])][, cn, with = FALSE]
     # if(as.character(strand(qgr)) == "+"){
     #     bam_dt[, strand := ifelse(strand == "+", "-", "+") ]
     # }
