@@ -373,7 +373,6 @@ ssvSignalClustering = function(bw_data, nclust = 6,
     row_ids = unique(plot_dt[[row_]])
     raw_nr = length(row_ids)
     if(raw_nr > max_rows){
-        set.seed(0)
         row_ids = sample(row_ids, max_rows)
         plot_dt = plot_dt[get(row_) %in% row_ids]
         warning(raw_nr - max_rows,

@@ -1,16 +1,20 @@
-# setsetvis 1.3.7
+# seqsetvis 1.3.8
+
+* coding practice fixes
+
+# seqsetvis 1.3.7
 
 * FEATURE ssvFetchBamPE piles up FR paired-end RNA-seq data as expected
 * bam indexes are generated automatically
 * added flip_strand param to ssvFetchBam
 * bugfix/improvement ssvFetchBam passes ... args to ScanBamParam
 
-# setsetvis 1.3.6
+# seqsetvis 1.3.6
 
 * change - when strands of qgr are negative, strands of results are
 swapped. x coordinates are already flipped.
 
-# setsetvis 1.3.5
+# seqsetvis 1.3.5
 
 * bugfix/improvement - checks were timing out due to fragLen_calcStranded()
 poor performance.  switched to shiftApply on Rle strategy to speed up.

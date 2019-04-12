@@ -717,7 +717,7 @@ ssvFetchBam = function(file_paths,
 
 #' ssvFetchBamPE
 #'
-#' wrapper to handle standard FR paired end data
+#' wrapper to handle pileup of standard FR paired end data
 #'
 #' @param file_paths character vector of file_paths to load from. Alternatively,
 #' file_paths can be a data.frame or data.table whose first column is a
@@ -740,11 +740,12 @@ ssvFetchBam = function(file_paths,
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
 #' library(GenomicRanges)
-#' bam_f = system.file("extdata/test.bam",
+#' bam_f = system.file("extdata/testPE.bam",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bam_files = c("a" = bam_f, "b" = bam_f)
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
 #' bw_gr = ssvFetchBamPE(bam_files, qgr, win_size = 10)
+#' bw_gr
 #' }
 ssvFetchBamPE = function(file_paths, qgr, win_size = 50, target_strand = "both", splice_strategy = "ignore",
                          return_data.table = FALSE){

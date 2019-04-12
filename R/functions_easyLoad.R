@@ -13,10 +13,15 @@
 #' np_f = system.file("extdata/test_loading.narrowPeak",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_narrowPeak(np_f, "my_narrowPeak")
-easyLoad_narrowPeak = function(file_paths, file_names = NULL){
+easyLoad_narrowPeak = function(file_paths, file_names = NULL) {
     #from: https://charlesjb.github.io/How_to_import_narrowPeak/
-    extraCols_narrowPeak <- c(signalValue = "numeric", pValue = "numeric",
-                              qValue = "numeric", relSummit = "integer")
+    extraCols_narrowPeak <-
+        c(
+            signalValue = "numeric",
+            pValue = "numeric",
+            qValue = "numeric",
+            relSummit = "integer"
+        )
     easyLoad_bed(file_paths = file_paths,
                  file_names = file_names,
                  extraCols = extraCols_narrowPeak)
@@ -35,10 +40,12 @@ easyLoad_narrowPeak = function(file_paths, file_names = NULL){
 #' bp_f = system.file("extdata/test_loading.broadPeak",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_broadPeak(bp_f, "my_broadPeak")
-easyLoad_broadPeak = function(file_paths, file_names = NULL){
+easyLoad_broadPeak = function(file_paths, file_names = NULL) {
     #from: https://charlesjb.github.io/How_to_import_narrowPeak/
-    extraCols_broadPeak <- c(signalValue = "numeric", pValue = "numeric",
-                             qValue = "numeric")
+    extraCols_broadPeak <-
+        c(signalValue = "numeric",
+          pValue = "numeric",
+          qValue = "numeric")
     easyLoad_bed(file_paths = file_paths,
                  file_names = file_names,
                  extraCols = extraCols_broadPeak)
@@ -60,26 +67,29 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL){
 #' bed_f = system.file("extdata/test_loading.bed",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_bed(bed_f, "my_bed")
-easyLoad_bed = function(file_paths, file_names = NULL, extraCols = character()){
-    if(is.factor(file_paths)){
+easyLoad_bed = function(file_paths,
+                        file_names = NULL,
+                        extraCols = character()) {
+    if (is.factor(file_paths)) {
         file_paths = as.character(file_paths)
     }
     stopifnot(is.character(file_paths))
-    stopifnot(all(file.exists(file_paths) | grepl("://", file_paths)))
+    stopifnot(all(file.exists(file_paths) |
+                      grepl("://", file_paths)))
     #check names of file-paths
-    if(is.null(names(file_paths))){
+    if (is.null(names(file_paths))) {
         names(file_paths) = basename(file_paths)
     }
     #override names with file_names if not NULL
-    if(!is.null(file_names)){
-        if(is.factor(file_names)){
+    if (!is.null(file_names)) {
+        if (is.factor(file_names)) {
             file_names = as.character(file_names)
         }
         stopifnot(is.character(file_paths))
         stopifnot(length(file_paths) == length(file_names))
         names(file_paths) = file_names
     }
-    grs <- lapply(file_paths, function(f){
+    grs <- lapply(file_paths, function(f) {
         rtracklayer::import(f, format = "BED",
                             extraCols = extraCols)
     })

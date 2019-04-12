@@ -30,11 +30,11 @@ files (bigwig files).
 
 *seqsetvis* is ideal for the following tasks:
 
-1.	Feature assessment and comparison.
-2.	Differential enrichment or expression results assessment.
-3.	Replicate comparison and reproducibility analysis.
-4.	Chromatin state inspection.
-5.	Clustering of histone modification and/or transcription factor enrichment 
+1. Feature assessment and comparison.
+2. Differential enrichment or expression results assessment.
+3. Replicate comparison and reproducibility analysis.
+4. Chromatin state inspection.
+5. Clustering of histone modification and/or transcription factor enrichment 
 at features such as promoters or enhancers.
 
 *seqsetvis* accepts and outputs the Bioconductor standard GRanges object while 

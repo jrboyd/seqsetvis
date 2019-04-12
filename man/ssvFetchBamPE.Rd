@@ -33,15 +33,16 @@ instead of GRanges.  Default is FALSE.}
 a GRanges (or data.table if return_data.table == TRUE)
 }
 \description{
-wrapper to handle standard FR paired end data
+wrapper to handle pileup of standard FR paired end data
 }
 \examples{
 if(Sys.info()['sysname'] != "Windows"){
 library(GenomicRanges)
-bam_f = system.file("extdata/test.bam",
+bam_f = system.file("extdata/testPE.bam",
     package = "seqsetvis", mustWork = TRUE)
 bam_files = c("a" = bam_f, "b" = bam_f)
 qgr = CTCF_in_10a_overlaps_gr[1:5]
 bw_gr = ssvFetchBamPE(bam_files, qgr, win_size = 10)
+bw_gr
 }
 }
