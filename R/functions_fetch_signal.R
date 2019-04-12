@@ -94,7 +94,7 @@ ssvFetchSignal = function(file_paths,
         names(file_paths) = unique_names
     }
     stopifnot(is.character(file_paths))
-    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is(qgr, "GRanges"))
     stopifnot(is.character(unique_names))
     stopifnot(is.character(names_variable))
     stopifnot(is.numeric(win_size))
@@ -191,9 +191,9 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
                                               "left", "left_unstranded")[1]){
     #reserve bindings for data.table
     x = id = NULL
-    stopifnot(class(score_gr) == "GRanges")
+    stopifnot(is(score_gr, "GRanges"))
     stopifnot(!is.null(score_gr$score))
-    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(window_size))
     stopifnot(window_size >= 1)
     stopifnot(window_size %% 1 == 0)
@@ -287,9 +287,9 @@ viewGRangesWinSummary_dt = function (score_gr,
     #reserve bindings for data.table
     x = id = tile_start = tile_end = tile_id =
         tile_widths = scored_width = tile_density = NULL
-    stopifnot(class(score_gr) == "GRanges")
+    stopifnot(is(score_gr, "GRanges"))
     stopifnot(!is.null(score_gr$score))
-    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(n_tiles))
     stopifnot(n_tiles >= 1)
     stopifnot(n_tiles%%1 == 0)
@@ -492,8 +492,7 @@ prepare_fetch_GRanges = function(qgr,
 quantileGRangesWidth = function(qgr,
                                 min_quantile = .75,
                                 win_size = 1){
-
-    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(min_quantile), is.numeric(win_size))
     stopifnot(min_quantile >= 0 && min_quantile <= 1)
     stopifnot(length(min_quantile) == 1 && length(win_size) == 1)

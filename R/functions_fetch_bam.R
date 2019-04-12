@@ -493,7 +493,7 @@ ssvFetchBam.single = function(bam_f,
     x = id = y = NULL
     stopifnot(is.character(win_method))
     stopifnot(length(win_method) == 1)
-    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is(qgr, "GRanges"))
     stopifnot(win_method %in% c("sample", "summary"))
     stopifnot(is.function(summary_FUN))
     stopifnot(target_strand %in% c("*", "+", "-", "both"))

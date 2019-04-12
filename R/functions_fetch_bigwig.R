@@ -117,7 +117,7 @@ ssvFetchBigwig.single = function(bw_file,
                                             "center_unstranded")[3],
                                  return_data.table = FALSE) {
     stopifnot(is.character(bw_file))
-    stopifnot(class(qgr) == "GRanges")
+    stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(win_size))
 
     switch (win_method,

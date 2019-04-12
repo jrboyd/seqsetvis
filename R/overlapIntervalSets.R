@@ -16,7 +16,7 @@
 #' @import GenomicRanges
 ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
   queryHits = NULL
-  if(class(grs) == "GRangesList"){
+  if(is(grs, "GRangesList")){
     grs = as.list(grs)
   }
   if(is.null(names(grs))){

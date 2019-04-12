@@ -46,7 +46,7 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
                                     n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95,
                                     return_data = FALSE
 ) {
-    if(class(bw_data)[1] == "GRanges"){
+    if(is(bw_data, "GRanges")){
         bw_data = data.table::as.data.table(bw_data)
     }
     stopifnot(data.table::is.data.table(bw_data))
@@ -194,7 +194,7 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
                                 show_help = FALSE, fixed_coords = TRUE,
                                 return_data = FALSE){
     xval = yval = xvolcano = id = yvolcano = group = NULL #declare binding for data.table
-    if(class(bw_data)[1] == "GRanges"){
+    if(is(bw_data, "GRanges")){
         bw_data = data.table::as.data.table(bw_data)
     }
     stopifnot(data.table::is.data.table(bw_data))
@@ -342,7 +342,7 @@ ssvSignalClustering = function(bw_data, nclust = 6,
                                dcast_fill = NA){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
     output_GRanges = FALSE
-    if(class(bw_data)[1] == "GRanges"){
+    if(is(bw_data, "GRanges")){
         bw_data = data.table::as.data.table(bw_data)
         output_GRanges = TRUE
     }
@@ -488,7 +488,7 @@ ssvSignalHeatmap = function(bw_data,
                             clustering_col_max = Inf,
                             return_data = FALSE){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
-    if(class(bw_data)[1] == "GRanges"){
+    if(is(bw_data, "GRanges")){
         bw_data = data.table::as.data.table(bw_data)
     }
     stopifnot(is.data.table(bw_data))
@@ -616,7 +616,7 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
                              facet_method = facet_wrap, spline_n = NULL,
                              return_data = FALSE){
     auto_grp = auto_facet = NULL
-    if(class(bw_data)[1] == "GRanges"){
+    if(is(bw_data, "GRanges")){
         bw_data = data.table::as.data.table(bw_data)
     }
     stopifnot(is.data.table(bw_data))
@@ -692,7 +692,7 @@ ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
                                 spline_n = NULL,
                                 return_data = FALSE){
     group_var = NULL # reserve for data.table
-    if(class(bw_data)[1] == "GRanges"){
+    if(is(bw_data, "GRanges")){
         bw_data = data.table::as.data.table(bw_data)
     }
     stopifnot(is.data.table(bw_data))

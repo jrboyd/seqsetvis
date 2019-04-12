@@ -15,8 +15,8 @@
 #' centered_grs = centerFixedSizeGRanges(grs, 10)
 #' width(centered_grs)
 centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
-    stopifnot(class(grs) == "GRanges")
-    stopifnot(class(fixed_size) == "numeric")
+    stopifnot(is(grs, "GRanges"))
+    stopifnot(is(fixed_size, "numeric"))
     stopifnot(fixed_size > 0)
     m = floor(start(grs) + width(grs)/2)
     ext = floor(fixed_size/2)
@@ -69,7 +69,7 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "",
                        splineFun = stats::spline) {
     output_GRanges = FALSE
-    if(class(dt)[1] == "GRanges"){
+    if(is(dt, "GRanges")){
         dt = as.data.table(dt)
         output_GRanges = TRUE
     }
@@ -184,7 +184,7 @@ centerAtMax = function(dt, x_ = "x", y_ = "y", by_ = "id", view_size = NULL,
                        replace_x = TRUE) {
     ymax = xsummit = xnew = N = NULL  #reserve data.table variables
     output_GRanges = FALSE
-    if(class(dt)[1] == "GRanges"){
+    if(is(dt, "GRanges")){
         dt = data.table::as.data.table(dt)
         output_GRanges = TRUE
     }
