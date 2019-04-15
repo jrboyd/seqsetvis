@@ -683,7 +683,9 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
 #' ssvSignalLineplotAgg(subset(bw_gr, bw_gr$id %in% seq_len(10)), sample_ = "id",
 #'     color_ = "id", spline_n = 10) +
 #'     labs(title = "agg samples by region id (weird), with spline smoothing")
-ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
+ssvSignalLineplotAgg = function(bw_data,
+                                x_ = "x",
+                                y_ = "y",
                                 sample_ = "sample",
                                 color_ = sample_,
                                 group_ = sample_,
@@ -700,7 +702,7 @@ ssvSignalLineplotAgg = function(bw_data, x_ = "x", y_ = "y",
               is.character(group_))
     stopifnot(x_ %in% colnames(bw_data), y_ %in% colnames(bw_data),
               color_ %in% colnames(bw_data), sample_ %in% colnames(bw_data))
-    stopifnot(group_ %in% colnames(bw_data) || group_ == "auto_grp")
+    stopifnot(all(group_ %in% colnames(bw_data)) || group_ == "auto_grp")
 
     stopifnot(is.function(agg_fun))
     stopifnot(is.numeric(spline_n) || is.null(spline_n))

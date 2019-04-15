@@ -7,3 +7,5 @@
 ^run_cov.R$
 ^dev_data$
 ^dev_.+$
+^doc$
+^Meta$
