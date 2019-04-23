@@ -109,6 +109,7 @@ ssvFetchBam = function(file_paths,
                                 return_data.table = TRUE,
                                 max_dupes = max_dupes,
                                 splice_strategy = splice_strategy,
+                                flip_strand = flip_strand,
                                 ...)
         # dt[[names_variable]] = rep(nam, nrow(dt))
         message("finished loading ", nam, ".")
@@ -124,13 +125,7 @@ ssvFetchBam = function(file_paths,
                          win_method = win_method,
                          return_data.table = TRUE,
                          n_cores = n_cores)
-    if(flip_strand){
-        if(target_strand == "*"){
-            warning('flip_strand is not compatible with target_strand="*", ignored.')
-        }else{
-            bdt[, strand := ifelse(strand == "+", "-", "+")]
-        }
-    }
+
     if(!return_data.table){
         bdt = GRanges(bdt)
     }
@@ -166,6 +161,8 @@ ssvFetchBam = function(file_paths,
 #'   present. fragLen must be NA for any other value to be valid.  "ignore" will
 #'   not count spliced regions.  add" counts spliced regions along with others,
 #'   "only" will only count spliced regions and ignore others.
+#' @param flip_strand if TRUE, strand alignment is flipped prior to fragLen
+#'   extension. Default is FALSE.
 #' @param ... passed to Rsamtools::ScanBamParam()
 #' @return tidy GRanges (or data.table if specified) with pileups from bam file.
 #'   pileup is calculated only every win_size bp.
@@ -183,6 +180,7 @@ ssvFetchBam.single = function(bam_f,
                               max_dupes = Inf,
                               splice_strategy = c("none", "ignore", "add",
                                                   "only", "splice_count")[1],
+                              flip_strand = FALSE,
                               ...) {
     x = id = y = NULL
     stopifnot(is.character(win_method))
@@ -197,7 +195,8 @@ ssvFetchBam.single = function(bam_f,
                                      "only", "splice_count"))
     if(splice_strategy == "splice_count"){
         return(fetchBam(bam_f, qgr, NA, "*",
-                        max_dupes, splice_strategy, ...))
+                        max_dupes, splice_strategy,
+                        flip_strand = flip_strand, ...))
     }
     switch (
         win_method,
@@ -205,9 +204,11 @@ ssvFetchBam.single = function(bam_f,
             qgr = prepare_fetch_GRanges(qgr, win_size)
             if(target_strand == "both"){
                 pos_gr = fetchBam(bam_f, qgr, fragLen, "+",
-                                  max_dupes, splice_strategy, ...)
+                                  max_dupes, splice_strategy,
+                                  flip_strand = flip_strand, ...)
                 neg_gr = fetchBam(bam_f, qgr, fragLen, "-",
-                                  max_dupes, splice_strategy, ...)
+                                  max_dupes, splice_strategy,
+                                  flip_strand = flip_strand, ...)
                 pos_dt = viewGRangesWinSample_dt(pos_gr, qgr,
                                                  win_size, anchor = anchor)
                 neg_dt = viewGRangesWinSample_dt(neg_gr, qgr,
@@ -220,7 +221,8 @@ ssvFetchBam.single = function(bam_f,
                 )
             }else{
                 score_gr = fetchBam(bam_f, qgr, fragLen, target_strand,
-                                    max_dupes, splice_strategy, ...)
+                                    max_dupes, splice_strategy,
+                                    flip_strand = flip_strand, ...)
                 out = viewGRangesWinSample_dt(score_gr, qgr,
                                               win_size, anchor = anchor)
                 out[, strand := target_strand]
@@ -231,9 +233,11 @@ ssvFetchBam.single = function(bam_f,
         summary = {
             if(target_strand == "both"){
                 pos_gr = fetchBam(bam_f, qgr, fragLen, "+",
-                                  max_dupes, splice_strategy, ...)
+                                  max_dupes, splice_strategy,
+                                  flip_strand = flip_strand, ...)
                 neg_gr = fetchBam(bam_f, qgr, fragLen, "-",
-                                  max_dupes, splice_strategy, ...)
+                                  max_dupes, splice_strategy,
+                                  flip_strand = flip_strand, ...)
                 pos_dt = viewGRangesWinSummary_dt(pos_gr, qgr, win_size,
                                                   summary_FUN = summary_FUN,
                                                   anchor = anchor)
@@ -249,7 +253,8 @@ ssvFetchBam.single = function(bam_f,
                 )
             }else{
                 score_gr = fetchBam(bam_f, qgr, fragLen, target_strand,
-                                    max_dupes, splice_strategy, ...)
+                                    max_dupes, splice_strategy,
+                                    flip_strand = flip_strand, ...)
                 out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
                                                summary_FUN = summary_FUN,
                                                anchor = anchor)
@@ -285,6 +290,8 @@ ssvFetchBam.single = function(bam_f,
 #'   fragLen must be NA for any other value to be valid.  "ignore" will not
 #'   count spliced regions.  "add" counts spliced regions along with others,
 #'   "only" will only count spliced regions and ignore others.
+#' @param flip_strand if TRUE, strand alignment is flipped prior to fragLen
+#'   extension. Default is FALSE.
 #' @param ... passed to ScanBamParam(), can't be which or what.
 #' @return GRanges containing tag pileup values in score meta column.  tags are
 #'   optionally extended to fragment length (fragLen) prior to pile up.
@@ -295,6 +302,7 @@ fetchBam = function(bam_f,
                     max_dupes = Inf,
                     splice_strategy = c("none", "ignore", "add",
                                         "only", "splice_count")[1],
+                    flip_strand = FALSE,
                     ...){
     which_label = NULL #reserve binding
     stopifnot(is.numeric(max_dupes))
@@ -336,6 +344,10 @@ fetchBam = function(bam_f,
     }
 
     bam_dt[, end := start + width - 1L]
+
+    if(flip_strand){
+        bam_dt[, strand := ifelse(strand == "+", "-", "+")]
+    }
 
     if(max_dupes < Inf){
         bam_dt = .rm_dupes(bam_dt, max_dupes)
