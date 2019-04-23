@@ -328,6 +328,7 @@ fetchBam = function(bam_f,
     bam_dt = data.table::rbindlist(bam_dt,
                                    use.names = TRUE,
                                    idcol = "which_label")
+    bam_dt = bam_dt[!is.na(width)]
     toflip = sub(":-", "", as.character(subset(qgr, strand == "-")))
     if(target_strand %in% c("+", "-")){
         bam_dt = bam_dt[strand == target_strand & !(which_label %in% toflip) |
