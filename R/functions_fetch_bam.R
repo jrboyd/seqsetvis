@@ -126,6 +126,12 @@ ssvFetchBam = function(file_paths,
                          return_data.table = TRUE,
                          n_cores = n_cores)
 
+    if(flip_strand){
+        if(target_strand != "*"){
+            bdt[, strand := ifelse(strand == "+", "-", "+")]
+        }
+    }
+
     if(!return_data.table){
         bdt = GRanges(bdt)
     }
@@ -345,10 +351,6 @@ fetchBam = function(bam_f,
 
     bam_dt[, end := start + width - 1L]
 
-    if(flip_strand){
-        bam_dt[, strand := ifelse(strand == "+", "-", "+")]
-    }
-
     if(max_dupes < Inf){
         bam_dt = .rm_dupes(bam_dt, max_dupes)
     }
@@ -364,8 +366,14 @@ fetchBam = function(bam_f,
         )
     }else{
         # bam_dt[, end := start + width - 1L]
-        bam_dt[strand == "+", end := start + as.integer(fragLen) - 1L]
-        bam_dt[strand == "-", start := end - as.integer(fragLen) + 1L]
+        if(flip_strand){
+            bam_dt[strand == "-", end := start + as.integer(fragLen) - 1L]
+            bam_dt[strand == "+", start := end - as.integer(fragLen) + 1L]
+        }else{
+            bam_dt[strand == "+", end := start + as.integer(fragLen) - 1L]
+            bam_dt[strand == "-", start := end - as.integer(fragLen) + 1L]
+        }
+
     }
     if(splice_strategy == "splice_count"){
         return(bam_dt[, .N,
