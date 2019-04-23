@@ -304,3 +304,13 @@ test_that("ssvFetchBam target_strand of both - summary", {
     expect_true(all(res_both[strand == "-"]$y == res_neg[strand == "+"]$y))
 
 })
+
+test_that("ssvFetchBam single column data.table", {
+    qdt = data.table(file = bam_file)
+    res = ssvFetchBam(qdt,
+                      qgr = qgr[1],
+                      win_size = 5, fragLens = 200,
+                           target_strand = "both", return_data.table = TRUE,
+                           win_method = "summary")
+    expect_equal(res$sample[1], bam_file)
+})

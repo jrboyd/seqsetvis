@@ -201,7 +201,7 @@ test_that("ssvFetchBigwig summary method correct bins", {
     expect_true(all(width(gr_sample) %in% 7:8))
 })
 
-test_that("ssvFetchBigwig bam_file as data.frame/table", {
+test_that("ssvFetchBigwig test_bw as data.frame/table", {
     skip_on_os("windows")
     gr_sample = ssvFetchBigwig(
         data.frame(rep(test_bw,3),
@@ -214,4 +214,14 @@ test_that("ssvFetchBigwig bam_file as data.frame/table", {
                         c("red", "green", "blue")))
     expect_true(all(levels(gr_sample$sample) %in%
                         c("10a", "10b", "10c")))
+})
+
+test_that("ssvFetchBigwig single column data.table", {
+    qdt = data.table(file = test_bw)
+    res = ssvFetchBigwig(qdt,
+                      qgr = test_qgr[1],
+                      win_size = 5,
+                      return_data.table = TRUE,
+                      win_method = "summary")
+    expect_equal(res$sample[1], test_bw)
 })
