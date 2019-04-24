@@ -22,6 +22,10 @@ correlation.}
 searched.  If not supplied will be determined from bam_file.  Set as NA
 to disable this behavior.}
 
+\item{flip_strand}{boolean. if TRUE strands that reads align to are swapped.
+This is typically only necessary if there was a mismatch between library
+chemistry and aligner settings. Default is FALSE.}
+
 \item{...}{arguments passed to ScanBamParam}
 }
 \value{

@@ -37,11 +37,13 @@ instead of GRanges.  Default is FALSE.}
 \item{max_dupes}{numeric >= 1.  duplicate reads by strandd start position
 over this number are removed, Default is Inf.}
 
-\item{...}{passed to Rsamtools::ScanBamParam()}
+\item{min_isize}{integer. Read pairs must have an isize greater than or equal to this value.  Default is 1.}
 
-\item{fragLen}{numeric, NULL, or NA.  if numeric, supplied value is used. if
-NULL, value is calculated with fragLen_calcStranded if NA, raw bam pileup
-with no cross strand shift is returned.}
+\item{max_isize}{integer. Read pairs must have an isize less than or equal to this value.  Default is Inf.}
+
+\item{return_unprocessed}{boolean. if TRUE returns read alignment in data.table. Default is FALSE.}
+
+\item{...}{passed to Rsamtools::ScanBamParam()}
 }
 \value{
 tidy GRanges (or data.table if specified) with pileups from bam file.

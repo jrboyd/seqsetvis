@@ -112,3 +112,14 @@ NULL
 #' @name CTCF_in_10a_narrowPeak_grs
 #' @format named character vector of length 3
 NULL
+
+#' 4 random peaks for paired-end data
+#'
+#' matches \code{system.file("extdata/Bcell_PE.mm10.bam", package = "seqsetvis")}
+#'
+#' @details this is included only for testing ssvFetchBamPE functions.
+#' @docType data
+#' @keywords datasets
+#' @name Bcell_peaks
+#' @format GRanges length 4
+NULL

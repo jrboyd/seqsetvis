@@ -11,8 +11,8 @@ ssvFetchBamPE(file_paths, qgr, unique_names = names(file_paths),
   summary_FUN = stats::weighted.mean, anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
   names_variable = "sample", return_data.table = FALSE,
-  max_dupes = Inf, n_cores = getOption("mc.cores", 1),
-  return_unprocessed = FALSE, min_isize = 1, max_isize = Inf, ...)
+  max_dupes = Inf, n_cores = getOption("mc.cores", 1), min_isize = 1,
+  max_isize = Inf, return_unprocessed = FALSE, ...)
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from. Alternatively,
@@ -48,7 +48,11 @@ over this number are removed, Default is Inf.}
 
 \item{n_cores}{integer number of cores to use.}
 
-\item{return_unprocessed}{returns unprocessed data.}
+\item{min_isize}{integer. Read pairs must have an isize greater than or equal to this value.  Default is 1.}
+
+\item{max_isize}{integer. Read pairs must have an isize less than or equal to this value.  Default is Inf.}
+
+\item{return_unprocessed}{boolean. if TRUE returns read alignment in data.table. Default is FALSE.}
 
 \item{...}{passed to Rsamtools::ScanBamParam()
 Uses mc.cores option if not supplied.}
@@ -69,10 +73,11 @@ if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
 \examples{
 if(Sys.info()['sysname'] != "Windows"){
 library(GenomicRanges)
-bam_f = system.file("extdata/test.bam",
+bam_f = system.file("extdata/Bcell_PE.mm10.bam",
     package = "seqsetvis", mustWork = TRUE)
 bam_files = c("a" = bam_f, "b" = bam_f)
-qgr = CTCF_in_10a_overlaps_gr[1:5]
+data("Bcell_peaks")
+qgr = Bcell_peaks
 bw_gr = ssvFetchBamPE(bam_files, qgr, win_size = 10)
 bw_gr2 = ssvFetchBamPE(as.list(bam_files), qgr, win_size = 10)
 

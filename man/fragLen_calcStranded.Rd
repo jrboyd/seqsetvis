@@ -24,6 +24,10 @@ ggplot showing values considered by calculation. Default is FALSE.}
 \item{test_fragLen}{numeric.  The set of fragment lenghts to gather
 strand cross correlation for.}
 
+\item{flip_strand}{boolean. if TRUE strands that reads align to are swapped.
+This is typically only necessary if there was a mismatch between library
+chemistry and aligner settings. Default is FALSE.}
+
 \item{...}{passed to Rsamtools::ScanBamParam, can't be which or what.}
 }
 \value{

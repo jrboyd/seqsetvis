@@ -42,10 +42,11 @@
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
 #' library(GenomicRanges)
-#' bam_f = system.file("extdata/test.bam",
+#' bam_f = system.file("extdata/Bcell_PE.mm10.bam",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bam_files = c("a" = bam_f, "b" = bam_f)
-#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' data("Bcell_peaks")
+#' qgr = Bcell_peaks
 #' bw_gr = ssvFetchBamPE(bam_files, qgr, win_size = 10)
 #' bw_gr2 = ssvFetchBamPE(as.list(bam_files), qgr, win_size = 10)
 #'
@@ -122,9 +123,6 @@ ssvFetchBamPE = function(file_paths,
 #'   qgr.
 #' @param summary_FUN function.  only relevant if win_method is "summary".
 #'   passed to \code{\link{viewGRangesWinSummary_dt}}.
-#' @param fragLen numeric, NULL, or NA.  if numeric, supplied value is used. if
-#'   NULL, value is calculated with fragLen_calcStranded if NA, raw bam pileup
-#'   with no cross strand shift is returned.
 #' @param anchor character, one of c("center", "center_unstranded", "left",
 #'   "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is returned
