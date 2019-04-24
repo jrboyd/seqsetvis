@@ -1,0 +1,174 @@
+---
+title: "The **seqsetvis** package"
+author: "Joseph R Boyd"
+output:
+  BiocStyle::html_document:
+    toc_float: true
+vignette: >
+    %\VignetteIndexEntry{Overview and Use Cases}
+    %\VignetteEngine{knitr::rmarkdown}
+    %\VignetteEncoding{UTF-8}
+---
+
+<style type = "text/css"> em { font-weight: bold; } </style>
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+    collapse = TRUE,
+    dpi=60
+)
+```
+
+# Why bams?
+
+`r Githubpkg("jrboyd/seqsetvis")` can load profiles from 
+[bigWigs](https://genome.ucsc.edu/goldenpath/help/bigWig.html) 
+or construct profiles of read pileups from 
+[bams](https://support.illumina.com/help/BS_App_RNASeq_Alignment_OLH_1000000006112/Content/Source/Informatics/BAM-Format.htm), which are binary [sam](https://samtools.github.io/hts-specs/SAMv1.pdf)
+files.  Binary files are not human readable but are compressed and provide 
+rapid access for computers,
+
+Compared to bam files, bigWigs generally take up much less disk space and are 
+faster to load data 
+from.  They are also standard outputs used by many powerful NGS analysis tools 
+(or can be easily generated from bedGraph files) and are accepted as inputs by
+common genome browsers (UCSC, WashU, IGV etc.).  
+
+However, assessing read pileups from bam files directly allows for more 
+flexibilty and is extremely powerful for quality control in ChIP-seq and related 
+data.  This vignette will demonstrate methods for loading data from bam files and
+how the results are useful in assessing ChIP-seq data quality.
+
+```{r library, message=FALSE}
+library(seqsetvis)
+library(data.table)
+library(GenomicRanges)
+```
+
+```{r files, echo=FALSE}
+bam_file = system.file("extdata/test_peaks.bam", package = "seqsetvis")
+xls_file = system.file("extdata/test_peaks.xls", package = "seqsetvis")
+np_file = system.file("extdata/test_loading.narrowPeak", package = "seqsetvis")
+pe_file = system.file("extdata/Bcell_PE.mm10.bam", package = "seqsetvis")
+data("test_peaks")
+query_gr = test_peaks
+strand_colors = c("*" = "darkgray", "+" = "blue", "-" = "red")
+theme_set(theme_classic())
+p_default = ggplot() + 
+    facet_grid("peak_id~peak_status") + 
+    scale_color_manual(values = strand_colors) +
+    labs(x = "bp", y = "read pileup")
+```
+
+
+# The simplest case
+
+A straightforward pileup.
+
+```{r basic, fig.cap="Read pileup with default parameters"}
+bam_dt = ssvFetchBam(bam_file, query_gr, return_data.table = TRUE)
+bam_dt[, c("peak_status", "peak_id") := tstrsplit(id, "_", keep = c(4,5))]
+p_basic = p_default + 
+    geom_path(data = bam_dt, aes(x = x, y = y, color = strand))
+p_basic
+```
+
+```{r basic2, fig.cap="Read pileup with default parameters"}
+bam_dt = ssvFetchBam(bam_file, 
+                     query_gr, 
+                     fragLens = NA, 
+                     win_size = 5, 
+                     return_data.table = TRUE)
+bam_dt[, c("peak_status", "peak_id") := tstrsplit(id, "_", keep = c(4,5))]
+p_basic = p_default + 
+    geom_path(data = bam_dt, aes(x = x, y = y, color = strand))
+p_basic
+```
+
+```{r basic_strand, fig.cap="Strand sensitive read pileup"}
+bam_dt = ssvFetchBam(bam_file,
+                     query_gr,
+                     fragLens = NA, 
+                     win_size = 5, 
+                     return_data.table = TRUE,
+                     target_strand = "both")
+bam_dt[, c("peak_status", "peak_id") := tstrsplit(id, "_", keep = c(4,5))]
+p_basic + geom_path(data = bam_dt, aes(x = x, y = y, color = strand)) + facet_grid("peak_id~peak_status")
+```
+
+# Considering strands and disabling extension to fragment length.
+
+```{r, basic_NAfragLens, fig.cap="no extension to fragment length" }
+bam_dt = ssvFetchBam(bam_file,
+                     win_size = 5,
+                     fragLens = NA,
+                     query_gr,
+                     return_data.table = TRUE,
+                     target_strand = "both")
+bam_dt[, c("peak_status", "peak_id") := tstrsplit(id, "_", keep = c(4,5))]
+p_basic + geom_path(data = bam_dt, aes(x = x, y = y, color = strand))
+```
+
+```{r}
+bam_dt = ssvFetchBam(bam_file,
+                     win_size = 10,
+                     fragLens = "auto",
+                     query_gr,
+                     return_data.table = TRUE,
+                     max_dupes = 1,
+                     target_strand = "both")
+bam_dt[, c("peak_status", "peak_id") := tstrsplit(id, "_", keep = c(4,5))]
+p_basic + geom_path(data = bam_dt, aes(x = x, y = y, color = strand)) 
+```
+
+```{r, fig.cap="Calculated fragment length doesn't match peak strand cross correlation very well."}
+shift_dt = crossCorrByRle(bam_file, query_gr)
+shift_dt[, c("peak_status", "peak_id") := tstrsplit(id, "_", keep = c(4,5))]
+ggplot(shift_dt, aes(x = shift, y = correlation)) + 
+    geom_path() + 
+    facet_grid("peak_id~peak_status") +
+    annotate("line", x = rep(172, 2), y = range(shift_dt$correlation), color = "red")
+```
+
+```{r}
+shift_dt[, .(max_shift = shift[which.max(correlation)]), .(peak_status, peak_id)]
+```
+```{r calc frag len}
+fl = fragLen_calcStranded(bam_file, subset(query_gr, grepl("peak", name)))
+fl
+```
+
+
+```{r}
+bam_dt = ssvFetchBam(bam_file,
+                     win_size = 10,
+                     fragLens = 141,
+                     query_gr,
+                     return_data.table = TRUE,
+                     max_dupes = 1,
+                     target_strand = "both")
+bam_dt[, c("peak_status", "peak_id") := tstrsplit(id, "_", keep = c(4,5))]
+p_basic + geom_path(data = bam_dt, aes(x = x, y = y, color = strand))
+```
+
+# PE
+
+Paired-end data is a bit different.
+
+```{r}
+data("Bcell_peaks")
+
+pe_default = ssvFetchBamPE(pe_file, Bcell_peaks)
+pe_raw = ssvFetchBamPE(pe_file, Bcell_peaks, return_unprocessed = TRUE)
+pe_raw[isize > 0, mean(isize), .(id)]
+ggplot(pe_raw[isize > 0], aes(x = isize)) + geom_histogram() + facet_wrap("id")
+
+
+shift_dt = crossCorrByRle(pe_file, Bcell_peaks, flip_strand = TRUE)
+shift_dt[, shift[which.max(correlation)], .(id)]
+ggplot(shift_dt, aes(x = shift, y = correlation)) + 
+    geom_path() + 
+    facet_wrap("id") +
+    annotate("line", x = rep(160, 2), y = range(shift_dt$correlation), color = "red")
+```
+
