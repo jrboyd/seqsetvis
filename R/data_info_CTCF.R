@@ -123,3 +123,16 @@ NULL
 #' @name Bcell_peaks
 #' @format GRanges length 4
 NULL
+
+#' 4 random peaks for single-end data and 4 control regions 30kb downstream from
+#' each peak.
+#'
+#' matches \code{system.file("extdata/test_peaks.bam", package =
+#' "seqsetvis")}
+#'
+#' @details this is included only for testing ssvFetchBam functions.
+#' @docType data
+#' @keywords datasets
+#' @name test_peaks
+#' @format GRanges length 8
+NULL
