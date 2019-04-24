@@ -131,10 +131,11 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
         plot_dt$facet_group = factor(plot_dt$facet_group, levels = levels(bw_data[, get(by_)]))
     }
 
+    colnames(plot_dt)[1] = "x"
     if(return_data){
         return(plot_dt)
     }
-    p = ggplot(plot_dt) + geom_ribbon(aes_(x = ~V1, ymin = ~low, ymax = ~high, fill = ~q_range)) +
+    p = ggplot(plot_dt) + geom_ribbon(aes_(x = ~x, ymin = ~low, ymax = ~high, fill = ~q_range)) +
         labs(fill = "quantile band",
              y = y_, x = "bp",
              title = "Enrichment Profiles",

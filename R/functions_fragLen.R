@@ -36,6 +36,9 @@ fragLen_fromMacs2Xls = function(macs2xls_file){
 #' ggplot showing values considered by calculation. Default is FALSE.
 #' @param test_fragLen numeric.  The set of fragment lenghts to gather
 #' strand cross correlation for.
+#' @param flip_strand boolean. if TRUE strands that reads align to are swapped.
+#' This is typically only necessary if there was a mismatch between library
+#' chemistry and aligner settings. Default is FALSE.
 #' @param ... passed to Rsamtools::ScanBamParam, can't be which or what.
 #' @return numeric fragment length
 #' @import Rsamtools
@@ -53,21 +56,28 @@ fragLen_calcStranded = function(bam_f,
                                 n_regions = 100,
                                 include_plot_in_output = FALSE,
                                 test_fragLen = seq(100, 400, 5),
+                                flip_strand = FALSE,
                                 ...){
 
     x = y = N = correlation = id = NULL #reserve bindings for data.table
     if(n_regions < length(qgr)){
         qgr = sample(qgr, n_regions)
     }
-    cc_res = crossCorrByRle(bam_f, qgr, max_dupes = 1,
-                            fragment_sizes = test_fragLen, ...)
+    cc_res = crossCorrByRle(
+        bam_f,
+        qgr,
+        max_dupes = 1,
+        fragment_sizes = test_fragLen,
+        flip_strand = flip_strand,
+        ...
+    )
     fragLen = cc_res[, list(shift = shift[which.max(correlation)]),
                      by = list(id)][, mean(shift)]
     fragLen = round(fragLen)
-    p_res = cc_res[, list(correlation = mean(correlation)), by = list(shift)]
     if(!include_plot_in_output){
         return(fragLen)
     }else{
+        p_res = cc_res[, list(correlation = mean(correlation)), by = list(shift)]
         pdt = data.table(x = p_res$shift, raw = p_res$correlation,
                          moving_average = movingAverage(p_res$correlation))
         fragLen = pdt$x[which.max(pdt$moving_average)]
@@ -91,7 +101,7 @@ fragLen_calcStranded = function(bam_f,
                      y = mean(range(pdt$y)),
                      label = fragLen,
                      color = "black")
-        return(list(fragLen, p))
+        return(list(fragLen = fragLen, plot = p))
     }
 }
 
@@ -105,6 +115,9 @@ fragLen_calcStranded = function(bam_f,
 #' @param read_length integer. Any values outside fragment_range that must be
 #'   searched.  If not supplied will be determined from bam_file.  Set as NA
 #'   to disable this behavior.
+#' @param flip_strand boolean. if TRUE strands that reads align to are swapped.
+#' This is typically only necessary if there was a mismatch between library
+#' chemistry and aligner settings. Default is FALSE.
 #' @param ... arguments passed to ScanBamParam
 #' @return named list of results
 #' @export
@@ -120,6 +133,7 @@ crossCorrByRle = function(bam_file,
                           max_dupes = 1,
                           fragment_sizes = 50:300,
                           read_length = NULL,
+                          flip_strand = FALSE,
                           ...){
     rn = NULL # reserve for data.table
     if(is.null(query_gr$name)){
@@ -146,8 +160,14 @@ crossCorrByRle = function(bam_file,
     Param <- Rsamtools::ScanBamParam(
         which=query_gr,
         what=c("flag","mapq"), ...)
+    if(!file.exists(paste0(bam_file, ".bai"))){
+        warning("creating index for ", bam_file)
+        Rsamtools::indexBam(bam_file)
+    }
     temp <- GenomicAlignments::readGAlignments(bam_file,param=Param)
-    dt = as.data.table(temp)
+    if(flip_strand){
+        strand(temp) = ifelse(as.character(strand(temp)) == "+", "-", "+")
+    }
     if(is.null(read_length)){
         read_length = getReadLength(bam_file, query_gr)
     }

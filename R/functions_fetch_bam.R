@@ -321,7 +321,7 @@ fetchBam = function(bam_f,
         stop('splice_strategy must be one of: "none", "ignore", "add", "only"')
     }
     if(is.null(fragLen)){
-        fragLen = fragLen_calcStranded(bam_f, qgr)
+        fragLen = fragLen_calcStranded(bam_f, qgr, flip_strand = flip_strand)
         message("fragLen was calculated as: ", fragLen)
     }
     if(!is.na(fragLen)){
@@ -535,3 +535,4 @@ getReadLength = function(bam_file,
     reads_dt$ndupe = NULL
     reads_dt
 }
+

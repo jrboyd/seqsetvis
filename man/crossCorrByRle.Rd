@@ -5,7 +5,8 @@
 \title{Calculate cross correlation by using shiftApply on read coverage Rle}
 \usage{
 crossCorrByRle(bam_file, query_gr, max_dupes = 1,
-  fragment_sizes = 50:300, read_length = NULL, ...)
+  fragment_sizes = 50:300, read_length = NULL, flip_strand = FALSE,
+  ...)
 }
 \arguments{
 \item{bam_file}{character. Path to .bam file, must have index at .bam.bai.}
