@@ -30,6 +30,4 @@ if(!require(devtools)){
 Install *seqsetvis* from github
 ```{r install seqsetvis from github, eval=FALSE}
 devtools::install_github("jrboyd/seqsetvis")
-#if you're still on R3.4
-#devtools::install_github("jrboyd/seqsetvis", ref = "R3.4")
 ```
