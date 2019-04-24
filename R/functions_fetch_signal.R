@@ -1,10 +1,10 @@
 # functions useful for fetching signal data regardless of source:
 # bam, bigwig, etc.
 
-#' Generic signal loading function
+#' signal loading framework
 #'
 #' Does nothing unless load_signal is overridden to carry out reading
-#' data from file_paths (likely via the appropriate fetchWindowed function,
+#' data from file_paths (likely via the appropriate ssvFetch* function,
 #' ie. \code{\link{ssvFetchBigwig}} or \code{\link{ssvFetchBam}}
 #'
 #' @param file_paths character vector of file_paths to load from. Alternatively,
@@ -65,45 +65,53 @@ ssvFetchSignal = function(file_paths,
                           return_data.table = FALSE,
                           load_signal = function(f, nam, qgr) {
                               warning("nothing happened, ",
-                                      "add code here to load files")
+                                      "supply a function to",
+                                      "load_signal parameter.")
                           },
-                          n_cores = getOption("mc.cores", 1)){
-    if(is.data.frame(file_paths) | is.data.table(file_paths)){
-        if(is.null(unique_names) || unique_names == colnames(file_paths)){
-            if(!is.null(file_paths[[names_variable]])){
+                          n_cores = getOption("mc.cores", 1)) {
+    if (is.data.frame(file_paths) | is.data.table(file_paths)) {
+        if (is.null(unique_names) || unique_names == colnames(file_paths)) {
+            if (!is.null(file_paths[[names_variable]])) {
                 unique_names = as.character(file_paths[[names_variable]])
-            }else{
+            } else{
                 unique_names = file_paths[[1]]
             }
 
         }
-        if(ncol(file_paths) == 1){
-            file_attribs = data.frame(data.frame(matrix(0, nrow = length(file_paths), ncol = 0)))
+        if (ncol(file_paths) == 1) {
+            file_attribs = data.frame(data.frame(matrix(
+                0, nrow = length(file_paths), ncol = 0
+            )))
             file_attribs[[names_variable]] = unique_names
-        }else{
+        } else{
             file_attribs = file_paths[,-1]
         }
 
         file_paths = file_paths[[1]]
 
-    }else{ #file_paths is assumed to be a character vector
-        file_attribs = data.frame(data.frame(matrix(0, nrow = length(file_paths), ncol = 0)))
+    } else{
+        #file_paths is assumed to be a character vector
+        file_attribs = data.frame(data.frame(matrix(
+            0, nrow = length(file_paths), ncol = 0
+        )))
         file_attribs[[names_variable]] = unique_names
     }
-    if(is.list(file_paths)){
+    if (is.list(file_paths)) {
         file_paths = unlist(file_paths)
     }
-    if(is.factor(file_paths)) file_paths = as.character(file_paths)
+    if (is.factor(file_paths))
+        file_paths = as.character(file_paths)
     if (is.null(unique_names)) {
         unique_names = basename(file_paths)
     }
-    if(is.factor(unique_names)) unique_names = as.character(unique_names)
-    if(is.null(file_attribs[[names_variable]])){
+    if (is.factor(unique_names))
+        unique_names = as.character(unique_names)
+    if (is.null(file_attribs[[names_variable]])) {
         file_attribs[[names_variable]] = unique_names
     }
 
 
-    if(is.null(names(file_paths))){
+    if (is.null(names(file_paths))) {
         names(file_paths) = unique_names
     }
     stopifnot(is.character(file_paths))
@@ -118,42 +126,45 @@ ssvFetchSignal = function(file_paths,
     }
     stopifnot(file.exists(file_paths))
     #names(file_paths) = unique_names
-    if(win_method == "sample"){
+    if (win_method == "sample") {
         qgr = prepare_fetch_GRanges(qgr = qgr,
                                     win_size = win_size,
                                     target_size = NULL)
     }
 
-    nam_load_signal = function(nam){
+    nam_load_signal = function(nam) {
         f = file_paths[nam]
         load_signal(f, nam, qgr)
     }
     # bw_list = lapply(names(file_paths), nam_load_signal)
     bw_list = parallel::mclapply(file_attribs[[names_variable]],
                                  nam_load_signal, mc.cores = n_cores)
-    for(i in seq_along(bw_list)){
-        for(attrib in colnames(file_attribs)){
+    for (i in seq_along(bw_list)) {
+        for (attrib in colnames(file_attribs)) {
             bw_list[[i]][[attrib]] = file_attribs[[attrib]][i]
         }
 
     }
     out = data.table::rbindlist(bw_list)
-    if(!return_data.table){
+    if (!return_data.table) {
         out = GRanges(out)
     }
     return(out)
 }
 
-.check_qgr = function(qgr){
-    if(!is.null(qgr$name) && is.null(names(qgr))){
+.check_qgr = function(qgr) {
+    if (!is.null(qgr$name) && is.null(names(qgr))) {
         names(qgr) = qgr$name
     }
-    if (is.null(qgr$id)) {#id not set
-        if (is.null(names(qgr))) {#id and names not set - make names
+    if (is.null(qgr$id)) {
+        #id not set
+        if (is.null(names(qgr))) {
+            #id and names not set - make names
             names(qgr) = paste0("region_", seq_along(qgr))
         }
         qgr$id = names(qgr)#names is used for id
-    }else if (is.null(names(qgr))){#id is used for names if id set but not names
+    } else if (is.null(names(qgr))) {
+        #id is used for names if id set but not names
         names(qgr) = qgr$id
     }
     qgr
@@ -199,9 +210,11 @@ ssvFetchSignal = function(file_paths,
 #'     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
 #'     bw_dt = viewGRangesWinSample_dt(bw_gr, qgr, 50)
 #' }
-viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
+viewGRangesWinSample_dt = function(score_gr,
+                                   qgr,
+                                   window_size,
                                    anchor = c("center", "center_unstranded",
-                                              "left", "left_unstranded")[1]){
+                                              "left", "left_unstranded")[1]) {
     #reserve bindings for data.table
     x = id = NULL
     stopifnot(is(score_gr, "GRanges"))
@@ -223,16 +236,22 @@ viewGRangesWinSample_dt = function(score_gr, qgr, window_size,
     windows$id = names(windows)
     windows = resize(windows, width = 1, fix = "center")
     olaps = suppressWarnings(data.table::as.data.table(
-        findOverlaps(query = windows,
-                     subject = score_gr,
-                     ignore.strand = TRUE)
+        findOverlaps(
+            query = windows,
+            subject = score_gr,
+            ignore.strand = TRUE
+        )
     ))
     # patch up missing/out of bound data with 0
     missing_idx = setdiff(seq_along(windows), olaps$queryHits)
     if (length(missing_idx) > 0) {
-        olaps = rbind(olaps, data.table::data.table(
-            queryHits = missing_idx,
-            subjectHits = length(score_gr) + 1))[order(queryHits)]
+        olaps = rbind(
+            olaps,
+            data.table::data.table(
+                queryHits = missing_idx,
+                subjectHits = length(score_gr) + 1
+            )
+        )[order(queryHits)]
         suppressWarnings({
             score_gr = c(score_gr,
                          GRanges("chrPatchZero",
@@ -296,7 +315,7 @@ viewGRangesWinSummary_dt = function (score_gr,
                                      n_tiles = 100,
                                      anchor = c("center", "center_unstranded",
                                                 "left", "left_unstranded")[1],
-                                     summary_FUN = stats::weighted.mean){
+                                     summary_FUN = stats::weighted.mean) {
     #reserve bindings for data.table
     x = id = tile_start = tile_end = tile_id =
         tile_widths = scored_width = tile_density = NULL
@@ -305,7 +324,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(n_tiles))
     stopifnot(n_tiles >= 1)
-    stopifnot(n_tiles%%1 == 0)
+    stopifnot(n_tiles %% 1 == 0)
     stopifnot(anchor %in% c("center", "center_unstranded", "left",
                             "left_unstranded"))
     qgr = .check_qgr(qgr)
@@ -321,32 +340,36 @@ viewGRangesWinSummary_dt = function (score_gr,
     tiles$id = names(tiles)
 
 
-    olaps = suppressWarnings(
-        data.table::as.data.table(
-            findOverlaps(query = tiles,
-                         subject = score_gr,
-                         ignore.strand = TRUE)))
+    olaps = suppressWarnings(data.table::as.data.table(
+        findOverlaps(
+            query = tiles,
+            subject = score_gr,
+            ignore.strand = TRUE
+        )
+    ))
     #fill in gaps with zeroes
     missing_idx = setdiff(seq_along(tiles), olaps$queryHits)
     if (length(missing_idx) > 0) {
-        olaps = rbind(olaps,
-                      data.table::data.table(
-                          queryHits = missing_idx,
-                          subjectHits = length(score_gr) + 1))[order(queryHits)]
+        olaps = rbind(
+            olaps,
+            data.table::data.table(
+                queryHits = missing_idx,
+                subjectHits = length(score_gr) + 1
+            )
+        )[order(queryHits)]
         suppressWarnings({
             score_gr = c(score_gr,
                          GRanges("chrPatchZero",
                                  IRanges::IRanges(1, 1), score = 0))
         })
     }
-    cov_dt = cbind(
-        as.data.table(score_gr[olaps$subjectHits])[,-c(1, 4:5)],
-        as.data.table(tiles[olaps$queryHits])[,-c(1, 4:5)],
-        tile_id = olaps$queryHits
-    )
+    cov_dt = cbind(as.data.table(score_gr[olaps$subjectHits])[, -c(1, 4:5)],
+                   as.data.table(tiles[olaps$queryHits])[, -c(1, 4:5)],
+                   tile_id = olaps$queryHits)
     colnames(cov_dt)[4:5] = c("tile_start", "tile_end")
 
-    cov_dt[start == 1 & end == 1, c("start", "end") := list(tile_start, tile_end)]
+    cov_dt[start == 1 &
+               end == 1, c("start", "end") := list(tile_start, tile_end)]
     #trim score regions to fit in tiles so score weighting is accurate
 
     cov_dt[start < tile_start, start := tile_start]
@@ -372,8 +395,8 @@ viewGRangesWinSummary_dt = function (score_gr,
     density_dt = cov_dt[, list(tile_density = summary_FUN(score, width)),
                         by = list(tile_id, id)]
 
-    density_dt[, x := (seq_len(.N)-.5)/.N, by = id]
-    if(!all(tiles$id == density_dt$id))
+    density_dt[, x := (seq_len(.N) - .5) / .N, by = id]
+    if (!all(tiles$id == density_dt$id))
         stop("something bad happened when merging density ",
              "data.table back to tiles GRanges.")
     score_dt = cbind(as.data.table(tiles), density_dt[, list(y = tile_density, x = x)])
@@ -381,16 +404,22 @@ viewGRangesWinSummary_dt = function (score_gr,
     #slightly different than summary,
     #x is already set and regions are already contiguous.
     #just need to flip x or center as needed.
-    switch(anchor, center = {
-        score_dt[, x := x - (mean(x)), by = id]
-        score_dt[strand == "-", x := (- 1 * x)]
-    }, center_unstranded = {
-        score_dt[, x := x - (mean(x)), by = id]
-    }, left = {
-        score_dt[strand == "-", x := (1 - 1 * x), by = id]
-    }, left_unstranded = {
-        #do nothing
-    })
+    switch(
+        anchor,
+        center = {
+            score_dt[, x := x - (mean(x)), by = id]
+            score_dt[strand == "-", x := (-1 * x)]
+        },
+        center_unstranded = {
+            score_dt[, x := x - (mean(x)), by = id]
+        },
+        left = {
+            score_dt[strand == "-", x := (1 - 1 * x), by = id]
+        },
+        left_unstranded = {
+            #do nothing
+        }
+    )
 
     #ensure x is rounded and easily flippable
     score_dt$x = round(score_dt$x, 9)
@@ -407,30 +436,31 @@ viewGRangesWinSummary_dt = function (score_gr,
 #' "left", "left_unstranded")
 #' @return score_dt with x values shifted appropriately and start and end
 #' extended to make ranges contiguous
-shift_anchor = function(score_dt, window_size, anchor){
+shift_anchor = function(score_dt, window_size, anchor) {
     x = id = NULL
-    shift = round(window_size/2)
-    switch(anchor,
-           center = {
-               score_dt[, x := start - min(start) + shift, by = id]
-               score_dt[, x := x - round(mean(x)), by = id]
-               score_dt[strand == "-", x := -1*x]
-           },
-           center_unstranded = {
-               score_dt[, x := start - min(start) + shift, by = id]
-               score_dt[, x := x - round(mean(x)), by = id]
-           },
-           left = {
-               score_dt[, x := -1]
-               score_dt[strand != "-", x := start - min(start) + shift,
-                        by = id]
-               #flip negative
-               score_dt[strand == "-", x := -1*(end - max(end) - shift),
-                        by = id]
-           },
-           left_unstranded = {
-               score_dt[, x := start - min(start) + shift, by = id]
-           }
+    shift = round(window_size / 2)
+    switch(
+        anchor,
+        center = {
+            score_dt[, x := start - min(start) + shift, by = id]
+            score_dt[, x := x - round(mean(x)), by = id]
+            score_dt[strand == "-", x := -1 * x]
+        },
+        center_unstranded = {
+            score_dt[, x := start - min(start) + shift, by = id]
+            score_dt[, x := x - round(mean(x)), by = id]
+        },
+        left = {
+            score_dt[, x := -1]
+            score_dt[strand != "-", x := start - min(start) + shift,
+                     by = id]
+            #flip negative
+            score_dt[strand == "-", x := -1 * (end - max(end) - shift),
+                     by = id]
+        },
+        left_unstranded = {
+            score_dt[, x := start - min(start) + shift, by = id]
+        }
     )
 
     score_dt[, start := start - shift]
@@ -460,28 +490,39 @@ shift_anchor = function(score_dt, window_size, anchor){
 prepare_fetch_GRanges = function(qgr,
                                  win_size,
                                  min_quantile = .75,
-                                 target_size = NULL){
-    if(length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0 ){
-        if(is.null(target_size)){
-            target_size = quantileGRangesWidth(qgr = qgr,
-                                               min_quantile = min_quantile,
-                                               win_size = win_size)
+                                 target_size = NULL) {
+    if (length(unique(width(qgr))) > 1 ||
+        width(qgr)[1] %% win_size != 0) {
+        if (is.null(target_size)) {
+            target_size = quantileGRangesWidth(
+                qgr = qgr,
+                min_quantile = min_quantile,
+                win_size = win_size
+            )
         }
-        if(target_size %% win_size != 0){
-            stop("target_size: ", target_size,
-                 " not evenly divisible by win_size: ", win_size)
+        if (target_size %% win_size != 0) {
+            stop(
+                "target_size: ",
+                target_size,
+                " not evenly divisible by win_size: ",
+                win_size
+            )
         }
 
         qgr = centerFixedSizeGRanges(qgr, fixed_size = target_size)
-        message("widths of qgr were not ",
-                "identical and evenly divisible by win_size.",
-                "\nA fixed width of ",
-                target_size, " was applied based on the data provided.")
+        message(
+            "widths of qgr were not ",
+            "identical and evenly divisible by win_size.",
+            "\nA fixed width of ",
+            target_size,
+            " was applied based on the data provided."
+        )
     }
-    if(any(start(qgr) < 1)){
+    if (any(start(qgr) < 1)) {
         warning("Some out of bounds GRanges had to be shifted back to start >= 1.")
         fix_shift = 1 - start(qgr)
-        fix_shift = vapply(fix_shift, function(x)max(x, 0), FUN.VALUE = 1)
+        fix_shift = vapply(fix_shift, function(x)
+            max(x, 0), FUN.VALUE = 1)
         qgr = IRanges::shift(qgr, fix_shift)
     }
     return(qgr)
@@ -504,12 +545,12 @@ prepare_fetch_GRanges = function(qgr,
 #' quantileGRangesWidth(gr, min_quantile = .5, win_size = 100)
 quantileGRangesWidth = function(qgr,
                                 min_quantile = .75,
-                                win_size = 1){
+                                win_size = 1) {
     stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(min_quantile), is.numeric(win_size))
     stopifnot(min_quantile >= 0 && min_quantile <= 1)
     stopifnot(length(min_quantile) == 1 && length(win_size) == 1)
-    stopifnot(win_size%%1==0)
+    stopifnot(win_size %% 1 == 0)
     stopifnot(win_size >= 1)
     qwidth = quantile(width(qgr), min_quantile)
     fwidth = ceiling(qwidth / win_size) * win_size
