@@ -104,7 +104,7 @@ ssvFetchBamPE = function(file_paths,
                          n_cores = n_cores)
 
 
-    if(!return_data.table){
+    if(!return_data.table & !return_unprocessed){
         bdt = GRanges(bdt)
     }
     bdt
