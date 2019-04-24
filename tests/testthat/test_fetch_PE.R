@@ -40,7 +40,7 @@ pe_dt = ssvFetchBamPE(pe_file,
                       return_data.table = TRUE,
                       win_size = 50)
 
-test_that("ssvFetchBamPE return_unprocessed", {
+test_that("ssvFetchBamPE normal", {
     expect_equal(
         colnames(pe_dt),
         c(
