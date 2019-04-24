@@ -2,13 +2,13 @@
 % Please edit documentation in R/functions_fetch_signal.R
 \name{ssvFetchSignal}
 \alias{ssvFetchSignal}
-\title{Generic signal loading function}
+\title{signal loading framework}
 \usage{
 ssvFetchSignal(file_paths, qgr, unique_names = names(file_paths),
   names_variable = "sample", win_size = 50, win_method = c("sample",
   "summary")[1], return_data.table = FALSE, load_signal = function(f,
-  nam, qgr) {     warning("nothing happened, ",
-  "add code here to load files") }, n_cores = getOption("mc.cores", 1))
+  nam, qgr) {     warning("nothing happened, ", "supply a function to",
+  "load_signal parameter.") }, n_cores = getOption("mc.cores", 1))
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from. Alternatively,
@@ -47,7 +47,7 @@ names_variable.  Output is data.table is return_data.table is TRUE.
 }
 \description{
 Does nothing unless load_signal is overridden to carry out reading
-data from file_paths (likely via the appropriate fetchWindowed function,
+data from file_paths (likely via the appropriate ssvFetch* function,
 ie. \code{\link{ssvFetchBigwig}} or \code{\link{ssvFetchBam}}
 }
 \details{
