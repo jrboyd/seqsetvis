@@ -119,19 +119,19 @@ test_that("ssvFetchBam query GRanges name gets used", {
     expect_true(all(unique(gr_sample$id) == unique(names(test_gr))))
 })
 
-test_that("ssvFetchBam bam_file as data.frame/table", {
-    test_gr = CTCF_in_10a_narrowPeak_grs$MCF10A_CTCF
-    gr_sample = ssvFetchBam(
-        data.frame(rep(bam_file,3),
-                   colors = c("red", "green", "blue"),
-                   sample = c("10a", "10b", "10c")),
-        win_size = 5, qgr = test_gr,
-        return_data.table = TRUE)
-    expect_true(all(levels(gr_sample$colors) %in%
-                        c("red", "green", "blue")))
-    expect_true(all(levels(gr_sample$sample) %in%
-                        c("10a", "10b", "10c")))
-})
+# test_that("ssvFetchBam bam_file as data.frame/table", {
+#     test_gr = CTCF_in_10a_narrowPeak_grs$MCF10A_CTCF
+#     gr_sample = ssvFetchBam(
+#         data.frame(rep(bam_file,3),
+#                    colors = c("red", "green", "blue"),
+#                    sample = c("10a", "10b", "10c")),
+#         win_size = 5, qgr = test_gr,
+#         return_data.table = TRUE)
+#     expect_true(all(levels(gr_sample$colors) %in%
+#                         c("red", "green", "blue")))
+#     expect_true(all(levels(gr_sample$sample) %in%
+#                         c("10a", "10b", "10c")))
+# })
 
 test_that("ssvFetchBam sample method correct bins", {
     skip_on_os("windows")

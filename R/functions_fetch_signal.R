@@ -69,8 +69,8 @@ ssvFetchSignal = function(file_paths,
                                       "load_signal parameter.")
                           },
                           n_cores = getOption("mc.cores", 1)) {
-    if (is.data.frame(file_paths) | is.data.table(file_paths)) {
-        if (is.null(unique_names) || unique_names == colnames(file_paths)) {
+    if (is.data.frame(file_paths) || is.data.table(file_paths)) {
+        if (is.null(unique_names) || all(unique_names == colnames(file_paths))) {
             if (!is.null(file_paths[[names_variable]])) {
                 unique_names = as.character(file_paths[[names_variable]])
             } else{
