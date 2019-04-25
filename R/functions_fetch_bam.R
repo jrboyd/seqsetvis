@@ -62,7 +62,7 @@
 #' }
 ssvFetchBam = function(file_paths,
                        qgr,
-                       unique_names = names(file_paths),
+                       unique_names = NULL,
                        win_size = 50,
                        win_method = c("sample", "summary")[1],
                        summary_FUN = stats::weighted.mean,

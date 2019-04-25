@@ -6,7 +6,7 @@
 \code{ssvFetchBigwig.single} on each.  Appends grouping variable to each
 resulting data.table and uses rbindlist to efficiently combine results.}
 \usage{
-ssvFetchBigwig(file_paths, qgr, unique_names = names(file_paths),
+ssvFetchBigwig(file_paths, qgr, unique_names = NULL,
   names_variable = "sample", win_size = 50, win_method = c("sample",
   "summary")[1], summary_FUN = stats::weighted.mean, anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],

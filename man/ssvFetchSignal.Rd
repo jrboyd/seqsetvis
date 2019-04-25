@@ -4,7 +4,7 @@
 \alias{ssvFetchSignal}
 \title{signal loading framework}
 \usage{
-ssvFetchSignal(file_paths, qgr, unique_names = names(file_paths),
+ssvFetchSignal(file_paths, qgr, unique_names = NULL,
   names_variable = "sample", win_size = 50, win_method = c("sample",
   "summary")[1], return_data.table = FALSE, load_signal = function(f,
   nam, qgr) {     warning("nothing happened, ", "supply a function to",

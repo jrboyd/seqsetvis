@@ -15,6 +15,8 @@ bam_file = system.file("extdata/test.bam", package = "seqsetvis")
 fetchBam = seqsetvis:::fetchBam
 
 bam_gr = fetchBam(bam_file, qgr)
+# bams
+bams = c("A" = bam_file, "B" = bam_file)
 
 #sampling
 test_that("viewGRangesWinSample_dt center", {
@@ -70,8 +72,7 @@ test_that("viewGRangesWinSummary_dt left", {
     expect_true(all(dt_us$x > 0))
 })
 
-# bams
-bams = c("A" = bam_file, "B" = bam_file)
+
 
 test_that("ssvFetchBam anchor GRanges", {
     gr = ssvFetchBam(bams, qgr, win_size = 50, anchor = "center")

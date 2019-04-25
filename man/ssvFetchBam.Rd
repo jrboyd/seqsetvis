@@ -6,8 +6,8 @@
 \code{ssvFetchBam.single} on each.  Appends grouping variable to each
 resulting data.table and uses rbindlist to efficiently combine results}
 \usage{
-ssvFetchBam(file_paths, qgr, unique_names = names(file_paths),
-  win_size = 50, win_method = c("sample", "summary")[1],
+ssvFetchBam(file_paths, qgr, unique_names = NULL, win_size = 50,
+  win_method = c("sample", "summary")[1],
   summary_FUN = stats::weighted.mean, fragLens = "auto",
   target_strand = c("*", "+", "-", "both")[1], flip_strand = FALSE,
   anchor = c("left", "left_unstranded", "center",

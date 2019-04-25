@@ -48,7 +48,7 @@
 #' }
 ssvFetchBigwig = function(file_paths,
                           qgr,
-                          unique_names = names(file_paths),
+                          unique_names = NULL,
                           names_variable = "sample",
                           win_size = 50,
                           win_method = c("sample", "summary")[1],

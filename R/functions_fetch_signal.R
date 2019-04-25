@@ -58,7 +58,7 @@
 #' ssvFetchSignal(bam_files, qgr, load_signal = load_bam)
 ssvFetchSignal = function(file_paths,
                           qgr,
-                          unique_names = names(file_paths),
+                          unique_names = NULL,
                           names_variable = "sample",
                           win_size = 50,
                           win_method = c("sample", "summary")[1],
@@ -70,19 +70,18 @@ ssvFetchSignal = function(file_paths,
                           },
                           n_cores = getOption("mc.cores", 1)) {
     if (is.data.frame(file_paths) || is.data.table(file_paths)) {
-        if (is.null(unique_names) || all(unique_names == colnames(file_paths))) {
-            if (!is.null(file_paths[[names_variable]])) {
-                unique_names = as.character(file_paths[[names_variable]])
-            } else{
-                unique_names = file_paths[[1]]
-            }
-
-        }
+        # if (is.null(unique_names) || unique_names == colnames(file_paths)) {
+        #     if (!is.null(file_paths[[names_variable]])) {
+        #         unique_names = as.character(file_paths[[names_variable]])
+        #     } else{
+        #         unique_names = file_paths[[1]]
+        #     }
+        # }
         if (ncol(file_paths) == 1) {
             file_attribs = data.frame(data.frame(matrix(
                 0, nrow = length(file_paths), ncol = 0
             )))
-            file_attribs[[names_variable]] = unique_names
+            # file_attribs[[names_variable]] = unique_names
         } else{
             file_attribs = file_paths[,-1]
         }
@@ -102,15 +101,19 @@ ssvFetchSignal = function(file_paths,
     if (is.factor(file_paths))
         file_paths = as.character(file_paths)
     if (is.null(unique_names)) {
-        unique_names = basename(file_paths)
+        if(!is.null(names(file_paths))){
+            unique_names = names(file_paths)
+        }else if(!is.null(file_attribs[[names_variable]])){
+            unique_names = file_attribs[[names_variable]]
+        }else{
+            unique_names = file_paths
+        }
     }
     if (is.factor(unique_names))
         unique_names = as.character(unique_names)
     if (is.null(file_attribs[[names_variable]])) {
         file_attribs[[names_variable]] = unique_names
     }
-
-
     if (is.null(names(file_paths))) {
         names(file_paths) = unique_names
     }
