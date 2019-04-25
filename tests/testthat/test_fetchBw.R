@@ -217,6 +217,7 @@ test_that("ssvFetchBigwig test_bw as data.frame/table", {
 })
 
 test_that("ssvFetchBigwig single column data.table", {
+    skip_on_os("windows")
     qdt = data.table(file = test_bw)
     res = ssvFetchBigwig(qdt,
                       qgr = test_qgr[1],
