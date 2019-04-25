@@ -1,11 +1,11 @@
 ---
-title: "The **seqsetvis** package"
+title: "Fetch Bams in Detail"
 author: "Joseph R Boyd"
 output:
   BiocStyle::html_document:
     toc_float: true
 vignette: >
-    %\VignetteIndexEntry{Overview and Use Cases}
+    %\VignetteIndexEntry{Fetch Bams in Detail}
     %\VignetteEngine{knitr::rmarkdown}
     %\VignetteEncoding{UTF-8}
 ---

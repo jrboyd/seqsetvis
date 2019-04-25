@@ -1,10 +1,10 @@
-testthat::context("fetchPE")
+testthat::context("ssvFetchBamPE")
 
 library(seqsetvis)
 library(GenomicRanges)
 library(data.table)
 library(testthat)
-pe_file = system.file("extdata/Bcell_PE.mm10.bam", package = "seqsetvis")
+pe_file = system.file("extdata/Bcell_PE.mm10.bam", package = "seqsetvis", mustWork = TRUE)
 
 data("Bcell_peaks")
 qgr = Bcell_peaks
