@@ -78,9 +78,9 @@ ssvFetchSignal = function(file_paths,
         #     }
         # }
         if (ncol(file_paths) == 1) {
-            file_attribs = data.frame(data.frame(matrix(
-                0, nrow = length(file_paths), ncol = 0
-            )))
+            file_attribs = data.frame(matrix(
+                0, nrow = nrow(file_paths), ncol = 0
+            ))
             # file_attribs[[names_variable]] = unique_names
         } else{
             file_attribs = file_paths[,-1]
