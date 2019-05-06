@@ -168,15 +168,16 @@ crossCorrByRle = function(bam_file,
     if(flip_strand){
         strand(temp) = ifelse(as.character(strand(temp)) == "+", "-", "+")
     }
+    rl = getReadLength(bam_file, query_gr)
     if(is.null(read_length)){
-        read_length = getReadLength(bam_file, query_gr)
+        read_length = rl
     }
     if(is.na(read_length)){
         read_length = numeric()
     }
     fragment_sizes = sort(union(read_length, fragment_sizes))
 
-    PosCoverage <- coverage(GenomicRanges::shift(GRanges(temp[strand(temp)=="+"])), -read_length)
+    PosCoverage <- coverage(GenomicRanges::shift(GRanges(temp[strand(temp)=="+"])), -rl)
     PosCoverage = PosCoverage[query_gr]
     names(PosCoverage) = query_gr$name
 
