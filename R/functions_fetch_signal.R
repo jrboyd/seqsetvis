@@ -120,7 +120,6 @@ ssvFetchSignal = function(file_paths,
                    unique(unique_names[duplicated(unique_names)])))
     }
     stopifnot(file.exists(file_paths))
-    #names(file_paths) = unique_names
     if (win_method == "sample") {
         qgr = prepare_fetch_GRanges(qgr = qgr,
                                     win_size = win_size,
@@ -131,7 +130,6 @@ ssvFetchSignal = function(file_paths,
         f = file_paths[nam]
         load_signal(f, nam, qgr)
     }
-    # bw_list = lapply(names(file_paths), nam_load_signal)
     bw_list = parallel::mclapply(file_attribs[[names_variable]],
                                  nam_load_signal, mc.cores = n_cores)
     for (i in seq_along(bw_list)) {
