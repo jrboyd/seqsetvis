@@ -126,6 +126,7 @@ test_that("ssvFetchBam bam_file as data.frame/table", {
                            sample = c("10a", "10b", "10c"))
     gr_sample = ssvFetchBam(
         config_df,
+        # fragLens = 180,
         win_size = 5, qgr = test_gr,
         return_data.table = TRUE)
     expect_true(all(levels(gr_sample$colors) %in%
@@ -311,7 +312,71 @@ test_that("ssvFetchBam single column data.table", {
     res = ssvFetchBam(qdt,
                       qgr = qgr[1],
                       win_size = 5, fragLens = 200,
-                           target_strand = "both", return_data.table = TRUE,
-                           win_method = "summary")
+                      target_strand = "both", return_data.table = TRUE,
+                      win_method = "summary")
     expect_equal(res$sample[1], bam_file)
+})
+
+test_that("ssvFetchBam sample target_strand of both - fragLens", {
+    strand(qgr) = "*"
+    res_100 = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 100,
+                          target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "+"
+    res_150 = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 150,
+                          target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "-"
+    res_200 = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 200,
+                          target_strand = "both", return_data.table = TRUE)
+    # ggplot(rbind(res_100[, group := "100"],
+    #              res_150[, group := "150"],
+    #              res_200[, group := "200"]),
+    #        aes(x = x, y = y, color = strand, group = group)) +
+    #     geom_path() + facet_wrap("strand")
+    expect_gt(res_200[x == 2 & strand == "+"]$y, res_100[x == 2 & strand == "+"]$y)
+    expect_gt(res_200[x == 2 & strand == "-"]$y, res_100[x == 2 & strand == "-"]$y)
+
+    expect_equal(res_200[x == -248 & strand == "+"]$y, res_100[x == -248 & strand == "+"]$y)
+    expect_equal(res_200[x == 247 & strand == "-"]$y, res_100[x == 247 & strand == "-"]$y)
+})
+
+test_that("ssvFetchBam summary target_strand of both - fragLens", {
+    strand(qgr) = "*"
+    res_100 = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 100, win_method = "summary",
+                          target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "+"
+    res_150 = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 150, win_method = "summary",
+                          target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "-"
+    res_200 = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 200, win_method = "summary",
+                          target_strand = "both", return_data.table = TRUE)
+    # ggplot(rbind(res_100[, group := "100"],
+    #              res_150[, group := "150"],
+    #              res_200[, group := "200"]),
+    #        aes(x = x, y = y, color = strand, group = group)) +
+    #     geom_path() + facet_wrap("strand")
+    expect_gt(res_200[x == 0 & strand == "+"]$y, res_100[x == 0 & strand == "+"]$y)
+    expect_gt(res_200[x == 0 & strand == "-"]$y, res_100[x == 0 & strand == "-"]$y)
+})
+
+test_that("ssvFetchBam sample target_strand of both - fragLens", {
+    strand(qgr) = "*"
+    qdf = data.frame(file = bam_file, mark = "a")
+    res_100 = ssvFetchBam(qdf, win_size = 5, qgr = qgr[1], fragLens = 100,
+                          target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "+"
+    res_150 = ssvFetchBam(qdf, win_size = 5, qgr = qgr[1], fragLens = 150,
+                          target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "-"
+    res_200 = ssvFetchBam(qdf, win_size = 5, qgr = qgr[1], fragLens = 200,
+                          target_strand = "both", return_data.table = TRUE)
+    # ggplot(rbind(res_100[, group := "100"],
+    #              res_150[, group := "150"],
+    #              res_200[, group := "200"]),
+    #        aes(x = x, y = y, color = strand, group = group)) +
+    #     geom_path() + facet_wrap("strand")
+    expect_gt(res_200[x == 2 & strand == "+"]$y, res_100[x == 2 & strand == "+"]$y)
+    expect_gt(res_200[x == 2 & strand == "-"]$y, res_100[x == 2 & strand == "-"]$y)
+
+    expect_equal(res_200[x == -248 & strand == "+"]$y, res_100[x == -248 & strand == "+"]$y)
+    expect_equal(res_200[x == 247 & strand == "-"]$y, res_100[x == 247 & strand == "-"]$y)
 })

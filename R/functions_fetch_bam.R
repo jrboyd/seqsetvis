@@ -83,9 +83,31 @@ ssvFetchBam = function(file_paths,
                       is.na(fragLens)))
     stopifnot(length(fragLens) == 1 || length(fragLens) == length(file_paths))
     if(length(fragLens == 1)){
-        fragLens = rep(fragLens[1], length(file_paths))
+        if (is.data.frame(file_paths) || is.data.table(file_paths)) {
+            fragLens = rep(fragLens[1], nrow(file_paths))
+        }else{
+            fragLens = rep(fragLens[1], length(file_paths))
+        }
+
     }
-    names(fragLens) = file_paths
+
+    if (is.data.frame(file_paths) || is.data.table(file_paths)) {
+        if(is.null(colnames(file_paths))){
+            names(fragLens) = file_paths[[1]]
+        }else{
+            if(any(grepl("file", colnames(file_paths)))){
+                k = which(grepl("file", colnames(file_paths)))[1]
+                names(fragLens) = file_paths[[k]]
+            }else{
+                names(fragLens) = file_paths[[1]]
+            }
+        }
+
+
+    }else{
+        names(fragLens) = file_paths
+    }
+
 
     load_bam = function(f, nam, qgr) {
         message("loading ", f, " ...")
@@ -435,12 +457,29 @@ harmonize_seqlengths = function(gr, bam_file){
     gr
 }
 
+#' determine the most common read length for input bam_file.  uses 50 randomly
+#' selected regions from query_gr.  If fewer than 20 reads are present, loads
+#' all of query_gr.
+#'
+#' @param bam_file indexed bam file
+#' @param query_gr GRanges to read from bam file
+#'
+#' @return numeric of most common read length.
 getReadLength = function(bam_file,
                          query_gr){
     Param <- Rsamtools::ScanBamParam(which=sample(query_gr,
-                                                  min(10, length(query_gr))),
+                                                  min(50, length(query_gr))),
                                      what=c("flag","mapq"))
     temp <- GenomicAlignments::readGAlignments(bam_file,param=Param)
+    if(length(temp) < 20){
+        Param <- Rsamtools::ScanBamParam(which=sample(query_gr),
+                                         what=c("flag","mapq"))
+        temp <- GenomicAlignments::readGAlignments(bam_file,param=Param)
+        if(length(temp) == 0){
+            stop("No reads could be found in query_gr to determine read length. ",
+                 "Please verify that query_gr is appropriate for bam_file: ", bam_file)
+        }
+    }
     readlength=as.numeric(names(sort(table(width(temp)), decreasing = TRUE))[1])
     readlength
 }
