@@ -70,20 +70,12 @@ ssvFetchSignal = function(file_paths,
                           },
                           n_cores = getOption("mc.cores", 1)) {
     if (is.data.frame(file_paths) || is.data.table(file_paths)) {
-        # if (is.null(unique_names) || unique_names == colnames(file_paths)) {
-        #     if (!is.null(file_paths[[names_variable]])) {
-        #         unique_names = as.character(file_paths[[names_variable]])
-        #     } else{
-        #         unique_names = file_paths[[1]]
-        #     }
-        # }
         if (ncol(file_paths) == 1) {
             file_attribs = data.frame(matrix(
                 0, nrow = nrow(file_paths), ncol = 0
             ))
-            # file_attribs[[names_variable]] = unique_names
         } else{
-            file_attribs = file_paths[,-1]
+            file_attribs = file_paths[,-1, drop = FALSE]
         }
 
         file_paths = file_paths[[1]]
