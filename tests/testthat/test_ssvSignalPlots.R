@@ -268,3 +268,13 @@ res_gr = GRanges(res_dt)
 
 doTest_ssvSignalPlots(test_object = res_dt)
 doTest_ssvSignalPlots(test_object = res_gr)
+
+test_that("ssvSignalHeatmap 1 clust", {
+    expect_failure(expect_error(ssvSignalHeatmap(res_dt, nclust = 1)))
+})
+
+test_that("ssvSignalHeatmap too many clust", {
+    t_dt = res_dt[id %in% unique(id)[1:5]]
+    expect_failure(expect_error(ssvSignalHeatmap(t_dt, nclust = 5)))
+    expect_failure(expect_error(ssvSignalHeatmap(t_dt, nclust = 6)))
+})

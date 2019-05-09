@@ -22,14 +22,29 @@
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
 clusteringKmeans = function(mat, nclust, seed = NULL) {
-    stopifnot(is.numeric(nclust) && nclust > 1)
+    stopifnot(is.numeric(nclust))
     cluster_ordered = mat_name = NULL#declare binding for data.table
     if(!is.null(seed)){
         warning("'seed' parameter is now deprecated. ",
                 "Please call set.seed() yourself if needed.")
     }
-    mat_kmclust = stats::kmeans(mat, centers = nclust, iter.max = 30)
-    center_o = stats::hclust(stats::dist(mat_kmclust$centers))$order
+    if(nrow(mat) <= nclust){
+        nclust = nrow(mat)
+        mat_kmclust = list(
+            centers = mat,
+            cluster = seq(nrow(mat))
+        )
+        names(mat_kmclust$cluster) = seq(nrow(mat))
+
+    }else{
+        mat_kmclust = stats::kmeans(mat, centers = nclust, iter.max = 30)
+    }
+
+    if(nclust < 3){
+        center_o = seq(nclust)
+    }else{
+        center_o = stats::hclust(stats::dist(mat_kmclust$centers))$order
+    }
     center_reo = seq_along(center_o)
     names(center_reo) = center_o
     center_reo[as.character(mat_kmclust$cluster)]
@@ -67,7 +82,7 @@ clusteringKmeans = function(mat, nclust, seed = NULL) {
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
 clusteringKmeansNestedHclust = function(mat, nclust, seed = NULL) {
-    stopifnot(is.numeric(nclust) && nclust > 1)
+    stopifnot(is.numeric(nclust))
     group = id = within_o = NULL#declare binding for data.table
     mat_dt = clusteringKmeans(mat, nclust)
     mat_dt$within_o = as.integer(-1)
