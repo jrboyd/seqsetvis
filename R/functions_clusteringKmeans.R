@@ -37,6 +37,12 @@ clusteringKmeans = function(mat, nclust, seed = NULL) {
         names(mat_kmclust$cluster) = seq(nrow(mat))
 
     }else{
+        if(nrow(unique(mat)) < nclust){
+            nclust = nrow(unique(mat))
+            warning("Reducing nclust to ", nclust,
+                    " - maximum number of clusters allowed due to ",
+                    "low uniqueness.")
+        }
         mat_kmclust = stats::kmeans(mat, centers = nclust, iter.max = 30)
     }
 
