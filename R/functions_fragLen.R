@@ -136,23 +136,23 @@ crossCorrByRle = function(bam_file,
                           flip_strand = FALSE,
                           ...){
     rn = NULL # reserve for data.table
-    if(is.null(query_gr$name)){
+    if(is.null(query_gr$id)){
         if(is.null(names(query_gr))){
-            query_gr$name = paste0("peak_", seq_along(query_gr))
+            query_gr$id = paste0("peak_", seq_along(query_gr))
         }else{
-            query_gr$name = names(query_gr)
+            query_gr$id = names(query_gr)
         }
     }else{
         if(is.null(names(query_gr))){
-            names(query_gr) = query_gr$name
+            names(query_gr) = query_gr$id
         }else{
-            #both names() and $name are set, leave it alone
+            #both names() and $id are set, leave it alone
         }
 
     }
     q_widths = apply(cbind(width(query_gr), max(fragment_sizes)*3), 1, max)
     query_gr = resize(query_gr, q_widths, fix = "center")
-    names(query_gr) = query_gr$name
+    names(query_gr) = query_gr$id
     # query_gr = resize(query_gr, 500, fix = "center")
 
     query_gr = harmonize_seqlengths(query_gr, bam_file)
@@ -179,11 +179,11 @@ crossCorrByRle = function(bam_file,
 
     PosCoverage <- coverage(GenomicRanges::shift(GRanges(temp[strand(temp)=="+"])), -rl)
     PosCoverage = PosCoverage[query_gr]
-    names(PosCoverage) = query_gr$name
+    names(PosCoverage) = query_gr$id
 
     NegCoverage <- coverage(GRanges(temp[strand(temp)=="-"]))
     NegCoverage = NegCoverage[query_gr]
-    names(NegCoverage) = query_gr$name
+    names(NegCoverage) = query_gr$id
     # ShiftMatCor = vapply(as.list(seq_along(query_gr)), FUN.VALUE = as.list(seq(fragment_sizes)),
     #                      function(i){
     #     ShiftsCorTemp <- S4Vectors::shiftApply(fragment_sizes,
@@ -207,9 +207,12 @@ crossCorrByRle = function(bam_file,
     #                      byrow = FALSE,
     #                      nrow = length(fragment_sizes),
     #                      ncol = length(query_gr))
+    if(length(fragment_sizes) == 1){
+        ShiftMatCor = matrix(ShiftMatCor, nrow = 1)
+    }
     ShiftMatCor[is.nan(ShiftMatCor)] = 0
 
-    colnames(ShiftMatCor) = query_gr$name
+    colnames(ShiftMatCor) = query_gr$id
     rownames(ShiftMatCor) = fragment_sizes
     shift_dt = as.data.table(ShiftMatCor, keep.rownames = TRUE)
     shift_dt[, shift := as.numeric(rn)]
