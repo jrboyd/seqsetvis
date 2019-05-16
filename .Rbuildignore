@@ -9,3 +9,4 @@
 ^dev_.+$
 ^doc$
 ^Meta$
+^vignettes/seqsetvis_fetchBams.Rmd
