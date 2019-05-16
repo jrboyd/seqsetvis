@@ -83,7 +83,7 @@ ssvFetchBam = function(file_paths,
                       is.na(fragLens)))
     exp_fragLen = ifelse(is.data.frame(file_paths) || is.data.table(file_paths), nrow(file_paths), length(file_paths))
     stopifnot(length(fragLens) == 1 || length(fragLens) == exp_fragLen)
-    if(length(fragLens == 1)){
+    if(length(fragLens) == 1){
         if (is.data.frame(file_paths) || is.data.table(file_paths)) {
             fragLens = rep(fragLens[1], nrow(file_paths))
         }else{
