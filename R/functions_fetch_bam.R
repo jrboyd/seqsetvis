@@ -410,6 +410,11 @@ fetchBam = function(bam_f,
     if(target_strand == "-"){
         strand(score_gr) = "-"
     }
+    if(length(score_gr) == 0){
+        score_gr = sbgr
+        mcols(score_gr) = NULL
+        score_gr$score = 0
+    }
     return(score_gr)
 }
 
