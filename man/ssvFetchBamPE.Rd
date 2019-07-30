@@ -2,12 +2,10 @@
 % Please edit documentation in R/functions_fetch_bamPE.R
 \name{ssvFetchBamPE}
 \alias{ssvFetchBamPE}
-\title{Iterates a character vector (ideally named) and calls
-\code{ssvFetchBamPE.single} on each.  Appends grouping variable to each
-resulting data.table and uses rbindlist to efficiently combine results}
+\title{ssvFetchBam for paired-end ChIP-seq files.}
 \usage{
-ssvFetchBamPE(file_paths, qgr, unique_names = names(file_paths),
-  win_size = 50, win_method = c("sample", "summary")[1],
+ssvFetchBamPE(file_paths, qgr, unique_names = NULL, win_size = 50,
+  win_method = c("sample", "summary")[1],
   summary_FUN = stats::weighted.mean, anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
   names_variable = "sample", return_data.table = FALSE,
@@ -62,10 +60,17 @@ A tidy formatted GRanges (or data.table if specified) containing
   fetched values.
 }
 \description{
-\code{ssvFetchBamPE} iteratively calls \code{fetchWindowedBam.single}. See
-\code{\link{ssvFetchBamPE.single}} for more info.
+Iterates a character vector (ideally named) and calls
+\code{ssvFetchBamPE.single} on each.  Appends grouping variable to each
+resulting data.table and uses rbindlist to efficiently combine results
 }
 \details{
+#' In contrast to ssvFetchBam, extension of reads to estimated fragment size is
+not an issue as each read pair represents a fragment of exact size.
+
+\code{ssvFetchBamPE} iteratively calls \code{fetchWindowedBam.single}. See
+\code{\link{ssvFetchBamPE.single}} for more info.
+
 if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
   10, values from positions chr1 5,15,25...85, and 95 will be retrieved from
   \code{bw_file}

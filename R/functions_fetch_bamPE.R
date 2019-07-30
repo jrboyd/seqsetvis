@@ -1,6 +1,11 @@
+#' ssvFetchBam for paired-end ChIP-seq files.
+#'
 #' Iterates a character vector (ideally named) and calls
 #' \code{ssvFetchBamPE.single} on each.  Appends grouping variable to each
 #' resulting data.table and uses rbindlist to efficiently combine results
+#'
+#' #' In contrast to ssvFetchBam, extension of reads to estimated fragment size is
+#' not an issue as each read pair represents a fragment of exact size.
 #'
 #' \code{ssvFetchBamPE} iteratively calls \code{fetchWindowedBam.single}. See
 #' \code{\link{ssvFetchBamPE.single}} for more info.
@@ -55,7 +60,7 @@
 #' }
 ssvFetchBamPE = function(file_paths,
                          qgr,
-                         unique_names = names(file_paths),
+                         unique_names = NULL,
                          win_size = 50,
                          win_method = c("sample", "summary")[1],
                          summary_FUN = stats::weighted.mean,
@@ -111,6 +116,9 @@ ssvFetchBamPE = function(file_paths,
 }
 
 #' fetch a windowed version of a paired-end bam file, returns GRanges
+#' In contrast to ssvFetchBam, extension of reads to estimated fragment size is
+#' not an issue as each read pair represents a fragment of exact size.
+#'
 #'
 #' @param bam_f character or BamFile to load
 #' @param qgr GRanges regions to fetchs

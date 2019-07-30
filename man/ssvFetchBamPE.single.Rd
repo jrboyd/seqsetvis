@@ -2,7 +2,9 @@
 % Please edit documentation in R/functions_fetch_bamPE.R
 \name{ssvFetchBamPE.single}
 \alias{ssvFetchBamPE.single}
-\title{fetch a windowed version of a paired-end bam file, returns GRanges}
+\title{fetch a windowed version of a paired-end bam file, returns GRanges
+In contrast to ssvFetchBam, extension of reads to estimated fragment size is
+not an issue as each read pair represents a fragment of exact size.}
 \usage{
 ssvFetchBamPE.single(bam_f, qgr, win_size = 50,
   win_method = c("sample", "summary")[1],
@@ -51,4 +53,6 @@ tidy GRanges (or data.table if specified) with pileups from bam file.
 }
 \description{
 fetch a windowed version of a paired-end bam file, returns GRanges
+In contrast to ssvFetchBam, extension of reads to estimated fragment size is
+not an issue as each read pair represents a fragment of exact size.
 }
