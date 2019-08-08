@@ -252,7 +252,8 @@ viewGRangesWinSample_dt = function(score_gr,
         })
     }
     # set y and output windows = windows[olaps$queryHits]
-    windows$y = score_gr[olaps$subjectHits]$score
+    windows$y = 0
+    windows[olaps$queryHits]$y = score_gr[olaps$subjectHits]$score
     score_dt = data.table::as.data.table(windows)
 
     return(shift_anchor(score_dt, window_size, anchor))

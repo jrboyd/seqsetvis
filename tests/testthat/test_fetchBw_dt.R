@@ -42,23 +42,23 @@ test_that("ssvFetchBigwig.single return expected for valid odd win_size", {
     }
 })
 
-# test_that("ssvFetchBigwig.single use GRanges names as id", {
-#     skip_on_os("windows")
-#     for(win in c(1, 3, 5, 15)){
-#         qgr = test_qgr
-#         names(qgr) = paste0("myNames_", seq_along(qgr))
-#         bw_dt = ssvFetchBigwig.single(bw_file = test_bw, win_size = win, qgr = qgr, return_data.table = TRUE)
-#         expect_is(bw_dt, "data.table")
-#         expect_equal(colnames(bw_dt), exp_colnames)
-#         expect_true(all(grepl("myNames", bw_dt$id)))
-#         for(tid in unique(bw_dt$id)){
-#             test_dt = bw_dt[id == tid]
-#             expect_equal(nrow(test_dt), region_size / win) #expected number of regions
-#             bw_gr = GRanges(test_dt)
-#             expect_equal(length(findOverlaps(bw_gr, bw_gr)), region_size / win, info = "each returned GRange should only intersect itself.")
-#         }
-#     }
-# })
+test_that("ssvFetchBigwig.single use GRanges names as id", {
+    skip_on_os("windows")
+    for(win in c(1, 3, 5, 15)){
+        qgr = test_qgr
+        names(qgr) = paste0("myNames_", seq_along(qgr))
+        bw_dt = ssvFetchBigwig.single(bw_file = test_bw, win_size = win, qgr = qgr, return_data.table = TRUE)
+        expect_is(bw_dt, "data.table")
+        expect_equal(colnames(bw_dt), exp_colnames)
+        expect_true(all(grepl("myNames", bw_dt$id)))
+        for(tid in unique(bw_dt$id)){
+            test_dt = bw_dt[id == tid]
+            expect_equal(nrow(test_dt), region_size / win) #expected number of regions
+            bw_gr = GRanges(test_dt)
+            expect_equal(length(findOverlaps(bw_gr, bw_gr)), region_size / win, info = "each returned GRange should only intersect itself.")
+        }
+    }
+})
 
 test_that("ssvFetchBigwig.single patches missing values", {
     skip_on_os("windows")
