@@ -37,11 +37,12 @@ calc_norm_factors = function(full_dt,
                              aggFUN1 = max,
                              aggFUN2 = function(x)quantile(x, .95)
 ){
+    value_summary_ = NULL #reserve binding for data.table
     stopifnot(data.table::is.data.table(full_dt))
     stopifnot(value_ %in% colnames(full_dt))
     stopifnot(by1 %in% colnames(full_dt))
     stopifnot(by2 %in% colnames(full_dt))
-    cap_dt = full_dt[, .(value_summary_ = aggFUN1(get(value_))), c(by1, by2)][, .(value_capped_ = aggFUN2(value_summary_)), c(by2)]
+    cap_dt = full_dt[, list(value_summary_ = aggFUN1(get(value_))), c(by1, by2)][, list(value_capped_ = aggFUN2(value_summary_)), c(by2)]
     data.table::setnames(cap_dt, "value_capped_", cap_value_)
     cap_dt[]
 }
