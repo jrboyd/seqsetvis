@@ -1,3 +1,10 @@
+# seqsetvis 1.5.1
+
+* FEATURE added calc_norm_factors and append_y_norm to facilitate normalization
+between datasets.
+* bugfix - apparent change in how names are used for which parameter of
+rtracklayer::import.bw required tweak in ssvFetchBam.single
+
 # seqsetvis 1.3.13
 
 * FEATURE added ssvFetchBamPE to properly handle paired-end (PE) ChIP-seq and
