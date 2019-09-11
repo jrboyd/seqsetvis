@@ -1,3 +1,7 @@
+# seqsetvis 1.5.2
+
+* improvement - added do_not_cap to append_ynorm to prevent capping at 1.
+
 # seqsetvis 1.5.1
 
 * FEATURE added calc_norm_factors and append_y_norm to facilitate normalization
