@@ -1,3 +1,8 @@
+# seqsetvis 1.5.3
+
+* bugfix - ssvFetchSignal handle empty result.
+* bugfix - better seqlengths handling for fetchBam
+
 # seqsetvis 1.5.2
 
 * improvement - added do_not_cap to append_ynorm to prevent capping at 1.

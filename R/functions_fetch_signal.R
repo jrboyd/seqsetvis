@@ -134,7 +134,12 @@ ssvFetchSignal = function(file_paths,
                                  nam_load_signal, mc.cores = n_cores)
     for (i in seq_along(bw_list)) {
         for (attrib in colnames(file_attribs)) {
-            bw_list[[i]][[attrib]] = file_attribs[[attrib]][i]
+            if(nrow(bw_list[[i]]) == 0){
+                bw_list[[i]][[attrib]] = file_attribs[[attrib]][0]
+            }else{
+                bw_list[[i]][[attrib]] = file_attribs[[attrib]][i]
+            }
+
         }
 
     }

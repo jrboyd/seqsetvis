@@ -404,16 +404,18 @@ fetchBam = function(bam_f,
     }
     ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))
     score_gr = GRanges(ext_cov)
+    score_gr = harmonize_seqlengths(score_gr, bam_f)
+
+    if(length(score_gr) == 0){
+        score_gr = sbgr
+        mcols(score_gr) = NULL
+        score_gr$score = 0
+    }
     if(target_strand == "+"){
         strand(score_gr) = "+"
     }
     if(target_strand == "-"){
         strand(score_gr) = "-"
-    }
-    if(length(score_gr) == 0){
-        score_gr = sbgr
-        mcols(score_gr) = NULL
-        score_gr$score = 0
     }
     return(score_gr)
 }
