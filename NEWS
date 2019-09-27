@@ -1,3 +1,7 @@
+# seqsetvis 1.5.4
+
+* FEATURE viewGrangesWin*_dt now handles qualitative attribute fields via attrib_name parameter.  Default behavior unchanged.
+
 # seqsetvis 1.5.3
 
 * bugfix - ssvFetchSignal handle empty result.

@@ -7,12 +7,14 @@ and widths can vary in qgr, in contrast to
 \code{\link{viewGRangesWinSample_dt}} where width must be constant across
 regions.}
 \usage{
-viewGRangesWinSummary_dt(attrib_gr, qgr, n_tiles = 100,
+viewGRangesWinSummary_dt(score_gr, qgr, n_tiles = 100,
   attrib_name = "score", attrib_type = NULL, fill_value = 0,
   anchor = c("center", "center_unstranded", "left",
   "left_unstranded")[1], summary_FUN = stats::weighted.mean)
 }
 \arguments{
+\item{score_gr}{GRanges with a "score" metadata column.}
+
 \item{qgr}{regions to view by window.}
 
 \item{n_tiles}{numeric >= 1, the number of tiles to use for every region in
@@ -36,8 +38,6 @@ x coordinates are flipped for (-) strand. One of c("center",
 \item{summary_FUN}{function. used to aggregate score by tile.  must accept
 x=score and w=width numeric vectors as only arguments. default is
 weighted.mean.  limma::weighted.median is a good alternative.}
-
-\item{score_gr}{GRanges with a "score" metadata column.}
 }
 \value{
 data.table that is GRanges compatible

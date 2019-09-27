@@ -4,11 +4,13 @@
 \alias{viewGRangesWinSample_dt}
 \title{get a windowed sampling of score_gr}
 \usage{
-viewGRangesWinSample_dt(attrib_gr, qgr, window_size,
-  attrib_var = "score", anchor = c("center", "center_unstranded",
-  "left", "left_unstranded")[1])
+viewGRangesWinSample_dt(score_gr, qgr, window_size, attrib_var = "score",
+  anchor = c("center", "center_unstranded", "left",
+  "left_unstranded")[1])
 }
 \arguments{
+\item{score_gr}{GRanges with a "score" metadata column.}
+
 \item{qgr}{regions to view by window.}
 
 \item{window_size}{qgr will be represented by value from score_gr every
@@ -21,8 +23,6 @@ window_size bp.}
 each region in qgr.  0 may be the left side or center.  If not unstranded,
 x coordinates are flipped for (-) strand. One of c("center",
 "center_unstranded", "left", "left_unstranded"). Default is "center".}
-
-\item{score_gr}{GRanges with a "score" metadata column.}
 }
 \value{
 data.table that is GRanges compatible

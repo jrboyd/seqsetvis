@@ -208,7 +208,7 @@ ssvFetchSignal = function(file_paths,
 #'     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
 #'     bw_dt = viewGRangesWinSample_dt(bw_gr, qgr, 50)
 #' }
-viewGRangesWinSample_dt = function(attrib_gr,
+viewGRangesWinSample_dt = function(score_gr,
                                    qgr,
                                    window_size,
                                    attrib_var = "score",
@@ -216,8 +216,8 @@ viewGRangesWinSample_dt = function(attrib_gr,
                                               "left", "left_unstranded")[1]) {
     #reserve bindings for data.table
     x = id = NULL
-    stopifnot(is(attrib_gr, "GRanges"))
-    stopifnot(!is.null(mcols(attrib_gr)[[attrib_var]]))
+    stopifnot(is(score_gr, "GRanges"))
+    stopifnot(!is.null(mcols(score_gr)[[attrib_var]]))
     stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(window_size))
     stopifnot(window_size >= 1)
@@ -237,7 +237,7 @@ viewGRangesWinSample_dt = function(attrib_gr,
     olaps = suppressWarnings(data.table::as.data.table(
         findOverlaps(
             query = windows,
-            subject = attrib_gr,
+            subject = score_gr,
             ignore.strand = TRUE
         )
     ))
@@ -248,18 +248,18 @@ viewGRangesWinSample_dt = function(attrib_gr,
             olaps,
             data.table::data.table(
                 queryHits = missing_idx,
-                subjectHits = length(attrib_gr) + 1
+                subjectHits = length(score_gr) + 1
             )
         )[order(queryHits)]
         suppressWarnings({
-            attrib_gr = c(attrib_gr,
+            score_gr = c(score_gr,
                           GRanges("chrPatchZero",
                                   IRanges::IRanges(1, 1), score = 0))
         })
     }
     # set y and output windows = windows[olaps$queryHits]
     windows$y = 0
-    windows[olaps$queryHits]$y = mcols(attrib_gr[olaps$subjectHits])[[attrib_var]]
+    windows[olaps$queryHits]$y = mcols(score_gr[olaps$subjectHits])[[attrib_var]]
     score_dt = data.table::as.data.table(windows)
 
     return(shift_anchor(score_dt, window_size, anchor))
@@ -315,7 +315,7 @@ viewGRangesWinSample_dt = function(attrib_gr,
 #'     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
 #'     bw_dt = viewGRangesWinSummary_dt(bw_gr, qgr, 50)
 #' }
-viewGRangesWinSummary_dt = function (attrib_gr,
+viewGRangesWinSummary_dt = function (score_gr,
                                             qgr,
                                             n_tiles = 100,
                                             attrib_name = "score",
@@ -327,8 +327,8 @@ viewGRangesWinSummary_dt = function (attrib_gr,
     #reserve bindings for data.table
     x = id = tile_start = tile_end = tile_id =
         tile_width = scored_width = tile_density = score_width = NULL
-    stopifnot(is(attrib_gr, "GRanges"))
-    stopifnot(!is.null(mcols(attrib_gr)[[attrib_name]]))
+    stopifnot(is(score_gr, "GRanges"))
+    stopifnot(!is.null(mcols(score_gr)[[attrib_name]]))
     stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(n_tiles))
     stopifnot(n_tiles >= 1)
@@ -352,7 +352,7 @@ viewGRangesWinSummary_dt = function (attrib_gr,
     olaps = suppressWarnings(data.table::as.data.table(
         findOverlaps(
             query = tiles,
-            subject = attrib_gr,
+            subject = score_gr,
             ignore.strand = TRUE
         )
     ))
@@ -363,19 +363,19 @@ viewGRangesWinSummary_dt = function (attrib_gr,
             olaps,
             data.table::data.table(
                 queryHits = missing_idx,
-                subjectHits = length(attrib_gr) + 1
+                subjectHits = length(score_gr) + 1
             )
         )[order(queryHits)]
         suppressWarnings({
             patch_gr = GRanges("chrPatchZero",
                                IRanges::IRanges(1, 1))
             mcols(patch_gr)[[attrib_name]] = NA
-            attrib_gr = c(attrib_gr,
+            score_gr = c(score_gr,
                           patch_gr
             )
         })
     }
-    cov_dt = cbind(as.data.table(attrib_gr[olaps$subjectHits])[, -c(1, 4:5)],
+    cov_dt = cbind(as.data.table(score_gr[olaps$subjectHits])[, -c(1, 4:5)],
                    as.data.table(tiles[olaps$queryHits])[, -c(1, 4:5)])
     colnames(cov_dt)[4:5] = c("tile_start", "tile_end")
 
