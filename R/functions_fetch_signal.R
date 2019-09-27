@@ -170,28 +170,28 @@ ssvFetchSignal = function(file_paths,
 
 #' get a windowed sampling of score_gr
 #'
-#' This method is appropriate when all GRanges in qgr are identical width
-#' and when it is practical to use a window_size smaller than features in
-#' genomic signal.  For instance, when retrieving signal around peaks or
-#' promoters this method maintains a fixed genomic scale across regions.  This
-#' allows meaingful comparison of peak widths can be made.
+#' This method is appropriate when all GRanges in qgr are identical width and
+#' when it is practical to use a window_size smaller than features in genomic
+#' signal.  For instance, when retrieving signal around peaks or promoters this
+#' method maintains a fixed genomic scale across regions.  This allows meaingful
+#' comparison of peak widths can be made.
 #'
 #' Summarizes score_gr by grabbing value of "score" every window_size bp.
-#' Columns in output data.table are:
-#' standard GRanges columns: seqnames, start, end, width, strand
-#' id - matched to names(score_gr). if names(score_gr) is missing,
-#' added as 1:length(score_gr)
-#' y - value of score from score_gr
-#' x - relative bp position
+#' Columns in output data.table are: standard GRanges columns: seqnames, start,
+#' end, width, strand id - matched to names(score_gr). if names(score_gr) is
+#' missing, added as 1:length(score_gr) y - value of score from score_gr x -
+#' relative bp position
 #'
 #' @param score_gr GRanges with a "score" metadata column.
 #' @param qgr regions to view by window.
 #' @param window_size qgr will be represented by value from score_gr every
-#' window_size bp.
+#'   window_size bp.
+#' @param attrib_var character name of attribute to pull data from. Default is
+#'   "score", compatible with with bigWigs or bam coverage.
 #' @param anchor character. controls how x value is derived from position for
-#' each region in qgr.  0 may be the left side or center.  If not unstranded,
-#' x coordinates are flipped for (-) strand. One of c("center",
-#' "center_unstranded", "left", "left_unstranded"). Default is "center".
+#'   each region in qgr.  0 may be the left side or center.  If not unstranded,
+#'   x coordinates are flipped for (-) strand. One of c("center",
+#'   "center_unstranded", "left", "left_unstranded"). Default is "center".
 #' @return data.table that is GRanges compatible
 #' @export
 #' @examples
@@ -208,15 +208,16 @@ ssvFetchSignal = function(file_paths,
 #'     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
 #'     bw_dt = viewGRangesWinSample_dt(bw_gr, qgr, 50)
 #' }
-viewGRangesWinSample_dt = function(score_gr,
+viewGRangesWinSample_dt = function(attrib_gr,
                                    qgr,
                                    window_size,
+                                   attrib_var = "score",
                                    anchor = c("center", "center_unstranded",
                                               "left", "left_unstranded")[1]) {
     #reserve bindings for data.table
     x = id = NULL
-    stopifnot(is(score_gr, "GRanges"))
-    stopifnot(!is.null(score_gr$score))
+    stopifnot(is(attrib_gr, "GRanges"))
+    stopifnot(!is.null(mcols(attrib_gr)[[attrib_var]]))
     stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(window_size))
     stopifnot(window_size >= 1)
@@ -236,7 +237,7 @@ viewGRangesWinSample_dt = function(score_gr,
     olaps = suppressWarnings(data.table::as.data.table(
         findOverlaps(
             query = windows,
-            subject = score_gr,
+            subject = attrib_gr,
             ignore.strand = TRUE
         )
     ))
@@ -247,50 +248,55 @@ viewGRangesWinSample_dt = function(score_gr,
             olaps,
             data.table::data.table(
                 queryHits = missing_idx,
-                subjectHits = length(score_gr) + 1
+                subjectHits = length(attrib_gr) + 1
             )
         )[order(queryHits)]
         suppressWarnings({
-            score_gr = c(score_gr,
-                         GRanges("chrPatchZero",
-                                 IRanges::IRanges(1, 1), score = 0))
+            attrib_gr = c(attrib_gr,
+                          GRanges("chrPatchZero",
+                                  IRanges::IRanges(1, 1), score = 0))
         })
     }
     # set y and output windows = windows[olaps$queryHits]
     windows$y = 0
-    windows[olaps$queryHits]$y = score_gr[olaps$subjectHits]$score
+    windows[olaps$queryHits]$y = mcols(attrib_gr[olaps$subjectHits])[[attrib_var]]
     score_dt = data.table::as.data.table(windows)
 
     return(shift_anchor(score_dt, window_size, anchor))
 }
 
 
-#' Summarizes signal in bins.  The same number of bins per region in qgr
-#' is used and widths can vary in qgr, in contrast to
+#' Summarizes signal in bins.  The same number of bins per region in qgr is used
+#' and widths can vary in qgr, in contrast to
 #' \code{\link{viewGRangesWinSample_dt}} where width must be constant across
 #' regions.
 #'
-#' This function is most appropriate where features are expected to vary
-#' greatly in size and feature boundaries are important, ie. gene bodies,
-#' enhancers or TADs.
+#' This function is most appropriate where features are expected to vary greatly
+#' in size and feature boundaries are important, ie. gene bodies, enhancers or
+#' TADs.
 #'
-#' Columns in output data.table are:
-#' standard GRanges columns: seqnames, start, end, width, strand
-#' id - matched to names(score_gr). if names(score_gr) is missing,
-#' added as 1:length(score_gr)
-#' y - value of score from score_gr
-#' x - relative bp position
+#' Columns in output data.table are: standard GRanges columns: seqnames, start,
+#' end, width, strand id - matched to names(score_gr). if names(score_gr) is
+#' missing, added as 1:length(score_gr) y - value of score from score_gr x -
+#' relative bp position
 #' @param score_gr GRanges with a "score" metadata column.
 #' @param qgr regions to view by window.
 #' @param n_tiles numeric >= 1, the number of tiles to use for every region in
-#' qgr.
+#'   qgr.
+#' @param attrib_name character name of attribute to pull data from. Default is
+#'   "score", compatible with with bigWigs or bam coverage.
+#' @param attrib_type one of NULL, qualitative or quantitative.  If NULL will
+#'   attempt to guess by casting attrib_name attribute to character or factor.
+#'   Default is NULL.
+#' @param fill_value value to substitute for missing ranges.  Default is 0 but
+#'   will switch to "MISSING" if data is guessed to me qualitative.
 #' @param anchor character. controls how x value is derived from position for
-#' each region in qgr.  0 may be the left side or center.  If not unstranded,
-#' x coordinates are flipped for (-) strand. One of c("center",
-#' "center_unstranded", "left", "left_unstranded"). Default is "center".
+#'   each region in qgr.  0 may be the left side or center.  If not unstranded,
+#'   x coordinates are flipped for (-) strand. One of c("center",
+#'   "center_unstranded", "left", "left_unstranded"). Default is "center".
 #' @param summary_FUN function. used to aggregate score by tile.  must accept
-#' x=score and w=width numeric vectors as only arguments. default is
-#' weighted.mean.  limma::weighted.median is a good alternative.
+#'   x=score and w=width numeric vectors as only arguments. default is
+#'   weighted.mean.  limma::weighted.median is a good alternative.
 #' @return data.table that is GRanges compatible
 #' @export
 #' @importFrom stats weighted.mean
@@ -309,17 +315,20 @@ viewGRangesWinSample_dt = function(score_gr,
 #'     bw_gr = rtracklayer::import.bw(bw_file, which = qgr)
 #'     bw_dt = viewGRangesWinSummary_dt(bw_gr, qgr, 50)
 #' }
-viewGRangesWinSummary_dt = function (score_gr,
-                                     qgr,
-                                     n_tiles = 100,
-                                     anchor = c("center", "center_unstranded",
-                                                "left", "left_unstranded")[1],
-                                     summary_FUN = stats::weighted.mean) {
+viewGRangesWinSummary_dt = function (attrib_gr,
+                                            qgr,
+                                            n_tiles = 100,
+                                            attrib_name = "score",
+                                            attrib_type = NULL,
+                                            fill_value = 0,
+                                            anchor = c("center", "center_unstranded",
+                                                       "left", "left_unstranded")[1],
+                                            summary_FUN = stats::weighted.mean) {
     #reserve bindings for data.table
     x = id = tile_start = tile_end = tile_id =
-        tile_widths = scored_width = tile_density = NULL
-    stopifnot(is(score_gr, "GRanges"))
-    stopifnot(!is.null(score_gr$score))
+        tile_width = scored_width = tile_density = NULL
+    stopifnot(is(attrib_gr, "GRanges"))
+    stopifnot(!is.null(mcols(attrib_gr)[[attrib_name]]))
     stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(n_tiles))
     stopifnot(n_tiles >= 1)
@@ -337,12 +346,13 @@ viewGRangesWinSummary_dt = function (score_gr,
     names(tiles) = NULL
     tiles = unlist(tiles)
     tiles$id = names(tiles)
+    tiles$tile_id = seq_along(tiles)
 
 
     olaps = suppressWarnings(data.table::as.data.table(
         findOverlaps(
             query = tiles,
-            subject = score_gr,
+            subject = attrib_gr,
             ignore.strand = TRUE
         )
     ))
@@ -353,18 +363,20 @@ viewGRangesWinSummary_dt = function (score_gr,
             olaps,
             data.table::data.table(
                 queryHits = missing_idx,
-                subjectHits = length(score_gr) + 1
+                subjectHits = length(attrib_gr) + 1
             )
         )[order(queryHits)]
         suppressWarnings({
-            score_gr = c(score_gr,
-                         GRanges("chrPatchZero",
-                                 IRanges::IRanges(1, 1), score = 0))
+            patch_gr = GRanges("chrPatchZero",
+                               IRanges::IRanges(1, 1))
+            mcols(patch_gr)[[attrib_name]] = NA
+            attrib_gr = c(attrib_gr,
+                          patch_gr
+            )
         })
     }
-    cov_dt = cbind(as.data.table(score_gr[olaps$subjectHits])[, -c(1, 4:5)],
-                   as.data.table(tiles[olaps$queryHits])[, -c(1, 4:5)],
-                   tile_id = olaps$queryHits)
+    cov_dt = cbind(as.data.table(attrib_gr[olaps$subjectHits])[, -c(1, 4:5)],
+                   as.data.table(tiles[olaps$queryHits])[, -c(1, 4:5)])
     colnames(cov_dt)[4:5] = c("tile_start", "tile_end")
 
     cov_dt[start == 1 &
@@ -373,44 +385,73 @@ viewGRangesWinSummary_dt = function (score_gr,
 
     cov_dt[start < tile_start, start := tile_start]
     cov_dt[end > tile_end, end := tile_end]
-    cov_dt[, width := end - start + 1]
+    cov_dt[, score_width := end - start + 1]
+    cov_dt[, tile_width := tile_end - tile_start + 1]
+
+    if(is.null(attrib_type)){
+        if(any(class(cov_dt[[attrib_name]]) %in% c("character", "factor"))){
+            attrib_type = "qualitative"
+            if(fill_value == 0){
+                fill_value = "MISSING"
+            }
+        }else{
+            attrib_type = "quantitative"
+        }
+    }
 
     # check for incompletely retrieved regions (zeroes omitted for instance)
-    check_dt = cov_dt[, list(scored_width = sum(width)), by = list(tile_id, id)]
-    check_dt$tile_widths = width(tiles)
+    check_dt = cov_dt[, list(scored_width = sum(score_width)), by = list(tile_id, id, tile_width)]
+    # check_dt$tile_width = width(tiles)
     #add a dummy interval of score zero to correct width
-    repair_dt = check_dt[tile_widths != scored_width, list(
+    repair_dt = check_dt[tile_width != scored_width, list(
         start = -1,
         end = -1,
-        score = 0,
+        score = fill_value,
         tile_start = -1,
         tile_end = -1,
         id = id,
         tile_id = tile_id,
-        width = tile_widths - scored_width
+        score_width = tile_width - scored_width,
+        tile_width
     )]
+    setnames(repair_dt, "score", attrib_name)
     cov_dt = rbind(cov_dt, repair_dt)
 
-    density_dt = cov_dt[, list(tile_density = summary_FUN(score, width)),
-                        by = list(tile_id, id)]
 
-    density_dt[, x := (seq_len(.N) - .5) / .N, by = id]
-    if (!all(tiles$id == density_dt$id))
+
+    if(attrib_type == "qualitative"){
+        density_dt = cov_dt[, list(tile_density = summary_FUN(score_width / tile_width, rep(1, length(width)))),
+                            by = c("tile_id", "id", attrib_name)]
+    }else if(attrib_type == "quantitative"){
+        density_dt = cov_dt[, list(tile_density = summary_FUN(get(attrib_name), score_width)),
+                            by = list(tile_id, id)]
+    }else{
+        stop("attrib_type must be one of qualitative or quantitative")
+    }
+
+    tiles = as.data.table(tiles)
+    tiles[, x := (seq_len(n_tiles) - .5) / n_tiles, by = id]
+
+    # density_dt[, x := (seq_len(n_tiles) - .5) / n_tiles, by = id]
+    if (!all(tiles$id %in% density_dt$id))
         stop("something bad happened when merging density ",
              "data.table back to tiles GRanges.")
-    score_dt = cbind(as.data.table(tiles), density_dt[, list(y = tile_density, x = x)])
 
+    score_dt = merge(tiles, density_dt[, list(y = tile_density, id, tile_id)], by = c("tile_id", "id"))
+    # setnames(score_dt, "ATTRIB_NAME", attrib_name)
     #slightly different than summary,
     #x is already set and regions are already contiguous.
     #just need to flip x or center as needed.
     switch(
         anchor,
         center = {
-            score_dt[, x := x - (mean(x)), by = id]
+            center_val = mean((seq_len(n_tiles) - .5) / n_tiles)
+            score_dt[, x := x - center_val, by = id]
             score_dt[strand == "-", x := (-1 * x)]
         },
         center_unstranded = {
-            score_dt[, x := x - (mean(x)), by = id]
+            center_val = mean((seq_len(n_tiles) - .5) / n_tiles)
+            score_dt[, x := x - center_val, by = id]
         },
         left = {
             score_dt[strand == "-", x := (1 - 1 * x), by = id]
