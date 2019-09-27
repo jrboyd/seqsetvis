@@ -441,6 +441,7 @@ cache_path = paste0(pkgdata_path, "/.cache")
 # the next line is enough to initialize the cache
 # BiocFileCache(cache = cache_path)
 use_full_data = dir.exists(cache_path) & require(BiocFileCache)
+use_full_data = FALSE
 if(use_full_data){
     library(BiocFileCache)
     ssv_bfc = BiocFileCache(cache = cache_path)
@@ -858,7 +859,7 @@ if(use_full_data){
     state_gr = resize(state_gr, width = chmm_win + 2 * flank_size, 
                       fix = "center")
     
-    bw_states_gr = ssvFetchBigwig(bw_file = chmm_bw_file, 
+    bw_states_gr = ssvFetchBigwig(file_paths = chmm_bw_file, 
                                        qgr = state_gr, 
                                        win_size = 50)
     bw_states_gr$grp = sub("\\..+", "", bw_states_gr$id)
@@ -1007,3 +1008,4 @@ ggdraw() +
                     c(1, 1, 1 - bar_height, 1 - bar_height - line_height), 
                     size = 15)
 ```
+

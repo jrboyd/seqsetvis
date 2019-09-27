@@ -283,10 +283,10 @@ viewGRangesWinSample_dt = function(score_gr,
 #' @param qgr regions to view by window.
 #' @param n_tiles numeric >= 1, the number of tiles to use for every region in
 #'   qgr.
-#' @param attrib_name character name of attribute to pull data from. Default is
+#' @param attrib_var character name of attribute to pull data from. Default is
 #'   "score", compatible with with bigWigs or bam coverage.
 #' @param attrib_type one of NULL, qualitative or quantitative.  If NULL will
-#'   attempt to guess by casting attrib_name attribute to character or factor.
+#'   attempt to guess by casting attrib_var attribute to character or factor.
 #'   Default is NULL.
 #' @param fill_value value to substitute for missing ranges.  Default is 0 but
 #'   will switch to "MISSING" if data is guessed to me qualitative.
@@ -318,7 +318,7 @@ viewGRangesWinSample_dt = function(score_gr,
 viewGRangesWinSummary_dt = function (score_gr,
                                             qgr,
                                             n_tiles = 100,
-                                            attrib_name = "score",
+                                            attrib_var = "score",
                                             attrib_type = NULL,
                                             fill_value = 0,
                                             anchor = c("center", "center_unstranded",
@@ -328,7 +328,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     x = id = tile_start = tile_end = tile_id =
         tile_width = scored_width = tile_density = score_width = NULL
     stopifnot(is(score_gr, "GRanges"))
-    stopifnot(!is.null(mcols(score_gr)[[attrib_name]]))
+    stopifnot(!is.null(mcols(score_gr)[[attrib_var]]))
     stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(n_tiles))
     stopifnot(n_tiles >= 1)
@@ -369,7 +369,7 @@ viewGRangesWinSummary_dt = function (score_gr,
         suppressWarnings({
             patch_gr = GRanges("chrPatchZero",
                                IRanges::IRanges(1, 1))
-            mcols(patch_gr)[[attrib_name]] = NA
+            mcols(patch_gr)[[attrib_var]] = NA
             score_gr = c(score_gr,
                           patch_gr
             )
@@ -389,7 +389,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     cov_dt[, tile_width := tile_end - tile_start + 1]
 
     if(is.null(attrib_type)){
-        if(any(class(cov_dt[[attrib_name]]) %in% c("character", "factor"))){
+        if(any(class(cov_dt[[attrib_var]]) %in% c("character", "factor"))){
             attrib_type = "qualitative"
             if(fill_value == 0){
                 fill_value = "MISSING"
@@ -414,16 +414,16 @@ viewGRangesWinSummary_dt = function (score_gr,
         score_width = tile_width - scored_width,
         tile_width
     )]
-    setnames(repair_dt, "score", attrib_name)
+    setnames(repair_dt, "score", attrib_var)
     cov_dt = rbind(cov_dt, repair_dt)
 
 
 
     if(attrib_type == "qualitative"){
         density_dt = cov_dt[, list(tile_density = summary_FUN(score_width / tile_width, rep(1, length(width)))),
-                            by = c("tile_id", "id", attrib_name)]
+                            by = c("tile_id", "id", attrib_var)]
     }else if(attrib_type == "quantitative"){
-        density_dt = cov_dt[, list(tile_density = summary_FUN(get(attrib_name), score_width)),
+        density_dt = cov_dt[, list(tile_density = summary_FUN(get(attrib_var), score_width)),
                             by = list(tile_id, id)]
     }else{
         stop("attrib_type must be one of qualitative or quantitative")
@@ -438,7 +438,7 @@ viewGRangesWinSummary_dt = function (score_gr,
              "data.table back to tiles GRanges.")
 
     score_dt = merge(tiles, density_dt[, list(y = tile_density, id, tile_id)], by = c("tile_id", "id"))
-    # setnames(score_dt, "ATTRIB_NAME", attrib_name)
+    # setnames(score_dt, "ATTRIB_NAME", attrib_var)
     #slightly different than summary,
     #x is already set and regions are already contiguous.
     #just need to flip x or center as needed.

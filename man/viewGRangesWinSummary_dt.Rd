@@ -8,7 +8,7 @@ and widths can vary in qgr, in contrast to
 regions.}
 \usage{
 viewGRangesWinSummary_dt(score_gr, qgr, n_tiles = 100,
-  attrib_name = "score", attrib_type = NULL, fill_value = 0,
+  attrib_var = "score", attrib_type = NULL, fill_value = 0,
   anchor = c("center", "center_unstranded", "left",
   "left_unstranded")[1], summary_FUN = stats::weighted.mean)
 }
@@ -20,11 +20,11 @@ viewGRangesWinSummary_dt(score_gr, qgr, n_tiles = 100,
 \item{n_tiles}{numeric >= 1, the number of tiles to use for every region in
 qgr.}
 
-\item{attrib_name}{character name of attribute to pull data from. Default is
+\item{attrib_var}{character name of attribute to pull data from. Default is
 "score", compatible with with bigWigs or bam coverage.}
 
 \item{attrib_type}{one of NULL, qualitative or quantitative.  If NULL will
-attempt to guess by casting attrib_name attribute to character or factor.
+attempt to guess by casting attrib_var attribute to character or factor.
 Default is NULL.}
 
 \item{fill_value}{value to substitute for missing ranges.  Default is 0 but
