@@ -4,40 +4,42 @@
 \alias{viewGRangesWinSample_dt}
 \title{get a windowed sampling of score_gr}
 \usage{
-viewGRangesWinSample_dt(score_gr, qgr, window_size, anchor = c("center",
-  "center_unstranded", "left", "left_unstranded")[1])
+viewGRangesWinSample_dt(attrib_gr, qgr, window_size,
+  attrib_var = "score", anchor = c("center", "center_unstranded",
+  "left", "left_unstranded")[1])
 }
 \arguments{
-\item{score_gr}{GRanges with a "score" metadata column.}
-
 \item{qgr}{regions to view by window.}
 
 \item{window_size}{qgr will be represented by value from score_gr every
 window_size bp.}
 
+\item{attrib_var}{character name of attribute to pull data from. Default is
+"score", compatible with with bigWigs or bam coverage.}
+
 \item{anchor}{character. controls how x value is derived from position for
 each region in qgr.  0 may be the left side or center.  If not unstranded,
 x coordinates are flipped for (-) strand. One of c("center",
 "center_unstranded", "left", "left_unstranded"). Default is "center".}
+
+\item{score_gr}{GRanges with a "score" metadata column.}
 }
 \value{
 data.table that is GRanges compatible
 }
 \description{
-This method is appropriate when all GRanges in qgr are identical width
-and when it is practical to use a window_size smaller than features in
-genomic signal.  For instance, when retrieving signal around peaks or
-promoters this method maintains a fixed genomic scale across regions.  This
-allows meaingful comparison of peak widths can be made.
+This method is appropriate when all GRanges in qgr are identical width and
+when it is practical to use a window_size smaller than features in genomic
+signal.  For instance, when retrieving signal around peaks or promoters this
+method maintains a fixed genomic scale across regions.  This allows meaingful
+comparison of peak widths can be made.
 }
 \details{
 Summarizes score_gr by grabbing value of "score" every window_size bp.
-Columns in output data.table are:
-standard GRanges columns: seqnames, start, end, width, strand
-id - matched to names(score_gr). if names(score_gr) is missing,
-added as 1:length(score_gr)
-y - value of score from score_gr
-x - relative bp position
+Columns in output data.table are: standard GRanges columns: seqnames, start,
+end, width, strand id - matched to names(score_gr). if names(score_gr) is
+missing, added as 1:length(score_gr) y - value of score from score_gr x -
+relative bp position
 }
 \examples{
 bam_file = system.file("extdata/test.bam",

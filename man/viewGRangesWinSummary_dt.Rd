@@ -2,22 +2,31 @@
 % Please edit documentation in R/functions_fetch_signal.R
 \name{viewGRangesWinSummary_dt}
 \alias{viewGRangesWinSummary_dt}
-\title{Summarizes signal in bins.  The same number of bins per region in qgr
-is used and widths can vary in qgr, in contrast to
+\title{Summarizes signal in bins.  The same number of bins per region in qgr is used
+and widths can vary in qgr, in contrast to
 \code{\link{viewGRangesWinSample_dt}} where width must be constant across
 regions.}
 \usage{
-viewGRangesWinSummary_dt(score_gr, qgr, n_tiles = 100,
+viewGRangesWinSummary_dt(attrib_gr, qgr, n_tiles = 100,
+  attrib_name = "score", attrib_type = NULL, fill_value = 0,
   anchor = c("center", "center_unstranded", "left",
   "left_unstranded")[1], summary_FUN = stats::weighted.mean)
 }
 \arguments{
-\item{score_gr}{GRanges with a "score" metadata column.}
-
 \item{qgr}{regions to view by window.}
 
 \item{n_tiles}{numeric >= 1, the number of tiles to use for every region in
 qgr.}
+
+\item{attrib_name}{character name of attribute to pull data from. Default is
+"score", compatible with with bigWigs or bam coverage.}
+
+\item{attrib_type}{one of NULL, qualitative or quantitative.  If NULL will
+attempt to guess by casting attrib_name attribute to character or factor.
+Default is NULL.}
+
+\item{fill_value}{value to substitute for missing ranges.  Default is 0 but
+will switch to "MISSING" if data is guessed to me qualitative.}
 
 \item{anchor}{character. controls how x value is derived from position for
 each region in qgr.  0 may be the left side or center.  If not unstranded,
@@ -27,22 +36,22 @@ x coordinates are flipped for (-) strand. One of c("center",
 \item{summary_FUN}{function. used to aggregate score by tile.  must accept
 x=score and w=width numeric vectors as only arguments. default is
 weighted.mean.  limma::weighted.median is a good alternative.}
+
+\item{score_gr}{GRanges with a "score" metadata column.}
 }
 \value{
 data.table that is GRanges compatible
 }
 \description{
-This function is most appropriate where features are expected to vary
-greatly in size and feature boundaries are important, ie. gene bodies,
-enhancers or TADs.
+This function is most appropriate where features are expected to vary greatly
+in size and feature boundaries are important, ie. gene bodies, enhancers or
+TADs.
 }
 \details{
-Columns in output data.table are:
-standard GRanges columns: seqnames, start, end, width, strand
-id - matched to names(score_gr). if names(score_gr) is missing,
-added as 1:length(score_gr)
-y - value of score from score_gr
-x - relative bp position
+Columns in output data.table are: standard GRanges columns: seqnames, start,
+end, width, strand id - matched to names(score_gr). if names(score_gr) is
+missing, added as 1:length(score_gr) y - value of score from score_gr x -
+relative bp position
 }
 \examples{
 bam_file = system.file("extdata/test.bam",

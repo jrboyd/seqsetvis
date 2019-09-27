@@ -326,7 +326,7 @@ viewGRangesWinSummary_dt = function (attrib_gr,
                                             summary_FUN = stats::weighted.mean) {
     #reserve bindings for data.table
     x = id = tile_start = tile_end = tile_id =
-        tile_width = scored_width = tile_density = NULL
+        tile_width = scored_width = tile_density = score_width = NULL
     stopifnot(is(attrib_gr, "GRanges"))
     stopifnot(!is.null(mcols(attrib_gr)[[attrib_name]]))
     stopifnot(is(qgr, "GRanges"))
