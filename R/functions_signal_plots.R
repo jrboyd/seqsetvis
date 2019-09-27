@@ -539,8 +539,9 @@ ssvSignalHeatmap = function(bw_data,
     if(facet_ != ""){
         p = p +  facet_grid(paste(". ~", facet_))
     }
-    xs = sort(unique(as.numeric(plot_dt[, get(column_)])), decreasing = FALSE)
+
     if(is.numeric(plot_dt[, get(column_)])){
+        xs = sort(unique(as.numeric(plot_dt[, get(column_)])), decreasing = FALSE)
         xleft = min(xs) - (xs[2] - xs[1])/2
         xright = max(xs) + (xs[2] - xs[1])/2
         if(xleft < 0 & xright > 0){
@@ -549,7 +550,11 @@ ssvSignalHeatmap = function(bw_data,
             xbr = c(xleft, xright)
         }
         p = p + scale_x_continuous(breaks = xbr)
+    }else{
+        xs = length(unique(plot_dt[, get(column_)]))
+        xs = seq_len(xs)
     }
+
     p = p + theme(axis.text.x  = element_text(angle = 90, hjust = 1, vjust = .5))
 
     rclust = plot_dt[, list(cluster_id = unique(get(cluster_))), by = get(row_)]
