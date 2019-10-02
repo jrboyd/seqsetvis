@@ -1,15 +1,10 @@
-# seqsetvis 1.5.4
-
-* FEATURE viewGrangesWin*_dt now handles qualitative attribute fields via attrib_name parameter.  Default behavior unchanged.
-
-# seqsetvis 1.5.3
-
-* bugfix - ssvFetchSignal handle empty result.
-* bugfix - better seqlengths handling for fetchBam
-
 # seqsetvis 1.5.2
 
+* improvement - ssvFetchGRanges does more than coverage now and can retrieve a qualititative attribute from supplied GRanges.  Support for summary too.  These changes are ideal for chromHMM states or similar.
 * improvement - added do_not_cap to append_ynorm to prevent capping at 1.
+* bugfix - ssvFetchSignal handle empty result.
+* bugfix - better seqlengths handling for fetchBam
+* FEATURE viewGrangesWin*_dt now handles qualitative attribute fields via attrib_name parameter.  Default behavior unchanged.
 
 # seqsetvis 1.5.1
 
