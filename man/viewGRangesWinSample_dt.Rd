@@ -5,7 +5,7 @@
 \title{get a windowed sampling of score_gr}
 \usage{
 viewGRangesWinSample_dt(score_gr, qgr, window_size, attrib_var = "score",
-  anchor = c("center", "center_unstranded", "left",
+  fill_value = 0, anchor = c("center", "center_unstranded", "left",
   "left_unstranded")[1])
 }
 \arguments{

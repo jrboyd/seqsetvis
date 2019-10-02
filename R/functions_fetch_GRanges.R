@@ -51,6 +51,7 @@ ssvFetchGRanges = function(grs,
                            target_strand = c("*", "+", "-", "both")[1],
                            use_coverage = NULL,
                            attrib_var = "score",
+                           fill_value = 0,
                            anchor = c("left", "left_unstranded", "center",
                                       "center_unstranded")[3],
                            return_data.table = FALSE,
@@ -67,9 +68,9 @@ ssvFetchGRanges = function(grs,
     # gr_dt = lapply(grs, function(x){
     gr_dt = parallel::mclapply(grs, mc.cores = n_cores, function(x){
         if(use_coverage){
-            fetchGRanges_as_coverage(x, qgr, win_size, win_method, summary_FUN, target_strand, anchor, fill_value = 0)
+            fetchGRanges_as_coverage(x, qgr, win_size, win_method, summary_FUN, target_strand, anchor, fill_value = fill_value)
         }else{
-            fetchGRanges_by_attrib_var(x, qgr, win_size, win_method, summary_FUN, target_strand, anchor, fill_value = 0, attrib_var = attrib_var)
+            fetchGRanges_by_attrib_var(x, qgr, win_size, win_method, summary_FUN, target_strand, anchor, fill_value = fill_value, attrib_var = attrib_var)
         }
     })
     for(i in seq_along(gr_dt)){
@@ -200,6 +201,7 @@ fetchGRanges_by_attrib_var = function(x, qgr, win_size, win_method, summary_FUN,
                        qgr,
                        win_size,
                        attrib_var = attrib_var,
+                       fill_value = fill_value,
                        anchor = anchor
                    )
                    neg_dt = viewGRangesWinSample_dt(
@@ -207,6 +209,7 @@ fetchGRanges_by_attrib_var = function(x, qgr, win_size, win_method, summary_FUN,
                        qgr,
                        win_size,
                        attrib_var = attrib_var,
+                       fill_value = fill_value,
                        anchor = anchor
                    )
                    pos_dt[, strand := "+"]
@@ -225,6 +228,7 @@ fetchGRanges_by_attrib_var = function(x, qgr, win_size, win_method, summary_FUN,
                        qgr,
                        win_size,
                        attrib_var = attrib_var,
+                       fill_value = fill_value,
                        anchor = anchor)
                    out[, strand := target_strand]
                }

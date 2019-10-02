@@ -9,9 +9,9 @@ ssvFetchGRanges(grs, qgr, file_attribs = data.frame(matrix(0, nrow =
   names_variable = "sample", win_size = 50, win_method = c("sample",
   "summary")[1], summary_FUN = function(x, w) max(x),
   target_strand = c("*", "+", "-", "both")[1], use_coverage = NULL,
-  attrib_var = "score", anchor = c("left", "left_unstranded", "center",
-  "center_unstranded")[3], return_data.table = FALSE,
-  n_cores = getOption("mc.cores", 1))
+  attrib_var = "score", fill_value = 0, anchor = c("left",
+  "left_unstranded", "center", "center_unstranded")[3],
+  return_data.table = FALSE, n_cores = getOption("mc.cores", 1))
 }
 \arguments{
 \item{grs}{a list of GRanges for which to calculate coverage.}

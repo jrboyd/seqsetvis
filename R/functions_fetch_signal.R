@@ -212,6 +212,7 @@ viewGRangesWinSample_dt = function(score_gr,
                                    qgr,
                                    window_size,
                                    attrib_var = "score",
+                                   fill_value = 0,
                                    anchor = c("center", "center_unstranded",
                                               "left", "left_unstranded")[1]) {
     #reserve bindings for data.table
@@ -252,13 +253,15 @@ viewGRangesWinSample_dt = function(score_gr,
             )
         )[order(queryHits)]
         suppressWarnings({
+            patch_gr = GRanges("chrPatchZero",
+                               IRanges::IRanges(1, 1))
+            mcols(patch_gr)[[attrib_var]] = fill_value
             score_gr = c(score_gr,
-                          GRanges("chrPatchZero",
-                                  IRanges::IRanges(1, 1), score = 0))
+                         patch_gr)
         })
     }
     # set y and output windows = windows[olaps$queryHits]
-    windows$y = 0
+    windows$y = fill_value
     windows[olaps$queryHits]$y = mcols(score_gr[olaps$subjectHits])[[attrib_var]]
     score_dt = data.table::as.data.table(windows)
 
@@ -316,14 +319,14 @@ viewGRangesWinSample_dt = function(score_gr,
 #'     bw_dt = viewGRangesWinSummary_dt(bw_gr, qgr, 50)
 #' }
 viewGRangesWinSummary_dt = function (score_gr,
-                                            qgr,
-                                            n_tiles = 100,
-                                            attrib_var = "score",
-                                            attrib_type = NULL,
-                                            fill_value = 0,
-                                            anchor = c("center", "center_unstranded",
-                                                       "left", "left_unstranded")[1],
-                                            summary_FUN = stats::weighted.mean) {
+                                     qgr,
+                                     n_tiles = 100,
+                                     attrib_var = "score",
+                                     attrib_type = NULL,
+                                     fill_value = 0,
+                                     anchor = c("center", "center_unstranded",
+                                                "left", "left_unstranded")[1],
+                                     summary_FUN = stats::weighted.mean) {
     #reserve bindings for data.table
     x = id = tile_start = tile_end = tile_id =
         tile_width = scored_width = tile_density = score_width = NULL
@@ -371,10 +374,11 @@ viewGRangesWinSummary_dt = function (score_gr,
                                IRanges::IRanges(1, 1))
             mcols(patch_gr)[[attrib_var]] = NA
             score_gr = c(score_gr,
-                          patch_gr
+                         patch_gr
             )
         })
     }
+    mcols(score_gr) = mcols(score_gr)[attrib_var]
     cov_dt = cbind(as.data.table(score_gr[olaps$subjectHits])[, -c(1, 4:5)],
                    as.data.table(tiles[olaps$queryHits])[, -c(1, 4:5)])
     colnames(cov_dt)[4:5] = c("tile_start", "tile_end")
@@ -387,6 +391,11 @@ viewGRangesWinSummary_dt = function (score_gr,
     cov_dt[end > tile_end, end := tile_end]
     cov_dt[, score_width := end - start + 1]
     cov_dt[, tile_width := tile_end - tile_start + 1]
+
+    if(all(is.na(cov_dt[[attrib_var]]))){
+        cov_dt[[attrib_var]] = fill_value
+    }
+    set(cov_dt, i = which(is.na(cov_dt[[attrib_var]])), j = attrib_var, value = fill_value)
 
     if(is.null(attrib_type)){
         if(any(class(cov_dt[[attrib_var]]) %in% c("character", "factor"))){
@@ -419,6 +428,7 @@ viewGRangesWinSummary_dt = function (score_gr,
 
 
 
+
     if(attrib_type == "qualitative"){
         density_dt = cov_dt[, list(tile_density = summary_FUN(score_width / tile_width, rep(1, length(width)))),
                             by = c("tile_id", "id", attrib_var)]
@@ -437,8 +447,15 @@ viewGRangesWinSummary_dt = function (score_gr,
         stop("something bad happened when merging density ",
              "data.table back to tiles GRanges.")
 
-    score_dt = merge(tiles, density_dt[, list(y = tile_density, id, tile_id)], by = c("tile_id", "id"))
-    # setnames(score_dt, "ATTRIB_NAME", attrib_var)
+    if(attrib_type == "qualitative"){
+        score_dt = merge(tiles, density_dt[, list(y = tile_density, id, tile_id, ATTRIB_VAR = get(attrib_var))], by = c("tile_id", "id"))
+        setnames(score_dt, "ATTRIB_VAR", attrib_var)
+        #score_dt[is.na(quality), quality := fill_value]
+    }else{
+        score_dt = merge(tiles, density_dt[, list(y = tile_density, id, tile_id)], by = c("tile_id", "id"))
+        #score_dt[is.na(y), y := fill_value]
+    }
+    score_dt$tile_id = NULL
     #slightly different than summary,
     #x is already set and regions are already contiguous.
     #just need to flip x or center as needed.
