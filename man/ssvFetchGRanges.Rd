@@ -49,6 +49,11 @@ number of intervals overlapping.  Default of NULL checks if attrib_var is
 Default of "score" is compatible with internal coverage calculation or
 bedgraph-like files.}
 
+\item{fill_value}{numeric or character value to use where queried regions are
+empty.  Default is 0 and appropriate for both calculated coverage and
+bedgraph/bigwig like files.  Will automatically switch to "MISSING" if data
+is guessed to be qualitative.}
+
 \item{anchor}{character, one of c("center", "center_unstranded", "left",
 "left_unstranded")}
 

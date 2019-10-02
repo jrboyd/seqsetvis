@@ -19,6 +19,11 @@ window_size bp.}
 \item{attrib_var}{character name of attribute to pull data from. Default is
 "score", compatible with with bigWigs or bam coverage.}
 
+\item{fill_value}{numeric or character value to use where queried regions are
+empty.  Default is 0 and appropriate for both calculated coverage and
+bedgraph/bigwig like files.  Will automatically switch to "MISSING" if data
+is guessed to be qualitative.}
+
 \item{anchor}{character. controls how x value is derived from position for
 each region in qgr.  0 may be the left side or center.  If not unstranded,
 x coordinates are flipped for (-) strand. One of c("center",

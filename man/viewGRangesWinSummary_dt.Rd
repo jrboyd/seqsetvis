@@ -27,8 +27,10 @@ qgr.}
 attempt to guess by casting attrib_var attribute to character or factor.
 Default is NULL.}
 
-\item{fill_value}{value to substitute for missing ranges.  Default is 0 but
-will switch to "MISSING" if data is guessed to me qualitative.}
+\item{fill_value}{numeric or character value to use where queried regions are
+empty.  Default is 0 and appropriate for both calculated coverage and
+bedgraph/bigwig like files.  Will automatically switch to "MISSING" if data
+is guessed to be qualitative.}
 
 \item{anchor}{character. controls how x value is derived from position for
 each region in qgr.  0 may be the left side or center.  If not unstranded,

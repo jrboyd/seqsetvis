@@ -29,6 +29,10 @@
 #' @param attrib_var character, column in mcols of GRanges to pull values from.
 #'   Default of "score" is compatible with internal coverage calculation or
 #'   bedgraph-like files.
+#' @param fill_value numeric or character value to use where queried regions are
+#'   empty.  Default is 0 and appropriate for both calculated coverage and
+#'   bedgraph/bigwig like files.  Will automatically switch to "MISSING" if data
+#'   is guessed to be qualitative.
 #' @param anchor character, one of c("center", "center_unstranded", "left",
 #'   "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is returned
