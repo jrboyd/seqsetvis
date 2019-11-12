@@ -247,7 +247,7 @@ fetchBamPE = function(bam_f,
     # ggplot(bam_dt[isize >= 0, ], aes(x = isize)) + geom_histogram() + facet_wrap("which_label")
 
     bam_dt = bam_dt[!is.na(qwidth)]
-    bam_dt[, paired := .N == 2, qname]
+    bam_dt[, paired := .N == 2, .(qname, which_label)]
     bam_dt = bam_dt[paired == TRUE]
     bam_dt = bam_dt[isize >= min_isize & isize <= max_isize]
 
