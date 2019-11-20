@@ -73,6 +73,7 @@ ssvFetchBamPE = function(file_paths,
                          min_isize = 1,
                          max_isize = Inf,
                          return_unprocessed = FALSE,
+                         force_skip_centerFix = FALSE,
                          ...){
     load_bamPE = function(f, nam, qgr) {
         message("loading ", f, " ...")
@@ -92,6 +93,7 @@ ssvFetchBamPE = function(file_paths,
             min_isize = min_isize,
             max_isize = max_isize,
             return_unprocessed = return_unprocessed,
+            force_skip_centerFix = force_skip_centerFix,
             ...)
         # dt[[names_variable]] = rep(nam, nrow(dt))
         message("finished loading ", nam, ".")
@@ -106,7 +108,8 @@ ssvFetchBamPE = function(file_paths,
                          win_size = win_size,
                          win_method = win_method,
                          return_data.table = TRUE,
-                         n_cores = n_cores)
+                         n_cores = n_cores,
+                         force_skip_centerFix = force_skip_centerFix)
 
 
     if(!return_data.table & !return_unprocessed){
@@ -156,6 +159,7 @@ ssvFetchBamPE.single = function(bam_f,
                                 min_isize = 1,
                                 max_isize = Inf,
                                 return_unprocessed = FALSE,
+                                force_skip_centerFix = FALSE,
                                 ...) {
     x = id = y = NULL
     stopifnot(is.character(win_method))
@@ -168,7 +172,7 @@ ssvFetchBamPE.single = function(bam_f,
     switch (
         win_method,
         sample = {
-            qgr = prepare_fetch_GRanges(qgr, win_size)
+            qgr = prepare_fetch_GRanges(qgr, win_size, skip_centerFix = force_skip_centerFix)
             score_gr = fetchBamPE(bam_f,
                                   qgr,
                                   max_dupes,
@@ -218,7 +222,8 @@ fetchBamPE = function(bam_f,
                       max_dupes = Inf,
                       min_isize = 1,
                       max_isize = Inf,
-                      return_unprocessed = FALSE
+                      return_unprocessed = FALSE,
+                      ...
                       ){
     isize = paired = qname = which_label = NULL #reserve bindings
     stopifnot(is.numeric(min_isize))
@@ -230,7 +235,8 @@ fetchBamPE = function(bam_f,
     sbParam = Rsamtools::ScanBamParam(
         which = sbgr,
         # what = Rsamtools::scanBamWhat())
-        what = c("rname", "qname", "isize", "strand", "pos", "qwidth", "cigar"))
+        what = c("rname", "qname", "isize", "strand", "pos", "qwidth", "cigar"),
+        ...)
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
 
     bam_dt = lapply(bam_raw, function(x){

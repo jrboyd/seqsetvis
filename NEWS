@@ -1,3 +1,11 @@
+# seqsetvis 1.5.3
+
+* new feature - added skip_force_centerFix to all ssvFetch functions to accomodate
+retrieval of variable width regions using sample methods, i.e. exons.
+* new feature - added collapse_gr() and convert_collapsed_coord() functions to
+support maniulation of signal across exons.
+* getReadLength is now exported
+
 # seqsetvis 1.5.2
 
 * improvement - ssvFetchGRanges does more than coverage now and can retrieve a qualititative attribute from supplied GRanges.  Support for summary too.  These changes are ideal for chromHMM states or similar.

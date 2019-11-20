@@ -56,7 +56,8 @@ ssvFetchBigwig = function(file_paths,
                           anchor = c("left", "left_unstranded", "center",
                                      "center_unstranded")[3],
                           return_data.table = FALSE,
-                          n_cores = getOption("mc.cores", 1)) {
+                          n_cores = getOption("mc.cores", 1),
+                          force_skip_centerFix = FALSE) {
 
     load_bw = function(f, nam, qgr) {
         message("loading ", f, " ...")
@@ -66,7 +67,8 @@ ssvFetchBigwig = function(file_paths,
                                    win_method = win_method,
                                    summary_FUN = summary_FUN,
                                    anchor = anchor,
-                                   return_data.table = TRUE)
+                                   return_data.table = TRUE,
+                                   force_skip_centerFix = force_skip_centerFix)
         # dt[[names_variable]] = nam
         message("finished loading ", nam, ".")
         dt
@@ -80,7 +82,8 @@ ssvFetchBigwig = function(file_paths,
                    win_method = win_method,
                    return_data.table = return_data.table,
                    load_signal = load_bw,
-                   n_cores = n_cores)
+                   n_cores = n_cores,
+                   force_skip_centerFix = force_skip_centerFix)
 }
 
 #' Fetch values from a bigwig appropriate for heatmaps etc.
@@ -115,13 +118,14 @@ ssvFetchBigwig.single = function(bw_file,
                                  summary_FUN = stats::weighted.mean,
                                  anchor = c("left", "left_unstranded", "center",
                                             "center_unstranded")[3],
-                                 return_data.table = FALSE) {
+                                 return_data.table = FALSE,
+                                 force_skip_centerFix = FALSE) {
     stopifnot(is.character(bw_file))
     stopifnot(is(qgr, "GRanges"))
     stopifnot(is.numeric(win_size))
     switch (win_method,
             sample = {
-                qgr = prepare_fetch_GRanges(qgr, win_size)
+                qgr = prepare_fetch_GRanges(qgr, win_size, skip_centerFix = force_skip_centerFix)
                 fetch_gr = qgr
                 names(fetch_gr) = NULL
                 score_gr = rtracklayer::import.bw(bw_file, which = fetch_gr)

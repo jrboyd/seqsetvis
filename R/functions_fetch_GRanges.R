@@ -59,7 +59,15 @@ ssvFetchGRanges = function(grs,
                            anchor = c("left", "left_unstranded", "center",
                                       "center_unstranded")[3],
                            return_data.table = FALSE,
-                           n_cores = getOption("mc.cores", 1)){
+                           n_cores = getOption("mc.cores", 1),
+                           force_skip_centerFix = FALSE){
+    if(!is.list(grs)){
+        grs = list(grs)
+    }
+    all_gr = all(sapply(grs, function(x){
+        "GRanges" %in% class(x)
+    }))
+    stopifnot(all_gr)
     if(is.null(unique_names)){
         unique_names = paste("regions", LETTERS[seq_along(grs)])
     }
@@ -72,9 +80,16 @@ ssvFetchGRanges = function(grs,
     # gr_dt = lapply(grs, function(x){
     gr_dt = parallel::mclapply(grs, mc.cores = n_cores, function(x){
         if(use_coverage){
-            fetchGRanges_as_coverage(x, qgr, win_size, win_method, summary_FUN, target_strand, anchor, fill_value = fill_value)
+            fetchGRanges_as_coverage(x, qgr, win_size, win_method,
+                                     summary_FUN, target_strand,
+                                     anchor, fill_value = fill_value,
+                                     force_skip_centerFix = force_skip_centerFix)
         }else{
-            fetchGRanges_by_attrib_var(x, qgr, win_size, win_method, summary_FUN, target_strand, anchor, fill_value = fill_value, attrib_var = attrib_var)
+            fetchGRanges_by_attrib_var(x, qgr, win_size, win_method,
+                                       summary_FUN, target_strand,
+                                       anchor, fill_value = fill_value,
+                                       attrib_var = attrib_var,
+                                       force_skip_centerFix = force_skip_centerFix)
         }
     })
     for(i in seq_along(gr_dt)){
@@ -105,10 +120,14 @@ ssvFetchGRanges = function(grs,
 #                                       "center_unstranded")[3],
 #                            return_data.table = FALSE,
 #                            n_cores = getOption("mc.cores", 1)){
-fetchGRanges_as_coverage = function(x, qgr, win_size, win_method, summary_FUN, target_strand, anchor, fill_value = 0){
+fetchGRanges_as_coverage = function(x, qgr, win_size, win_method, summary_FUN,
+                                    target_strand, anchor,
+                                    fill_value = 0, force_skip_centerFix = FALSE){
     switch(win_method,
            sample = {
-               qgr = prepare_fetch_GRanges(qgr, win_size)
+               qgr = prepare_fetch_GRanges(qgr,
+                                           win_size,
+                                           skip_centerFix = force_skip_centerFix)
                if(target_strand == "both"){
                    pos_gr = GRanges(coverage(subset(x, strand == "+")))
                    neg_gr = GRanges(coverage(subset(x, strand == "-")))
@@ -193,10 +212,13 @@ fetchGRanges_as_coverage = function(x, qgr, win_size, win_method, summary_FUN, t
 }
 
 fetchGRanges_by_attrib_var = function(x, qgr, win_size, win_method, summary_FUN,
-                                      target_strand, anchor, fill_value = "MISSING", attrib_var = "name"){
+                                      target_strand, anchor,
+                                      fill_value = "MISSING", attrib_var = "name",
+                                      force_skip_centerFix = FALSE){
     switch(win_method,
            sample = {
-               qgr = prepare_fetch_GRanges(qgr, win_size)
+               qgr = prepare_fetch_GRanges(qgr, win_size,
+                                           skip_centerFix = force_skip_centerFix)
                if(target_strand == "both"){
                    pos_gr = subset(x, strand == "+")
                    neg_gr = subset(x, strand == "-")

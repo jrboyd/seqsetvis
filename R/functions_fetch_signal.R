@@ -68,7 +68,8 @@ ssvFetchSignal = function(file_paths,
                                       "supply a function to",
                                       "load_signal parameter.")
                           },
-                          n_cores = getOption("mc.cores", 1)) {
+                          n_cores = getOption("mc.cores", 1),
+                          force_skip_centerFix = FALSE) {
     if (is.data.frame(file_paths) || is.data.table(file_paths)) {
         if (ncol(file_paths) == 1) {
             file_attribs = data.frame(matrix(
@@ -120,11 +121,12 @@ ssvFetchSignal = function(file_paths,
                    unique(unique_names[duplicated(unique_names)])))
     }
     stopifnot(file.exists(file_paths))
-    if (win_method == "sample") {
-        qgr = prepare_fetch_GRanges(qgr = qgr,
-                                    win_size = win_size,
-                                    target_size = NULL)
-    }
+    #if (win_method == "sample") {
+    qgr = prepare_fetch_GRanges(qgr = qgr,
+                                win_size = win_size,
+                                target_size = NULL,
+                                skip_centerFix = win_method != "sample" | force_skip_centerFix)
+    #}
 
     nam_load_signal = function(nam) {
         f = file_paths[nam]
@@ -553,9 +555,10 @@ shift_anchor = function(score_dt, window_size, anchor) {
 prepare_fetch_GRanges = function(qgr,
                                  win_size,
                                  min_quantile = .75,
-                                 target_size = NULL) {
-    if (length(unique(width(qgr))) > 1 ||
-        width(qgr)[1] %% win_size != 0) {
+                                 target_size = NULL,
+                                 skip_centerFix = FALSE) {
+    if (!skip_centerFix &&
+        (length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0)) {
         if (is.null(target_size)) {
             target_size = quantileGRangesWidth(
                 qgr = qgr,

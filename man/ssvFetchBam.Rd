@@ -14,7 +14,8 @@ ssvFetchBam(file_paths, qgr, unique_names = NULL, win_size = 50,
   "center_unstranded")[3], names_variable = "sample",
   return_data.table = FALSE, max_dupes = Inf,
   splice_strategy = c("none", "ignore", "add", "only",
-  "splice_count")[1], n_cores = getOption("mc.cores", 1), ...)
+  "splice_count")[1], n_cores = getOption("mc.cores", 1),
+  force_skip_centerFix = FALSE, ...)
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from. Alternatively,

@@ -10,7 +10,8 @@ ssvFetchBamPE(file_paths, qgr, unique_names = NULL, win_size = 50,
   "left_unstranded", "center", "center_unstranded")[3],
   names_variable = "sample", return_data.table = FALSE,
   max_dupes = Inf, n_cores = getOption("mc.cores", 1), min_isize = 1,
-  max_isize = Inf, return_unprocessed = FALSE, ...)
+  max_isize = Inf, return_unprocessed = FALSE,
+  force_skip_centerFix = FALSE, ...)
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from. Alternatively,

@@ -11,7 +11,8 @@ ssvFetchBamPE.single(bam_f, qgr, win_size = 50,
   summary_FUN = stats::weighted.mean, anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
   return_data.table = FALSE, max_dupes = Inf, min_isize = 1,
-  max_isize = Inf, return_unprocessed = FALSE, ...)
+  max_isize = Inf, return_unprocessed = FALSE,
+  force_skip_centerFix = FALSE, ...)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}

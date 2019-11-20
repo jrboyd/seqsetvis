@@ -8,7 +8,7 @@ ssvFetchBigwig.single(bw_file, qgr, win_size = 50,
   win_method = c("sample", "summary")[1],
   summary_FUN = stats::weighted.mean, anchor = c("left",
   "left_unstranded", "center", "center_unstranded")[3],
-  return_data.table = FALSE)
+  return_data.table = FALSE, force_skip_centerFix = FALSE)
 }
 \arguments{
 \item{bw_file}{The character vector path to bigwig files to read from.}

@@ -77,6 +77,7 @@ ssvFetchBam = function(file_paths,
                        splice_strategy = c("none", "ignore", "add",
                                            "only", "splice_count")[1],
                        n_cores = getOption("mc.cores", 1),
+                       force_skip_centerFix = FALSE,
                        ...){
     stopifnot(all(is.character(fragLens) |
                       is.numeric(fragLens) |
@@ -133,6 +134,7 @@ ssvFetchBam = function(file_paths,
                                 max_dupes = max_dupes,
                                 splice_strategy = splice_strategy,
                                 flip_strand = flip_strand,
+                                force_skip_centerFix = force_skip_centerFix,
                                 ...)
         # dt[[names_variable]] = rep(nam, nrow(dt))
         message("finished loading ", nam, ".")
@@ -147,7 +149,8 @@ ssvFetchBam = function(file_paths,
                          win_size = win_size,
                          win_method = win_method,
                          return_data.table = TRUE,
-                         n_cores = n_cores)
+                         n_cores = n_cores,
+                         force_skip_centerFix = force_skip_centerFix)
 
     if(flip_strand){
         if(target_strand != "*"){
@@ -210,6 +213,7 @@ ssvFetchBam.single = function(bam_f,
                               splice_strategy = c("none", "ignore", "add",
                                                   "only", "splice_count")[1],
                               flip_strand = FALSE,
+                              force_skip_centerFix = FALSE,
                               ...) {
     x = id = y = NULL
     stopifnot(is.character(win_method))
@@ -230,7 +234,7 @@ ssvFetchBam.single = function(bam_f,
     switch (
         win_method,
         sample = {
-            qgr = prepare_fetch_GRanges(qgr, win_size)
+            qgr = prepare_fetch_GRanges(qgr, win_size, skip_centerFix = force_skip_centerFix)
             if(target_strand == "both"){
                 pos_gr = fetchBam(bam_f, qgr, fragLen, "+",
                                   max_dupes, splice_strategy,
@@ -356,7 +360,8 @@ fetchBam = function(bam_f,
     strand(sbgr) = "*"
     sbParam = Rsamtools::ScanBamParam(
         which = sbgr,
-        what = c("rname", "strand", "pos", "qwidth", "cigar"), ...)
+        what = c("rname", "strand", "pos", "qwidth", "cigar"),
+        ...)
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
     bam_dt = lapply(bam_raw, function(x){
         data.table(seqnames = x$rname, strand = x$strand,
@@ -471,7 +476,7 @@ harmonize_seqlengths = function(gr, bam_file){
 #'
 #' @param bam_file indexed bam file
 #' @param query_gr GRanges to read from bam file
-#'
+#' @export
 #' @return numeric of most common read length.
 getReadLength = function(bam_file,
                          query_gr){
