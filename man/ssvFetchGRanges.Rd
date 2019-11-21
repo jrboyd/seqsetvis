@@ -63,6 +63,10 @@ instead of GRanges.  Default is FALSE.}
 
 \item{n_cores}{integer number of cores to use. Uses mc.cores option if not
 supplied.}
+
+\item{force_skip_centerFix}{boolean, if TRUE all query ranges will be
+used "as is".  This is already the case by default if win_method == "summary"
+but may have applications where win_method == "sample".}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing

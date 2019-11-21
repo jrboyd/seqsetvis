@@ -7,7 +7,8 @@
 collapse_gr(genome_gr)
 }
 \arguments{
-\item{genome_gr}{}
+\item{genome_gr}{a GRanges of regions on a single chromosome.  Regions
+are intended to be non-contiguous and may even overlap.}
 }
 \value{
 a new GRanges object with same mcols as input with all intervals

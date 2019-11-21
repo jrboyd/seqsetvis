@@ -10,7 +10,7 @@ ssvFetchBam.single(bam_f, qgr, win_size = 50, win_method = c("sample",
   "left_unstranded", "center", "center_unstranded")[3],
   return_data.table = FALSE, max_dupes = Inf,
   splice_strategy = c("none", "ignore", "add", "only",
-  "splice_count")[1], flip_strand = FALSE,
+  "splice_count")[1], flip_strand = FALSE, return_unprocessed = FALSE,
   force_skip_centerFix = FALSE, ...)
 }
 \arguments{
@@ -54,6 +54,12 @@ not count spliced regions.  add" counts spliced regions along with others,
 
 \item{flip_strand}{if TRUE, strand alignment is flipped prior to fragLen
 extension. Default is FALSE.}
+
+\item{return_unprocessed}{boolean. if TRUE returns read alignment in data.table. Default is FALSE.}
+
+\item{force_skip_centerFix}{boolean, if TRUE all query ranges will be
+used "as is".  This is already the case by default if win_method == "summary"
+but may have applications where win_method == "sample".}
 
 \item{...}{passed to Rsamtools::ScanBamParam()}
 }

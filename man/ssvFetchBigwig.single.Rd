@@ -31,6 +31,10 @@ passed to \code{\link{viewGRangesWinSummary_dt}}.}
 
 \item{return_data.table}{logical. If TRUE the internal data.table is
 returned instead of GRanges.  Default is FALSE.}
+
+\item{force_skip_centerFix}{boolean, if TRUE all query ranges will be
+used "as is".  This is already the case by default if win_method == "summary"
+but may have applications where win_method == "sample".}
 }
 \value{
 A GRanges (or data.table if specified) containing fetched values.

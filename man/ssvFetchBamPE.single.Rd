@@ -46,6 +46,10 @@ over this number are removed, Default is Inf.}
 
 \item{return_unprocessed}{boolean. if TRUE returns read alignment in data.table. Default is FALSE.}
 
+\item{force_skip_centerFix}{boolean, if TRUE all query ranges will be
+used "as is".  This is already the case by default if win_method == "summary"
+but may have applications where win_method == "sample".}
+
 \item{...}{passed to Rsamtools::ScanBamParam()}
 }
 \value{

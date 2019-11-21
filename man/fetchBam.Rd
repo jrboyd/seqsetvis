@@ -7,7 +7,8 @@ fragment size (fragLen)}
 \usage{
 fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+",
   "-")[1], max_dupes = Inf, splice_strategy = c("none", "ignore",
-  "add", "only", "splice_count")[1], flip_strand = FALSE, ...)
+  "add", "only", "splice_count")[1], flip_strand = FALSE,
+  return_unprocessed = FALSE, ...)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}
@@ -32,6 +33,8 @@ count spliced regions.  "add" counts spliced regions along with others,
 
 \item{flip_strand}{if TRUE, strand alignment is flipped prior to fragLen
 extension. Default is FALSE.}
+
+\item{return_unprocessed}{boolean. if TRUE returns read alignment in data.table. Default is FALSE.}
 
 \item{...}{passed to ScanBamParam(), can't be which or what.}
 }

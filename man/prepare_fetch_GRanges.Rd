@@ -17,6 +17,10 @@ relevant if target_size is not specified.}
 
 \item{target_size}{numeric final width of qgr if known. Default of NULL
 leads to quantile based determination of target_size.}
+
+\item{skip_centerFix}{boolean, if FALSE (default) all regions will be resized
+GenomicRanges::resize(x, w, fix = "center") to a uniform size based on
+min_quantile to a width divisible by win_size.}
 }
 \value{
 GRanges, either identical to qgr or with suitable consistent width

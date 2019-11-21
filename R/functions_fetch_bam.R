@@ -543,7 +543,7 @@ getReadLength = function(bam_file,
 #' Default is FALSE.
 #' @export
 #' @return data.table with cigar entries expanded
-#' @example
+#' @examples
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
 #' bam_file = system.file("extdata/test.bam", package = "seqsetvis", mustWork = TRUE)
 #' raw_dt = ssvFetchBam(bam_file, qgr, return_unprocessed = TRUE)

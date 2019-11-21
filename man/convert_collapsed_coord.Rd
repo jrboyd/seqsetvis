@@ -7,21 +7,23 @@
 convert_collapsed_coord(genome_gr, x)
 }
 \arguments{
-\item{genome_gr}{non-contiguous regions to collapse a la \code{\link{collapse_gr}}}
+\item{genome_gr}{non-contiguous regions to collapse a la
+\code{\link{collapse_gr}}}
 
-\item{x}{numeric, positions within genome_gr to convert}
+\item{x}{numeric, positions within genome_gr to convert to collapsed
+coordinates.}
 }
 \value{
-numeric, positions of every value of x within collapse coordinates.  values
-outside of collapsed regions (an intron or outside range) will be NA.
+numeric, positions of every value of x within collapse coordinates.
+values outside of collapsed regions (an intron or outside range) will be NA.
 }
 \description{
 (preliminary implementation, sub-optimal)
 }
 \details{
-see \code{\link{collapse_gr}} for explanation of intended uses.
- this function translates all values of x from original genomic coordinates
- to new coordinate space created by \code{\link{collapse_gr}}.
+see \code{\link{collapse_gr}} for explanation of intended uses. this function
+translates all values of x from original genomic coordinates to new
+coordinate space created by \code{\link{collapse_gr}}.
 }
 \examples{
 library(data.table)

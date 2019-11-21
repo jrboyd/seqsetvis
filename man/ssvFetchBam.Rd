@@ -15,7 +15,7 @@ ssvFetchBam(file_paths, qgr, unique_names = NULL, win_size = 50,
   return_data.table = FALSE, max_dupes = Inf,
   splice_strategy = c("none", "ignore", "add", "only",
   "splice_count")[1], n_cores = getOption("mc.cores", 1),
-  force_skip_centerFix = FALSE, ...)
+  return_unprocessed = FALSE, force_skip_centerFix = FALSE, ...)
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from. Alternatively,
@@ -64,10 +64,16 @@ present. fragLen must be NA for any other value to be valid.  "ignore" will
 not count spliced regions.  add" counts spliced regions along with others,
 "only" will only count spliced regions and ignore others.}
 
-\item{n_cores}{integer number of cores to use.}
-
-\item{...}{passed to Rsamtools::ScanBamParam()
+\item{n_cores}{integer number of cores to use.
 Uses mc.cores option if not supplied.}
+
+\item{return_unprocessed}{boolean. if TRUE returns read alignment in data.table. Default is FALSE.}
+
+\item{force_skip_centerFix}{boolean, if TRUE all query ranges will be
+used "as is".  This is already the case by default if win_method == "summary"
+but may have applications where win_method == "sample".}
+
+\item{...}{passed to Rsamtools::ScanBamParam()}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing
