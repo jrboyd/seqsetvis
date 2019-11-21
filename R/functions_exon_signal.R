@@ -34,7 +34,7 @@ collapse_gr = function(genome_gr){
     if(as.character(strand(genome_gr[1])) == "-"){
         tmp = mcols(genome_gr)
         genome_gr = GRanges(seqnames(genome_gr),
-                IRanges(max(end(genome_gr)) - end(genome_gr) + 1,
+                            IRanges::IRanges(max(end(genome_gr)) - end(genome_gr) + 1,
                         max(end(genome_gr))- start(genome_gr) + 1))
         mcols(genome_gr) = tmp
 
@@ -91,7 +91,7 @@ convert_collapsed_coord = function(genome_gr, x){
         x = max(end(genome_gr)) - x + 1
         tmp = mcols(genome_gr)
         genome_gr = GRanges(seqnames(genome_gr),
-                            IRanges(max(end(genome_gr)) - end(genome_gr) + 1,
+                            IRanges::IRanges(max(end(genome_gr)) - end(genome_gr) + 1,
                                     max(end(genome_gr))- start(genome_gr) + 1))
         mcols(genome_gr) = tmp
     }
