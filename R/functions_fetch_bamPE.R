@@ -245,10 +245,10 @@ fetchBamPE = function(bam_f,
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
 
     bam_dt = lapply(bam_raw, function(x){
-        as.data.table(data.frame(x))
-        # data.table(seqnames = x$rname, qname = x$qname, strand = x$strand,
-        #            start = x$pos, width = x$qwidth, cigar = x$cigar)
+        data.table(seqnames = x$rname, qname = x$qname, strand = x$strand,
+                   start = x$pos, width = x$qwidth, cigar = x$cigar, isize = x$isize)
     })
+
     bam_dt = data.table::rbindlist(bam_dt,
                                    use.names = TRUE,
                                    idcol = "which_label")
@@ -257,7 +257,7 @@ fetchBamPE = function(bam_f,
     }
     # ggplot(bam_dt[isize >= 0, ], aes(x = isize)) + geom_histogram() + facet_wrap("which_label")
 
-    bam_dt = bam_dt[!is.na(qwidth)]
+    bam_dt = bam_dt[!is.na(width)]
     bam_dt[, paired := .N == 2, .(qname, which_label)]
     bam_dt = bam_dt[paired == TRUE]
     bam_dt = bam_dt[isize >= min_isize & isize <= max_isize]
@@ -265,11 +265,11 @@ fetchBamPE = function(bam_f,
     #prepare for GRanges conversion
     bam_dt = bam_dt[, list(
         which_label,
-        seqnames = rname,
+        seqnames = seqnames,
         strand = "*",
-        start = pos,
+        start = start,
         width = isize,
-        end = pos + isize - 1L
+        end = start + isize - 1L
     )]
     if(max_dupes < Inf){
         bam_dt = .rm_dupesPE(bam_dt, max_dupes)

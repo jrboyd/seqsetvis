@@ -525,6 +525,65 @@ getReadLength = function(bam_file,
     readlength
 }
 
+
+#' Expand cigar codes to GRanges
+#'
+#' see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs} for
+#' cigar details
+#'
+#'
+#' @param cigar_dt data.table with 5 required named columns in any order.
+#'   c("which_label", "seqnames", "strand", "start", "cigar")
+#' @param op_2count Cigar codes to count. Default is alignment (M), deletion
+#'   (D), match (=), and mismatch (X).  Other useful codes may be skipped
+#'   regions for RNA splicing (N).  The locations of any insterions (I) or
+#'   clipping/padding (S, H, or P) will be a single bp immediately before the
+#'   interval.
+#' @param return_data.table if TRUE, a data.table is returned, else a GRanges.
+#' Default is FALSE.
+#' @export
+#' @return data.table with cigar entries expanded
+#' @example
+#' qgr = CTCF_in_10a_overlaps_gr[1:5]
+#' bam_file = system.file("extdata/test.bam", package = "seqsetvis", mustWork = TRUE)
+#' raw_dt = ssvFetchBam(bam_file, qgr, return_unprocessed = TRUE)
+#' expandCigar(raw_dt)
+expandCigar = function(cigar_dt, op_2count = c("M", "D", "=", "X"), return_data.table = FALSE){
+    if("GRanges" %in% class(cigar_dt)){
+        cigar_dt = as.data.table(cigar_dt)
+    }
+    stopifnot(c("which_label", "seqnames", "strand", "start", "cigar") %in% colnames(cigar_dt))
+    res = .expand_cigar_dt(cigar_dt, op_2count)
+    if(!return_data.table){
+        res = GRanges(res)
+    }
+    return(res)
+}
+
+#' Expand intermediate bam fetch by cigar codes
+#'
+#' see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs} for
+#' cigar details
+#'
+#'
+#' @param cigar_dt data.table with 5 required named columns in any order.
+#'   c("which_label", "seqnames", "strand", "start", "cigar")
+#' @param op_2count Cigar codes to count. Default is alignment (M), deletion
+#'   (D), match (=), and mismatch (X).  Other useful codes may be skipped
+#'   regions for RNA splicing (N).  The locations of any insterions (I) or
+#'   clipping/padding (S, H, or P) will be a single bp immediately before the
+#'   interval.
+#'
+#' @return data.table with cigar entries expanded
+.expand_cigar_dt = function(cigar_dt, op_2count = c("M", "D", "=", "X")){
+    cigar_type = NULL
+    cigar_dt = copy(cigar_dt)
+    cigar_dt[, end := start]
+    exp_dt = .expand_cigar_dt_recursive(cigar_dt)
+    exp_dt[cigar_type %in% op_2count]
+}
+
+
 #' Expand intermediate bam fetch by cigar codes
 #'
 #' see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs} for
@@ -565,31 +624,6 @@ getReadLength = function(bam_file,
     }else{
         return(ass1)
     }
-}
-
-
-
-#' Expand intermediate bam fetch by cigar codes
-#'
-#' see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs} for
-#' cigar details
-#'
-#'
-#' @param cigar_dt data.table with 5 required named columns in any order.
-#'   c("which_label", "seqnames", "strand", "start", "cigar")
-#' @param op_2count Cigar codes to count. Default is alignment (M), deletion
-#'   (D), match (=), and mismatch (X).  Other useful codes may be skipped
-#'   regions for RNA splicing (N).  The locations of any insterions (I) or
-#'   clipping/padding (S, H, or P) will be a single bp immediately before the
-#'   interval.
-#'
-#' @return data.table with cigar entries expanded
-.expand_cigar_dt = function(cigar_dt, op_2count = c("M", "D", "=", "X")){
-    cigar_type = NULL
-    cigar_dt = copy(cigar_dt)
-    cigar_dt[, end := start]
-    exp_dt = .expand_cigar_dt_recursive(cigar_dt)
-    exp_dt[cigar_type %in% op_2count]
 }
 
 #' Remove duplicate reads based on stranded start position.  This is an
