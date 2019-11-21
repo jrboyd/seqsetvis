@@ -27,6 +27,9 @@
 #' file_paths, nam is from unique_names, and qgr is qgr. See details.
 #' @param n_cores integer number of cores to use.
 #' Uses mc.cores option if not supplied.
+#' @param force_skip_centerFix boolean, if TRUE all query ranges will be
+#' used "as is".  This is already the case by default if win_method == "summary"
+#' but may have applications where win_method == "sample".
 #' @details load_signal is passed f, nam, and qgr and is executed in the
 #' environment where load_signal is defined. See
 #' \code{\link{ssvFetchBigwig}} and \code{\link{ssvFetchBam}}
