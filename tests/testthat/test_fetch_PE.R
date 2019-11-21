@@ -18,15 +18,15 @@ pe_raw = ssvFetchBamPE(
 )
 
 test_that("ssvFetchBamPE return_unprocessed", {
-    expect_equal(
+    expect_setequal(
         colnames(pe_raw),
         c(
             "which_label",
+            "seqnames",
             "qname",
-            "rname",
             'strand',
-            "pos",
-            "qwidth",
+            "start",
+            "width",
             "cigar",
             "isize",
             "id",
