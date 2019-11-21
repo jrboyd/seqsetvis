@@ -545,6 +545,9 @@ shift_anchor = function(score_dt, window_size, anchor) {
 #' relevant if target_size is not specified.
 #' @param target_size numeric final width of qgr if known. Default of NULL
 #' leads to quantile based determination of target_size.
+#' @param skip_centerFix boolean, if FALSE (default) all regions will be resized
+#' GenomicRanges::resize(x, w, fix = "center") to a uniform size based on
+#' min_quantile to a width divisible by win_size.
 #' @return GRanges, either identical to qgr or with suitable consistent width
 #' applied.
 #' @export

@@ -35,6 +35,9 @@
 #' @param min_isize integer. Read pairs must have an isize greater than or equal to this value.  Default is 1.
 #' @param max_isize integer. Read pairs must have an isize less than or equal to this value.  Default is Inf.
 #' @param return_unprocessed boolean. if TRUE returns read alignment in data.table. Default is FALSE.
+#' @param force_skip_centerFix boolean, if TRUE all query ranges will be
+#' used "as is".  This is already the case by default if win_method == "summary"
+#' but may have applications where win_method == "sample".
 #' @param ... passed to Rsamtools::ScanBamParam()
 #' Uses mc.cores option if not supplied.
 #' @return A tidy formatted GRanges (or data.table if specified) containing
@@ -143,6 +146,9 @@ ssvFetchBamPE = function(file_paths,
 #' @param min_isize integer. Read pairs must have an isize greater than or equal to this value.  Default is 1.
 #' @param max_isize integer. Read pairs must have an isize less than or equal to this value.  Default is Inf.
 #' @param return_unprocessed boolean. if TRUE returns read alignment in data.table. Default is FALSE.
+#' @param force_skip_centerFix boolean, if TRUE all query ranges will be
+#' used "as is".  This is already the case by default if win_method == "summary"
+#' but may have applications where win_method == "sample".
 #' @param ... passed to Rsamtools::ScanBamParam()
 #' @return tidy GRanges (or data.table if specified) with pileups from bam file.
 #'   pileup is calculated only every win_size bp.
@@ -169,6 +175,17 @@ ssvFetchBamPE.single = function(bam_f,
     stopifnot(is.function(summary_FUN))
     stopifnot(anchor %in% c("left", "left_unstranded", "center",
                             "center_unstranded"))
+    if(return_unprocessed){
+        score_gr = fetchBamPE(bam_f,
+                              qgr,
+                              max_dupes,
+                              min_isize,
+                              max_isize,
+                              return_unprocessed = return_unprocessed,
+                              ...)
+        score_gr = merge(score_gr, data.table(which_label = as.character(qgr), id = qgr$name), by = "which_label")
+        return(score_gr)
+    }
     switch (
         win_method,
         sample = {
@@ -178,17 +195,11 @@ ssvFetchBamPE.single = function(bam_f,
                                   max_dupes,
                                   min_isize,
                                   max_isize,
-                                  return_unprocessed = return_unprocessed,
                                   ...)
-            if(return_unprocessed){
-                score_gr = merge(score_gr, data.table(which_label = as.character(qgr), id = qgr$name), by = "which_label")
-                return(score_gr)
-            }else{
-                out = viewGRangesWinSample_dt(score_gr,
-                                              qgr,
-                                              win_size,
-                                              anchor = anchor)
-            }
+            out = viewGRangesWinSample_dt(score_gr,
+                                          qgr,
+                                          win_size,
+                                          anchor = anchor)
         },
         summary = {
             score_gr = fetchBamPE(bam_f,
@@ -196,16 +207,10 @@ ssvFetchBamPE.single = function(bam_f,
                                   max_dupes,
                                   min_isize,
                                   max_isize,
-                                  return_unprocessed = return_unprocessed,
                                   ...)
-            if(return_unprocessed){
-                score_gr = merge(score_gr, data.table(which_label = as.character(qgr), id = qgr$name), by = "which_label")
-                return(score_gr)
-            }else{
-                out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
-                                               summary_FUN = summary_FUN,
-                                               anchor = anchor)
-            }
+            out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
+                                           summary_FUN = summary_FUN,
+                                           anchor = anchor)
         }
     )
 
@@ -224,7 +229,7 @@ fetchBamPE = function(bam_f,
                       max_isize = Inf,
                       return_unprocessed = FALSE,
                       ...
-                      ){
+){
     isize = paired = qname = which_label = NULL #reserve bindings
     stopifnot(is.numeric(min_isize))
     stopifnot(is.numeric(max_isize))

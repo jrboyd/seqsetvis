@@ -4,7 +4,8 @@
 #' starting at 1.  this is strand sensitive and intended for use with
 #' all exons of a single gene.
 #'
-#' @param genome_gr
+#' @param genome_gr a GRanges of regions on a single chromosome.  Regions
+#' are intended to be non-contiguous and may even overlap.
 #'
 #' @return a new GRanges object with same mcols as input with all intervals
 #' starting at 1 and no empty space between syntenic regions.
@@ -44,7 +45,8 @@ collapse_gr = function(genome_gr){
     for(i in rev(seq_along(rm_gr))){
         irm_gr = rm_gr[i]
         to_shift = start(tx_gr) > end(irm_gr)
-        tx_gr[to_shift]  = GenomicRanges::shift(tx_gr[to_shift], shift = -width(irm_gr))
+        tx_gr[to_shift]  = GenomicRanges::shift(tx_gr[to_shift],
+                                                shift = -width(irm_gr))
     }
     tx_gr = GenomicRanges::shift(tx_gr, -min(start(tx_gr)) + 1)
     return(tx_gr)
@@ -54,17 +56,18 @@ collapse_gr = function(genome_gr){
 #'
 #' (preliminary implementation, sub-optimal)
 #'
-#' see \code{\link{collapse_gr}} for explanation of intended uses.
-#'  this function translates all values of x from original genomic coordinates
-#'  to new coordinate space created by \code{\link{collapse_gr}}.
+#' see \code{\link{collapse_gr}} for explanation of intended uses. this function
+#' translates all values of x from original genomic coordinates to new
+#' coordinate space created by \code{\link{collapse_gr}}.
 #'
 #'
-#' @param genome_gr non-contiguous regions to collapse a la \code{\link{collapse_gr}}
-#' @param x numeric, positions within genome_gr to convert
+#' @param genome_gr non-contiguous regions to collapse a la
+#'   \code{\link{collapse_gr}}
+#' @param x numeric, positions within genome_gr to convert to collapsed
+#'   coordinates.
 #'
-#' @return
-#' numeric, positions of every value of x within collapse coordinates.  values
-#' outside of collapsed regions (an intron or outside range) will be NA.
+#' @return numeric, positions of every value of x within collapse coordinates.
+#' values outside of collapsed regions (an intron or outside range) will be NA.
 #' @export
 #'
 #' @examples

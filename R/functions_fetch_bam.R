@@ -38,8 +38,12 @@
 #'   not count spliced regions.  add" counts spliced regions along with others,
 #'   "only" will only count spliced regions and ignore others.
 #' @param n_cores integer number of cores to use.
-#' @param ... passed to Rsamtools::ScanBamParam()
 #' Uses mc.cores option if not supplied.
+#' @param return_unprocessed boolean. if TRUE returns read alignment in data.table. Default is FALSE.
+#' @param force_skip_centerFix boolean, if TRUE all query ranges will be
+#' used "as is".  This is already the case by default if win_method == "summary"
+#' but may have applications where win_method == "sample".
+#' @param ... passed to Rsamtools::ScanBamParam()
 #' @return A tidy formatted GRanges (or data.table if specified) containing
 #'   fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
@@ -77,6 +81,7 @@ ssvFetchBam = function(file_paths,
                        splice_strategy = c("none", "ignore", "add",
                                            "only", "splice_count")[1],
                        n_cores = getOption("mc.cores", 1),
+                       return_unprocessed = FALSE,
                        force_skip_centerFix = FALSE,
                        ...){
     stopifnot(all(is.character(fragLens) |
@@ -134,6 +139,7 @@ ssvFetchBam = function(file_paths,
                                 max_dupes = max_dupes,
                                 splice_strategy = splice_strategy,
                                 flip_strand = flip_strand,
+                                return_unprocessed = return_unprocessed,
                                 force_skip_centerFix = force_skip_centerFix,
                                 ...)
         # dt[[names_variable]] = rep(nam, nrow(dt))
@@ -158,7 +164,7 @@ ssvFetchBam = function(file_paths,
         }
     }
 
-    if(!return_data.table){
+    if(!return_data.table & !return_unprocessed){
         bdt = GRanges(bdt)
     }
     bdt
@@ -195,6 +201,10 @@ ssvFetchBam = function(file_paths,
 #'   "only" will only count spliced regions and ignore others.
 #' @param flip_strand if TRUE, strand alignment is flipped prior to fragLen
 #'   extension. Default is FALSE.
+#' @param return_unprocessed boolean. if TRUE returns read alignment in data.table. Default is FALSE.
+#' @param force_skip_centerFix boolean, if TRUE all query ranges will be
+#' used "as is".  This is already the case by default if win_method == "summary"
+#' but may have applications where win_method == "sample".
 #' @param ... passed to Rsamtools::ScanBamParam()
 #' @return tidy GRanges (or data.table if specified) with pileups from bam file.
 #'   pileup is calculated only every win_size bp.
@@ -213,6 +223,7 @@ ssvFetchBam.single = function(bam_f,
                               splice_strategy = c("none", "ignore", "add",
                                                   "only", "splice_count")[1],
                               flip_strand = FALSE,
+                              return_unprocessed = FALSE,
                               force_skip_centerFix = FALSE,
                               ...) {
     x = id = y = NULL
@@ -226,6 +237,18 @@ ssvFetchBam.single = function(bam_f,
                             "center_unstranded"))
     stopifnot(splice_strategy %in% c("none", "ignore", "add",
                                      "only", "splice_count"))
+    if(return_unprocessed){
+        score_gr = fetchBam(bam_f,
+                            qgr,
+                            fragLen = NA,
+                            target_strand = "*",
+                            max_dupes,
+                            splice_strategy = "none",
+                            return_unprocessed = return_unprocessed,
+                            ...)
+        score_gr = merge(score_gr, data.table(which_label = as.character(qgr), id = qgr$name), by = "which_label")
+        return(score_gr)
+    }
     if(splice_strategy == "splice_count"){
         return(fetchBam(bam_f, qgr, NA, "*",
                         max_dupes, splice_strategy,
@@ -325,6 +348,7 @@ ssvFetchBam.single = function(bam_f,
 #'   "only" will only count spliced regions and ignore others.
 #' @param flip_strand if TRUE, strand alignment is flipped prior to fragLen
 #'   extension. Default is FALSE.
+#' @param return_unprocessed boolean. if TRUE returns read alignment in data.table. Default is FALSE.
 #' @param ... passed to ScanBamParam(), can't be which or what.
 #' @return GRanges containing tag pileup values in score meta column.  tags are
 #'   optionally extended to fragment length (fragLen) prior to pile up.
@@ -336,6 +360,7 @@ fetchBam = function(bam_f,
                     splice_strategy = c("none", "ignore", "add",
                                         "only", "splice_count")[1],
                     flip_strand = FALSE,
+                    return_unprocessed = FALSE,
                     ...){
     which_label = NULL #reserve binding
     stopifnot(is.numeric(max_dupes))
@@ -370,6 +395,9 @@ fetchBam = function(bam_f,
     bam_dt = data.table::rbindlist(bam_dt,
                                    use.names = TRUE,
                                    idcol = "which_label")
+    if(return_unprocessed){
+        return(bam_dt)
+    }
     bam_dt = bam_dt[!is.na(width)]
     toflip = sub(":-", "", as.character(subset(qgr, strand == "-")))
     if(target_strand %in% c("+", "-")){

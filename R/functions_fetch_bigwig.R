@@ -27,6 +27,9 @@
 #' returned instead of GRanges.  Default is FALSE.
 #' @param n_cores integer number of cores to use.
 #' Uses mc.cores option if not supplied.
+#' @param force_skip_centerFix boolean, if TRUE all query ranges will be
+#' used "as is".  This is already the case by default if win_method == "summary"
+#' but may have applications where win_method == "sample".
 #' @return A tidy formatted GRanges (or data.table if specified) containing
 #' fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
@@ -106,6 +109,9 @@ ssvFetchBigwig = function(file_paths,
 #' "left", "left_unstranded")
 #' @param return_data.table logical. If TRUE the internal data.table is
 #' returned instead of GRanges.  Default is FALSE.
+#' @param force_skip_centerFix boolean, if TRUE all query ranges will be
+#' used "as is".  This is already the case by default if win_method == "summary"
+#' but may have applications where win_method == "sample".
 #' @return A GRanges (or data.table if specified) containing fetched values.
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @details if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
