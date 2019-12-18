@@ -65,18 +65,19 @@ clusteringKmeans = function(mat, nclust, seed = NULL) {
 
 
 #' perform kmeans clustering on matrix rows and return reordered matrix along
-#' with order matched cluster assignments
-#' clusters are sorted using hclust on centers
-#' the contents of each cluster are sorted using hclust
+#' with order matched cluster assignments clusters are sorted using hclust on
+#' centers the contents of each cluster are sorted using hclust
 #' @param mat A wide format matrix
 #' @param nclust the number of clusters
+#' @param within_order_strategy one of "hclust" or "sort".  if hclust,
+#'   hierarchical clustering will be used. if sort, a simple decreasing sort of
+#'   rosSums.
 #' @param seed passed to set.seed() to allow reproducibility
 #' @export
 #' @importFrom stats  hclust dist
-#' @return data.table with 2 columns of cluster info.
-#' id column corresponds with input matrix rownames and is sorted within
-#' each cluster using hierarchical clusering
-#' group column indicates cluster assignment
+#' @return data.table with 2 columns of cluster info. id column corresponds with
+#'   input matrix rownames and is sorted within each cluster using hierarchical
+#'   clusering group column indicates cluster assignment
 #' @examples
 #' dt = data.table::copy(CTCF_in_10a_profiles_dt)
 #' mat = data.table::dcast(dt, id ~ sample + x, value.var = "y" )
@@ -87,19 +88,25 @@ clusteringKmeans = function(mat, nclust, seed = NULL) {
 #' dt = merge(dt, clust_dt)
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
-clusteringKmeansNestedHclust = function(mat, nclust, seed = NULL) {
+clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy, seed = NULL) {
     stopifnot(is.numeric(nclust))
+    stopifnot(within_order_strategy %in% c("hclust", "sort"))
     group = id = within_o = NULL#declare binding for data.table
     mat_dt = clusteringKmeans(mat, nclust)
     mat_dt$within_o = as.integer(-1)
-    for (i in seq_along(nclust)) {
+    for (i in seq_len(nclust)) {
         cmat = mat[mat_dt[group == i, id], , drop = FALSE]
-        if (nrow(cmat) > 2) {
-            mat_dt[group == i, ]$within_o =
-                stats::hclust(stats::dist((cmat)))$order
-        } else {
-            mat_dt[group == i, ]$within_o = seq_len(nrow(cmat))
+        if(within_order_strategy == "hclust"){
+            if (nrow(cmat) > 2) {
+                mat_dt[group == i, ]$within_o =
+                    stats::hclust(stats::dist((cmat)))$order
+            } else {
+                mat_dt[group == i, ]$within_o = seq_len(nrow(cmat))
+            }
+        }else if(within_order_strategy == "sort"){
+            mat_dt[group == i, ]$within_o = order(rowSums(cmat), decreasing = TRUE)
         }
+
 
     }
     mat_dt = mat_dt[order(within_o), ][order(group), ]

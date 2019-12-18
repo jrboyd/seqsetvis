@@ -3,30 +3,32 @@
 \name{clusteringKmeansNestedHclust}
 \alias{clusteringKmeansNestedHclust}
 \title{perform kmeans clustering on matrix rows and return reordered matrix along
-with order matched cluster assignments
-clusters are sorted using hclust on centers
-the contents of each cluster are sorted using hclust}
+with order matched cluster assignments clusters are sorted using hclust on
+centers the contents of each cluster are sorted using hclust}
 \usage{
-clusteringKmeansNestedHclust(mat, nclust, seed = NULL)
+clusteringKmeansNestedHclust(mat, nclust, within_order_strategy,
+  seed = NULL)
 }
 \arguments{
 \item{mat}{A wide format matrix}
 
 \item{nclust}{the number of clusters}
 
+\item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
+hierarchical clustering will be used. if sort, a simple decreasing sort of
+rosSums.}
+
 \item{seed}{passed to set.seed() to allow reproducibility}
 }
 \value{
-data.table with 2 columns of cluster info.
-id column corresponds with input matrix rownames and is sorted within
-each cluster using hierarchical clusering
-group column indicates cluster assignment
+data.table with 2 columns of cluster info. id column corresponds with
+  input matrix rownames and is sorted within each cluster using hierarchical
+  clusering group column indicates cluster assignment
 }
 \description{
 perform kmeans clustering on matrix rows and return reordered matrix along
-with order matched cluster assignments
-clusters are sorted using hclust on centers
-the contents of each cluster are sorted using hclust
+with order matched cluster assignments clusters are sorted using hclust on
+centers the contents of each cluster are sorted using hclust
 }
 \examples{
 dt = data.table::copy(CTCF_in_10a_profiles_dt)

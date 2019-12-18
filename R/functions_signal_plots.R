@@ -316,6 +316,9 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
+#' @param within_order_strategy one of "hclust" or "sort".  if hclust,
+#'   hierarchical clustering will be used. if sort, a simple decreasing sort of
+#'   rosSums.
 #' @param dcast_fill value to supply to dcast fill argument. default is NA.
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @return data.table of signal profiles, ready for ssvSignalHeatmap
@@ -340,6 +343,7 @@ ssvSignalClustering = function(bw_data, nclust = 6,
                                max_rows = 500, max_cols = 100,
                                clustering_col_min = -Inf,
                                clustering_col_max = Inf,
+                               within_order_strategy = c("hclust", "sort")[1],
                                dcast_fill = NA){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
     output_GRanges = FALSE
@@ -397,7 +401,7 @@ ssvSignalClustering = function(bw_data, nclust = 6,
 
     dc_mat = as.matrix(dc_dt[,-1])
     rownames(dc_mat) = dc_dt[[row_]]
-    rclusters = clusteringKmeansNestedHclust(dc_mat, nclust = nclust)
+    rclusters = clusteringKmeansNestedHclust(dc_mat, nclust = nclust, within_order_strategy)
     rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[["id"]])
     data.table::setkey(rclusters, id)
