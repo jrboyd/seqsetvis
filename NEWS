@@ -1,3 +1,8 @@
+# seqsetvis 1.7.2
+
+* fix - ssvSignalClustering - within cluster sorting was not being applied
+* new feature - added within_order_strategy = c("hclust", "sort") paramter to ssvSignalClustering.
+
 # seqsetvis 1.5.3
 
 * new feature - added skip_force_centerFix to all ssvFetch functions to accomodate
