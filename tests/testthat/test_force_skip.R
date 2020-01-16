@@ -30,6 +30,7 @@ test_that("ssvFetchBam - force_skip_centerFix", {
 })
 
 test_that("ssvFetchBigwig - force_skip_centerFix", {
+    skip_on_os("windows")
     pos = c(20, 180, 210, 440, 520, 521)
     region_size = 30
     test_qgr = GRanges("chrTest", IRanges(pos+1, pos + region_size))

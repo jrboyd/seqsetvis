@@ -104,7 +104,7 @@ clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy, seed
                 mat_dt[group == i, ]$within_o = seq_len(nrow(cmat))
             }
         }else if(within_order_strategy == "sort"){
-            mat_dt[group == i, ]$within_o = order(rowSums(cmat), decreasing = TRUE)
+            mat_dt[group == i, ]$within_o = rank(-rowSums(cmat))
         }
 
 
