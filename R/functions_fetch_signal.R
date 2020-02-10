@@ -135,7 +135,7 @@ ssvFetchSignal = function(file_paths,
         f = file_paths[nam]
         load_signal(f, nam, qgr)
     }
-    bw_list = parallel::mclapply(file_attribs[[names_variable]],
+    bw_list = parallel::mclapply(unique_names,
                                  nam_load_signal, mc.cores = n_cores)
     for (i in seq_along(bw_list)) {
         for (attrib in colnames(file_attribs)) {

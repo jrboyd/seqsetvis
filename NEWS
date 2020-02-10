@@ -1,3 +1,7 @@
+# seqsetvis 1.7.4
+
+* bugfix - error if uniq_names factor
+
 # seqsetvis 1.7.2
 
 * fix - ssvSignalClustering - within cluster sorting was not being applied
