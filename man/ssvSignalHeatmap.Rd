@@ -9,7 +9,8 @@ ssvSignalHeatmap(bw_data, nclust = 6, perform_clustering = c("auto",
   "yes", "no")[1], row_ = "id", column_ = "x", fill_ = "y",
   facet_ = "sample", cluster_ = "cluster_id", max_rows = 500,
   max_cols = 100, clustering_col_min = -Inf,
-  clustering_col_max = Inf, return_data = FALSE)
+  clustering_col_max = Inf, within_order_strategy = c("hclust",
+  "sort")[2], dcast_fill = NA, return_data = FALSE)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
@@ -37,6 +38,12 @@ auto considers if row_ has been ordered by being a factor and if cluster_ is a n
 \item{clustering_col_min}{numeric minimum for col range considered when clustering, default in -Inf}
 
 \item{clustering_col_max}{numeric maximum for col range considered when clustering, default in Inf}
+
+\item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
+hierarchical clustering will be used. if sort, a simple decreasing sort of
+rosSums.}
+
+\item{dcast_fill}{value to supply to dcast fill argument. default is NA.}
 
 \item{return_data}{logical.  If TRUE, return value is no longer ggplot and
 is instead the data used to generate that plot. Default is FALSE.}

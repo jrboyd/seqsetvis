@@ -8,7 +8,7 @@ ssvSignalClustering(bw_data, nclust = 6, row_ = "id", column_ = "x",
   fill_ = "y", facet_ = "sample", cluster_ = "cluster_id",
   max_rows = 500, max_cols = 100, clustering_col_min = -Inf,
   clustering_col_max = Inf, within_order_strategy = c("hclust",
-  "sort")[1], dcast_fill = NA)
+  "sort")[2], dcast_fill = NA)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
