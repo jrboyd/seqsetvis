@@ -1,3 +1,8 @@
+# seqsetvis 1.7.5
+
+* bugfix - update ssvSignalHeatmap for within_order_strategy compatibility
+* change - default within_order_strategy is now "sort"
+
 # seqsetvis 1.7.4
 
 * bugfix - error if uniq_names factor

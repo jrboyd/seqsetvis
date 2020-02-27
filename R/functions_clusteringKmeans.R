@@ -88,7 +88,7 @@ clusteringKmeans = function(mat, nclust, seed = NULL) {
 #' dt = merge(dt, clust_dt)
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
-clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy, seed = NULL) {
+clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("hclust", "sort")[2], seed = NULL) {
     stopifnot(is.numeric(nclust))
     stopifnot(within_order_strategy %in% c("hclust", "sort"))
     group = id = within_o = NULL#declare binding for data.table
