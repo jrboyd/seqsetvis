@@ -6,12 +6,19 @@
 \code{ssvFetchBigwig.single} on each.  Appends grouping variable to each
 resulting data.table and uses rbindlist to efficiently combine results.}
 \usage{
-ssvFetchBigwig(file_paths, qgr, unique_names = NULL,
-  names_variable = "sample", win_size = 50, win_method = c("sample",
-  "summary")[1], summary_FUN = stats::weighted.mean, anchor = c("left",
-  "left_unstranded", "center", "center_unstranded")[3],
-  return_data.table = FALSE, n_cores = getOption("mc.cores", 1),
-  force_skip_centerFix = FALSE)
+ssvFetchBigwig(
+  file_paths,
+  qgr,
+  unique_names = NULL,
+  names_variable = "sample",
+  win_size = 50,
+  win_method = c("sample", "summary")[1],
+  summary_FUN = stats::weighted.mean,
+  anchor = c("left", "left_unstranded", "center", "center_unstranded")[3],
+  return_data.table = FALSE,
+  n_cores = getOption("mc.cores", 1),
+  force_skip_centerFix = FALSE
+)
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from. Alternatively,

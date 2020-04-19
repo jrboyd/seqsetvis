@@ -4,8 +4,12 @@
 \alias{ssvFeatureBars}
 \title{bar plots of set sizes}
 \usage{
-ssvFeatureBars(object, show_counts = TRUE, bar_colors = NULL,
-  return_data = FALSE)
+ssvFeatureBars(
+  object,
+  show_counts = TRUE,
+  bar_colors = NULL,
+  return_data = FALSE
+)
 }
 \arguments{
 \item{object}{passed to ssvMakeMembTable for conversion to membership table}

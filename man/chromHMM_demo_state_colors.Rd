@@ -4,7 +4,9 @@
 \name{chromHMM_demo_state_colors}
 \alias{chromHMM_demo_state_colors}
 \title{original state name to color mappings stored in segmentation bed}
-\format{a named character vector mapping states to hex colors}
+\format{
+a named character vector mapping states to hex colors
+}
 \description{
 original state name to color mappings stored in segmentation bed
 }

@@ -4,9 +4,15 @@
 \alias{fragLen_calcStranded}
 \title{calculate fragLen from a bam file for specified regions}
 \usage{
-fragLen_calcStranded(bam_f, qgr, n_regions = 100,
-  include_plot_in_output = FALSE, test_fragLen = seq(100, 400, 5),
-  flip_strand = FALSE, ...)
+fragLen_calcStranded(
+  bam_f,
+  qgr,
+  n_regions = 100,
+  include_plot_in_output = FALSE,
+  test_fragLen = seq(100, 400, 5),
+  flip_strand = FALSE,
+  ...
+)
 }
 \arguments{
 \item{bam_f}{character or BamFile. bam file to read from.

@@ -4,7 +4,9 @@
 \name{Bcell_peaks}
 \alias{Bcell_peaks}
 \title{4 random peaks for paired-end data}
-\format{GRanges length 4}
+\format{
+GRanges length 4
+}
 \description{
 matches \code{system.file("extdata/Bcell_PE.mm10.bam", package = "seqsetvis")}
 }

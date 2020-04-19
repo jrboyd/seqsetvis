@@ -4,12 +4,19 @@
 \alias{ssvFetchSignal}
 \title{signal loading framework}
 \usage{
-ssvFetchSignal(file_paths, qgr, unique_names = NULL,
-  names_variable = "sample", win_size = 50, win_method = c("sample",
-  "summary")[1], return_data.table = FALSE, load_signal = function(f,
-  nam, qgr) {     warning("nothing happened, ", "supply a function to",
-  "load_signal parameter.") }, n_cores = getOption("mc.cores", 1),
-  force_skip_centerFix = FALSE)
+ssvFetchSignal(
+  file_paths,
+  qgr,
+  unique_names = NULL,
+  names_variable = "sample",
+  win_size = 50,
+  win_method = c("sample", "summary")[1],
+  return_data.table = FALSE,
+  load_signal = function(f, nam, qgr) {     warning("nothing happened, ",
+    "supply a function to", "load_signal parameter.") },
+  n_cores = getOption("mc.cores", 1),
+  force_skip_centerFix = FALSE
+)
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from. Alternatively,

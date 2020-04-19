@@ -4,8 +4,13 @@
 \alias{prepare_fetch_GRanges}
 \title{prepares GRanges for windowed fetching.}
 \usage{
-prepare_fetch_GRanges(qgr, win_size, min_quantile = 0.75,
-  target_size = NULL, skip_centerFix = FALSE)
+prepare_fetch_GRanges(
+  qgr,
+  win_size,
+  min_quantile = 0.75,
+  target_size = NULL,
+  skip_centerFix = FALSE
+)
 }
 \arguments{
 \item{qgr}{GRanges to prepare}

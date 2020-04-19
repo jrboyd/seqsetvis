@@ -4,9 +4,14 @@
 \alias{viewGRangesWinSample_dt}
 \title{get a windowed sampling of score_gr}
 \usage{
-viewGRangesWinSample_dt(score_gr, qgr, window_size, attrib_var = "score",
-  fill_value = 0, anchor = c("center", "center_unstranded", "left",
-  "left_unstranded")[1])
+viewGRangesWinSample_dt(
+  score_gr,
+  qgr,
+  window_size,
+  attrib_var = "score",
+  fill_value = 0,
+  anchor = c("center", "center_unstranded", "left", "left_unstranded")[1]
+)
 }
 \arguments{
 \item{score_gr}{GRanges with a "score" metadata column.}

@@ -6,10 +6,15 @@
 heatmap is sorted by column left to right.
 change column order to reveal patterns}
 \usage{
-ssvFeatureBinaryHeatmap(object, raster_approximation = FALSE,
-  true_color = "black", false_color = "#EFEFEF",
-  raster_width_min = 1000, raster_height_min = 1000,
-  return_data = FALSE)
+ssvFeatureBinaryHeatmap(
+  object,
+  raster_approximation = FALSE,
+  true_color = "black",
+  false_color = "#EFEFEF",
+  raster_width_min = 1000,
+  raster_height_min = 1000,
+  return_data = FALSE
+)
 }
 \arguments{
 \item{object}{passed to ssvMakeMembTable}

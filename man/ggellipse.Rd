@@ -5,10 +5,19 @@
 \title{returns a ggplot with ellipses drawn using specified parameters
 used by ssvFeatureVenn and ssvFeatureEuler}
 \usage{
-ggellipse(xcentres, ycentres, r, r2 = r, phi = rep(0,
-  length(xcentres)), circle_colors = NULL,
-  group_names = LETTERS[seq_along(xcentres)], line_alpha = 1,
-  fill_alpha = 0.3, line_width = 2, n_points = 200)
+ggellipse(
+  xcentres,
+  ycentres,
+  r,
+  r2 = r,
+  phi = rep(0, length(xcentres)),
+  circle_colors = NULL,
+  group_names = LETTERS[seq_along(xcentres)],
+  line_alpha = 1,
+  fill_alpha = 0.3,
+  line_width = 2,
+  n_points = 200
+)
 }
 \arguments{
 \item{xcentres}{numeric x-coord of centers of ellipses}

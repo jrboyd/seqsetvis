@@ -7,10 +7,16 @@ and widths can vary in qgr, in contrast to
 \code{\link{viewGRangesWinSample_dt}} where width must be constant across
 regions.}
 \usage{
-viewGRangesWinSummary_dt(score_gr, qgr, n_tiles = 100,
-  attrib_var = "score", attrib_type = NULL, fill_value = 0,
-  anchor = c("center", "center_unstranded", "left",
-  "left_unstranded")[1], summary_FUN = stats::weighted.mean)
+viewGRangesWinSummary_dt(
+  score_gr,
+  qgr,
+  n_tiles = 100,
+  attrib_var = "score",
+  attrib_type = NULL,
+  fill_value = 0,
+  anchor = c("center", "center_unstranded", "left", "left_unstranded")[1],
+  summary_FUN = stats::weighted.mean
+)
 }
 \arguments{
 \item{score_gr}{GRanges with a "score" metadata column.}

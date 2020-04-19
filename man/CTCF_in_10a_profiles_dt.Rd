@@ -6,7 +6,9 @@
 \title{Profiles for 100 randomly selected regions from overlapping CTCF peaks in
 10a cell ChIP-seq
 Results from fetching bigwigs with CTCF_in_10a_overlaps_gr.}
-\format{A tidy data.table of 2100 rows and 9 columns}
+\format{
+A tidy data.table of 2100 rows and 9 columns
+}
 \description{
 A tidy data.table at window size 50 bp within 350 bp of peak center
  The variables are as follows:

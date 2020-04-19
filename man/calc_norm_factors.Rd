@@ -4,9 +4,15 @@
 \alias{calc_norm_factors}
 \title{calc_norm_factors}
 \usage{
-calc_norm_factors(full_dt, value_ = "y", cap_value_ = "y_cap_value",
-  by1 = "id", by2 = "sample", aggFUN1 = max, aggFUN2 = function(x)
-  quantile(x, 0.95))
+calc_norm_factors(
+  full_dt,
+  value_ = "y",
+  cap_value_ = "y_cap_value",
+  by1 = "id",
+  by2 = "sample",
+  aggFUN1 = max,
+  aggFUN2 = function(x) quantile(x, 0.95)
+)
 }
 \arguments{
 \item{full_dt}{a data.table, as returned by ssvFetch*(..., return_data.table.

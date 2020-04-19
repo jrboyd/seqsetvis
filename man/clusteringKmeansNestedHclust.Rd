@@ -6,8 +6,12 @@
 with order matched cluster assignments clusters are sorted using hclust on
 centers the contents of each cluster are sorted using hclust}
 \usage{
-clusteringKmeansNestedHclust(mat, nclust,
-  within_order_strategy = c("hclust", "sort")[2], seed = NULL)
+clusteringKmeansNestedHclust(
+  mat,
+  nclust,
+  within_order_strategy = c("hclust", "sort")[2],
+  seed = NULL
+)
 }
 \arguments{
 \item{mat}{A wide format matrix}

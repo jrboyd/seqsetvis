@@ -93,7 +93,7 @@ clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("
     stopifnot(within_order_strategy %in% c("hclust", "sort"))
     group = id = within_o = NULL#declare binding for data.table
     mat_dt = clusteringKmeans(mat, nclust)
-    mat_dt$within_o = as.integer(-1)
+    mat_dt$within_o = as.numeric(-1)
     for (i in seq_len(nclust)) {
         cmat = mat[mat_dt[group == i, id], , drop = FALSE]
         if(within_order_strategy == "hclust"){

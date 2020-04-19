@@ -6,13 +6,21 @@
 In contrast to ssvFetchBam, extension of reads to estimated fragment size is
 not an issue as each read pair represents a fragment of exact size.}
 \usage{
-ssvFetchBamPE.single(bam_f, qgr, win_size = 50,
+ssvFetchBamPE.single(
+  bam_f,
+  qgr,
+  win_size = 50,
   win_method = c("sample", "summary")[1],
-  summary_FUN = stats::weighted.mean, anchor = c("left",
-  "left_unstranded", "center", "center_unstranded")[3],
-  return_data.table = FALSE, max_dupes = Inf, min_isize = 1,
-  max_isize = Inf, return_unprocessed = FALSE,
-  force_skip_centerFix = FALSE, ...)
+  summary_FUN = stats::weighted.mean,
+  anchor = c("left", "left_unstranded", "center", "center_unstranded")[3],
+  return_data.table = FALSE,
+  max_dupes = Inf,
+  min_isize = 1,
+  max_isize = Inf,
+  return_unprocessed = FALSE,
+  force_skip_centerFix = FALSE,
+  ...
+)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}

@@ -4,7 +4,9 @@
 \name{chromHMM_demo_chain_url}
 \alias{chromHMM_demo_chain_url}
 \title{URL to download hg19ToHg38 liftover chain from UCSC}
-\format{a character containing a URL}
+\format{
+a character containing a URL
+}
 \description{
 URL to download hg19ToHg38 liftover chain from UCSC
 }

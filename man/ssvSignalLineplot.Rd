@@ -4,10 +4,20 @@
 \alias{ssvSignalLineplot}
 \title{construct line type plots where each region in each sample is represented}
 \usage{
-ssvSignalLineplot(bw_data, x_ = "x", y_ = "y", color_ = "sample",
-  sample_ = "sample", region_ = "id", group_ = "auto_grp",
-  line_alpha = 1, facet_ = "auto_facet", facet_method = facet_wrap,
-  spline_n = NULL, return_data = FALSE)
+ssvSignalLineplot(
+  bw_data,
+  x_ = "x",
+  y_ = "y",
+  color_ = "sample",
+  sample_ = "sample",
+  region_ = "id",
+  group_ = "auto_grp",
+  line_alpha = 1,
+  facet_ = "auto_facet",
+  facet_method = facet_wrap,
+  spline_n = NULL,
+  return_data = FALSE
+)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.

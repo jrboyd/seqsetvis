@@ -4,14 +4,24 @@
 \alias{ssvFetchBamPE}
 \title{ssvFetchBam for paired-end ChIP-seq files.}
 \usage{
-ssvFetchBamPE(file_paths, qgr, unique_names = NULL, win_size = 50,
+ssvFetchBamPE(
+  file_paths,
+  qgr,
+  unique_names = NULL,
+  win_size = 50,
   win_method = c("sample", "summary")[1],
-  summary_FUN = stats::weighted.mean, anchor = c("left",
-  "left_unstranded", "center", "center_unstranded")[3],
-  names_variable = "sample", return_data.table = FALSE,
-  max_dupes = Inf, n_cores = getOption("mc.cores", 1), min_isize = 1,
-  max_isize = Inf, return_unprocessed = FALSE,
-  force_skip_centerFix = FALSE, ...)
+  summary_FUN = stats::weighted.mean,
+  anchor = c("left", "left_unstranded", "center", "center_unstranded")[3],
+  names_variable = "sample",
+  return_data.table = FALSE,
+  max_dupes = Inf,
+  n_cores = getOption("mc.cores", 1),
+  min_isize = 1,
+  max_isize = Inf,
+  return_unprocessed = FALSE,
+  force_skip_centerFix = FALSE,
+  ...
+)
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from. Alternatively,

@@ -6,16 +6,26 @@
 \code{ssvFetchBam.single} on each.  Appends grouping variable to each
 resulting data.table and uses rbindlist to efficiently combine results}
 \usage{
-ssvFetchBam(file_paths, qgr, unique_names = NULL, win_size = 50,
+ssvFetchBam(
+  file_paths,
+  qgr,
+  unique_names = NULL,
+  win_size = 50,
   win_method = c("sample", "summary")[1],
-  summary_FUN = stats::weighted.mean, fragLens = "auto",
-  target_strand = c("*", "+", "-", "both")[1], flip_strand = FALSE,
-  anchor = c("left", "left_unstranded", "center",
-  "center_unstranded")[3], names_variable = "sample",
-  return_data.table = FALSE, max_dupes = Inf,
-  splice_strategy = c("none", "ignore", "add", "only",
-  "splice_count")[1], n_cores = getOption("mc.cores", 1),
-  return_unprocessed = FALSE, force_skip_centerFix = FALSE, ...)
+  summary_FUN = stats::weighted.mean,
+  fragLens = "auto",
+  target_strand = c("*", "+", "-", "both")[1],
+  flip_strand = FALSE,
+  anchor = c("left", "left_unstranded", "center", "center_unstranded")[3],
+  names_variable = "sample",
+  return_data.table = FALSE,
+  max_dupes = Inf,
+  splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1],
+  n_cores = getOption("mc.cores", 1),
+  return_unprocessed = FALSE,
+  force_skip_centerFix = FALSE,
+  ...
+)
 }
 \arguments{
 \item{file_paths}{character vector of file_paths to load from. Alternatively,

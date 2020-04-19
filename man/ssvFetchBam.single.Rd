@@ -4,14 +4,23 @@
 \alias{ssvFetchBam.single}
 \title{fetch a windowed version of a bam file, returns GRanges}
 \usage{
-ssvFetchBam.single(bam_f, qgr, win_size = 50, win_method = c("sample",
-  "summary")[1], summary_FUN = stats::weighted.mean, fragLen = NULL,
-  target_strand = c("*", "+", "-", "both")[1], anchor = c("left",
-  "left_unstranded", "center", "center_unstranded")[3],
-  return_data.table = FALSE, max_dupes = Inf,
-  splice_strategy = c("none", "ignore", "add", "only",
-  "splice_count")[1], flip_strand = FALSE, return_unprocessed = FALSE,
-  force_skip_centerFix = FALSE, ...)
+ssvFetchBam.single(
+  bam_f,
+  qgr,
+  win_size = 50,
+  win_method = c("sample", "summary")[1],
+  summary_FUN = stats::weighted.mean,
+  fragLen = NULL,
+  target_strand = c("*", "+", "-", "both")[1],
+  anchor = c("left", "left_unstranded", "center", "center_unstranded")[3],
+  return_data.table = FALSE,
+  max_dupes = Inf,
+  splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1],
+  flip_strand = FALSE,
+  return_unprocessed = FALSE,
+  force_skip_centerFix = FALSE,
+  ...
+)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}

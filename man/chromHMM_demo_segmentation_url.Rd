@@ -4,7 +4,9 @@
 \name{chromHMM_demo_segmentation_url}
 \alias{chromHMM_demo_segmentation_url}
 \title{URL to download hg19 MCF7 chromHMM segmentation}
-\format{a character containing a URL}
+\format{
+a character containing a URL
+}
 \description{
 URL to download hg19 MCF7 chromHMM segmentation
 }

@@ -5,7 +5,9 @@
 \alias{test_peaks}
 \title{4 random peaks for single-end data and 4 control regions 30kb downstream from
 each peak.}
-\format{GRanges length 8}
+\format{
+GRanges length 8
+}
 \description{
 matches \code{system.file("extdata/test_peaks.bam", package =
 "seqsetvis")}

@@ -5,10 +5,17 @@
 \title{fetch a bam file pileup with the ability to consider read extension to
 fragment size (fragLen)}
 \usage{
-fetchBam(bam_f, qgr, fragLen = NULL, target_strand = c("*", "+",
-  "-")[1], max_dupes = Inf, splice_strategy = c("none", "ignore",
-  "add", "only", "splice_count")[1], flip_strand = FALSE,
-  return_unprocessed = FALSE, ...)
+fetchBam(
+  bam_f,
+  qgr,
+  fragLen = NULL,
+  target_strand = c("*", "+", "-")[1],
+  max_dupes = Inf,
+  splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1],
+  flip_strand = FALSE,
+  return_unprocessed = FALSE,
+  ...
+)
 }
 \arguments{
 \item{bam_f}{character or BamFile to load}

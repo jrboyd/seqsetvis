@@ -4,7 +4,9 @@
 \name{chromHMM_demo_state_total_widths}
 \alias{chromHMM_demo_state_total_widths}
 \title{state name to total width mappings, hg38}
-\format{named numeric of total widths per state}
+\format{
+named numeric of total widths per state
+}
 \description{
 state name to total width mappings, hg38
 }

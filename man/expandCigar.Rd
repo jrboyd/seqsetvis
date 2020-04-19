@@ -4,8 +4,11 @@
 \alias{expandCigar}
 \title{Expand cigar codes to GRanges}
 \usage{
-expandCigar(cigar_dt, op_2count = c("M", "D", "=", "X"),
-  return_data.table = FALSE)
+expandCigar(
+  cigar_dt,
+  op_2count = c("M", "D", "=", "X"),
+  return_data.table = FALSE
+)
 }
 \arguments{
 \item{cigar_dt}{data.table with 5 required named columns in any order.

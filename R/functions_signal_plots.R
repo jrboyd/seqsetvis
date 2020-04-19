@@ -473,11 +473,13 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
 #' @param dcast_fill value to supply to dcast fill argument. default is NA.
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and
 #' is instead the data used to generate that plot. Default is FALSE.
+#' @param show_cluster_bars if TRUE, show bars indicating cluster membership.
 #' @import ggplot2
 #' @return ggplot heatmap of signal profiles, facetted by sample
 #' @examples
 #' #the simplest use
 #' ssvSignalHeatmap(CTCF_in_10a_profiles_gr)
+#' ssvSignalHeatmap(CTCF_in_10a_profiles_gr, show_cluster_bars = FALSE)
 #'
 #' #clustering can be done manually beforehand
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 3)
@@ -496,7 +498,8 @@ ssvSignalHeatmap = function(bw_data,
                             clustering_col_max = Inf,
                             within_order_strategy = c("hclust", "sort")[2],
                             dcast_fill = NA,
-                            return_data = FALSE){
+                            return_data = FALSE,
+                            show_cluster_bars = TRUE){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
     if(is(bw_data, "GRanges")){
         bw_data = data.table::as.data.table(bw_data)
@@ -554,6 +557,7 @@ ssvSignalHeatmap = function(bw_data,
 
     if(is.numeric(plot_dt[, get(column_)])){
         xs = sort(unique(as.numeric(plot_dt[, get(column_)])), decreasing = FALSE)
+        if(length(xs) == 1) xs = rep(xs, 2)
         xleft = min(xs) - (xs[2] - xs[1])/2
         xright = max(xs) + (xs[2] - xs[1])/2
         if(xleft < 0 & xright > 0){
@@ -575,12 +579,14 @@ ssvSignalHeatmap = function(bw_data,
     xfloor = min(xs) - .5 - xfactor/20
     xleft = xfloor - .12*xfactor
     xright = xfloor - .03*xfactor
+    if(show_cluster_bars){
+        p = add_cluster_annotation(p,
+                                   cluster_ids = rclust$cluster_id,
+                                   xleft = xleft,
+                                   xright = xright,
+                                   lowAtTop = TRUE)
+    }
 
-    p = add_cluster_annotation(p,
-                               cluster_ids = rclust$cluster_id,
-                               xleft = xleft,
-                               xright = xright,
-                               lowAtTop = TRUE)
     if(return_data){
         return(plot_dt)
     }

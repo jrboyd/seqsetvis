@@ -1,3 +1,8 @@
+# setsetvis 1.7.6
+
+* improvement - added show_cluster_bars arg to ssvSignalHeatmap to suppress cluster labelling.
+* improvement - added force_append arg to appen_ynorm to conveinently overwrite previous normalization,
+
 # seqsetvis 1.7.5
 
 * bugfix - update ssvSignalHeatmap for within_order_strategy compatibility

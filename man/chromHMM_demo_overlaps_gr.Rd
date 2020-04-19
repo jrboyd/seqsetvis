@@ -4,8 +4,10 @@
 \name{chromHMM_demo_overlaps_gr}
 \alias{chromHMM_demo_overlaps_gr}
 \title{overlap of MCF10A CTCF with MCF7 chromHMM states, hg38.}
-\format{a GRanges object of length 98
-with 10 logical metadata columns, 1 per state.}
+\format{
+a GRanges object of length 98
+with 10 logical metadata columns, 1 per state.
+}
 \description{
 overlap of MCF10A CTCF with MCF7 chromHMM states, hg38.
 }

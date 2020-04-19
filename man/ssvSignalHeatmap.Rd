@@ -5,12 +5,24 @@
 \title{heatmap style representation of membership table.
 instead of clustering, each column is sorted starting from the left.}
 \usage{
-ssvSignalHeatmap(bw_data, nclust = 6, perform_clustering = c("auto",
-  "yes", "no")[1], row_ = "id", column_ = "x", fill_ = "y",
-  facet_ = "sample", cluster_ = "cluster_id", max_rows = 500,
-  max_cols = 100, clustering_col_min = -Inf,
-  clustering_col_max = Inf, within_order_strategy = c("hclust",
-  "sort")[2], dcast_fill = NA, return_data = FALSE)
+ssvSignalHeatmap(
+  bw_data,
+  nclust = 6,
+  perform_clustering = c("auto", "yes", "no")[1],
+  row_ = "id",
+  column_ = "x",
+  fill_ = "y",
+  facet_ = "sample",
+  cluster_ = "cluster_id",
+  max_rows = 500,
+  max_cols = 100,
+  clustering_col_min = -Inf,
+  clustering_col_max = Inf,
+  within_order_strategy = c("hclust", "sort")[2],
+  dcast_fill = NA,
+  return_data = FALSE,
+  show_cluster_bars = TRUE
+)
 }
 \arguments{
 \item{bw_data}{a GRanges or data.table of bigwig signal.
@@ -47,6 +59,8 @@ rosSums.}
 
 \item{return_data}{logical.  If TRUE, return value is no longer ggplot and
 is instead the data used to generate that plot. Default is FALSE.}
+
+\item{show_cluster_bars}{if TRUE, show bars indicating cluster membership.}
 }
 \value{
 ggplot heatmap of signal profiles, facetted by sample
@@ -58,6 +72,7 @@ instead of clustering, each column is sorted starting from the left.
 \examples{
 #the simplest use
 ssvSignalHeatmap(CTCF_in_10a_profiles_gr)
+ssvSignalHeatmap(CTCF_in_10a_profiles_gr, show_cluster_bars = FALSE)
 
 #clustering can be done manually beforehand
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 3)

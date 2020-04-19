@@ -4,7 +4,9 @@
 \name{CTCF_in_10a_narrowPeak_grs}
 \alias{CTCF_in_10a_narrowPeak_grs}
 \title{list of GRanges that results in 100 random subset when overlapped}
-\format{named character vector of length 3}
+\format{
+named character vector of length 3
+}
 \description{
 list of GRanges that results in 100 random subset when overlapped
 }
