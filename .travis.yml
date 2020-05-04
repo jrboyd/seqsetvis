@@ -14,6 +14,9 @@ compiler:
 r_packages:
   - covr
 
+before_install:
+  - sudo apt-get -y install libgsl-dev
+
 after_success:
   - Rscript -e 'library(covr); codecov()'
   - Rscript -e 'sessionInfo()'
