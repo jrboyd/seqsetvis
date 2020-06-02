@@ -499,7 +499,7 @@ viewGRangesWinSummary_dt = function (score_gr,
 #' extends ranges to be contiguous
 #'
 #' @param score_dt data.table, GRanges() sufficient
-#' @param window_size numeric, window size used to generate socre_dt
+#' @param window_size numeric, window size used to generate score_dt
 #' @param anchor character, one of c("center", "center_unstranded",
 #' "left", "left_unstranded")
 #' @return score_dt with x values shifted appropriately and start and end
@@ -512,7 +512,12 @@ shift_anchor = function(score_dt, window_size, anchor) {
         center = {
             score_dt[, x := start - min(start) + shift, by = id]
             score_dt[, x := x - round(mean(x)), by = id]
-            score_dt[strand == "-", x := -1 * x]
+            if(window_size %% 2 == 0){
+                score_dt[strand == "-", x := -1 * x]
+            }else{
+                score_dt[strand == "-", x := -1 * x + 1]
+            }
+
         },
         center_unstranded = {
             score_dt[, x := start - min(start) + shift, by = id]
@@ -523,8 +528,10 @@ shift_anchor = function(score_dt, window_size, anchor) {
             score_dt[strand != "-", x := start - min(start) + shift,
                      by = id]
             #flip negative
+
             score_dt[strand == "-", x := -1 * (end - max(end) - shift),
                      by = id]
+
         },
         left_unstranded = {
             score_dt[, x := start - min(start) + shift, by = id]

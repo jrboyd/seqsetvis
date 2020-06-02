@@ -183,3 +183,104 @@ test_that("ssvFetchBigwig anchor - summary", {
     expect_gte(min(dt_uns$x), 0)
 })
 
+
+
+#bug target ssvFetchBam with stranded qgr and odd win_size causes inconsistent x values
+test_that("ssvFetchBam bugfix - stranded qgr and odd win_size causes inconsistent x values", {
+    view_size = 30
+    even_size = 10
+    odd_size = 5
+    strand(qgr) = c("-", "-", "+", "+", "-")
+    qgr = resize(qgr, view_size, fix = "center")
+    qdf = data.frame(file = bam_file, mark = "a")
+    res_even = ssvFetchBam(qdf, win_size = even_size, qgr = qgr, fragLens = NA,
+                           target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "+"
+    res_odd = ssvFetchBam(qdf, win_size = odd_size, qgr = qgr, fragLens = NA,
+                          target_strand = "both", return_data.table = TRUE)
+
+    expect_equal(view_size / even_size, length(unique(res_even$x)))
+    expect_equal(view_size / odd_size, length(unique(res_odd$x)))
+})
+
+test_that("bugfix - stranded qgr and odd win_size causes inconsistent x values - center(default)", {
+    view_size = 30
+    even_size = 10
+    odd_size = 5
+    strand(qgr) = c("-", "-", "+", "+", "-")
+    qgr = resize(qgr, view_size, fix = "center")
+    qdf = data.frame(file = bam_file, mark = "a")
+    res_even = ssvFetchBam(qdf, win_size = even_size, qgr = qgr, fragLens = NA,
+                           target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "+"
+    res_odd = ssvFetchBam(qdf, win_size = odd_size, qgr = qgr, fragLens = NA,
+                          target_strand = "both", return_data.table = TRUE)
+
+    expect_equal(view_size / even_size, length(unique(res_even$x)))
+    expect_equal(view_size / odd_size, length(unique(res_odd$x)))
+})
+
+test_that("bugfix - stranded qgr and odd win_size causes inconsistent x values - center(default) - summary", {
+    view_size = 30
+    even_size = 10
+    odd_size = 5
+    strand(qgr) = c("-", "-", "+", "+", "-")
+    qgr = resize(qgr, view_size, fix = "center")
+    qdf = data.frame(file = bam_file, mark = "a")
+    res_even = ssvFetchBam(qdf, win_size = even_size, qgr = qgr, fragLens = NA,
+                           win_method = "summary",
+                           target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "+"
+    res_odd = ssvFetchBam(qdf, win_size = odd_size, qgr = qgr, fragLens = NA,
+                          win_method = "summary",
+                          target_strand = "both", return_data.table = TRUE)
+
+    expect_equal(even_size, length(unique(res_even$x)))
+    expect_equal(odd_size, length(unique(res_odd$x)))
+})
+
+
+test_that("bugfix - stranded qgr and odd win_size causes inconsistent x values - left", {
+    view_size = 30
+    even_size = 10
+    odd_size = 5
+    strand(qgr) = c("-", "-", "+", "+", "-")
+    qgr = resize(qgr, view_size, fix = "center")
+    qdf = data.frame(file = bam_file, mark = "a")
+    res_even = ssvFetchBam(qdf, win_size = even_size, qgr = qgr,
+                           anchor = "left",
+                           fragLens = NA,
+                           target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "+"
+    res_odd = ssvFetchBam(qdf, win_size = odd_size, qgr = qgr,
+                          anchor = "left",
+                          fragLens = NA,
+                          target_strand = "both", return_data.table = TRUE)
+
+    expect_equal(view_size / even_size, length(unique(res_even$x)))
+    expect_equal(view_size / odd_size, length(unique(res_odd$x)))
+})
+
+test_that("bugfix - stranded qgr and odd win_size causes inconsistent x values - left - summary", {
+    view_size = 30
+    even_size = 10
+    odd_size = 5
+    strand(qgr) = c("-", "-", "+", "+", "-")
+    qgr = resize(qgr, view_size, fix = "center")
+    qdf = data.frame(file = bam_file, mark = "a")
+    res_even = ssvFetchBam(qdf, win_size = even_size, qgr = qgr,
+                           win_method = "summary",
+                           anchor = "left",
+                           fragLens = NA,
+                           target_strand = "both", return_data.table = TRUE)
+    # strand(qgr) = "+"
+    res_odd = ssvFetchBam(qdf, win_size = odd_size, qgr = qgr,
+                          win_method = "summary",
+                          anchor = "left",
+                          fragLens = NA,
+                          target_strand = "both", return_data.table = TRUE)
+
+    expect_equal(even_size, length(unique(res_even$x)))
+    expect_equal(odd_size, length(unique(res_odd$x)))
+})
+

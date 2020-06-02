@@ -1,3 +1,8 @@
+# setsetvis 1.9.1
+
+* bugfix - stranded qgr and odd win_size causes inconsistent x values
+
+
 # setsetvis 1.7.6
 
 * improvement - added show_cluster_bars arg to ssvSignalHeatmap to suppress cluster labelling.
