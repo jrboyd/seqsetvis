@@ -3,42 +3,44 @@
 
 #' signal loading framework
 #'
-#' Does nothing unless load_signal is overridden to carry out reading
-#' data from file_paths (likely via the appropriate ssvFetch* function,
-#' ie. \code{\link{ssvFetchBigwig}} or \code{\link{ssvFetchBam}}
+#' Does nothing unless load_signal is overridden to carry out reading data from
+#' file_paths (likely via the appropriate ssvFetch* function, ie.
+#' \code{\link{ssvFetchBigwig}} or \code{\link{ssvFetchBam}}
 #'
 #' @param file_paths character vector of file_paths to load from. Alternatively,
-#' file_paths can be a data.frame or data.table whose first column is a
-#' character vector of paths and additial columns will be used as metadata.
+#'   file_paths can be a data.frame or data.table whose first column is a
+#'   character vector of paths and additial columns will be used as metadata.
 #' @param qgr GRanges of intervals to return from each file
-#' @param unique_names unique file ids for each file in file_paths.  Default
-#' is names of file_paths vector
+#' @param unique_names unique file ids for each file in file_paths.  Default is
+#'   names of file_paths vector
 #' @param names_variable character, variable name for column containing
-#' unique_names entries.  Default is "sample"
+#'   unique_names entries.  Default is "sample"
 #' @param win_size numeric/integer window size resolution to load signal at.
-#' Default is 50.
-#' @param win_method character.  one of c("sample", "summary").  Determines
-#' if \code{\link{viewGRangesWinSample_dt}} or
-#' \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
-#' qgr.
+#'   Default is 50.
+#' @param win_method character.  one of c("sample", "summary").  Determines if
+#'   \code{\link{viewGRangesWinSample_dt}} or
+#'   \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
+#'   qgr.
 #' @param return_data.table logical. If TRUE data.table is returned instead of
-#' GRanges, the default.
+#'   GRanges, the default.
 #' @param load_signal function taking f, nam, and qgr arguments.  f is from
-#' file_paths, nam is from unique_names, and qgr is qgr. See details.
-#' @param n_cores integer number of cores to use.
-#' Uses mc.cores option if not supplied.
-#' @param force_skip_centerFix boolean, if TRUE all query ranges will be
-#' used "as is".  This is already the case by default if win_method == "summary"
-#' but may have applications where win_method == "sample".
+#'   file_paths, nam is from unique_names, and qgr is qgr. See details.
+#' @param n_cores integer number of cores to use. Uses mc.cores option if not
+#'   supplied.
+#' @param n_region_splits integer number of splits to apply to qgr. The query
+#'   GRanges will be split into this many roughly equal parts for increased
+#'   parallelization. Default is 1, no split.
+#' @param force_skip_centerFix boolean, if TRUE all query ranges will be used
+#'   "as is".  This is already the case by default if win_method == "summary"
+#'   but may have applications where win_method == "sample".
 #' @details load_signal is passed f, nam, and qgr and is executed in the
-#' environment where load_signal is defined. See
-#' \code{\link{ssvFetchBigwig}} and \code{\link{ssvFetchBam}}
-#'  for examples.
+#'   environment where load_signal is defined. See \code{\link{ssvFetchBigwig}}
+#'   and \code{\link{ssvFetchBam}} for examples.
 #' @return A GRanges with values read from file_paths at intervals of win_size.
-#' Originating file is coded by unique_names and assigned to column of name
-#' names_variable.  Output is data.table is return_data.table is TRUE.
+#'   Originating file is coded by unique_names and assigned to column of name
+#'   names_variable.  Output is data.table is return_data.table is TRUE.
 #' @export
-#' @import parallel
+#' @import pbmcapply
 #' @examples
 #' library(GenomicRanges)
 #' bam_f = system.file("extdata/test.bam",
@@ -72,6 +74,7 @@ ssvFetchSignal = function(file_paths,
                                       "load_signal parameter.")
                           },
                           n_cores = getOption("mc.cores", 1),
+                          n_region_splits = 1,
                           force_skip_centerFix = FALSE) {
     if (is.data.frame(file_paths) || is.data.table(file_paths)) {
         if (ncol(file_paths) == 1) {
@@ -130,13 +133,32 @@ ssvFetchSignal = function(file_paths,
                                 target_size = NULL,
                                 skip_centerFix = win_method != "sample" | force_skip_centerFix)
     #}
+    stopifnot(is.numeric(n_region_splits))
+    n_region_splits = round(n_region_splits)
+    stopifnot(n_region_splits >= 1)
 
-    nam_load_signal = function(nam) {
-        f = file_paths[nam]
-        load_signal(f, nam, qgr)
+    if(n_region_splits == 1){
+        nam_load_signal = function(nam) {
+            f = file_paths[nam]
+            load_signal(f, nam, qgr)
+        }
+        bw_list = pbmcapply::pbmclapply(unique_names,
+                                        nam_load_signal,
+                                        mc.cores = n_cores)
+    }else{
+        split_qgr = split(qgr, ceiling(seq_along(qgr)/length(qgr)*n_region_splits))
+        task_df = expand.grid(unique_names, seq_along(split_qgr))
+        rownames(task_df) = paste(task_df$Var1, task_df$Var2)
+        nam_load_signal = function(nam) {
+            f = file_paths[task_df[nam,]$Var1]
+            sub_qgr = split_qgr[task_df[nam,]$Var2]
+            load_signal(f, task_df[nam,]$Var1, sub_qgr)
+        }
+        bw_list = pbmcapply::pbmclapply(rownames(task_df),
+                                        nam_load_signal,
+                                        mc.cores = n_cores)
     }
-    bw_list = parallel::mclapply(unique_names,
-                                 nam_load_signal, mc.cores = n_cores)
+
     for (i in seq_along(bw_list)) {
         for (attrib in colnames(file_attribs)) {
             if(nrow(bw_list[[i]]) == 0){

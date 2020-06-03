@@ -15,6 +15,7 @@ ssvFetchSignal(
   load_signal = function(f, nam, qgr) {     warning("nothing happened, ",
     "supply a function to", "load_signal parameter.") },
   n_cores = getOption("mc.cores", 1),
+  n_region_splits = 1,
   force_skip_centerFix = FALSE
 )
 }
@@ -25,8 +26,8 @@ character vector of paths and additial columns will be used as metadata.}
 
 \item{qgr}{GRanges of intervals to return from each file}
 
-\item{unique_names}{unique file ids for each file in file_paths.  Default
-is names of file_paths vector}
+\item{unique_names}{unique file ids for each file in file_paths.  Default is
+names of file_paths vector}
 
 \item{names_variable}{character, variable name for column containing
 unique_names entries.  Default is "sample"}
@@ -34,8 +35,8 @@ unique_names entries.  Default is "sample"}
 \item{win_size}{numeric/integer window size resolution to load signal at.
 Default is 50.}
 
-\item{win_method}{character.  one of c("sample", "summary").  Determines
-if \code{\link{viewGRangesWinSample_dt}} or
+\item{win_method}{character.  one of c("sample", "summary").  Determines if
+\code{\link{viewGRangesWinSample_dt}} or
 \code{\link{viewGRangesWinSummary_dt}} is used to represent each region in
 qgr.}
 
@@ -45,28 +46,31 @@ GRanges, the default.}
 \item{load_signal}{function taking f, nam, and qgr arguments.  f is from
 file_paths, nam is from unique_names, and qgr is qgr. See details.}
 
-\item{n_cores}{integer number of cores to use.
-Uses mc.cores option if not supplied.}
+\item{n_cores}{integer number of cores to use. Uses mc.cores option if not
+supplied.}
 
-\item{force_skip_centerFix}{boolean, if TRUE all query ranges will be
-used "as is".  This is already the case by default if win_method == "summary"
+\item{n_region_splits}{integer number of splits to apply to qgr. The query
+GRanges will be split into this many roughly equal parts for increased
+parallelization. Default is 1, no split.}
+
+\item{force_skip_centerFix}{boolean, if TRUE all query ranges will be used
+"as is".  This is already the case by default if win_method == "summary"
 but may have applications where win_method == "sample".}
 }
 \value{
 A GRanges with values read from file_paths at intervals of win_size.
-Originating file is coded by unique_names and assigned to column of name
-names_variable.  Output is data.table is return_data.table is TRUE.
+  Originating file is coded by unique_names and assigned to column of name
+  names_variable.  Output is data.table is return_data.table is TRUE.
 }
 \description{
-Does nothing unless load_signal is overridden to carry out reading
-data from file_paths (likely via the appropriate ssvFetch* function,
-ie. \code{\link{ssvFetchBigwig}} or \code{\link{ssvFetchBam}}
+Does nothing unless load_signal is overridden to carry out reading data from
+file_paths (likely via the appropriate ssvFetch* function, ie.
+\code{\link{ssvFetchBigwig}} or \code{\link{ssvFetchBam}}
 }
 \details{
 load_signal is passed f, nam, and qgr and is executed in the
-environment where load_signal is defined. See
-\code{\link{ssvFetchBigwig}} and \code{\link{ssvFetchBam}}
- for examples.
+  environment where load_signal is defined. See \code{\link{ssvFetchBigwig}}
+  and \code{\link{ssvFetchBam}} for examples.
 }
 \examples{
 library(GenomicRanges)

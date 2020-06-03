@@ -10,7 +10,7 @@ shift_anchor(score_dt, window_size, anchor)
 \arguments{
 \item{score_dt}{data.table, GRanges() sufficient}
 
-\item{window_size}{numeric, window size used to generate socre_dt}
+\item{window_size}{numeric, window size used to generate score_dt}
 
 \item{anchor}{character, one of c("center", "center_unstranded",
 "left", "left_unstranded")}
