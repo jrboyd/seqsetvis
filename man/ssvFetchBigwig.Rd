@@ -17,6 +17,7 @@ ssvFetchBigwig(
   anchor = c("left", "left_unstranded", "center", "center_unstranded")[3],
   return_data.table = FALSE,
   n_cores = getOption("mc.cores", 1),
+  n_region_splits = 1,
   force_skip_centerFix = FALSE
 )
 }
@@ -52,6 +53,10 @@ returned instead of GRanges.  Default is FALSE.}
 
 \item{n_cores}{integer number of cores to use.
 Uses mc.cores option if not supplied.}
+
+\item{n_region_splits}{integer number of splits to apply to qgr. The query
+GRanges will be split into this many roughly equal parts for increased
+parallelization. Default is 1, no split.}
 
 \item{force_skip_centerFix}{boolean, if TRUE all query ranges will be
 used "as is".  This is already the case by default if win_method == "summary"

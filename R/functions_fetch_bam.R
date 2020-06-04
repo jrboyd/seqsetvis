@@ -28,6 +28,8 @@
 #' @param anchor character, one of c("center", "center_unstranded", "left",
 #'   "left_unstranded")
 #' @param names_variable The column name where unique_names are stored.
+#' @param file_attribs optional data.frame/data.table with one row per item in
+#' file paths.  Each column will be a variable added to final tidy output.
 #' @param return_data.table logical. If TRUE the internal data.table is returned
 #'   instead of GRanges.  Default is FALSE.
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
@@ -39,6 +41,9 @@
 #'   "only" will only count spliced regions and ignore others.
 #' @param n_cores integer number of cores to use.
 #' Uses mc.cores option if not supplied.
+#' @param n_region_splits integer number of splits to apply to qgr. The query
+#'   GRanges will be split into this many roughly equal parts for increased
+#'   parallelization. Default is 1, no split.
 #' @param return_unprocessed boolean. if TRUE returns read alignment in data.table. Default is FALSE.
 #' @param force_skip_centerFix boolean, if TRUE all query ranges will be
 #' used "as is".  This is already the case by default if win_method == "summary"
@@ -67,6 +72,8 @@
 ssvFetchBam = function(file_paths,
                        qgr,
                        unique_names = NULL,
+                       names_variable = "sample",
+                       file_attribs = NULL,
                        win_size = 50,
                        win_method = c("sample", "summary")[1],
                        summary_FUN = stats::weighted.mean,
@@ -75,12 +82,12 @@ ssvFetchBam = function(file_paths,
                        flip_strand = FALSE,
                        anchor = c("left", "left_unstranded", "center",
                                   "center_unstranded")[3],
-                       names_variable = "sample",
                        return_data.table = FALSE,
                        max_dupes = Inf,
                        splice_strategy = c("none", "ignore", "add",
                                            "only", "splice_count")[1],
                        n_cores = getOption("mc.cores", 1),
+                       n_region_splits = 1,
                        return_unprocessed = FALSE,
                        force_skip_centerFix = FALSE,
                        ...){
@@ -95,34 +102,33 @@ ssvFetchBam = function(file_paths,
         }else{
             fragLens = rep(fragLens[1], length(file_paths))
         }
-
     }
+    tmp = .get_file_attribs(file_paths, file_attribs)
+    file_paths = tmp$file_paths
+    file_attribs = tmp$file_attribs
+    remove(tmp)
+    unique_names = .get_unique_names(unique_names, file_paths, file_attribs, names_variable)
 
-    if (is.data.frame(file_paths) || is.data.table(file_paths)) {
-        if(is.null(colnames(file_paths))){
-            names(fragLens) = file_paths[[1]]
-        }else{
-            if(any(grepl("file", colnames(file_paths)))){
-                k = which(grepl("file", colnames(file_paths)))[1]
-                names(fragLens) = file_paths[[k]]
-            }else{
-                names(fragLens) = file_paths[[1]]
-            }
+    names(fragLens) = unique_names
+    names(file_paths) = unique_names
+
+    for(nam in unique_names){
+        if(!is.na(fragLens[nam]) && fragLens[nam] == "auto"){
+            fl = fragLen_calcStranded(file_paths[nam], qgr, flip_strand = flip_strand)
+            fragLens[nam] = fl
+            message("fragLen for ", basename(nam), " was calculated as: ", fl)
         }
-
-
-    }else{
-        names(fragLens) = file_paths
     }
-
+    fragLens = as.numeric(fragLens)
+    names(fragLens) = unique_names
 
     load_bam = function(f, nam, qgr) {
-        message("loading ", f, " ...")
+        message("loading ", nam, " ...")
         if(!file.exists(paste0(f, ".bai"))){
             warning("creating index for ", f)
             Rsamtools::indexBam(f)
         }
-        fl = fragLens[f]
+        fl = fragLens[nam]
         if(!is.na(fl))
             if(fl == "auto"){
                 fl = NULL
@@ -152,10 +158,12 @@ ssvFetchBam = function(file_paths,
                          load_signal = load_bam,
                          unique_names = unique_names,
                          names_variable = names_variable,
+                         file_attribs = file_attribs,
                          win_size = win_size,
                          win_method = win_method,
                          return_data.table = TRUE,
                          n_cores = n_cores,
+                         n_region_splits = n_region_splits,
                          force_skip_centerFix = force_skip_centerFix)
 
     if(flip_strand){

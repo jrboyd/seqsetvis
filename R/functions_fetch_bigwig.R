@@ -27,6 +27,9 @@
 #' returned instead of GRanges.  Default is FALSE.
 #' @param n_cores integer number of cores to use.
 #' Uses mc.cores option if not supplied.
+#' @param n_region_splits integer number of splits to apply to qgr. The query
+#'   GRanges will be split into this many roughly equal parts for increased
+#'   parallelization. Default is 1, no split.
 #' @param force_skip_centerFix boolean, if TRUE all query ranges will be
 #' used "as is".  This is already the case by default if win_method == "summary"
 #' but may have applications where win_method == "sample".
@@ -60,6 +63,7 @@ ssvFetchBigwig = function(file_paths,
                                      "center_unstranded")[3],
                           return_data.table = FALSE,
                           n_cores = getOption("mc.cores", 1),
+                          n_region_splits = 1,
                           force_skip_centerFix = FALSE) {
 
     load_bw = function(f, nam, qgr) {
@@ -86,6 +90,7 @@ ssvFetchBigwig = function(file_paths,
                    return_data.table = return_data.table,
                    load_signal = load_bw,
                    n_cores = n_cores,
+                   n_region_splits = n_region_splits,
                    force_skip_centerFix = force_skip_centerFix)
 }
 

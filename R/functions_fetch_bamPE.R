@@ -32,6 +32,9 @@
 #' @param max_dupes numeric >= 1.  duplicate reads by strandd start position
 #'   over this number are removed, Default is Inf.
 #' @param n_cores integer number of cores to use.
+#' @param n_region_splits integer number of splits to apply to qgr. The query
+#'   GRanges will be split into this many roughly equal parts for increased
+#'   parallelization. Default is 1, no split.
 #' @param min_isize integer. Read pairs must have an isize greater than or equal to this value.  Default is 1.
 #' @param max_isize integer. Read pairs must have an isize less than or equal to this value.  Default is Inf.
 #' @param return_unprocessed boolean. if TRUE returns read alignment in data.table. Default is FALSE.
@@ -73,6 +76,7 @@ ssvFetchBamPE = function(file_paths,
                          return_data.table = FALSE,
                          max_dupes = Inf,
                          n_cores = getOption("mc.cores", 1),
+                         n_region_splits = 1,
                          min_isize = 1,
                          max_isize = Inf,
                          return_unprocessed = FALSE,
@@ -112,6 +116,7 @@ ssvFetchBamPE = function(file_paths,
                          win_method = win_method,
                          return_data.table = TRUE,
                          n_cores = n_cores,
+                         n_region_splits = n_region_splits,
                          force_skip_centerFix = force_skip_centerFix)
 
 

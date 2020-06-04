@@ -193,6 +193,38 @@ test_that("ssvFetchBam summary method correct bins", {
     expect_true(all(width(gr_sample) %in% 167:170))
 })
 
+
+test_that("ssvFetchBam summary method correct bins", {
+    skip_on_os("windows")
+    test_qgr2 = qgr
+
+    ###invariant widths
+    gr_sample = ssvFetchBam(bam_file, win_size = 5,
+                            qgr = test_qgr2, win_method = "summary")
+    #for non-overlapping, all reduce granges width should be equal to input qgr
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    #for non-overlapping, all granges width should be equal to win_size
+    expect_true(all(width(gr_sample) == 500 / 5))
+
+    #same as above but individual widths now vary while total is unchanged
+    gr_sample = ssvFetchBam(bam_file, win_size = 3, qgr = test_qgr2, win_method = "summary")
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    expect_true(all(width(gr_sample) %in% 166:167))
+
+    ###varying widths
+    end(test_qgr2) = end(test_qgr2) + seq_along(test_qgr2)*2
+    gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_qgr2, win_method = "summary")
+    #for non-overlapping, all reduce granges width should be equal to input qgr
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    #for non-overlapping, all granges width should be equal to win_size
+    expect_true(all(width(gr_sample) %in% 100:102))
+
+    #same as above but individual widths now vary while total is unchanged
+    gr_sample = ssvFetchBam(bam_file, win_size = 3, qgr = test_qgr2, win_method = "summary")
+    expect_true(all(width(reduce(gr_sample)) == width(test_qgr2)))
+    expect_true(all(width(gr_sample) %in% 167:170))
+})
+
 test_that(".rm_dupes removes duplicates", {
     dt = data.table(which_label = 1:10, seqnames = "chr1", strand = c("+", "-"), start = 1:10, end = 1:10+10)
     dt[, width := end - start + 1]

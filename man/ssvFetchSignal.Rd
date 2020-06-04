@@ -9,6 +9,7 @@ ssvFetchSignal(
   qgr,
   unique_names = NULL,
   names_variable = "sample",
+  file_attribs = NULL,
   win_size = 50,
   win_method = c("sample", "summary")[1],
   return_data.table = FALSE,
@@ -31,6 +32,9 @@ names of file_paths vector}
 
 \item{names_variable}{character, variable name for column containing
 unique_names entries.  Default is "sample"}
+
+\item{file_attribs}{optional data.frame/data.table with one row per item in
+file paths.  Each column will be a variable added to final tidy output.}
 
 \item{win_size}{numeric/integer window size resolution to load signal at.
 Default is 50.}

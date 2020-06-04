@@ -10,6 +10,8 @@ ssvFetchBam(
   file_paths,
   qgr,
   unique_names = NULL,
+  names_variable = "sample",
+  file_attribs = NULL,
   win_size = 50,
   win_method = c("sample", "summary")[1],
   summary_FUN = stats::weighted.mean,
@@ -17,11 +19,11 @@ ssvFetchBam(
   target_strand = c("*", "+", "-", "both")[1],
   flip_strand = FALSE,
   anchor = c("left", "left_unstranded", "center", "center_unstranded")[3],
-  names_variable = "sample",
   return_data.table = FALSE,
   max_dupes = Inf,
   splice_strategy = c("none", "ignore", "add", "only", "splice_count")[1],
   n_cores = getOption("mc.cores", 1),
+  n_region_splits = 1,
   return_unprocessed = FALSE,
   force_skip_centerFix = FALSE,
   ...
@@ -37,6 +39,11 @@ interval should be identical and evenly divisible by \code{win_size}.}
 
 \item{unique_names}{names to use in final data.table to designate source
 bigwig. Default is 'sample'}
+
+\item{names_variable}{The column name where unique_names are stored.}
+
+\item{file_attribs}{optional data.frame/data.table with one row per item in
+file paths.  Each column will be a variable added to final tidy output.}
 
 \item{win_size}{The window size that evenly divides widths in \code{qgr}.}
 
@@ -60,8 +67,6 @@ of reads by strand.  Default of "*" combines both strands.}
 \item{anchor}{character, one of c("center", "center_unstranded", "left",
 "left_unstranded")}
 
-\item{names_variable}{The column name where unique_names are stored.}
-
 \item{return_data.table}{logical. If TRUE the internal data.table is returned
 instead of GRanges.  Default is FALSE.}
 
@@ -76,6 +81,10 @@ not count spliced regions.  add" counts spliced regions along with others,
 
 \item{n_cores}{integer number of cores to use.
 Uses mc.cores option if not supplied.}
+
+\item{n_region_splits}{integer number of splits to apply to qgr. The query
+GRanges will be split into this many roughly equal parts for increased
+parallelization. Default is 1, no split.}
 
 \item{return_unprocessed}{boolean. if TRUE returns read alignment in data.table. Default is FALSE.}
 

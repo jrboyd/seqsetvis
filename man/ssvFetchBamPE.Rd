@@ -16,6 +16,7 @@ ssvFetchBamPE(
   return_data.table = FALSE,
   max_dupes = Inf,
   n_cores = getOption("mc.cores", 1),
+  n_region_splits = 1,
   min_isize = 1,
   max_isize = Inf,
   return_unprocessed = FALSE,
@@ -56,6 +57,10 @@ instead of GRanges.  Default is FALSE.}
 over this number are removed, Default is Inf.}
 
 \item{n_cores}{integer number of cores to use.}
+
+\item{n_region_splits}{integer number of splits to apply to qgr. The query
+GRanges will be split into this many roughly equal parts for increased
+parallelization. Default is 1, no split.}
 
 \item{min_isize}{integer. Read pairs must have an isize greater than or equal to this value.  Default is 1.}
 

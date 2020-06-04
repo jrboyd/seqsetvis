@@ -15,6 +15,8 @@
 #'   names of file_paths vector
 #' @param names_variable character, variable name for column containing
 #'   unique_names entries.  Default is "sample"
+#' @param file_attribs optional data.frame/data.table with one row per item in
+#' file paths.  Each column will be a variable added to final tidy output.
 #' @param win_size numeric/integer window size resolution to load signal at.
 #'   Default is 50.
 #' @param win_method character.  one of c("sample", "summary").  Determines if
@@ -65,6 +67,7 @@ ssvFetchSignal = function(file_paths,
                           qgr,
                           unique_names = NULL,
                           names_variable = "sample",
+                          file_attribs = NULL,
                           win_size = 50,
                           win_method = c("sample", "summary")[1],
                           return_data.table = FALSE,
@@ -76,40 +79,15 @@ ssvFetchSignal = function(file_paths,
                           n_cores = getOption("mc.cores", 1),
                           n_region_splits = 1,
                           force_skip_centerFix = FALSE) {
-    if (is.data.frame(file_paths) || is.data.table(file_paths)) {
-        if (ncol(file_paths) == 1) {
-            file_attribs = data.frame(matrix(
-                0, nrow = nrow(file_paths), ncol = 0
-            ))
-        } else{
-            file_attribs = file_paths[,-1, drop = FALSE]
-        }
 
-        file_paths = file_paths[[1]]
 
-    } else{
-        #file_paths is assumed to be a character vector
-        file_attribs = data.frame(data.frame(matrix(
-            0, nrow = length(file_paths), ncol = 0
-        )))
-        file_attribs[[names_variable]] = unique_names
-    }
-    if (is.list(file_paths)) {
-        file_paths = unlist(file_paths)
-    }
-    if (is.factor(file_paths))
-        file_paths = as.character(file_paths)
-    if (is.null(unique_names)) {
-        if(!is.null(names(file_paths))){
-            unique_names = names(file_paths)
-        }else if(!is.null(file_attribs[[names_variable]])){
-            unique_names = file_attribs[[names_variable]]
-        }else{
-            unique_names = file_paths
-        }
-    }
-    if (is.factor(unique_names))
-        unique_names = as.character(unique_names)
+
+    tmp = .get_file_attribs(file_paths, file_attribs)
+    file_paths = tmp$file_paths
+    file_attribs = tmp$file_attribs
+    remove(tmp)
+    unique_names = .get_unique_names(unique_names, file_paths, file_attribs, names_variable)
+    file_attribs[[names_variable]] = unique_names
     if (is.null(file_attribs[[names_variable]])) {
         file_attribs[[names_variable]] = unique_names
     }
@@ -124,7 +102,10 @@ ssvFetchSignal = function(file_paths,
     if (any(duplicated(unique_names))) {
         stop("some unique_names are duplicated:\n",
              paste(collapse = "\n",
-                   unique(unique_names[duplicated(unique_names)])))
+                   unique(unique_names[duplicated(unique_names)])), "\n",
+             "If you haven't manually supplied uninque_names, this is derived from",
+             " file paths supplied.  \nTry supplying unique_names manually if you ",
+             "intended to load duplicate files.")
     }
     stopifnot(file.exists(file_paths))
     #if (win_method == "sample") {
@@ -133,6 +114,7 @@ ssvFetchSignal = function(file_paths,
                                 target_size = NULL,
                                 skip_centerFix = win_method != "sample" | force_skip_centerFix)
     #}
+    qgr = .check_qgr(qgr)
     stopifnot(is.numeric(n_region_splits))
     n_region_splits = round(n_region_splits)
     stopifnot(n_region_splits >= 1)
@@ -147,12 +129,15 @@ ssvFetchSignal = function(file_paths,
                                         mc.cores = n_cores)
     }else{
         split_qgr = split(qgr, ceiling(seq_along(qgr)/length(qgr)*n_region_splits))
-        task_df = expand.grid(unique_names, seq_along(split_qgr))
-        rownames(task_df) = paste(task_df$Var1, task_df$Var2)
+        file_attribs = file_attribs[rep(1:nrow(file_attribs), each = n_region_splits),, drop = FALSE]
+
+        task_df = expand.grid(seq_along(split_qgr), unique_names)
+        colnames(task_df) = c("region_var", "file_var")
+        rownames(task_df) = paste(task_df$file_var, task_df$region_var)
         nam_load_signal = function(nam) {
-            f = file_paths[task_df[nam,]$Var1]
-            sub_qgr = split_qgr[task_df[nam,]$Var2]
-            load_signal(f, task_df[nam,]$Var1, sub_qgr)
+            f = file_paths[task_df[nam,]$file_var]
+            sub_qgr = split_qgr[[task_df[nam,]$region_var]]
+            load_signal(f, task_df[nam,]$file_var, sub_qgr)
         }
         bw_list = pbmcapply::pbmclapply(rownames(task_df),
                                         nam_load_signal,
@@ -166,9 +151,7 @@ ssvFetchSignal = function(file_paths,
             }else{
                 bw_list[[i]][[attrib]] = file_attribs[[attrib]][i]
             }
-
         }
-
     }
     out = data.table::rbindlist(bw_list)
     if (!return_data.table) {
@@ -251,12 +234,12 @@ viewGRangesWinSample_dt = function(score_gr,
     stopifnot(is(score_gr, "GRanges"))
     stopifnot(!is.null(mcols(score_gr)[[attrib_var]]))
     stopifnot(is(qgr, "GRanges"))
+    if(is.null(qgr$id)) qgr = .check_qgr(qgr)
     stopifnot(is.numeric(window_size))
     stopifnot(window_size >= 1)
     stopifnot(window_size %% 1 == 0)
     stopifnot(anchor %in% c("center", "center_unstranded",
                             "left", "left_unstranded"))
-    qgr = .check_qgr(qgr)
     windows = slidingWindows(qgr, width = window_size, step = window_size)
 
     # names(windows) = qgr$id
@@ -366,12 +349,12 @@ viewGRangesWinSummary_dt = function (score_gr,
     stopifnot(is(score_gr, "GRanges"))
     stopifnot(!is.null(mcols(score_gr)[[attrib_var]]))
     stopifnot(is(qgr, "GRanges"))
+    if(is.null(qgr$id)) qgr = .check_qgr(qgr)
     stopifnot(is.numeric(n_tiles))
     stopifnot(n_tiles >= 1)
     stopifnot(n_tiles %% 1 == 0)
     stopifnot(anchor %in% c("center", "center_unstranded", "left",
                             "left_unstranded"))
-    qgr = .check_qgr(qgr)
     tiles = tile(qgr, n_tiles)
     # lapply(seq_len(tqgr), function(i)as.data.table(tqgr[[i]]))
 
@@ -656,4 +639,79 @@ quantileGRangesWidth = function(qgr,
     qwidth = quantile(width(qgr), min_quantile)
     fwidth = ceiling(qwidth / win_size) * win_size
     return(fwidth)
+}
+
+.get_file_attribs = function(file_paths, file_attribs){
+    if(is.null(file_attribs)){
+        if (is.data.frame(file_paths) || is.data.table(file_paths)) {
+            if (ncol(file_paths) == 1) {
+                file_attribs = data.frame(matrix(
+                    0, nrow = nrow(file_paths), ncol = 0
+                ))
+            } else{
+                k = which(grepl("file", colnames(file_paths)))[1]
+                if(is.na(k)) k = 1
+                file_attribs = file_paths[,-k, drop = FALSE]
+            }
+
+        } else{
+            #file_paths is assumed to be a character vector
+            file_attribs = data.frame(data.frame(matrix(
+                0, nrow = length(file_paths), ncol = 0
+            )))
+        }
+    }
+    if (is.data.frame(file_paths) || is.data.table(file_paths)) {
+        if(any(grepl("file", colnames(file_paths)))){
+            k = which(grepl("file", colnames(file_paths)))[1]
+            file_paths = file_paths[[k]]
+        }else{
+            file_paths = file_paths[[1]]
+        }
+    }
+
+    if (is.list(file_paths)) {
+        file_paths = unlist(file_paths)
+    }
+    if (is.factor(file_paths)){
+        file_paths = as.character(file_paths)
+    }
+    return(list(file_paths = file_paths, file_attribs = file_attribs))
+}
+
+.get_unique_names = function(unique_names, file_paths, file_attribs, names_variable){
+    if(is.null(unique_names)){
+        if(!is.null(file_attribs[[names_variable]])){
+            unique_names = file_attribs[[names_variable]]
+        }else if (is.data.frame(file_paths) || is.data.table(file_paths)) {
+            if(is.null(colnames(file_paths))){
+                unique_names = file_paths[[1]]
+            }else{
+                if(any(grepl("file", colnames(file_paths)))){
+                    k = which(grepl("file", colnames(file_paths)))[1]
+                    unique_names = file_paths[[k]]
+                }else{
+                    unique_names = file_paths[[1]]
+                }
+            }
+        }else{
+            if(is.null(names(file_paths))){
+                unique_names = file_paths
+            }else{
+                unique_names = names(file_paths)
+            }
+
+        }
+    }
+    if(any(duplicated(unique_names))){
+        stop("some unique_names are duplicated:\n",
+             paste(collapse = "\n",
+                   unique(unique_names[duplicated(unique_names)])), "\n",
+             "If you haven't manually supplied uninque_names, this is derived from",
+             " file paths supplied.  \nTry supplying unique_names manually if you ",
+             "intended to load duplicate files.")
+    }
+    if (is.factor(unique_names))
+        unique_names = as.character(unique_names)
+    unique_names
 }
