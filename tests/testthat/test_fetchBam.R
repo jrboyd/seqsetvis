@@ -412,3 +412,29 @@ test_that("ssvFetchBam sample target_strand of both - fragLens", {
     expect_equal(res_200[x == -248 & strand == "+"]$y, res_100[x == -248 & strand == "+"]$y)
     expect_equal(res_200[x == 247 & strand == "-"]$y, res_100[x == 247 & strand == "-"]$y)
 })
+
+test_that("ssvFetchBam file_paths as data.table", {
+    strand(qgr) = "*"
+    qdf = data.frame(file = bam_file, mark = "a")
+    res_qdf = ssvFetchBam(qdf, win_size = 5, qgr = qgr[1], fragLens = 100,
+                          target_strand = "both", return_data.table = TRUE)
+
+    qdt = as.data.table(qdf)
+    res_qdt = ssvFetchBam(qdt, win_size = 5, qgr = qgr[1], fragLens = 100,
+                          target_strand = "both", return_data.table = TRUE)
+
+    expect_equal(digest::digest(res_qdf), digest::digest(res_qdt))
+})
+
+test_that("ssvFetchBam file_attribs as data.table", {
+    strand(qgr) = "*"
+    qdf = data.frame(file = bam_file, mark = "a")
+    res_qdf = ssvFetchBam(qdf$file, file_attribs = qdf[,1, drop = FALSE], win_size = 5, qgr = qgr[1], fragLens = 100,
+                          target_strand = "both", return_data.table = TRUE)
+
+    qdt = as.data.table(qdf)
+    res_qdt = ssvFetchBam(qdt$file, file_attribs = qdt[,1], win_size = 5, qgr = qgr[1], fragLens = 100,
+                          target_strand = "both", return_data.table = TRUE)
+
+    expect_equal(digest::digest(res_qdf), digest::digest(res_qdt))
+})

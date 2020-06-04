@@ -642,8 +642,14 @@ quantileGRangesWidth = function(qgr,
 }
 
 .get_file_attribs = function(file_paths, file_attribs){
+    if(is.data.table(file_paths)){
+        file_paths = as.data.frame(file_paths)
+    }
+    if(is.data.table(file_attribs)){
+        file_attribs = as.data.frame(file_attribs)
+    }
     if(is.null(file_attribs)){
-        if (is.data.frame(file_paths) || is.data.table(file_paths)) {
+        if (is.data.frame(file_paths)) {
             if (ncol(file_paths) == 1) {
                 file_attribs = data.frame(matrix(
                     0, nrow = nrow(file_paths), ncol = 0
@@ -661,7 +667,7 @@ quantileGRangesWidth = function(qgr,
             )))
         }
     }
-    if (is.data.frame(file_paths) || is.data.table(file_paths)) {
+    if (is.data.frame(file_paths)) {
         if(any(grepl("file", colnames(file_paths)))){
             k = which(grepl("file", colnames(file_paths)))[1]
             file_paths = file_paths[[k]]
