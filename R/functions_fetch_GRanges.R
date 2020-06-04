@@ -67,9 +67,9 @@ ssvFetchGRanges = function(grs,
     if(!is.list(grs)){
         grs = list(grs)
     }
-    all_gr = all(sapply(grs, function(x){
+    all_gr = all(vapply(grs, function(x){
         "GRanges" %in% class(x)
-    }))
+    }, FUN.VALUE = TRUE))
     stopifnot(all_gr)
     if(is.null(unique_names)){
         unique_names = paste("regions", LETTERS[seq_along(grs)])

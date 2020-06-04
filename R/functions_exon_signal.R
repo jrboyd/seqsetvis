@@ -97,7 +97,7 @@ convert_collapsed_coord = function(genome_gr, x){
     }
     genome_gr
     red_gr = reduce(genome_gr)
-    xnew = sapply(x, function(xx){
+    xnew = vapply(x, function(xx){
         is_over = xx > end(red_gr)
         if(any(is_over)){
             is_in = max(which(is_over)) + 1
@@ -106,12 +106,12 @@ convert_collapsed_coord = function(genome_gr, x){
         }
 
         xx - start(red_gr)[is_in] + sum(width(red_gr[is_over])) + 1
-    })
+    }, FUN.VALUE = 1)
 
 
-    is_miss = sapply(x, function(xx){
+    is_miss = vapply(x, function(xx){
         !any(start(red_gr) <= xx & end(red_gr) >= xx)
-    })
+    }, FUN.VALUE = TRUE)
 
     xnew[is_miss] = NA
 
