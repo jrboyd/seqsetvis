@@ -116,6 +116,9 @@ ssvFetchSignal = function(file_paths,
     #}
     qgr = .check_qgr(qgr)
     stopifnot(is.numeric(n_region_splits))
+    if(n_region_splits > length(qgr)){
+        n_region_splits = length(qgr)
+    }
     n_region_splits = round(n_region_splits)
     stopifnot(n_region_splits >= 1)
 

@@ -1,3 +1,7 @@
+# setsetvis 1.9.4
+
+* bugfix - n_region_splits limited to length of qgr
+
 # setsetvis 1.9.3
 
 * new feature - improved parallelization by splitting up regions according to n_region_splits
