@@ -163,21 +163,18 @@ ssvFetchSignal = function(file_paths,
     return(out)
 }
 
-.check_qgr = function(qgr) {
-    if (!is.null(qgr$name) && is.null(names(qgr))) {
-        names(qgr) = qgr$name
-    }
-    if (is.null(qgr$id)) {
-        #id not set
-        if (is.null(names(qgr))) {
-            #id and names not set - make names
-            names(qgr) = paste0("region_", seq_along(qgr))
+.check_qgr = function(qgr){
+    if(is.null(qgr$id)){#need id
+        if (!is.null(qgr$name)) {
+            qgr$id = qgr$name
+        }else if (!is.null(names(qgr))) {
+            qgr$id = names(qgr)
+        }else{
+            qgr$id = paste0("region_", seq_along(qgr))
         }
-        qgr$id = names(qgr)#names is used for id
-    } else if (is.null(names(qgr))) {
-        #id is used for names if id set but not names
-        names(qgr) = qgr$id
     }
+    if(any(duplicated(qgr$id))) stop("qgr$id must be unique. qgr$id is either directly supplied or taken from qgr$name or names(qgr).")
+    names(qgr) = qgr$id
     qgr
 }
 

@@ -1,15 +1,21 @@
-# setsetvis 1.9.4
+# seqsetvis 1.9.5
+
+* bugfix - for stranded bam fetch, strand sensititvity lost when overlapping
+features have opposing strands.
+* improvement - error if qgr has duplicate names/ids
+
+# seqsetvis 1.9.4
 
 * bugfix - n_region_splits limited to length of qgr
 
-# setsetvis 1.9.3
+# seqsetvis 1.9.3
 
 * new feature - improved parallelization by splitting up regions according to n_region_splits
 * improvement - fragLen for bam file is now calculatd once per bam file prior to any region splitting.
 * bugfix - stranded qgr and odd win_size causes inconsistent x values
 * bugfix - ssvFetch* - file_paths and file_attribs as data.table causes error.
 
-# setsetvis 1.7.6
+# seqsetvis 1.7.6
 
 * improvement - added show_cluster_bars arg to ssvSignalHeatmap to suppress cluster labelling.
 * improvement - added force_append arg to appen_ynorm to conveinently overwrite previous normalization,

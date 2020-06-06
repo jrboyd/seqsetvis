@@ -166,7 +166,7 @@ test_that("ssvFetchBam sample method correct bins", {
 test_that("ssvFetchBam summary method correct bins", {
     skip_on_os("windows")
     test_qgr2 = qgr
-
+    width(test_qgr2)
     ###invariant widths
     gr_sample = ssvFetchBam(bam_file, win_size = 5, qgr = test_qgr2, win_method = "summary")
     #for non-overlapping, all reduce granges width should be equal to input qgr
@@ -437,3 +437,14 @@ test_that("ssvFetchBam file_attribs as data.table", {
                           target_strand = "both", return_data.table = TRUE)
     expect_equal(res_qdf, res_qdt)
 })
+
+# test_that("ssvFetchBam strand sensitivity for overlapping features on opposite strands", {
+#     this_qgr = qgr[rep(1, 2)]
+#     strand(this_qgr) = c("+", "-")
+#     this_qgr$id = seq_along(this_qgr)
+#     res_qdf = ssvFetchBam(bam_file, win_size = 5, qgr = this_qgr, fragLens = 100,
+#                           target_strand = "both", return_data.table = TRUE)
+#     ggplot(res_qdf, aes(x = x, y = y, color = strand)) +
+#         geom_path() +
+#         facet_wrap(~id)
+# })

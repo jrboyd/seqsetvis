@@ -262,70 +262,80 @@ ssvFetchBam.single = function(bam_f,
                         max_dupes, splice_strategy,
                         flip_strand = flip_strand, ...))
     }
-    switch (
-        win_method,
-        sample = {
-            qgr = prepare_fetch_GRanges(qgr, win_size, skip_centerFix = force_skip_centerFix)
-            if(target_strand == "both"){
-                pos_gr = fetchBam(bam_f, qgr, fragLen, "+",
-                                  max_dupes, splice_strategy,
-                                  flip_strand = flip_strand, ...)
-                neg_gr = fetchBam(bam_f, qgr, fragLen, "-",
-                                  max_dupes, splice_strategy,
-                                  flip_strand = flip_strand, ...)
-                pos_dt = viewGRangesWinSample_dt(pos_gr, qgr,
-                                                 win_size, anchor = anchor)
-                neg_dt = viewGRangesWinSample_dt(neg_gr, qgr,
-                                                 win_size, anchor = anchor)
-                pos_dt[, strand := "+"]
-                neg_dt[, strand := "-"]
-                out = rbind(
-                    pos_dt,
-                    neg_dt
-                )
-            }else{
-                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand,
-                                    max_dupes, splice_strategy,
-                                    flip_strand = flip_strand, ...)
-                out = viewGRangesWinSample_dt(score_gr, qgr,
-                                              win_size, anchor = anchor)
-                out[, strand := target_strand]
+
+    #splitting by qgr strand is necessary for strand sensitive fetch when
+    #features on opposing strands overlap
+    strands_TODO = unique(as.character(strand(qgr)))
+    out_l = list()
+    for(s in strands_TODO){
+        strand_qgr = subset(qgr, strand == s)
+        switch (
+            win_method,
+            sample = {
+                strand_qgr = prepare_fetch_GRanges(strand_qgr, win_size, skip_centerFix = force_skip_centerFix)
+                if(target_strand == "both"){
+                    pos_gr = fetchBam(bam_f, strand_qgr, fragLen, "+",
+                                      max_dupes, splice_strategy,
+                                      flip_strand = flip_strand, ...)
+                    neg_gr = fetchBam(bam_f, strand_qgr, fragLen, "-",
+                                      max_dupes, splice_strategy,
+                                      flip_strand = flip_strand, ...)
+                    pos_dt = viewGRangesWinSample_dt(pos_gr, strand_qgr,
+                                                     win_size, anchor = anchor)
+                    neg_dt = viewGRangesWinSample_dt(neg_gr, strand_qgr,
+                                                     win_size, anchor = anchor)
+                    pos_dt[, strand := "+"]
+                    neg_dt[, strand := "-"]
+                    out = rbind(
+                        pos_dt,
+                        neg_dt
+                    )
+                }else{
+                    score_gr = fetchBam(bam_f, strand_qgr, fragLen, target_strand,
+                                        max_dupes, splice_strategy,
+                                        flip_strand = flip_strand, ...)
+                    out = viewGRangesWinSample_dt(score_gr, strand_qgr,
+                                                  win_size, anchor = anchor)
+                    out[, strand := target_strand]
+                }
+
+
+            },
+            summary = {
+                if(target_strand == "both"){
+                    pos_gr = fetchBam(bam_f, strand_qgr, fragLen, "+",
+                                      max_dupes, splice_strategy,
+                                      flip_strand = flip_strand, ...)
+                    neg_gr = fetchBam(bam_f, strand_qgr, fragLen, "-",
+                                      max_dupes, splice_strategy,
+                                      flip_strand = flip_strand, ...)
+                    pos_dt = viewGRangesWinSummary_dt(pos_gr, strand_qgr, win_size,
+                                                      summary_FUN = summary_FUN,
+                                                      anchor = anchor)
+
+                    neg_dt = viewGRangesWinSummary_dt(neg_gr, strand_qgr, win_size,
+                                                      summary_FUN = summary_FUN,
+                                                      anchor = anchor)
+                    pos_dt[, strand := "+"]
+                    neg_dt[, strand := "-"]
+                    out = rbind(
+                        pos_dt,
+                        neg_dt
+                    )
+                }else{
+                    score_gr = fetchBam(bam_f, strand_qgr, fragLen, target_strand,
+                                        max_dupes, splice_strategy,
+                                        flip_strand = flip_strand, ...)
+                    out = viewGRangesWinSummary_dt(score_gr, strand_qgr, win_size,
+                                                   summary_FUN = summary_FUN,
+                                                   anchor = anchor)
+                    out[, strand := target_strand]
+                }
             }
-
-
-        },
-        summary = {
-            if(target_strand == "both"){
-                pos_gr = fetchBam(bam_f, qgr, fragLen, "+",
-                                  max_dupes, splice_strategy,
-                                  flip_strand = flip_strand, ...)
-                neg_gr = fetchBam(bam_f, qgr, fragLen, "-",
-                                  max_dupes, splice_strategy,
-                                  flip_strand = flip_strand, ...)
-                pos_dt = viewGRangesWinSummary_dt(pos_gr, qgr, win_size,
-                                                  summary_FUN = summary_FUN,
-                                                  anchor = anchor)
-
-                neg_dt = viewGRangesWinSummary_dt(neg_gr, qgr, win_size,
-                                                  summary_FUN = summary_FUN,
-                                                  anchor = anchor)
-                pos_dt[, strand := "+"]
-                neg_dt[, strand := "-"]
-                out = rbind(
-                    pos_dt,
-                    neg_dt
-                )
-            }else{
-                score_gr = fetchBam(bam_f, qgr, fragLen, target_strand,
-                                    max_dupes, splice_strategy,
-                                    flip_strand = flip_strand, ...)
-                out = viewGRangesWinSummary_dt(score_gr, qgr, win_size,
-                                               summary_FUN = summary_FUN,
-                                               anchor = anchor)
-                out[, strand := target_strand]
-            }
-        }
-    )
+        )
+        out_l[[s]] = out
+    }
+    out = rbindlist(out_l)
     # if(any(strand(qgr) == "-")){
     #     toflip = names(subset(qgr, strand == "-"))
     #     out[id %in% toflip & strand != "*", strand := ifelse(strand == "+", "-", "+")]
