@@ -417,7 +417,13 @@ fetchBam = function(bam_f,
         return(bam_dt)
     }
     bam_dt = bam_dt[!is.na(width)]
-    toflip = sub(":-", "", as.character(subset(qgr, strand == "-")))
+    #as.character for GRanges does a couple annoying things. for GRanges
+    #of width 1, end is omitted.  Appending strand also not desirable here.
+    # want chr1:17508106-17508106 not chr1:17508106:-
+    gr_as.character = function(gr){
+        paste0(seqnames(gr), ":", start(gr), "-", end(gr))
+    }
+    toflip = gr_as.character(subset(qgr, strand == "-"))
     if(target_strand %in% c("+", "-")){
         bam_dt = bam_dt[strand == target_strand & !(which_label %in% toflip) |
                             strand != target_strand & which_label %in% toflip]

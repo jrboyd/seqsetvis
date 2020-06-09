@@ -186,23 +186,6 @@ test_that("ssvFetchBigwig anchor - summary", {
 
 
 #bug target ssvFetchBam with stranded qgr and odd win_size causes inconsistent x values
-test_that("ssvFetchBam bugfix - stranded qgr and odd win_size causes inconsistent x values", {
-    view_size = 30
-    even_size = 10
-    odd_size = 5
-    strand(qgr) = c("-", "-", "+", "+", "-")
-    qgr = resize(qgr, view_size, fix = "center")
-    qdf = data.frame(file = bam_file, mark = "a")
-    res_even = ssvFetchBam(qdf, win_size = even_size, qgr = qgr, fragLens = NA,
-                           target_strand = "both", return_data.table = TRUE)
-    # strand(qgr) = "+"
-    res_odd = ssvFetchBam(qdf, win_size = odd_size, qgr = qgr, fragLens = NA,
-                          target_strand = "both", return_data.table = TRUE)
-
-    expect_equal(view_size / even_size, length(unique(res_even$x)))
-    expect_equal(view_size / odd_size, length(unique(res_odd$x)))
-})
-
 test_that("bugfix - stranded qgr and odd win_size causes inconsistent x values - center(default)", {
     view_size = 30
     even_size = 10
@@ -284,3 +267,37 @@ test_that("bugfix - stranded qgr and odd win_size causes inconsistent x values -
     expect_equal(odd_size, length(unique(res_odd$x)))
 })
 
+#
+test_that("ssvFetchBam bugfix - query GRanges size of 1 - loses strand sensitivity and x bounces around from 0 to 1", {
+    view_size.sm = 1
+    view_size.lg = 5
+    win_size = 1
+    strand(qgr) = c("-", "-", "+", "+", "+")
+
+
+
+    qdf = data.frame(file = bam_file, mark = "a")
+    qgr.sm = resize(qgr, view_size.sm, fix = "center")
+    res_small = ssvFetchBam(qdf, win_size = win_size,
+                            qgr = qgr.sm,
+                            fragLens = NA,
+                            target_strand = "+", return_data.table = TRUE)
+    # strand(qgr) = "+"
+    qgr.lg = resize(qgr, view_size.lg, fix = "center")
+    res_large = ssvFetchBam(qdf, win_size = win_size,
+                            qgr = qgr.lg,
+                            fragLens = NA,
+                            target_strand = "+", return_data.table = TRUE)
+
+
+    setequal(res_small[x == 0]$y,
+             res_large[x == 0]$y)
+
+    expect_setequal(res_small[x == 0]$y, res_large[x == 0]$y)
+
+    all(res_small[x == 0][order(strand)][order(x)]$y ==
+            res_large[x == 0][order(strand)][order(x)]$y)
+
+    expect_equal(res_small[x == 0][order(strand)][order(x)]$y,
+                 res_large[x == 0][order(strand)][order(x)]$y)
+})

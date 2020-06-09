@@ -127,9 +127,15 @@ ssvFetchSignal = function(file_paths,
             f = file_paths[nam]
             load_signal(f, nam, qgr)
         }
-        bw_list = pbmcapply::pbmclapply(unique_names,
-                                        nam_load_signal,
-                                        mc.cores = n_cores)
+        if(n_cores == 1){
+            bw_list = lapply(unique_names,
+                             nam_load_signal)
+        }else{
+            bw_list = pbmcapply::pbmclapply(unique_names,
+                                            nam_load_signal,
+                                            mc.cores = n_cores)
+        }
+
     }else{
         split_qgr = split(qgr, ceiling(seq_along(qgr)/length(qgr)*n_region_splits))
         file_attribs = file_attribs[rep(seq_len(nrow(file_attribs)), each = n_region_splits),, drop = FALSE]
@@ -142,9 +148,15 @@ ssvFetchSignal = function(file_paths,
             sub_qgr = split_qgr[[task_df[nam,]$region_var]]
             load_signal(f, task_df[nam,]$file_var, sub_qgr)
         }
-        bw_list = pbmcapply::pbmclapply(rownames(task_df),
-                                        nam_load_signal,
-                                        mc.cores = n_cores)
+        if(n_cores == 1){
+            bw_list = lapply(rownames(task_df),
+                                            nam_load_signal)
+        }else{
+            bw_list = pbmcapply::pbmclapply(rownames(task_df),
+                                            nam_load_signal,
+                                            mc.cores = n_cores)
+        }
+
     }
 
     for (i in seq_along(bw_list)) {
@@ -356,12 +368,6 @@ viewGRangesWinSummary_dt = function (score_gr,
     stopifnot(anchor %in% c("center", "center_unstranded", "left",
                             "left_unstranded"))
     tiles = tile(qgr, n_tiles)
-    # lapply(seq_len(tqgr), function(i)as.data.table(tqgr[[i]]))
-
-
-    # names(tiles) = qgr$id
-    # tile's handling of names seems to have changed and now every nest
-    # GRanges has  parent's name
     names(tiles) = NULL
     tiles = unlist(tiles)
     tiles$id = names(tiles)
@@ -512,6 +518,8 @@ viewGRangesWinSummary_dt = function (score_gr,
 shift_anchor = function(score_dt, window_size, anchor) {
     x = id = NULL
     shift = round(window_size / 2)
+    fudge = 1
+    if(window_size == 1) fudge = 0
     switch(
         anchor,
         center = {
@@ -520,7 +528,7 @@ shift_anchor = function(score_dt, window_size, anchor) {
             if(window_size %% 2 == 0){
                 score_dt[strand == "-", x := -1 * x]
             }else{
-                score_dt[strand == "-", x := -1 * x + 1]
+                score_dt[strand == "-", x := -1 * x + fudge]
             }
 
         },
