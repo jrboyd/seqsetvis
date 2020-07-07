@@ -4,11 +4,12 @@ Title: Set Based Visualizations for Next-Gen Sequencing Data
 Version: 1.9.6
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
-Description: seqsetvis enables the visualization and analysis of multiple 
-    genomic samples. Although seqsetvis was designed for the comparison of 
+Description: seqsetvis enables the visualization and analysis of sets of 
+    genomic sites in next gen sequencing data. 
+    Although seqsetvis was designed for the comparison of 
     mulitple ChIP-seq samples, this package is domain-agnostic and allows the 
     processing of multiple genomic coordinate files (bed-like files) and 
-    signal files (bigwig files or bam pileups).
+    signal files (bigwig files pileups from bam file).
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
