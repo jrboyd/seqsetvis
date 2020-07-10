@@ -224,5 +224,5 @@ test_that("ssvFetchBigwig single column data.table", {
                       win_size = 5,
                       return_data.table = TRUE,
                       win_method = "summary")
-    expect_equal(res$sample[1], test_bw)
+    expect_equal(levels(res$sample)[1], test_bw)
 })

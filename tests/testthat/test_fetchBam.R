@@ -346,7 +346,7 @@ test_that("ssvFetchBam single column data.table", {
                       win_size = 5, fragLens = 200,
                       target_strand = "both", return_data.table = TRUE,
                       win_method = "summary")
-    expect_equal(res$sample[1], bam_file)
+    expect_equal(levels(res$sample)[1], bam_file)
 })
 
 test_that("ssvFetchBam sample target_strand of both - fragLens", {

@@ -169,6 +169,7 @@ ssvFetchSignal = function(file_paths,
         }
     }
     out = data.table::rbindlist(bw_list)
+    out[[names_variable]] = factor(out[[names_variable]], levels = unique_names)
     if (!return_data.table) {
         out = GRanges(out)
     }
