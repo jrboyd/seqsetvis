@@ -719,7 +719,7 @@ quantileGRangesWidth = function(qgr,
         }
     }
     if (is.factor(unique_names)){
-        unique_names = levels(unique_names)
+        unique_names = levels(droplevels(unique_names))
     }
     if(any(duplicated(unique_names))){
         stop("some unique_names are duplicated:\n",

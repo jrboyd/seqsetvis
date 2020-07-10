@@ -1,4 +1,4 @@
-# seqsetvis 1.9.8
+# seqsetvis 1.9.9
 
 *bugfix - levels of unique_names was not being used in ssvFetch functions
 
