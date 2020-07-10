@@ -717,6 +717,9 @@ quantileGRangesWidth = function(qgr,
 
         }
     }
+    if (is.factor(unique_names)){
+        unique_names = levels(unique_names)
+    }
     if(any(duplicated(unique_names))){
         stop("some unique_names are duplicated:\n",
              paste(collapse = "\n",
@@ -725,7 +728,5 @@ quantileGRangesWidth = function(qgr,
              " file paths supplied.  \nTry supplying unique_names manually if you ",
              "intended to load duplicate files.")
     }
-    if (is.factor(unique_names))
-        unique_names = as.character(unique_names)
     unique_names
 }

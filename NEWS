@@ -1,3 +1,7 @@
+# seqsetvis 1.9.7
+
+*bugfix - levels of unique_names was not being used in ssvFetch functions
+
 # seqsetvis 1.9.5
 
 * bugfix - for stranded bam fetch, strand sensititvity lost when overlapping
