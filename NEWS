@@ -1,3 +1,7 @@
+#seqsetvis 1.9.10
+
+* new feature - easyLoad_seacr function for loading seacr output bed files.
+
 # seqsetvis 1.9.9
 
 *bugfix - levels of unique_names was not being used in ssvFetch functions
