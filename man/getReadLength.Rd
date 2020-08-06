@@ -21,3 +21,8 @@ determine the most common read length for input bam_file.  uses 50 randomly
 selected regions from query_gr.  If fewer than 20 reads are present, loads
 all of query_gr.
 }
+\examples{
+qgr = CTCF_in_10a_overlaps_gr[1:5]
+bam_file = system.file("extdata/test.bam", package = "seqsetvis", mustWork = TRUE)
+getReadLength(bam_file, qgr)
+}
