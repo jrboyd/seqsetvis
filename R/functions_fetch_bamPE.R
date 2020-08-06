@@ -280,8 +280,15 @@ fetchBamPE = function(bam_f,
         bam_dt = .rm_dupesPE(bam_dt, max_dupes)
     }
 
-    ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))
+    ext_cov = coverage(split(GRanges(bam_dt[!is.na(which_label)]), bam_dt$which_label))
     score_gr = GRanges(ext_cov)
+
+    if(length(score_gr) == 0){
+        score_gr = sbgr
+        mcols(score_gr) = NULL
+        score_gr$score = 0
+    }
+
     score_gr
 }
 
