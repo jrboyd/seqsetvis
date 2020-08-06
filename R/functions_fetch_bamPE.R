@@ -268,19 +268,31 @@ fetchBamPE = function(bam_f,
     bam_dt = bam_dt[isize >= min_isize & isize <= max_isize]
 
     #prepare for GRanges conversion
-    bam_dt = bam_dt[, list(
-        which_label,
-        seqnames = seqnames,
-        strand = "*",
-        start = start,
-        width = isize,
-        end = start + isize - 1L
-    )]
+    if(nrow(bam_dt) > 1){
+        bam_dt = bam_dt[, list(
+            which_label,
+            seqnames = seqnames,
+            strand = "*",
+            start = start,
+            width = isize,
+            end = start + isize - 1L
+        )]
+    }else{
+        bam_dt = bam_dt[, list(
+            which_label,
+            seqnames = seqnames,
+            strand = character(),
+            start = start,
+            width = isize,
+            end = start + isize - 1L
+        )]
+    }
+
     if(max_dupes < Inf){
         bam_dt = .rm_dupesPE(bam_dt, max_dupes)
     }
 
-    ext_cov = coverage(split(GRanges(bam_dt[!is.na(which_label)]), bam_dt$which_label))
+    ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))
     score_gr = GRanges(ext_cov)
 
     if(length(score_gr) == 0){
