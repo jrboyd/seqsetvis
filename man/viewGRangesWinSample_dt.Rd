@@ -48,13 +48,13 @@ comparison of peak widths can be made.
 Summarizes score_gr by grabbing value of "score" every window_size bp.
 Columns in output data.table are: standard GRanges columns: seqnames, start,
 end, width, strand id - matched to names(score_gr). if names(score_gr) is
-missing, added as 1:length(score_gr) y - value of score from score_gr x -
-relative bp position
+missing, added as 1:length(score_gr). y - value of score from score_gr. x -
+relative bp position.
 }
 \examples{
 bam_file = system.file("extdata/test.bam",
     package = "seqsetvis")
-qgr = CTCF_in_10a_overlaps_gr[1:5]
+qgr = CTCF_in_10a_overlaps_gr[seq_len(5)]
 qgr = GenomicRanges::resize(qgr, width = 500, fix = "center")
 bam_gr = seqsetvis:::fetchBam(bam_file, qgr)
 bam_dt = viewGRangesWinSample_dt(bam_gr, qgr, 50)

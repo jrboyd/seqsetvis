@@ -58,7 +58,7 @@ TADs.
 \details{
 Columns in output data.table are: standard GRanges columns: seqnames, start,
 end, width, strand id - matched to names(score_gr). if names(score_gr) is
-missing, added as 1:length(score_gr) y - value of score from score_gr x -
+missing, added as seq_along(score_gr). y - value of score from score_gr x -
 relative bp position
 }
 \examples{
