@@ -1,4 +1,4 @@
-testthat::context("CenterAtMax")
+testthat::context("CenterFixedSizeGRanges")
 library(seqsetvis)
 library(testthat)
 library(GenomicRanges)

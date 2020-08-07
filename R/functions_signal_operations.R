@@ -278,4 +278,37 @@ centerAtMax = function(dt,
     return(dt)
 }
 
+#' Centers query GRanges at maximum signal in prof_dt.
+#'
+#' @param prof_dt a GRanges or data.table as returned by ssvFetch*.
+#' @param qgr the GRanges used to query ssvFetch* as the qgr argument.
+#' @param x_ positional variable.  Should almost always be the default, "x".
+#' @param y_ the signal value variable.  Likely the default value of "y" but
+#'   could be "y_norm" if append_ynorm was applied to data.
+#' @param by_ region identifier variable. Should almost always be the default,
+#'   "id".
+#' @param width Desired width of final regions.  Default is 1.
+#'
+#' @return a GRanges with same mcols as qgr that has been centered based on
+#'   signal in prof_dt and with regions of specified width.
+#' @export
+#'
+#' @examples
+#' centerGRangesAtMax(CTCF_in_10a_profiles_dt, CTCF_in_10a_overlaps_gr)
+#' centerGRangesAtMax(CTCF_in_10a_profiles_gr, CTCF_in_10a_overlaps_gr)
+#'
+centerGRangesAtMax = function(prof_dt, qgr, x_ = "x", y_ = "y", by_ = "id", width = 1){
+    if(is(prof_dt, "GRanges")){
+        prof_dt = data.table::as.data.table(prof_dt)
+    }
+    cent_dt = centerAtMax(prof_dt, y_ = y_, by_ = by_, check_by_dupes = FALSE)
+    cent_dt = cent_dt[, .SD[which(x == min(abs(x)))[1],], list(id)]
+    cent_gr = GenomicRanges::GRanges(cent_dt[, list(seqnames, start = (start + end)/2, end = (start + end)/2)])
+    names(cent_gr) = cent_dt$id
 
+    qgr = .check_qgr(qgr)
+    GenomicRanges::strand(cent_gr) = GenomicRanges::strand(qgr[names(cent_gr)])
+    GenomicRanges::mcols(cent_gr) = GenomicRanges::mcols(qgr[names(cent_gr)])
+    cent_gr = cent_gr[names(qgr)]
+    GenomicRanges::resize(cent_gr, width, fix = "center")
+}
