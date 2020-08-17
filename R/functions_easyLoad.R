@@ -47,12 +47,10 @@ easyLoad_bed = function(file_paths,
     }else{
         grs = pbmcapply::pbmclapply(file_paths, function(f) {
             rtracklayer::import(f, format = "BED",
-                                extraCols = extraCols,
-                                mc.cores = n_cores)
-        })
+                                extraCols = extraCols)
+        },
+        mc.cores = n_cores)
     }
-
-
     grs
 }
 
