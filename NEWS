@@ -1,4 +1,8 @@
-#seqsetvis 1.9.11
+# seqsetvis 1.9.12
+
+* parallelization support for easyLoad_* via n_cores argument
+
+# seqsetvis 1.9.11
 
 * new feature - centerGrangesAtMax function for creating query GRanges centered
 at. signal maximum.

@@ -18,7 +18,8 @@
 #' easyLoad_bed(bed_f, "my_bed")
 easyLoad_bed = function(file_paths,
                         file_names = NULL,
-                        extraCols = character()) {
+                        extraCols = character(),
+                        n_cores = getOption("mc.cores", 1)) {
     if (is.factor(file_paths)) {
         file_paths = as.character(file_paths)
     }
@@ -38,10 +39,20 @@ easyLoad_bed = function(file_paths,
         stopifnot(length(file_paths) == length(file_names))
         names(file_paths) = file_names
     }
-    grs <- lapply(file_paths, function(f) {
-        rtracklayer::import(f, format = "BED",
-                            extraCols = extraCols)
-    })
+    if(n_cores == 1){
+        grs <- lapply(file_paths, function(f) {
+            rtracklayer::import(f, format = "BED",
+                                extraCols = extraCols)
+        })
+    }else{
+        grs = pbmcapply::pbmclapply(function(f) {
+            rtracklayer::import(f, format = "BED",
+                                extraCols = extraCols,
+                                mc.cores = n_cores)
+        })
+    }
+
+
     grs
 }
 
@@ -58,7 +69,7 @@ easyLoad_bed = function(file_paths,
 #' np_f = system.file("extdata/test_loading.narrowPeak",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_narrowPeak(np_f, "my_narrowPeak")
-easyLoad_narrowPeak = function(file_paths, file_names = NULL) {
+easyLoad_narrowPeak = function(file_paths, file_names = NULL, n_cores = getOption("mc.cores", 1)) {
     #from: https://charlesjb.github.io/How_to_import_narrowPeak/
     extraCols_narrowPeak <-
         c(
@@ -69,7 +80,8 @@ easyLoad_narrowPeak = function(file_paths, file_names = NULL) {
         )
     easyLoad_bed(file_paths = file_paths,
                  file_names = file_names,
-                 extraCols = extraCols_narrowPeak)
+                 extraCols = extraCols_narrowPeak,
+                 n_cores = n_cores)
 }
 
 #' easyLoad_broadPeak takes a character vector of file paths to narrowPeak
@@ -85,7 +97,7 @@ easyLoad_narrowPeak = function(file_paths, file_names = NULL) {
 #' bp_f = system.file("extdata/test_loading.broadPeak",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_broadPeak(bp_f, "my_broadPeak")
-easyLoad_broadPeak = function(file_paths, file_names = NULL) {
+easyLoad_broadPeak = function(file_paths, file_names = NULL, n_cores = getOption("mc.cores", 1)) {
     #from: https://charlesjb.github.io/How_to_import_narrowPeak/
     extraCols_broadPeak <-
         c(signalValue = "numeric",
@@ -93,7 +105,8 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL) {
           qValue = "numeric")
     easyLoad_bed(file_paths = file_paths,
                  file_names = file_names,
-                 extraCols = extraCols_broadPeak)
+                 extraCols = extraCols_broadPeak,
+                 n_cores = n_cores)
 }
 
 #' easyLoad_seacr takes a character vector of file paths to seacr output bed files and returns a named list of GRanges.
@@ -108,7 +121,7 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL) {
 #' bed_f = system.file("extdata/test_loading.seacr.bed",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_seacr(bed_f, "my_seacr")
-easyLoad_seacr = function(file_paths, file_names = NULL){
+easyLoad_seacr = function(file_paths, file_names = NULL, n_cores = getOption("mc.cores", 1)){
     extraCols_seacr = c(
         total_signal = "numeric",
         max_signal = "numeric",
@@ -116,5 +129,6 @@ easyLoad_seacr = function(file_paths, file_names = NULL){
     )
     easyLoad_bed(file_paths = file_paths,
                  file_names = file_names,
-                 extraCols = extraCols_seacr)
+                 extraCols = extraCols_seacr,
+                 n_cores = n_cores)
 }

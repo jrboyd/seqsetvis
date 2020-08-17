@@ -127,7 +127,7 @@ ssvFetchSignal = function(file_paths,
             f = file_paths[nam]
             load_signal(f, nam, qgr)
         }
-        if(n_cores == 1){
+        if(n_cores == 1 | length(unique_names) == 1){
             bw_list = lapply(unique_names,
                              nam_load_signal)
         }else{
@@ -150,7 +150,7 @@ ssvFetchSignal = function(file_paths,
         }
         if(n_cores == 1){
             bw_list = lapply(rownames(task_df),
-                                            nam_load_signal)
+                             nam_load_signal)
         }else{
             bw_list = pbmcapply::pbmclapply(rownames(task_df),
                                             nam_load_signal,
@@ -158,6 +158,7 @@ ssvFetchSignal = function(file_paths,
         }
 
     }
+
 
     for (i in seq_along(bw_list)) {
         for (attrib in colnames(file_attribs)) {

@@ -390,6 +390,7 @@ fetchBam = function(bam_f,
                                  "only", "splice_count")){
         stop('splice_strategy must be one of: "none", "ignore", "add", "only"')
     }
+    qgr = harmonize_seqlengths(qgr, bam_f)
     if(is.null(fragLen)){
         fragLen = fragLen_calcStranded(bam_f, qgr, flip_strand = flip_strand)
         message("fragLen was calculated as: ", fragLen)
