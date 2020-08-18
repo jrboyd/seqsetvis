@@ -6,7 +6,12 @@
 returning named list of GRanges.
 Mainly a utility function for loading MACS2 narrowPeak and broadPeak.}
 \usage{
-easyLoad_bed(file_paths, file_names = NULL, extraCols = character())
+easyLoad_bed(
+  file_paths,
+  file_names = NULL,
+  extraCols = character(),
+  n_cores = getOption("mc.cores", 1)
+)
 }
 \arguments{
 \item{file_paths}{character vector of paths to narrowPeak files.  If named,
@@ -17,6 +22,8 @@ will override any existing names for file_paths.  Default is NULL.}
 
 \item{extraCols}{named character vector of classes.  passed to
 rtracklayer::import for format = "BED". default is character().}
+
+\item{n_cores}{number of cores to use, uses mc.cores option if set or 1.}
 }
 \value{
 a named list of GRanges loaded from file_paths

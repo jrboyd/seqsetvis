@@ -5,7 +5,11 @@
 \title{easyLoad_narrowPeak takes a character vector of file paths to narrowPeak
 files from MACS2 and returns a named list of GRanges.}
 \usage{
-easyLoad_narrowPeak(file_paths, file_names = NULL)
+easyLoad_narrowPeak(
+  file_paths,
+  file_names = NULL,
+  n_cores = getOption("mc.cores", 1)
+)
 }
 \arguments{
 \item{file_paths}{character vector of paths to narrowPeak files.  If named,
@@ -13,6 +17,8 @@ those names will be used in output unless overriden by providing file_names.}
 
 \item{file_names}{character vector of names for output list.  If not NULL
 will override any existing names for file_paths.  Default is NULL.}
+
+\item{n_cores}{number of cores to use, uses mc.cores option if set or 1.}
 }
 \value{
 a named list of GRanges loaded from file_paths

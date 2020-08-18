@@ -1,4 +1,4 @@
-# seqsetvis 1.9.12
+# seqsetvis 1.9.13
 
 * parallelization support for easyLoad_* via n_cores argument
 

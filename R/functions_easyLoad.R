@@ -3,12 +3,14 @@
 #' easyLoad_bed takes a character vector of file paths to bed plus files and
 #' returning named list of GRanges.
 #' Mainly a utility function for loading MACS2 narrowPeak and broadPeak.
+#'
 #' @param file_paths character vector of paths to narrowPeak files.  If named,
 #' those names will be used in output unless overriden by providing file_names.
 #' @param file_names character vector of names for output list.  If not NULL
 #' will override any existing names for file_paths.  Default is NULL.
 #' @param extraCols named character vector of classes.  passed to
 #' rtracklayer::import for format = "BED". default is character().
+#' @param n_cores number of cores to use, uses mc.cores option if set or 1.
 #' @return a named list of GRanges loaded from file_paths
 #' @import rtracklayer
 #' @export
@@ -60,6 +62,7 @@ easyLoad_bed = function(file_paths,
 #' those names will be used in output unless overriden by providing file_names.
 #' @param file_names character vector of names for output list.  If not NULL
 #' will override any existing names for file_paths.  Default is NULL.
+#' @param n_cores number of cores to use, uses mc.cores option if set or 1.
 #' @return a named list of GRanges loaded from file_paths
 #' @import rtracklayer
 #' @export
@@ -67,7 +70,9 @@ easyLoad_bed = function(file_paths,
 #' np_f = system.file("extdata/test_loading.narrowPeak",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_narrowPeak(np_f, "my_narrowPeak")
-easyLoad_narrowPeak = function(file_paths, file_names = NULL, n_cores = getOption("mc.cores", 1)) {
+easyLoad_narrowPeak = function(file_paths,
+                               file_names = NULL,
+                               n_cores = getOption("mc.cores", 1)) {
     #from: https://charlesjb.github.io/How_to_import_narrowPeak/
     extraCols_narrowPeak <-
         c(
@@ -88,6 +93,7 @@ easyLoad_narrowPeak = function(file_paths, file_names = NULL, n_cores = getOptio
 #' those names will be used in output unless overriden by providing file_names.
 #' @param file_names character vector of names for output list.  If not NULL
 #' will override any existing names for file_paths.  Default is NULL.
+#' @param n_cores number of cores to use, uses mc.cores option if set or 1.
 #' @return a named list of GRanges loaded from file_paths
 #' @import rtracklayer
 #' @export
@@ -95,7 +101,9 @@ easyLoad_narrowPeak = function(file_paths, file_names = NULL, n_cores = getOptio
 #' bp_f = system.file("extdata/test_loading.broadPeak",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_broadPeak(bp_f, "my_broadPeak")
-easyLoad_broadPeak = function(file_paths, file_names = NULL, n_cores = getOption("mc.cores", 1)) {
+easyLoad_broadPeak = function(file_paths,
+                              file_names = NULL,
+                              n_cores = getOption("mc.cores", 1)) {
     #from: https://charlesjb.github.io/How_to_import_narrowPeak/
     extraCols_broadPeak <-
         c(signalValue = "numeric",
@@ -112,6 +120,7 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL, n_cores = getOption
 #' those names will be used in output unless overriden by providing file_names.
 #' @param file_names character vector of names for output list.  If not NULL
 #' will override any existing names for file_paths.  Default is NULL.
+#' @param n_cores number of cores to use, uses mc.cores option if set or 1.
 #' @return a named list of GRanges loaded from file_paths
 #' @import rtracklayer
 #' @export
@@ -119,7 +128,9 @@ easyLoad_broadPeak = function(file_paths, file_names = NULL, n_cores = getOption
 #' bed_f = system.file("extdata/test_loading.seacr.bed",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' easyLoad_seacr(bed_f, "my_seacr")
-easyLoad_seacr = function(file_paths, file_names = NULL, n_cores = getOption("mc.cores", 1)){
+easyLoad_seacr = function(file_paths,
+                          file_names = NULL,
+                          n_cores = getOption("mc.cores", 1)){
     extraCols_seacr = c(
         total_signal = "numeric",
         max_signal = "numeric",
