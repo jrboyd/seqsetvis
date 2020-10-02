@@ -44,3 +44,43 @@ test_that("ssvOverlapIntervalSets ext reduces number of results", {
     expect_equal(length(ol_ext1), 10)
     expect_equal(length(ol_ext10), 1)
 })
+
+
+#consensus
+test_that("ssvConsensusIntervalSets grs input are valid. single GR fails.", {
+  expect_error(ssvConsensusIntervalSets(gr_a))
+})
+
+test_that("ssvConsensusIntervalSets grs input are valid. single numeric fails.", {
+  expect_error(ssvConsensusIntervalSets(1))
+})
+
+test_that("ssvConsensusIntervalSets grs input are valid. GRangesList OK.", {
+  expect_s4_class(ssvConsensusIntervalSets(GRangesList("gr_a" = gr_a, "gr_b" = gr_b)), class = "GRanges")
+})
+
+test_that("ssvConsensusIntervalSets grs input are valid. List of GRanges OK.", {
+  expect_s4_class(ssvConsensusIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b)), class = "GRanges")
+})
+
+test_that("ssvConsensusIntervalSets grs input are valid. GRangesList OK.", {
+  expect_s4_class(ssvConsensusIntervalSets(GRangesList(list("gr_a" = gr_a, "gr_b" = gr_b))), class = "GRanges")
+})
+
+test_that("ssvConsensusIntervalSets grs input are valid. List of GRanges with non-matching mcols OK.", {
+  gr_amod = gr_a
+  gr_amod$score = "scored"
+  expect_s4_class(ssvConsensusIntervalSets(list("gr_a" = gr_amod, "gr_b" = gr_b)), class = "GRanges")
+})
+
+test_that("ssvConsensusIntervalSets useFirst.", {
+  ol = ssvConsensusIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b), min_number = 2)
+  expect_equal(length(ol), 3)
+})
+
+test_that("ssvConsensusIntervalSets ext reduces number of results", {
+  ol_ext1 = ssvConsensusIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b), ext = 1)
+  ol_ext10 = ssvConsensusIntervalSets(list("gr_a" = gr_a, "gr_b" = gr_b), ext = 10)
+  expect_equal(length(ol_ext1), 3)
+  expect_equal(length(ol_ext10), 1)
+})

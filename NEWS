@@ -1,3 +1,8 @@
+# seqsetvis 1.9.14
+
+* fetch_bam return_unprocessed now returns all bam fields (seq etc.)
+* new feature - ssvConsensusIntervalSets allows consensus style overlaps, ie. more than 3 of 10 regions must be present.
+
 # seqsetvis 1.9.13
 
 * parallelization support for easyLoad_* via n_cores argument

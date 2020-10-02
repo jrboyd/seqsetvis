@@ -254,7 +254,9 @@ ssvFetchBam.single = function(bam_f,
                             splice_strategy = "none",
                             return_unprocessed = return_unprocessed,
                             ...)
-        score_gr = merge(score_gr, data.table(which_label = as.character(qgr), id = qgr$name), by = "which_label")
+        tmp = qgr
+        strand(tmp) = "*"
+        score_gr = merge(score_gr, data.table(which_label = as.character(tmp), id = qgr$name), by = "which_label")
         return(score_gr)
     }
     if(splice_strategy == "splice_count"){
@@ -402,21 +404,40 @@ fetchBam = function(bam_f,
     }
     sbgr = qgr
     strand(sbgr) = "*"
-    sbParam = Rsamtools::ScanBamParam(
-        which = sbgr,
-        what = c("rname", "strand", "pos", "qwidth", "cigar"),
-        ...)
-    bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
-    bam_dt = lapply(bam_raw, function(x){
-        data.table(seqnames = x$rname, strand = x$strand,
-                   start = x$pos, width = x$qwidth, cigar = x$cigar)
-    })
-    bam_dt = data.table::rbindlist(bam_dt,
-                                   use.names = TRUE,
-                                   idcol = "which_label")
+
     if(return_unprocessed){
+        sbParam = Rsamtools::ScanBamParam(
+            which = sbgr,
+            what = Rsamtools::scanBamWhat(),
+            ...)
+        bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
+        bam_dt = lapply(bam_raw, function(x){
+            data.table(seqnames = x$rname, strand = x$strand,
+                       start = x$pos, width = x$qwidth, cigar = x$cigar,
+                       read_id = x$qname, flag = x$flag, mapq = x$mapq,
+                       mrnm = x$mrnm, mpos = x$mpos, isize = x$isize,
+                       seq = as.character(x$seq), qual = as.character(x$qual))
+        })
+        bam_dt = data.table::rbindlist(bam_dt,
+                                       use.names = TRUE,
+                                       idcol = "which_label")
         return(bam_dt)
+    }else{
+        sbParam = Rsamtools::ScanBamParam(
+            which = sbgr,
+            what = c("rname", "strand", "pos", "qwidth", "cigar"),
+            ...)
+        bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
+        bam_dt = lapply(bam_raw, function(x){
+            data.table(seqnames = x$rname, strand = x$strand,
+                       start = x$pos, width = x$qwidth, cigar = x$cigar)
+        })
+        bam_dt = data.table::rbindlist(bam_dt,
+                                       use.names = TRUE,
+                                       idcol = "which_label")
     }
+
+
     bam_dt = bam_dt[!is.na(width)]
     #as.character for GRanges does a couple annoying things. for GRanges
     #of width 1, end is omitted.  Appending strand also not desirable here.

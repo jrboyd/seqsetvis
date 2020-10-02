@@ -18,7 +18,7 @@ merge}
 first and add metadata logicals for others.}
 }
 \value{
-GRanges with metadata columns describing overlap of input grs
+GRanges with metadata columns describing overlap of input grs.
 }
 \description{
 Intersect a list of GRanges to create a single GRanges object of
