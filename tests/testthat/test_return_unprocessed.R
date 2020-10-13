@@ -38,7 +38,9 @@ test_that("ssvFetchBam - return_unprocessed", {
                          return_unprocessed = TRUE)
     expect_s3_class(raw_dt, "data.table")
     expect_setequal(colnames(raw_dt),
-                    c("which_label", 'seqnames', "strand", "start", "width", "cigar", "sample"))
+                    c("which_label", 'seqnames', "strand", "start", "width",
+                    "cigar", "read_id", "flag", "mapq", "mrnm", "mpos", "isize",
+                    "seq", "qual", "sample"))
 })
 
 test_that("ssvFetchBamPE - expandCigar", {
