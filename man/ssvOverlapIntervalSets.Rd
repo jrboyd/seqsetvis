@@ -5,7 +5,7 @@
 \title{Intersect a list of GRanges to create a single GRanges object of
 merged ranges including metadata describing overlaps per input GRanges}
 \usage{
-ssvOverlapIntervalSets(grs, ext = 0, use_first = FALSE)
+ssvOverlapIntervalSets(grs, ext = 0, use_first = FALSE, ...)
 }
 \arguments{
 \item{grs}{A list of GRanges}
@@ -16,6 +16,8 @@ merge}
 
 \item{use_first}{A logical.  If True, instead of merging all grs, only use
 first and add metadata logicals for others.}
+
+\item{...}{arguments passed to IRanges::findOverlaps, i.e. maxgap, minoverlap, type, select, invert.}
 }
 \value{
 GRanges with metadata columns describing overlap of input grs.

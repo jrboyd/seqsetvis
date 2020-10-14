@@ -8,6 +8,7 @@
 #' merge
 #' @param use_first A logical.  If True, instead of merging all grs, only use
 #' first and add metadata logicals for others.
+#' @param ... arguments passed to IRanges::findOverlaps, i.e. maxgap, minoverlap, type, select, invert.
 #' @return GRanges with metadata columns describing overlap of input grs.
 #' @examples
 #' library(GenomicRanges)
@@ -15,7 +16,7 @@
 #' b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
 #' ssvOverlapIntervalSets(list(a, b))
 #' @import GenomicRanges
-ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
+ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE, ...){
   queryHits = NULL
   if(is(grs, "GRangesList")){
     grs = as.list(grs)
@@ -42,18 +43,12 @@ ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
     for(i in seq_along(grs)){
       nam = names(grs)[i]
       mcols(base_gr)[[nam]] = FALSE
-      olaps = findOverlaps(base_gr, grs[[i]])
+      olaps = findOverlaps(base_gr, grs[[i]], ...)
       mcols(base_gr)[[nam]][queryHits(olaps)] = TRUE
     }
     if(use_first){
       base_gr$no_hit = apply(mcols(base_gr), 1, function(x)all(!x))
     }
-    # base_gr$group = "no_hit"
-    # for(i in rev(seq_along(grs))){
-    #   i_gr = grs[[i]]
-    #   olaps = findOverlaps(base_gr, i_gr)
-    #   base_gr[queryHits(olaps)]$group = names(grs)  [i]
-    # }
   })
   names(base_gr) = seq_along(base_gr)
   return(base_gr)
@@ -72,7 +67,7 @@ ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
 #'   grs that must overlap for a site to be considered consensus.
 #' @param min_fraction A numeric between 0 and 1 specifying the fraction of grs
 #'   that must overlap to be considered consensus.
-#'
+#' @param ... arguments passed to IRanges::findOverlaps, i.e. maxgap, minoverlap, type, select, invert.
 #' @details Only the most stringent of min_number or min_fraction will be
 #'   applied.
 #' @return GRanges with metadata columns describing consensus overlap of input
@@ -84,7 +79,7 @@ ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE){
 #' a = GRanges("chr1", IRanges(1:7*10, 1:7*10))
 #' b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
 #' ssvConsensusIntervalSets(list(a, b))
-ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction = .5){
+ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction = .5, ...){
   if(is(grs, "GRangesList")){
     grs = as.list(grs)
   }
@@ -119,7 +114,7 @@ ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction =
   grs_cov$score = NULL
   for(nam in names(grs)){
     gr = grs[[nam]]
-    olaps = findOverlaps(grs_cov, gr)
+    olaps = findOverlaps(grs_cov, gr, ...)
     mcols(grs_cov)[[nam]] = FALSE
     mcols(grs_cov)[[nam]][queryHits(olaps)] = TRUE
   }

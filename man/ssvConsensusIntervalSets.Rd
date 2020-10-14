@@ -2,31 +2,36 @@
 % Please edit documentation in R/overlapIntervalSets.R
 \name{ssvConsensusIntervalSets}
 \alias{ssvConsensusIntervalSets}
-\title{Intersect a list of GRanges to create a single GRanges object of
-merged ranges including metadata describing overlaps per input GRanges.}
+\title{Intersect a list of GRanges to create a single GRanges object of merged
+ranges including metadata describing overlaps per input GRanges.}
 \usage{
-ssvConsensusIntervalSets(grs, ext = 0, min_number = 2, min_fraction = 0.5)
+ssvConsensusIntervalSets(grs, ext = 0, min_number = 2, min_fraction = 0.5, ...)
 }
 \arguments{
 \item{grs}{A list of GRanges}
 
-\item{ext}{An integer specifying how far to extend ranges before merging.
-in effect, ranges withing 2*ext of one another will be joined during the
-merge}
+\item{ext}{An integer specifying how far to extend ranges before merging. in
+effect, ranges withing 2*ext of one another will be joined during the merge}
 
-\item{min_number}{An integer number specifying the absloute minimum of input grs that must overlap for a site to be considered consensus.}
+\item{min_number}{An integer number specifying the absloute minimum of input
+grs that must overlap for a site to be considered consensus.}
 
-\item{min_fraction}{A numeric between 0 and 1 specifying the fraction of grs that must overlap to be considered consensus.}
+\item{min_fraction}{A numeric between 0 and 1 specifying the fraction of grs
+that must overlap to be considered consensus.}
+
+\item{...}{arguments passed to IRanges::findOverlaps, i.e. maxgap, minoverlap, type, select, invert.}
 }
 \value{
-GRanges with metadata columns describing consensus overlap of input grs.
+GRanges with metadata columns describing consensus overlap of input
+  grs.
 }
 \description{
 In constrast to ssvOverlapIntervalSets, only regions where a consensus of
 input grs are present are preserved and annotated.
 }
 \details{
-Only the most stringent of min_number or min_fraction will be applied.
+Only the most stringent of min_number or min_fraction will be
+  applied.
 }
 \examples{
 library(GenomicRanges)
