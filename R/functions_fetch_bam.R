@@ -166,11 +166,11 @@ ssvFetchBam = function(file_paths,
                          n_region_splits = n_region_splits,
                          force_skip_centerFix = force_skip_centerFix)
 
-    if(flip_strand){
-        if(target_strand != "*"){
-            bdt[, strand := ifelse(strand == "+", "-", "+")]
-        }
-    }
+    # if(flip_strand){
+    #     if(target_strand != "*"){
+    #         bdt[, strand := ifelse(strand == "+", "-", "+")]
+    #     }
+    # }
 
     if(!return_data.table & !return_unprocessed){
         bdt = GRanges(bdt)
@@ -447,8 +447,14 @@ fetchBam = function(bam_f,
     }
     toflip = gr_as.character(subset(qgr, strand == "-"))
     if(target_strand %in% c("+", "-")){
-        bam_dt = bam_dt[strand == target_strand & !(which_label %in% toflip) |
-                            strand != target_strand & which_label %in% toflip]
+        if(!flip_strand){
+            bam_dt = bam_dt[strand == target_strand & !(which_label %in% toflip) |
+                                strand != target_strand & which_label %in% toflip]
+        }else{
+            bam_dt = bam_dt[strand != target_strand & !(which_label %in% toflip) |
+                                strand == target_strand & which_label %in% toflip]
+        }
+
     }
 
     bam_dt[, end := start + width - 1L]

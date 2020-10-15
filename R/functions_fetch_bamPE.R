@@ -1,4 +1,5 @@
 #' ssvFetchBam for paired-end ChIP-seq files.
+#' Only concordant reads are considered, but this has been minimally tested, please verify.
 #'
 #' Iterates a character vector (ideally named) and calls
 #' \code{ssvFetchBamPE.single} on each.  Appends grouping variable to each

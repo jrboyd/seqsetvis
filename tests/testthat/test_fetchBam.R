@@ -251,7 +251,8 @@ test_that("ssvFetchBam removes duplicates if max_dupes set", {
     expect_true(all(!rFull < r1))
 })
 
-test_that("ssvFetchBam strand of qgr doesn't matter", {
+test_that("ssvFetchBam strand of qgr does matter", {
+    # * == + and * == rev(-)
     qres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr[1], fragLens = 200)
     pgr = qgr
     strand(pgr) = "+"
@@ -263,7 +264,7 @@ test_that("ssvFetchBam strand of qgr doesn't matter", {
     expect_equal(nres$y,  rev(qres$y))
 })
 
-test_that("ssvFetchBam strand of targt_strand does matter", {
+test_that("ssvFetchBam strand of target_strand does matter", {
     strand(qgr) = "*"
     qres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "*")
     pres = ssvFetchBam(bam_file, win_size = 5, qgr = qgr, fragLens = 200, target_strand = "+")
@@ -438,13 +439,64 @@ test_that("ssvFetchBam file_attribs as data.table", {
     expect_equal(res_qdf, res_qdt)
 })
 
-# test_that("ssvFetchBam strand sensitivity for overlapping features on opposite strands", {
-#     this_qgr = qgr[rep(1, 2)]
-#     strand(this_qgr) = c("+", "-")
-#     this_qgr$id = seq_along(this_qgr)
-#     res_qdf = ssvFetchBam(bam_file, win_size = 5, qgr = this_qgr, fragLens = 100,
-#                           target_strand = "both", return_data.table = TRUE)
-#     ggplot(res_qdf, aes(x = x, y = y, color = strand)) +
-#         geom_path() +
-#         facet_wrap(~id)
-# })
+
+
+test_that("ssvFetchBam strand sensitivity for overlapping features on opposite strands", {
+    this_qgr = qgr[rep(1, 2)]
+    strand(this_qgr) = c("+", "-")
+    this_qgr$id = seq_along(this_qgr)
+    res_qdf = ssvFetchBam(bam_file, win_size = 5, qgr = this_qgr, fragLens = 100,
+                          target_strand = "both", return_data.table = TRUE)
+    # ggplot(res_qdf, aes(x = x, y = y, color = strand)) +
+    #     geom_path() +
+    #     facet_wrap(~id)
+
+    expect_equal(res_qdf[strand == "+"]$y, rev(res_qdf[strand == "-"]$y))
+})
+
+test_that("ssvFetchBam (target_strand '+', flip_strand TRUE) === (taget_strand '-', flip_strand FALSE", {
+    this_qgr = qgr
+    strand(this_qgr) = c("+", "+", "+", "+", "-")
+    this_qgr = this_qgr[c(1, 4)]
+    this_qgr$id = seq_along(this_qgr)
+    res_both = ssvFetchBam(bam_file, win_size = 5, qgr = this_qgr, fragLens = 100,
+                             target_strand = "both", flip_strand = FALSE,
+                             return_data.table = TRUE)
+
+    res_flip = ssvFetchBam(bam_file, win_size = 5, qgr = this_qgr, fragLens = 100,
+                           target_strand = "+", flip_strand = TRUE,
+                           return_data.table = TRUE)
+
+    res_unflip = ssvFetchBam(bam_file, win_size = 5, qgr = this_qgr, fragLens = 100,
+                           target_strand = "-", flip_strand = FALSE,
+                           return_data.table = TRUE)
+
+    res_flip_inv = ssvFetchBam(bam_file, win_size = 5, qgr = this_qgr, fragLens = 100,
+                           target_strand = "-", flip_strand = TRUE,
+                           return_data.table = TRUE)
+
+    res_unflip_inv = ssvFetchBam(bam_file, win_size = 5, qgr = this_qgr, fragLens = 100,
+                             target_strand = "+", flip_strand = FALSE,
+                             return_data.table = TRUE)
+
+    # ggplot() +
+    #     geom_path(data = res_both, aes(x = x, y = y, group = paste(strand, id), color = strand)) +
+    #     geom_path(data = res_flip, aes(x = x, y = y-2, group = id), color = "red") +
+    #     geom_path(data = res_unflip, aes(x = x, y = y-4, group = id), color = "blue") +
+    #     geom_path(data = res_flip_inv, aes(x = x, y = y-6, group = id), color = "orange") +
+    #     geom_path(data = res_unflip_inv, aes(x = x, y = y-8, group = id), color = "green") +
+    #     facet_wrap(~id)
+
+    expect_equal(unique(as.character(res_flip$strand)), "+")
+    expect_equal(unique(as.character(res_unflip$strand)), "-")
+    expect_equal(unique(as.character(res_flip_inv$strand)), "-")
+    expect_equal(unique(as.character(res_unflip_inv$strand)), "+")
+
+    mismatch_val = sum(abs(res_flip$y - res_flip_inv$y))
+    match_val = sum(abs(res_flip$y - res_unflip$y))
+    expect_lt(match_val, mismatch_val*.1)
+
+    mismatch_val2 = sum(abs(res_unflip$y - res_unflip_inv$y))
+    match_val2 = sum(abs(res_flip_inv$y - res_unflip_inv$y))
+    expect_lt(match_val2, mismatch_val2*.1)
+})

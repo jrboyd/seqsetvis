@@ -1,3 +1,11 @@
+# seqsetvis 1.9.17
+
+* bugfix - resolved unexpected strand behavior with flip_strand and target_strand interaction in ssvFetchBam.
+
+# seqsetvis 1.9.16
+
+* improvement - ssvConsensusIntervalSets and ssvOverlapIntervalSets now pass ... params to findOverlaps.
+
 # seqsetvis 1.9.15
 
 * fetch_bam return_unprocessed now returns all bam fields (seq etc.)

@@ -2,7 +2,8 @@
 % Please edit documentation in R/functions_fetch_bamPE.R
 \name{ssvFetchBamPE}
 \alias{ssvFetchBamPE}
-\title{ssvFetchBam for paired-end ChIP-seq files.}
+\title{ssvFetchBam for paired-end ChIP-seq files.
+Only concordant reads are considered, but this has been minimally tested, please verify.}
 \usage{
 ssvFetchBamPE(
   file_paths,
