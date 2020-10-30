@@ -109,7 +109,7 @@ test_that("ssvFetchBam strand flipping fragLen", {
     # ggplot(rbind(test_res, flip_res), aes(x = x, y = y, color = strand)) + geom_path() + facet_wrap("group", ncol = 1)
     test_cor = cor(dcast(test_res, "x~strand", value.var = "y")[,-1])[1,2]
     flip_cor = cor(dcast(flip_res, "x~strand", value.var = "y")[,-1])[1,2]
-    expect_true(test_cor - flip_cor > 1)
+    expect_true(abs(test_cor - flip_cor) < .1)
 
     expect_false(all(test_res$y == rev(flip_res$y)))
 })

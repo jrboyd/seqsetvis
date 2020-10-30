@@ -189,7 +189,7 @@ ssvFetchBamPE.single = function(bam_f,
                               max_isize,
                               return_unprocessed = return_unprocessed,
                               ...)
-        score_gr = merge(score_gr, data.table(which_label = as.character(qgr), id = qgr$name), by = "which_label")
+        score_gr = merge(score_gr, data.table(which_label = as.character(qgr), id = names(qgr)), by = "which_label")
         return(score_gr)
     }
     switch (

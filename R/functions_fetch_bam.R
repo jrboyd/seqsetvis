@@ -36,7 +36,7 @@
 #'   over this number are removed, Default is Inf.
 #' @param splice_strategy character, one of c("none", "ignore", "add", "only",
 #'   "splice_count"). Default is "none" and spliced alignment are asssumed not
-#'   present. fragLen must be NA for any other value to be valid.  "ignore" will
+#'   present. fragLen will be forced to be NA for any other value.  "ignore" will
 #'   not count spliced regions.  add" counts spliced regions along with others,
 #'   "only" will only count spliced regions and ignore others.
 #' @param n_cores integer number of cores to use.
@@ -96,6 +96,7 @@ ssvFetchBam = function(file_paths,
                       is.na(fragLens)))
     exp_fragLen = ifelse(is.data.frame(file_paths) || is.data.table(file_paths), nrow(file_paths), length(file_paths))
     stopifnot(length(fragLens) == 1 || length(fragLens) == exp_fragLen)
+    if(splice_strategy != "none") fragLens = NA
     if(length(fragLens) == 1){
         if (is.data.frame(file_paths) || is.data.table(file_paths)) {
             fragLens = rep(fragLens[1], nrow(file_paths))
@@ -256,13 +257,17 @@ ssvFetchBam.single = function(bam_f,
                             ...)
         tmp = qgr
         strand(tmp) = "*"
-        score_gr = merge(score_gr, data.table(which_label = as.character(tmp), id = qgr$name), by = "which_label")
+        score_gr = merge(score_gr, data.table(which_label = as.character(tmp), id = names(qgr)), by = "which_label")
         return(score_gr)
     }
     if(splice_strategy == "splice_count"){
-        return(fetchBam(bam_f, qgr, NA, "*",
+        return(fetchBam(bam_f,
+                        qgr,
+                        fragLen = NA,
+                        target_strand = target_strand,
                         max_dupes, splice_strategy,
-                        flip_strand = flip_strand, ...))
+                        flip_strand = flip_strand,
+                        ...))
     }
 
     #splitting by qgr strand is necessary for strand sensitive fetch when
@@ -443,8 +448,13 @@ fetchBam = function(bam_f,
     #of width 1, end is omitted.  Appending strand also not desirable here.
     # want chr1:17508106-17508106 not chr1:17508106:-
     gr_as.character = function(gr){
-        paste0(seqnames(gr), ":", start(gr), "-", end(gr))
+        if(length(gr) == 0){
+            character()
+        }else{
+            paste0(seqnames(gr), ":", start(gr), "-", end(gr))
+        }
     }
+
     toflip = gr_as.character(subset(qgr, strand == "-"))
     if(target_strand %in% c("+", "-")){
         if(!flip_strand){
@@ -453,6 +463,7 @@ fetchBam = function(bam_f,
         }else{
             bam_dt = bam_dt[strand != target_strand & !(which_label %in% toflip) |
                                 strand == target_strand & which_label %in% toflip]
+            bam_dt[, strand := ifelse(strand == "+", "-", "+")]
         }
 
     }
@@ -484,8 +495,12 @@ fetchBam = function(bam_f,
 
     }
     if(splice_strategy == "splice_count"){
-        return(bam_dt[, .N,
-                      by = list(which_label, seqnames, start, end, strand)])
+        sp_dt = bam_dt[, .N,
+                       by = list(which_label, seqnames, start, end, strand)]
+        if(target_strand %in% c("+", "-")){
+            sp_dt = sp_dt[strand == target_strand]
+        }
+        return(sp_dt)
     }
     ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))
     score_gr = GRanges(ext_cov)

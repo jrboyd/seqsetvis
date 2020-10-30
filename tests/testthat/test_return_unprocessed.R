@@ -40,7 +40,7 @@ test_that("ssvFetchBam - return_unprocessed", {
     expect_setequal(colnames(raw_dt),
                     c("which_label", 'seqnames', "strand", "start", "width",
                     "cigar", "read_id", "flag", "mapq", "mrnm", "mpos", "isize",
-                    "seq", "qual", "sample"))
+                    "seq", "qual", "id", "sample"))
 })
 
 test_that("ssvFetchBamPE - expandCigar", {
