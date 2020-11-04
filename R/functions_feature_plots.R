@@ -244,13 +244,17 @@ ssvFeatureEuler = function(object,
 #' ssvFeatureBars(list(1:3, 2:6))
 #' ssvFeatureBars(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
-ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL,
+ssvFeatureBars = function(object,
+                          show_counts = TRUE,
+                          bar_colors = NULL,
+                          text_colors = NULL,
                           return_data = FALSE) {
     group = count = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     stopifnot(is.logical(show_counts))
     stopifnot(is.null(bar_colors) || all(is.character(bar_colors)))
     n_bars = ncol(object)
+    #bar colors
     if (is.null(bar_colors)) {
         bar_colors = safeBrew(n_bars, "Dark2")
     } else {
@@ -260,6 +264,17 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL,
     if (length(bar_colors) < n_bars)
         bar_colors <- rep(bar_colors, length.out = n_bars)
     names(bar_colors) = colnames(object)
+    #text colors
+    if (is.null(text_colors)) {
+        text_colors = rep("black", n_bars)
+    } else {
+        not_hex = substr(text_colors, 0, 1) != "#"
+        text_colors[not_hex] = col2hex(text_colors[not_hex])
+    }
+    if (length(text_colors) < n_bars)
+        text_colors <- rep(text_colors, length.out = n_bars)
+    names(text_colors) = colnames(object)
+
     hit_counts = colSums(object)
     hit_counts_df = data.frame(count = hit_counts,
                                group = factor(names(hit_counts),
@@ -279,7 +294,8 @@ ssvFeatureBars = function(object, show_counts = TRUE, bar_colors = NULL,
         p = p + annotate("text",
                          y = hit_counts/2,
                          x = seq_along(hit_counts),
-                         label = hit_counts)
+                         label = hit_counts,
+                         color = text_colors)
     return(p)
 }
 
