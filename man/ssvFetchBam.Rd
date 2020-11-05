@@ -75,7 +75,7 @@ over this number are removed, Default is Inf.}
 
 \item{splice_strategy}{character, one of c("none", "ignore", "add", "only",
 "splice_count"). Default is "none" and spliced alignment are asssumed not
-present. fragLen must be NA for any other value to be valid.  "ignore" will
+present. fragLen will be forced to be NA for any other value.  "ignore" will
 not count spliced regions.  add" counts spliced regions along with others,
 "only" will only count spliced regions and ignore others.}
 

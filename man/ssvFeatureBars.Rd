@@ -8,6 +8,7 @@ ssvFeatureBars(
   object,
   show_counts = TRUE,
   bar_colors = NULL,
+  counts_text_colors = NULL,
   return_data = FALSE
 )
 }
@@ -18,7 +19,10 @@ ssvFeatureBars(
 bar. default is TRUE}
 
 \item{bar_colors}{character. rcolor or hex colors. default of NULL
-uses RColorBrewer Dark2.}
+uses RColorBrewer Dark2. Will repeat to match number of samples.}
+
+\item{counts_text_colors}{character. rcolor or hex colors. default of NULL
+uses RColorBrewer Dark2. Will repeat to match number of samples.}
 
 \item{return_data}{logical.  If TRUE, return value is no longer ggplot and
 is instead the data used to generate that plot. Default is FALSE.}

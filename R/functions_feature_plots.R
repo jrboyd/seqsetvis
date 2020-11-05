@@ -234,7 +234,9 @@ ssvFeatureEuler = function(object,
 #' @param show_counts logical.  should counts be displayed at the center of each
 #' bar. default is TRUE
 #' @param bar_colors character. rcolor or hex colors. default of NULL
-#' uses RColorBrewer Dark2.
+#' uses RColorBrewer Dark2. Will repeat to match number of samples.
+#' @param counts_text_colors character. rcolor or hex colors. default of NULL
+#' uses RColorBrewer Dark2. Will repeat to match number of samples.
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and
 #' is instead the data used to generate that plot. Default is FALSE.
 #' @return ggplot of bar plot of set sizes
@@ -247,7 +249,7 @@ ssvFeatureEuler = function(object,
 ssvFeatureBars = function(object,
                           show_counts = TRUE,
                           bar_colors = NULL,
-                          text_colors = NULL,
+                          counts_text_colors = NULL,
                           return_data = FALSE) {
     group = count = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
@@ -265,15 +267,15 @@ ssvFeatureBars = function(object,
         bar_colors <- rep(bar_colors, length.out = n_bars)
     names(bar_colors) = colnames(object)
     #text colors
-    if (is.null(text_colors)) {
-        text_colors = rep("black", n_bars)
+    if (is.null(counts_text_colors)) {
+        counts_text_colors = rep("black", n_bars)
     } else {
-        not_hex = substr(text_colors, 0, 1) != "#"
-        text_colors[not_hex] = col2hex(text_colors[not_hex])
+        not_hex = substr(counts_text_colors, 0, 1) != "#"
+        counts_text_colors[not_hex] = col2hex(counts_text_colors[not_hex])
     }
-    if (length(text_colors) < n_bars)
-        text_colors <- rep(text_colors, length.out = n_bars)
-    names(text_colors) = colnames(object)
+    if (length(counts_text_colors) < n_bars)
+        counts_text_colors <- rep(counts_text_colors, length.out = n_bars)
+    names(counts_text_colors) = colnames(object)
 
     hit_counts = colSums(object)
     hit_counts_df = data.frame(count = hit_counts,
@@ -295,7 +297,7 @@ ssvFeatureBars = function(object,
                          y = hit_counts/2,
                          x = seq_along(hit_counts),
                          label = hit_counts,
-                         color = text_colors)
+                         color = counts_text_colors)
     return(p)
 }
 
