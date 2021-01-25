@@ -89,8 +89,8 @@ ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction =
   if(is.null(names(grs))){
     names(grs) = paste0("set_", LETTERS[seq_along(grs)])
   }
-  stopifnot(min_fraction > 0 & min_fraction <= 1)
-  stopifnot(min_number > 0 & min_number <= length(grs))
+  stopifnot(min_fraction >= 0 & min_fraction <= 1)
+  stopifnot(min_number >= 0 & min_number <= length(grs))
   min_by_fraction = ceiling(length(grs) * min_fraction)
   min_consensus = 0
   if(min_by_fraction > min_number){
@@ -118,5 +118,6 @@ ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction =
     mcols(grs_cov)[[nam]] = FALSE
     mcols(grs_cov)[[nam]][queryHits(olaps)] = TRUE
   }
+  seqlengths(grs_cov) = NA
   grs_cov
 }
