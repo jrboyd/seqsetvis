@@ -1,3 +1,8 @@
+# seqsetvis 1.9.19
+
+* tweak - ssvConsensusOverlaps accepts 0 for min_fraction and min_number
+*bugfix - data.table::get no longer accepts multiple items, broke applySpline
+
 # seqsetvis 1.9.18
 
 * feature - text_colors for ssvFeatureBars
