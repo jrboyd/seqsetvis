@@ -91,7 +91,9 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "",
         }
     dt = dt[order(get(x_))]
     if(by_[1] != ""){
-        dt = dt[order(get(by_))]
+        for(.by_ in by_){
+            dt = dt[order(get(.by_))]
+        }
     }
 
     stopifnot(n > 1)
