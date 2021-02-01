@@ -1,7 +1,7 @@
 Package: seqsetvis
 Type: Package
 Title: Set Based Visualizations for Next-Gen Sequencing Data
-Version: 1.11.1
+Version: 1.11.2
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
 Description: seqsetvis enables the visualization and analysis of sets of 
@@ -30,6 +30,7 @@ Imports:
     GenomeInfoDb,
     GenomicAlignments,
     GenomicRanges, 
+    ggplotify,
     grDevices, 
     grid, 
     IRanges, 
@@ -42,7 +43,8 @@ Imports:
     Rsamtools,
     rtracklayer, 
     S4Vectors, 
-    stats
+    stats,
+    UpSetR
 RoxygenNote: 7.1.1
 VignetteBuilder: knitr
 NeedsCompilation: no

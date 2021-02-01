@@ -3,7 +3,9 @@
 \name{ssvFeatureVenn}
 \alias{ssvFeatureVenn}
 \title{ggplot implementation of vennDiagram from limma package.  currently limited
-at 3 sets}
+at 3 sets.  ssvFeatureUpset and ssvFeatureBinaryHeatmap are good options for
+more than 3 sets. ssvFeatureEuler can work too but can take a very long time
+to run for more than 5 or so.}
 \usage{
 ssvFeatureVenn(
   object,
@@ -57,7 +59,9 @@ ggplot venn diagram
 }
 \description{
 ggplot implementation of vennDiagram from limma package.  currently limited
-at 3 sets
+at 3 sets.  ssvFeatureUpset and ssvFeatureBinaryHeatmap are good options for
+more than 3 sets. ssvFeatureEuler can work too but can take a very long time
+to run for more than 5 or so.
 }
 \examples{
 ssvFeatureVenn(list(1:3, 2:6))

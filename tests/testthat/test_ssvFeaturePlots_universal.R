@@ -7,7 +7,7 @@ b = GRanges("chr1", IRanges(5:10*10, 5:10*10+1))
 c = GRanges("chr1", IRanges(8:10*10+5, 8:10*10+6))
 
 #test all plotting functions
-method_names = c("ssvFeatureVenn", "ssvFeatureEuler", "ssvFeatureBars", "ssvFeaturePie", "ssvFeatureBinaryHeatmap")
+method_names = c("ssvFeatureVenn", "ssvFeatureEuler", "ssvFeatureBars", "ssvFeaturePie", "ssvFeatureBinaryHeatmap", "ssvFeatureUpset")
 for(met_name in method_names){
   if(!exists(met_name)){
     warning("function", met_name, "couldn't be found! not tested.")

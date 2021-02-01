@@ -10,7 +10,9 @@
 #   - list of GRanges
 
 #' ggplot implementation of vennDiagram from limma package.  currently limited
-#' at 3 sets
+#' at 3 sets.  ssvFeatureUpset and ssvFeatureBinaryHeatmap are good options for
+#' more than 3 sets. ssvFeatureEuler can work too but can take a very long time
+#' to run for more than 5 or so.
 #' @export
 #' @param object will be passed to \code{\link{ssvMakeMembTable}} for
 #' conversion to membership matrix
@@ -154,6 +156,52 @@ ssvFeatureVenn = function(object,
     }
     return(p)
 }
+
+
+#' ssvFeatureUpset
+#'
+#' Uses the UpSetR package to create an upset plot of overlaps.
+#'
+#' @param object will be passed to \code{\link{ssvMakeMembTable}} for
+#' conversion to membership matrix
+#' @param return_UpSetR If TRUE, return the UpSetR object, The default is FALSE and results in a ggplotified version compatible with cowplot etc.
+#' @param nsets Number of sets to look at
+#' @param nintersects Number of intersections to plot. If set to NA, all intersections will be plotted.
+#' @param order.by How the intersections in the matrix should be ordered by. Options include frequency (entered as "freq"), degree, or both in any order.
+#' @param ... Additional parameters passed to \code{\link[UpSetR]{upset}} in the UpSetR  package.
+#'
+#' @return
+#' @export
+#' @import UpSetR
+#' @import ggplotify
+#'
+#' @examples
+#' ssvFeatureUpset(list(1:3, 2:6))
+#' ssvFeatureUpset(CTCF_in_10a_overlaps_gr)
+#' ssvFeatureUpset(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+ssvFeatureUpset = function(object,
+                           return_UpSetR = FALSE,
+                           nsets = NULL,
+                           nintersects = 15,
+                           order.by = "freq",
+                           ...){
+    object = ssvMakeMembTable(object)
+    up_df = as.matrix(object)
+    up_df = ifelse(up_df, 1, 0)
+    up_df = as.data.frame(up_df)
+    if(is.null(nsets)) nsets = ncol(up_df)
+    p_up = UpSetR::upset(up_df,
+                         nsets = nsets,
+                         nintersects = nintersects,
+                         order.by = order.by,
+                         ...)
+    if(return_UpSetR){
+        return(p_up)
+    }
+    p = ggplotify::as.ggplot(p_up)
+    p
+}
+
 
 #' Try to load a bed-like file and convert it to a GRanges object
 #'
