@@ -10,7 +10,8 @@ clusteringKmeansNestedHclust(
   mat,
   nclust,
   within_order_strategy = c("hclust", "sort")[2],
-  seed = NULL
+  centroids = NULL,
+  manual_mapping = NULL
 )
 }
 \arguments{
@@ -21,8 +22,6 @@ clusteringKmeansNestedHclust(
 \item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
 hierarchical clustering will be used. if sort, a simple decreasing sort of
 rosSums.}
-
-\item{seed}{passed to set.seed() to allow reproducibility}
 }
 \value{
 data.table with 2 columns of cluster info. id column corresponds with

@@ -6,15 +6,12 @@
 with order matched cluster assignments. clusters are sorted using hclust on
 centers}
 \usage{
-clusteringKmeans(mat, nclust, seed = NULL)
+clusteringKmeans(mat, nclust, centroids = NULL)
 }
 \arguments{
 \item{mat}{numeric matrix to cluster}
 
 \item{nclust}{the number of clusters}
-
-\item{seed}{DEPRECATED.  Call set.seed() prior to this funciton to allow
-reproducibility.}
 }
 \value{
 data.table with group variable indicating cluster membership and id

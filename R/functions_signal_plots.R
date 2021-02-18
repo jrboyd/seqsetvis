@@ -302,24 +302,49 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
     p
 }
 
-#' clustering as for a heatmap
+#' Clustering as for a heatmap.  This is used internally by
+#' \code{\link{ssvSignalHeatmap}} but can also be run before calling
+#' ssvSignalHeatmap for greater control and access to clustering results
+#' directly.
+#'
+#' Clustering is via k-means by default.  The number of clusters is determined
+#' by nclust. Optionally, k-means can be initialized with a data.frame provided
+#' to k_centroids. As an alternative to k-means, a membership table from
+#' \code{\link{ssvMakeMembTable}} can be provided to determine logical clusters.
+#'
+#' Within each cluster, items will either be sorted by decreasing average signal
+#' or hierachically clustered; this is controlled via within_order_strategy.
+#'
 #' @export
-#' @param bw_data a GRanges or data.table of bigwig signal.
-#' As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
-#' @param nclust number of clusters
-#' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
+#'
+#' @param bw_data a GRanges or data.table of bigwig signal. As returned from
+#'   \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
+#' @param nclust Number of clusters.  Defaults to 6 if nclust, k_centroids, and
+#'   memb_table are not set.
+#' @param k_centroids data.frame of centroids for k-means clusters. Incompatible
+#'   with nclust or memb_table.
+#' @param memb_table Membership table as from \code{\link{ssvMakeMembTable}}.
+#'   Logical groups from membership table will be clusters. Incompatible with
+#'   nclust or k_centroids.
+#' @param row_ variable name mapped to row, likely peak id or gene name for ngs
+#'   data
 #' @param column_ varaible mapped to column, likely bp position for ngs data
 #' @param cluster_ variable name to use for cluster info
 #' @param fill_ numeric variable to map to fill
 #' @param facet_ variable name to facet horizontally by
-#' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
-#' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
-#' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
-#' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
+#' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot
+#'   full data
+#' @param max_cols for speed columns are sampled to 100 by default, use Inf to
+#'   plot full data
+#' @param clustering_col_min numeric minimum for col range considered when
+#'   clustering, default in -Inf
+#' @param clustering_col_max numeric maximum for col range considered when
+#'   clustering, default in Inf
 #' @param within_order_strategy one of "hclust" or "sort".  if hclust,
 #'   hierarchical clustering will be used. if sort, a simple decreasing sort of
 #'   rosSums.
 #' @param dcast_fill value to supply to dcast fill argument. default is NA.
+#'
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @return data.table of signal profiles, ready for ssvSignalHeatmap
 #' @examples
@@ -336,7 +361,9 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
 #' clust_dt4 = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 2,
 #'     clustering_col_min = 150, clustering_col_max = 250)
 #' ssvSignalHeatmap(clust_dt4)
-ssvSignalClustering = function(bw_data, nclust = 6,
+ssvSignalClustering = function(bw_data, nclust = NULL,
+                               k_centroids = NULL,
+                               memb_table = NULL,
                                row_ = "id",
                                column_ = "x", fill_ = "y", facet_ = "sample",
                                cluster_ = "cluster_id",
@@ -352,7 +379,38 @@ ssvSignalClustering = function(bw_data, nclust = 6,
         output_GRanges = TRUE
     }
     stopifnot(is.data.table(bw_data))
-    stopifnot(is.numeric(nclust) || nclust < 2)
+    if(!is.null(k_centroids) & !is.null(memb_table)){
+        stop("only one of k_centroids or memb_table is allowed.")
+    }
+    if(!is.null(k_centroids)){
+        nclust = nrow(k_centroids)
+    }
+    if(!is.null(memb_table)){ #memb_table get handled to provide row_ to cluster_ mapping
+        if(!is.null(memb_table[[row_]]) & !is.null(memb_table[[cluster_]])){
+            #in this case memb_table is already a valid row_ to cluster_ mapping
+            #nothing needs done
+        }else{
+            memb_table = ssvFactorizeMembTable(memb_table)
+            if(is.null(memb_table[[row_]])){
+                memb_table[[row_]] = memb_table[["id"]]
+                memb_table[["id"]] = NULL
+            }
+            if(is.null(memb_table[[cluster_]])){
+                memb_table[[cluster_]] = memb_table[["group"]]
+                memb_table[["group"]] = NULL
+            }
+        }
+        nclust = length(unique(memb_table[[cluster_]]))
+        cluster_assignment = memb_table[[cluster_]]
+        names(cluster_assignment) = memb_table[[row_]]
+    }else{
+        cluster_assignment = NULL
+    }
+    if(is.null(nclust) & is.null(k_centroids) & is.null(memb_table)){
+        nclust = 6
+        # stop("one of nclust, k_centroids, or memb_table must be set.")
+    }
+    stopifnot(is.numeric(nclust))
     stopifnot(is.character(row_), is.character(column_), is.character(fill_),
               is.character(facet_), is.character(cluster_))
     stopifnot(row_ %in% colnames(bw_data), column_ %in% colnames(bw_data),
@@ -401,7 +459,11 @@ ssvSignalClustering = function(bw_data, nclust = 6,
 
     dc_mat = as.matrix(dc_dt[,-1])
     rownames(dc_mat) = dc_dt[[row_]]
-    rclusters = clusteringKmeansNestedHclust(dc_mat, nclust = nclust, within_order_strategy)
+    rclusters = clusteringKmeansNestedHclust(dc_mat,
+                                             nclust = nclust,
+                                             within_order_strategy,
+                                             centroids = k_centroids,
+                                             manual_mapping = cluster_assignment)
     rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[["id"]])
     data.table::setkey(rclusters, id)
@@ -417,7 +479,10 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
                                   xleft = 0, xright = 1,
                                   lowAtTop = TRUE,
                                   rect_colors = c("black", "gray"),
-                                  text_colors = rev(rect_colors)){
+                                  text_colors = rev(rect_colors),
+                                  show_labels = TRUE,
+                                  label_angle = 0){
+    stopifnot(is.factor(cluster_ids))
     if(is.null(p)){
         p = ggplot() + theme_void()
     }
@@ -434,6 +499,7 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
     df_rects$fill = rect_colors[seq_len(nrow(df_rects))%%length(rect_colors)+1]
     df_rects$color = text_colors[seq_len(nrow(df_rects))%%length(text_colors)+1]
     df_rects = df_rects[rev(seq_len(nrow(df_rects))),]
+    cluster_labels = levels(cluster_ids)
     for(i in seq_len(nrow(df_rects))){
         p = p + annotate("rect",
                          xmin = df_rects$xmin[i],
@@ -441,11 +507,14 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
                          ymin= df_rects$ymin[i],
                          ymax = df_rects$ymax[i],
                          fill = df_rects$fill[i])
-        p = p + annotate("text",
-                         x = mean(c(df_rects$xmin[i], df_rects$xmax[i])),
-                         y = mean(c(df_rects$ymin[i], df_rects$ymax[i])),
-                         label = i,
-                         color = df_rects$color[i])
+        if(show_labels){
+            p = p + annotate("text",
+                             x = mean(c(df_rects$xmin[i], df_rects$xmax[i])),
+                             y = mean(c(df_rects$ymin[i], df_rects$ymax[i])),
+                             label = cluster_labels[i],
+                             color = df_rects$color[i],
+                             angle = label_angle)
+        }
     }
     p
 }
@@ -516,7 +585,7 @@ ssvSignalHeatmap = function(bw_data,
     #determine if user wants clustering
     do_cluster = perform_clustering == "yes"
     if(perform_clustering == "auto"){
-        if(is.factor(bw_data[[row_]]) & is.numeric(bw_data[[cluster_]])){
+        if(is.factor(bw_data[[row_]]) & is.factor(bw_data[[cluster_]])){
             do_cluster = FALSE
         }else{
             do_cluster = TRUE
@@ -539,6 +608,9 @@ ssvSignalHeatmap = function(bw_data,
                                       dcast_fill = dcast_fill)
     }else{
         plot_dt = bw_data
+    }
+    if(return_data){
+        return(plot_dt)
     }
     message("making plot...")
     scale_floor = .1
@@ -587,10 +659,163 @@ ssvSignalHeatmap = function(bw_data,
                                    lowAtTop = TRUE)
     }
 
-    if(return_data){
-        return(plot_dt)
-    }
+
     p
+}
+
+#' heatmap style representation of membership table.
+#' instead of clustering, each column is sorted starting from the left.
+#'
+#' Compared to ssvSignalHeatmap, cluster_bars are displayed on the left once instead of for each facet
+#'
+#' @export
+#' @param bw_data a GRanges or data.table of bigwig signal.
+#' As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
+#' @param nclust number of clusters
+#' @param perform_clustering should clustering be done? default is auto.
+#' auto considers if row_ has been ordered by being a factor and if cluster_ is a numeric.
+#' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
+#' @param column_ varaible mapped to column, likely bp position for ngs data
+#' @param fill_ numeric variable to map to fill
+#' @param facet_ variable name to facet horizontally by
+#' @param cluster_ variable name to use for cluster info
+#' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
+#' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
+#' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
+#' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
+#' @param within_order_strategy one of "hclust" or "sort".  if hclust,
+#'   hierarchical clustering will be used. if sort, a simple decreasing sort of
+#'   rosSums.
+#' @param dcast_fill value to supply to dcast fill argument. default is NA.
+#' @param return_data logical.  If TRUE, return value is no longer ggplot and
+#' is instead the data used to generate that plot. Default is FALSE.
+#' @param return_unassembled_plots logical. If TRUE, return list of heatmap and cluster-bar ggplots.  Can be customized and passed to \code{\link{assemble_heatmap_cluster_bars}}
+#' @param ... addtional arguments passed to cowplot::plot_grid
+#' @import ggplot2
+#' @return ggplot heatmap of signal profiles, facetted by sample
+#' @examples
+#' #the simplest use
+#' ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr)
+#' ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, rel_widths = c(1, 5))
+#'
+#' #clustering can be done manually beforehand
+#' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 3)
+#' ssvSignalHeatmap.ClusterBars(clust_dt)
+ssvSignalHeatmap.ClusterBars = function(bw_data,
+                                        nclust = 6,
+                                        perform_clustering = c("auto", "yes", "no")[1],
+                                        row_ = "id",
+                                        column_ = "x",
+                                        fill_ = "y",
+                                        facet_ = "sample",
+                                        cluster_ = "cluster_id",
+                                        max_rows = 500,
+                                        max_cols = 100,
+                                        clustering_col_min = -Inf,
+                                        clustering_col_max = Inf,
+                                        within_order_strategy = c("hclust", "sort")[2],
+                                        dcast_fill = NA,
+                                        return_data = FALSE,
+                                        return_unassembled_plots = FALSE,
+                                        ...){
+    clust_dt = ssvSignalHeatmap(
+        bw_data = bw_data,
+        nclust = nclust,
+        row_ = row_,
+        column_ = column_,
+        fill_ = fill_,
+        facet_ = facet_,
+        cluster_ = cluster_,
+        max_rows = max_rows,
+        max_cols = max_cols,
+        clustering_col_min = clustering_col_min,
+        clustering_col_max = clustering_col_max,
+        within_order_strategy = within_order_strategy,
+        dcast_fill = dcast_fill,
+        return_data = TRUE
+    )
+    if(return_data) return(clust_dt)
+    p_heatmap = ssvSignalHeatmap(
+        bw_data = clust_dt,
+        nclust = nclust,
+        perform_clustering = FALSE,
+        row_ = row_,
+        column_ = column_,
+        fill_ = fill_,
+        facet_ = facet_,
+        cluster_ = cluster_,
+        max_rows = max_rows,
+        max_cols = max_cols,
+        clustering_col_min = clustering_col_min,
+        clustering_col_max = clustering_col_max,
+        within_order_strategy = within_order_strategy,
+        dcast_fill = dcast_fill,
+        return_data = FALSE,
+        show_cluster_bars = FALSE
+    ) + labs(y = "")
+
+    assign_dt = unique(clust_dt[, c(row_, cluster_), with = FALSE])
+    tmp_df = data.frame(facet= "")
+    p_cluster_bar = ggplot(tmp_df) +
+        coord_cartesian(xlim = c(0, 1), ylim = c(0, nrow(assign_dt)), expand = FALSE) +
+        theme_void() +
+        facet_grid(.~facet)
+    p_cluster_bar = add_cluster_annotation(p_cluster_bar,
+                                           cluster_ids = assign_dt[[cluster_]],
+                                           xleft = 0,
+                                           xright = 1,
+                                           lowAtTop = TRUE, show_labels = TRUE, label_angle = 0)
+    plots = list(cluster_bars = p_cluster_bar, heatmap = p_heatmap)
+    if(return_unassembled_plots){
+        return(plots)
+    }
+    assemble_heatmap_cluster_bars(plots, ...)
+}
+
+#' assemble_heatmap_cluster_bars
+#'
+#' @param plots list of plots as returned from ssvSignalHeatmap.ClusterBars when return_unassembled_plots = TRUE
+#' @param ... arguments passed to cowplot::plot_grid
+#'
+#' @return A grob produced by cowplot::plot_grid
+#' @export
+#'
+#' @examples
+#' plots = ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, return_unassembled_plots = TRUE)
+#' assemble_heatmap_cluster_bars(plots)
+assemble_heatmap_cluster_bars = function(plots, ...){
+    # plots = list(heatmap = p_heatmap, cluster_bars = p_cluster_bar)
+    grobs = sync_height(plots)
+    cowplot::plot_grid(plotlist = grobs, ...)
+}
+
+sync_height = function(my_plots){
+    stopifnot(class(my_plots) == "list")
+    is_ok = sapply(my_plots, function(x){
+        "ggplot" %in% class(x) | "grob" %in% class(x)
+    })
+    stopifnot(all(is_ok))
+    my_grobs = lapply(my_plots, function(x){
+        if(grid::is.grob(x)){
+            x
+        }else{
+            ggplotGrob(x)
+        }
+    })
+
+    my_widths = lapply(my_grobs, function(gt){
+        gt$heights
+    })
+    maxWidth = my_widths[[1]]
+    if(length(my_widths) > 1){
+        for(i in 2:length(my_widths)){
+            maxWidth = grid::unit.pmax(maxWidth, my_widths[[i]])
+        }
+    }
+    for(j in 1:length(my_grobs)){
+        my_grobs[[j]]$heights = maxWidth
+    }
+    my_grobs
 }
 
 #' construct line type plots where each region in each sample is represented
@@ -660,7 +885,7 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
     bw_data[,auto_facet := paste(get(sample_), get(region_))]
     if(!is.null(spline_n)){
         plot_dt = applySpline(bw_data, n = spline_n, x_ = x_, y_ = y_,
-                           by_ = unique(c(group_, sample_, region_, facet_)))
+                              by_ = unique(c(group_, sample_, region_, facet_)))
     }else{
         plot_dt = bw_data
     }
@@ -668,10 +893,10 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
         return(plot_dt)
     }
     ggplot(plot_dt) + geom_path(aes_string(x = x_,
-                                        y = y_,
-                                        col = color_,
-                                        group = group_),
-                             alpha = line_alpha) +
+                                           y = y_,
+                                           col = color_,
+                                           group = group_),
+                                alpha = line_alpha) +
         facet_method(facet_)
 }
 
@@ -736,7 +961,7 @@ ssvSignalLineplotAgg = function(bw_data,
 
     if(!is.null(spline_n)){
         plot_dt = applySpline(agg_dt, n = spline_n, x_ = x_, y_ = y_,
-                           by_ = c(group_, sample_))
+                              by_ = c(group_, sample_))
     }else{
         plot_dt = agg_dt
     }

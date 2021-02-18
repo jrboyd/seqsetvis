@@ -19,7 +19,11 @@
 #' dt = merge(dt, clust_dt)
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
-clusteringKmeans = function(mat, nclust, seed = NULL) {
+clusteringKmeans = function(mat, nclust, centroids = NULL) {
+    if(!is.null(centroids)){
+        browser()
+        nclust = nrow(centroids)
+    }
     stopifnot(is.numeric(nclust))
     cluster_ordered = mat_name = NULL#declare binding for data.table
     if(nrow(mat) <= nclust){
@@ -81,13 +85,20 @@ clusteringKmeans = function(mat, nclust, seed = NULL) {
 #' dt = merge(dt, clust_dt)
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
-clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("hclust", "sort")[2], seed = NULL) {
+clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("hclust", "sort")[2], centroids = NULL, manual_mapping = NULL) {
     stopifnot(is.numeric(nclust))
     stopifnot(within_order_strategy %in% c("hclust", "sort"))
     group = id = within_o = NULL#declare binding for data.table
-    mat_dt = clusteringKmeans(mat, nclust)
+    if(is.null(manual_mapping)){
+        mat_dt = clusteringKmeans(mat, nclust, centroids)
+    }else{
+        manual_mapping
+        mat_dt = data.table(id = names(manual_mapping), group = manual_mapping)
+        mat_dt = mat_dt[order(group)]
+    }
+
     mat_dt$within_o = as.numeric(-1)
-    for (i in seq_len(nclust)) {
+    for (i in unique(mat_dt$group)) {
         cmat = mat[mat_dt[group == i, id], , drop = FALSE]
         if(within_order_strategy == "hclust"){
             if (nrow(cmat) > 2) {
@@ -103,7 +114,11 @@ clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("
 
     }
     mat_dt = mat_dt[order(within_o), ][order(group), ]
+    mat_dt$id = factor(mat_dt$id, levels = mat_dt$id)
     mat_dt$within_o = NULL
+    if(!is.factor(mat_dt$group)){
+        mat_dt$group = factor(mat_dt$group)
+    }
     return(mat_dt)
 }
 

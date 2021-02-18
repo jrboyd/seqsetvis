@@ -2,11 +2,16 @@
 % Please edit documentation in R/functions_signal_plots.R
 \name{ssvSignalClustering}
 \alias{ssvSignalClustering}
-\title{clustering as for a heatmap}
+\title{Clustering as for a heatmap.  This is used internally by
+\code{\link{ssvSignalHeatmap}} but can also be run before calling
+ssvSignalHeatmap for greater control and access to clustering results
+directly.}
 \usage{
 ssvSignalClustering(
   bw_data,
-  nclust = 6,
+  nclust = NULL,
+  k_centroids = NULL,
+  memb_table = NULL,
   row_ = "id",
   column_ = "x",
   fill_ = "y",
@@ -21,12 +26,21 @@ ssvSignalClustering(
 )
 }
 \arguments{
-\item{bw_data}{a GRanges or data.table of bigwig signal.
-As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
+\item{bw_data}{a GRanges or data.table of bigwig signal. As returned from
+\code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 
-\item{nclust}{number of clusters}
+\item{nclust}{Number of clusters.  Defaults to 6 if nclust, k_centroids, and
+memb_table are not set.}
 
-\item{row_}{variable name mapped to row, likely peak id or gene name for ngs data}
+\item{k_centroids}{data.frame of centroids for k-means clusters. Incompatible
+with nclust or memb_table.}
+
+\item{memb_table}{Membership table as from \code{\link{ssvMakeMembTable}}.
+Logical groups from membership table will be clusters. Incompatible with
+nclust or k_centroids.}
+
+\item{row_}{variable name mapped to row, likely peak id or gene name for ngs
+data}
 
 \item{column_}{varaible mapped to column, likely bp position for ngs data}
 
@@ -36,13 +50,17 @@ As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 
 \item{cluster_}{variable name to use for cluster info}
 
-\item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot full data}
+\item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot
+full data}
 
-\item{max_cols}{for speed columns are sampled to 100 by default, use Inf to plot full data}
+\item{max_cols}{for speed columns are sampled to 100 by default, use Inf to
+plot full data}
 
-\item{clustering_col_min}{numeric minimum for col range considered when clustering, default in -Inf}
+\item{clustering_col_min}{numeric minimum for col range considered when
+clustering, default in -Inf}
 
-\item{clustering_col_max}{numeric maximum for col range considered when clustering, default in Inf}
+\item{clustering_col_max}{numeric maximum for col range considered when
+clustering, default in Inf}
 
 \item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
 hierarchical clustering will be used. if sort, a simple decreasing sort of
@@ -54,7 +72,14 @@ rosSums.}
 data.table of signal profiles, ready for ssvSignalHeatmap
 }
 \description{
-clustering as for a heatmap
+Clustering is via k-means by default.  The number of clusters is determined
+by nclust. Optionally, k-means can be initialized with a data.frame provided
+to k_centroids. As an alternative to k-means, a membership table from
+\code{\link{ssvMakeMembTable}} can be provided to determine logical clusters.
+}
+\details{
+Within each cluster, items will either be sorted by decreasing average signal
+or hierachically clustered; this is controlled via within_order_strategy.
 }
 \examples{
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr)
