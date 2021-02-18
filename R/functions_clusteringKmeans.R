@@ -4,8 +4,6 @@
 #'
 #' @param mat numeric matrix to cluster
 #' @param nclust the number of clusters
-#' @param seed DEPRECATED.  Call set.seed() prior to this funciton to allow
-#'   reproducibility.
 #' @return data.table with group variable indicating cluster membership and id
 #'   variable that is a factor indicating order based on within cluster
 #'   similarity
@@ -24,10 +22,6 @@
 clusteringKmeans = function(mat, nclust, seed = NULL) {
     stopifnot(is.numeric(nclust))
     cluster_ordered = mat_name = NULL#declare binding for data.table
-    if(!is.null(seed)){
-        warning("'seed' parameter is now deprecated. ",
-                "Please call set.seed() yourself if needed.")
-    }
     if(nrow(mat) <= nclust){
         nclust = nrow(mat)
         mat_kmclust = list(
@@ -72,7 +66,6 @@ clusteringKmeans = function(mat, nclust, seed = NULL) {
 #' @param within_order_strategy one of "hclust" or "sort".  if hclust,
 #'   hierarchical clustering will be used. if sort, a simple decreasing sort of
 #'   rosSums.
-#' @param seed passed to set.seed() to allow reproducibility
 #' @export
 #' @importFrom stats  hclust dist
 #' @return data.table with 2 columns of cluster info. id column corresponds with
