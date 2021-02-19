@@ -21,7 +21,6 @@
 #' dt[order(id)]
 clusteringKmeans = function(mat, nclust, centroids = NULL) {
     if(!is.null(centroids)){
-        browser()
         nclust = nrow(centroids)
     }
     stopifnot(is.numeric(nclust))
