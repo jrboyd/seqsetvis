@@ -603,6 +603,7 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
 
     }
     if(is.character(cluster_ids)) cluster_ids = factor(cluster_ids, levels = unique(cluster_ids))
+    if(is.numeric(cluster_ids)) cluster_ids = factor(cluster_ids)
     stopifnot(is.factor(cluster_ids))
     if(is.null(p)){
         tmp_df = data.frame(facet= "")
