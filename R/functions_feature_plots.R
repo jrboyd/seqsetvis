@@ -170,7 +170,7 @@ ssvFeatureVenn = function(object,
 #' @param order.by How the intersections in the matrix should be ordered by. Options include frequency (entered as "freq"), degree, or both in any order.
 #' @param ... Additional parameters passed to \code{\link[UpSetR]{upset}} in the UpSetR  package.
 #'
-#' @return
+#' @return ggplot version of UpSetR plot
 #' @export
 #' @import UpSetR
 #' @import ggplotify

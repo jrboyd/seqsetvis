@@ -28,7 +28,7 @@ conversion to membership matrix}
 \item{...}{Additional parameters passed to \code{\link[UpSetR]{upset}} in the UpSetR  package.}
 }
 \value{
-
+ggplot version of UpSetR plot
 }
 \description{
 Uses the UpSetR package to create an upset plot of overlaps.

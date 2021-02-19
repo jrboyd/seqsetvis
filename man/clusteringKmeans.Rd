@@ -9,9 +9,13 @@ centers}
 clusteringKmeans(mat, nclust, centroids = NULL)
 }
 \arguments{
-\item{mat}{numeric matrix to cluster}
+\item{mat}{numeric matrix to cluster.}
 
-\item{nclust}{the number of clusters}
+\item{nclust}{the number of clusters.}
+
+\item{centroids}{optional matrix with same columns as mat and one centroid
+per row to base clusters off of.  Overrides any setting to nclust. Default
+of NULL results in randomly initialized k-means.}
 }
 \value{
 data.table with group variable indicating cluster membership and id

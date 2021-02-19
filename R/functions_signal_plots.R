@@ -304,8 +304,11 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
 
 #' make_clustering_matrix
 #'
-#' Create a wide matrix from a tidy data.table more suitable for clustering methods
+#' Create a wide matrix from a tidy data.table more suitable for clustering
+#' methods
 #'
+#' @param tidy_dt the tidy data.table to covert to a wide matrix.  Must have
+#'   entries for variables specified by row_, column_, fill_, and facet_.
 #' @param row_ variable name mapped to row, likely peak id or gene name for ngs
 #'   data
 #' @param column_ varaible mapped to column, likely bp position for ngs data
@@ -401,12 +404,11 @@ make_clustering_matrix = function(tidy_dt,
 #' @param memb_table Membership table as from \code{\link{ssvMakeMembTable}}.
 #'   Logical groups from membership table will be clusters. Incompatible with
 #'   nclust or k_centroids.
-#' @param row_ variable name mapped to row, likely peak id or gene name for ngs
-#'   data
-#' @param column_ varaible mapped to column, likely bp position for ngs data
-#' @param cluster_ variable name to use for cluster info
-#' @param fill_ numeric variable to map to fill
-#' @param facet_ variable name to facet horizontally by
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.
+#' @param column_ varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.
+#' @param fill_ numeric variable to map to fill. Default is "y" and works with ssvFetch* output.
+#' @param facet_ variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.
+#' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
 #' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot
 #'   full data
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to
@@ -562,16 +564,24 @@ ssvSignalClustering = function(bw_data, nclust = NULL,
 
 #' add_cluster_annotation
 #'
-#' adds rectangle boxes proportional to cluster sizes of heatmap with optional labels.
+#' adds rectangle boxes proportional to cluster sizes of heatmap with optional
+#' labels.
 #'
-#' @param cluster_ids Vector of cluster ids for each item in heatmap. Should be sorted by plot order for heatmap.
+#' @param cluster_ids Vector of cluster ids for each item in heatmap. Should be
+#'   sorted by plot order for heatmap.
 #' @param p Optionally an existing ggplot to add annotation to.
 #' @param xleft left side of cluster annotation rectangles. Default is 0.
 #' @param xright right side of cluster annotation rectangles. Default is 1.
-#' @param rect_colors colors of rectangle fill, repeat to match number of clusters. Default is c("black", "gray").
-#' @param text_colors colors of text, repeat to match number of clusters. Default is reverse of rect_colors.
-#' @param show_labels logical, shoud rectangles be labelled with cluster identity.  Default is TRUE.
-#' @param label_angle angle to add clusters labels at.  Default is 0, which is horizontal.
+#' @param rect_colors colors of rectangle fill, repeat to match number of
+#'   clusters. Default is c("black", "gray").
+#' @param text_colors colors of text, repeat to match number of clusters.
+#'   Default is reverse of rect_colors.
+#' @param show_labels logical, shoud rectangles be labelled with cluster
+#'   identity.  Default is TRUE.
+#' @param label_angle angle to add clusters labels at.  Default is 0, which is
+#'   horizontal.
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* outputs.
+#' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
 #'
 #' @return A ggplot with cluster annotations added.
 #' @export
@@ -586,8 +596,10 @@ ssvSignalClustering = function(bw_data, nclust = NULL,
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 #' assign_dt = unique(clust_dt[, .(id, cluster_id)])[order(id)]
 #' p_heat = ssvSignalHeatmap(clust_dt, show_cluster_bars = FALSE)
-#' add_cluster_annotation(assign_dt$cluster_id, p_heat, xleft = -400, xright = -360, rect_colors = rainbow(3), text_colors = "gray")
-#' p_clusters = add_cluster_annotation(assign_dt$cluster_id, rect_colors = rainbow(3), text_colors = "gray")
+#' add_cluster_annotation(assign_dt$cluster_id, p_heat,
+#'   xleft = -400, xright = -360, rect_colors = rainbow(3), text_colors = "gray")
+#' p_clusters = add_cluster_annotation(assign_dt$cluster_id,
+#'   rect_colors = rainbow(3), text_colors = "gray")
 #' #specialized use as plot outside of heatmap
 #' assemble_heatmap_cluster_bars(plots = list(p_clusters, p_heat), rel_widths = c(1, 3))
 add_cluster_annotation = function(cluster_ids, p = NULL,
@@ -596,7 +608,8 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
                                   text_colors = rev(rect_colors),
                                   show_labels = TRUE,
                                   label_angle = 0,
-                                  row_ = "id", cluster_ = "cluster_id"){
+                                  row_ = "id",
+                                  cluster_ = "cluster_id"){
     if(is.data.table(cluster_ids)){
         assign_dt = unique(cluster_ids[, c(row_, cluster_), with = FALSE])[order(get(row_))]
         cluster_ids = assign_dt[[cluster_]]
@@ -653,11 +666,11 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
 #' @param nclust number of clusters
 #' @param perform_clustering should clustering be done? default is auto.
 #' auto considers if row_ has been ordered by being a factor and if cluster_ is a numeric.
-#' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
-#' @param column_ varaible mapped to column, likely bp position for ngs data
-#' @param fill_ numeric variable to map to fill
-#' @param facet_ variable name to facet horizontally by
-#' @param cluster_ variable name to use for cluster info
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.
+#' @param column_ varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.
+#' @param fill_ numeric variable to map to fill. Default is "y" and works with ssvFetch* output.
+#' @param facet_ variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.
+#' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
 #' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
@@ -799,11 +812,11 @@ ssvSignalHeatmap = function(bw_data,
 #' @param nclust number of clusters
 #' @param perform_clustering should clustering be done? default is auto.
 #' auto considers if row_ has been ordered by being a factor and if cluster_ is a numeric.
-#' @param row_ variable name mapped to row, likely peak id or gene name for ngs data
-#' @param column_ varaible mapped to column, likely bp position for ngs data
-#' @param fill_ numeric variable to map to fill
-#' @param facet_ variable name to facet horizontally by
-#' @param cluster_ variable name to use for cluster info
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.
+#' @param column_ varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.
+#' @param fill_ numeric variable to map to fill. Default is "y" and works with ssvFetch* output.
+#' @param facet_ variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.
+#' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
 #' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf

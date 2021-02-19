@@ -22,6 +22,14 @@ clusteringKmeansNestedHclust(
 \item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
 hierarchical clustering will be used. if sort, a simple decreasing sort of
 rosSums.}
+
+\item{centroids}{optional matrix with same columns as mat and one centroid
+per row to base clusters off of.  Overrides any setting to nclust. Default
+of NULL results in randomly initialized k-means.}
+
+\item{manual_mapping}{optional named vector manually specififying cluster
+assignments. names should be item ids and values should be cluster names
+the items are assigned to. Default of NULL allows clustering to proceed.}
 }
 \value{
 data.table with 2 columns of cluster info. id column corresponds with

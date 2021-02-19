@@ -72,6 +72,7 @@ ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE, ...){
 #'   applied.
 #' @return GRanges with metadata columns describing consensus overlap of input
 #'   grs.
+#' @importFrom GenomeInfoDb seqlengths
 #' @export
 #'
 #' @examples
@@ -118,6 +119,6 @@ ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction =
     mcols(grs_cov)[[nam]] = FALSE
     mcols(grs_cov)[[nam]][queryHits(olaps)] = TRUE
   }
-  seqlengths(grs_cov) = NA
+  GenomeInfoDb::seqlengths(grs_cov) = NA
   grs_cov
 }

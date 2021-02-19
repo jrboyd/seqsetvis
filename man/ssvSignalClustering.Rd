@@ -39,16 +39,15 @@ with nclust or memb_table.}
 Logical groups from membership table will be clusters. Incompatible with
 nclust or k_centroids.}
 
-\item{row_}{variable name mapped to row, likely peak id or gene name for ngs
-data}
+\item{row_}{variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.}
 
-\item{column_}{varaible mapped to column, likely bp position for ngs data}
+\item{column_}{varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.}
 
-\item{fill_}{numeric variable to map to fill}
+\item{fill_}{numeric variable to map to fill. Default is "y" and works with ssvFetch* output.}
 
-\item{facet_}{variable name to facet horizontally by}
+\item{facet_}{variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.}
 
-\item{cluster_}{variable name to use for cluster info}
+\item{cluster_}{variable name to use for cluster info. Default is "cluster_id".}
 
 \item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot
 full data}

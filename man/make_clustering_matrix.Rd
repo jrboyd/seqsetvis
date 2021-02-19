@@ -18,6 +18,9 @@ make_clustering_matrix(
 )
 }
 \arguments{
+\item{tidy_dt}{the tidy data.table to covert to a wide matrix.  Must have
+entries for variables specified by row_, column_, fill_, and facet_.}
+
 \item{row_}{variable name mapped to row, likely peak id or gene name for ngs
 data}
 
@@ -45,7 +48,8 @@ clustering, default in Inf}
 A wide matrix version of input tidy data.table
 }
 \description{
-Create a wide matrix from a tidy data.table more suitable for clustering methods
+Create a wide matrix from a tidy data.table more suitable for clustering
+methods
 }
 \examples{
 mat = make_clustering_matrix(CTCF_in_10a_profiles_dt)

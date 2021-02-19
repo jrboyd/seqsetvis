@@ -18,7 +18,8 @@ add_cluster_annotation(
 )
 }
 \arguments{
-\item{cluster_ids}{Vector of cluster ids for each item in heatmap. Should be sorted by plot order for heatmap.}
+\item{cluster_ids}{Vector of cluster ids for each item in heatmap. Should be
+sorted by plot order for heatmap.}
 
 \item{p}{Optionally an existing ggplot to add annotation to.}
 
@@ -26,19 +27,28 @@ add_cluster_annotation(
 
 \item{xright}{right side of cluster annotation rectangles. Default is 1.}
 
-\item{rect_colors}{colors of rectangle fill, repeat to match number of clusters. Default is c("black", "gray").}
+\item{rect_colors}{colors of rectangle fill, repeat to match number of
+clusters. Default is c("black", "gray").}
 
-\item{text_colors}{colors of text, repeat to match number of clusters. Default is reverse of rect_colors.}
+\item{text_colors}{colors of text, repeat to match number of clusters.
+Default is reverse of rect_colors.}
 
-\item{show_labels}{logical, shoud rectangles be labelled with cluster identity.  Default is TRUE.}
+\item{show_labels}{logical, shoud rectangles be labelled with cluster
+identity.  Default is TRUE.}
 
-\item{label_angle}{angle to add clusters labels at.  Default is 0, which is horizontal.}
+\item{label_angle}{angle to add clusters labels at.  Default is 0, which is
+horizontal.}
+
+\item{row_}{variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* outputs.}
+
+\item{cluster_}{variable name to use for cluster info. Default is "cluster_id".}
 }
 \value{
 A ggplot with cluster annotations added.
 }
 \description{
-adds rectangle boxes proportional to cluster sizes of heatmap with optional labels.
+adds rectangle boxes proportional to cluster sizes of heatmap with optional
+labels.
 }
 \examples{
 #simplest uses
@@ -50,8 +60,10 @@ add_cluster_annotation(factor(c(rep("A", 3), "B")), p)
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 assign_dt = unique(clust_dt[, .(id, cluster_id)])[order(id)]
 p_heat = ssvSignalHeatmap(clust_dt, show_cluster_bars = FALSE)
-add_cluster_annotation(assign_dt$cluster_id, p_heat, xleft = -400, xright = -360, rect_colors = rainbow(3), text_colors = "gray")
-p_clusters = add_cluster_annotation(assign_dt$cluster_id, rect_colors = rainbow(3), text_colors = "gray")
+add_cluster_annotation(assign_dt$cluster_id, p_heat,
+  xleft = -400, xright = -360, rect_colors = rainbow(3), text_colors = "gray")
+p_clusters = add_cluster_annotation(assign_dt$cluster_id,
+  rect_colors = rainbow(3), text_colors = "gray")
 #specialized use as plot outside of heatmap
 assemble_heatmap_cluster_bars(plots = list(p_clusters, p_heat), rel_widths = c(1, 3))
 }

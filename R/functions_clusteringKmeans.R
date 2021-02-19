@@ -2,8 +2,12 @@
 #' with order matched cluster assignments. clusters are sorted using hclust on
 #' centers
 #'
-#' @param mat numeric matrix to cluster
-#' @param nclust the number of clusters
+#' @param mat numeric matrix to cluster.
+#' @param nclust the number of clusters.
+#' @param centroids optional matrix with same columns as mat and one centroid
+#'   per row to base clusters off of.  Overrides any setting to nclust. Default
+#'   of NULL results in randomly initialized k-means.
+#'
 #' @return data.table with group variable indicating cluster membership and id
 #'   variable that is a factor indicating order based on within cluster
 #'   similarity
@@ -21,6 +25,9 @@
 #' dt[order(id)]
 clusteringKmeans = function(mat, nclust, centroids = NULL) {
     if(!is.null(centroids)){
+        if(!all(colnames(mat) != colnames(centroids))){
+            stop("provided centroids matrix did not have identical column names to mat matrix.")
+        }
         nclust = nrow(centroids)
     }
     stopifnot(is.numeric(nclust))
@@ -69,6 +76,12 @@ clusteringKmeans = function(mat, nclust, centroids = NULL) {
 #' @param within_order_strategy one of "hclust" or "sort".  if hclust,
 #'   hierarchical clustering will be used. if sort, a simple decreasing sort of
 #'   rosSums.
+#' @param centroids optional matrix with same columns as mat and one centroid
+#'   per row to base clusters off of.  Overrides any setting to nclust. Default
+#'   of NULL results in randomly initialized k-means.
+#' @param manual_mapping optional named vector manually specififying cluster
+#'   assignments. names should be item ids and values should be cluster names
+#'   the items are assigned to. Default of NULL allows clustering to proceed.
 #' @export
 #' @importFrom stats  hclust dist
 #' @return data.table with 2 columns of cluster info. id column corresponds with
