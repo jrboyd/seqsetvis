@@ -1,3 +1,12 @@
+# 1.11.3
+
+* feature - ssvSignalClustering accepts memb_table
+* feature - ssvSignalHeatmap.ClusterBars displays cluster bars once on the left instead of in each facet
+* feature - ssvSignalClustering accepts centroids instead of nclust
+* feature - exposed make_clustering_matrix to convert tidy data.table to wide matrix
+* feature - exposed add_cluster_annotation to append or insert cluster size bars beside heatmaps
+* feature - exposed assemble_heatmap_cluster_bars to make appending add_cluster_annotation easier
+
 # 1.11.2
 
 * feature - added ssvFeatureUpset to support upset plots.

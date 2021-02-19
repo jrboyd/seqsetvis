@@ -2,8 +2,7 @@ testthat::context("SignalClustering")
 
 #new feature - ssvSignalClustering accepts memb_table
 #new feature - ssvSignalHeatmap.ClusterBars displays cluster bars once on the left instead of in each facet
-
-#TODO new feature - ssvSignalClustering accepts centroids instead of nclust
+#new feature - ssvSignalClustering accepts centroids instead of nclust
 
 library(seqsetvis)
 library(testthat)
