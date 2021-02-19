@@ -25,7 +25,7 @@
 #' dt[order(id)]
 clusteringKmeans = function(mat, nclust, centroids = NULL) {
     if(!is.null(centroids)){
-        if(!all(colnames(mat) != colnames(centroids))){
+        if(!all(colnames(mat) == colnames(centroids))){
             stop("provided centroids matrix did not have identical column names to mat matrix.")
         }
         nclust = nrow(centroids)
