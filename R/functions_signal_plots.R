@@ -761,8 +761,9 @@ ssvSignalHeatmap = function(bw_data,
     if(!is.null(fill_limits)){
         ymax = max(fill_limits)
         ymin = min(fill_limits)
-        plot_dt[get(fill_) > ymax][[fill_]] = ymax
-        plot_dt[get(fill_) < ymin][[fill_]] = ymin
+        if(any(plot_dt[[fill_]] > ymax)) plot_dt[get(fill_) > ymax][[fill_]] = ymax
+        if(any(plot_dt[[fill_]] < ymin)) plot_dt[get(fill_) < ymin][[fill_]] = ymin
+
         p = ggplot(plot_dt) +
             geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
             theme(axis.line = element_blank(),
