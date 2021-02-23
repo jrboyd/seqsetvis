@@ -8,6 +8,20 @@ library(seqsetvis)
 library(testthat)
 library(GenomicRanges)
 
+test_that("ssvSignalClustering max rows", {
+    clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, max_rows = 10)
+    expect_equal(nrow(clust_dt[!is.na(id)]), 420)
+    expect_equal(nrow(clust_dt[is.na(id)]), 0)
+
+    library(data.table)
+    prof_dt = copy(CTCF_in_10a_profiles_dt)
+    setnames(prof_dt, "id", "new_id")
+
+    clust_dt2 = ssvSignalClustering(prof_dt, max_rows = 10, row_ = "new_id")
+    expect_equal(nrow(clust_dt2[!is.na(new_id)]), 420)
+    expect_equal(nrow(clust_dt2[is.na(new_id)]), 0)
+})
+
 test_that("ssvSignalHeatmap.ClusterBars", {
     p_heat = ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_dt)
     class(p_heat)

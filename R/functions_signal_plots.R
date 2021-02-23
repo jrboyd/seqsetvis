@@ -347,7 +347,7 @@ make_clustering_matrix = function(tidy_dt,
         }, 1)
         kept = sort(unique(tidy_dt[[column_]]))[kept]
         tidy_dt = tidy_dt[get(column_) %in% kept]
-        warning(raw_nc - max_cols,
+        message(raw_nc - max_cols,
                 " columns were discarded according to max_cols: ",
                 max_cols)
     }
@@ -356,7 +356,7 @@ make_clustering_matrix = function(tidy_dt,
     if(raw_nr > max_rows){
         row_ids = sample(row_ids, max_rows)
         tidy_dt = tidy_dt[get(row_) %in% row_ids]
-        warning(raw_nr - max_rows,
+        message(raw_nr - max_rows,
                 " rows were discarded according to max_rows: ",
                 max_rows)
     }
@@ -552,6 +552,7 @@ ssvSignalClustering = function(bw_data, nclust = NULL,
                                              centroids = k_centroids,
                                              manual_mapping = cluster_assignment)
     rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
+    plot_dt = plot_dt[get(row_) %in% rclusters[["id"]]]
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[["id"]])
     data.table::setkey(rclusters, id)
     plot_dt[[cluster_]] = rclusters[list(plot_dt[[row_]]), group]

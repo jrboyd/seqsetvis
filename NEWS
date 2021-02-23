@@ -1,7 +1,9 @@
-# 1.11.4
+# 1.11.5
 
 * feature - fill_limits to ssvSignalHeatmap and ssvSignalHeatmap.ClusterBars to control fill limits
 * tweak - rel_widths default of 1,9 for ssvSignalHeatmap.ClusterBars
+* bugfix - drop removed ids from ssvSignalClustering
+* tweak - row and column drops are messages, not warnings.
 
 # 1.11.3
 

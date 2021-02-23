@@ -192,12 +192,12 @@ doTest_ssvSignalPlots = function(test_object){
     })
 
     test_that("ssvSignalHeatmap works with maxCols and maxRows", {
-        expect_warning({
+        expect_message({
             p_max_rows = ssvSignalHeatmap(test_object, nclust = 2, max_rows = 8)
         }, regexp = "92 rows were discarded")
         expect_s3_class(p_max_rows, "ggplot")
 
-        expect_warning({
+        expect_message({
             p_max_cols = ssvSignalHeatmap(test_object, nclust = 2, max_cols = 2)
         }, regexp = "12 columns were discarded")
         expect_s3_class(p_max_cols, "ggplot")
