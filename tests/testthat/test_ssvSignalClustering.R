@@ -8,6 +8,29 @@ library(seqsetvis)
 library(testthat)
 library(GenomicRanges)
 
+test_that("ssvSignalHeatmap.ClusterBars", {
+    p_heat = ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_dt)
+    class(p_heat)
+    expect_s3_class(p_heat, "ggplot")
+
+    p_list = ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_dt, return_unassembled_plots = TRUE)
+    class(p_list)
+    class(p_list[[1]])
+    expect_is(p_list, "list")
+    expect_s3_class(p_list[[1]], "ggplot")
+    expect_s3_class(p_list[[2]], "ggplot")
+})
+
+test_that("ssvSignalHeatmap fill_limits", {
+    p_heat = ssvSignalHeatmap(CTCF_in_10a_profiles_dt, fill_limits = c(20, 60))
+    expect_equal(max(p_heat$data$y), 60)
+    expect_equal(min(p_heat$data$y), 20)
+
+    p_heat2 = ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_dt, fill_limits = c(20, 60), return_unassembled_plots = TRUE)[[2]]
+    expect_equal(max(p_heat2$data$y), 60)
+    expect_equal(min(p_heat2$data$y), 20)
+})
+
 test_that("ssvSignalHeatmap memb_table", {
     memb_table = ssvMakeMembTable(CTCF_in_10a_narrowPeak_grs)
     setequal(rownames(memb_table), CTCF_in_10a_profiles_dt$id)

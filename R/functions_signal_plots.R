@@ -673,6 +673,7 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
 #' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
 #' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
+#' @param fill_limits limits for fill legend.  values will be cropped to this range if set.  Default of NULL uses natural range of fill_.
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
 #' @param within_order_strategy one of "hclust" or "sort".  if hclust,
@@ -702,6 +703,7 @@ ssvSignalHeatmap = function(bw_data,
                             cluster_ = "cluster_id",
                             max_rows = 500,
                             max_cols = 100,
+                            fill_limits = NULL,
                             clustering_col_min = -Inf,
                             clustering_col_max = Inf,
                             within_order_strategy = c("hclust", "sort")[2],
@@ -721,6 +723,7 @@ ssvSignalHeatmap = function(bw_data,
     stopifnot(facet_ %in% colnames(bw_data) || facet_ == "")
     stopifnot(is.numeric(max_rows), is.numeric(max_cols),
               is.numeric(clustering_col_min), is.numeric(clustering_col_max))
+    stopifnot(is.null(fill_limits) || (is.numeric(fill_limits) && length(fill_limits) == 2))
     #determine if user wants clustering
     do_cluster = perform_clustering == "yes"
     if(perform_clustering == "auto"){
@@ -754,14 +757,32 @@ ssvSignalHeatmap = function(bw_data,
     message("making plot...")
     scale_floor = .1
     scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
-    p = ggplot(plot_dt) +
-        geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
-        theme(axis.line = element_blank(),
-              axis.text.y = element_blank(),
-              axis.ticks.y = element_blank(),
-              panel.background = element_blank()) +
-        scale_fill_distiller(type = "div", palette = "Spectral",
-                             values = scale_vals)
+
+    if(!is.null(fill_limits)){
+        ymax = max(fill_limits)
+        ymin = min(fill_limits)
+        plot_dt[get(fill_) > ymax][[fill_]] = ymax
+        plot_dt[get(fill_) < ymin][[fill_]] = ymin
+        p = ggplot(plot_dt) +
+            geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
+            theme(axis.line = element_blank(),
+                  axis.text.y = element_blank(),
+                  axis.ticks.y = element_blank(),
+                  panel.background = element_blank()) +
+            scale_fill_distiller(type = "div", palette = "Spectral",
+                                 values = scale_vals, limits = c(ymin, ymax))
+    }else{
+        p = ggplot(plot_dt) +
+            geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
+            theme(axis.line = element_blank(),
+                  axis.text.y = element_blank(),
+                  axis.ticks.y = element_blank(),
+                  panel.background = element_blank()) +
+            scale_fill_distiller(type = "div", palette = "Spectral",
+                                 values = scale_vals)
+    }
+
+
     if(facet_ != ""){
         p = p +  facet_grid(paste(". ~", facet_))
     }
@@ -807,6 +828,7 @@ ssvSignalHeatmap = function(bw_data,
 #' Compared to ssvSignalHeatmap, cluster_bars are displayed on the left once instead of for each facet
 #'
 #' @export
+#'
 #' @param bw_data a GRanges or data.table of bigwig signal.
 #' As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
 #' @param nclust number of clusters
@@ -819,6 +841,7 @@ ssvSignalHeatmap = function(bw_data,
 #' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
 #' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
+#' @param fill_limits limits for fill legend.  values will be cropped to this range if set.  Default of NULL uses natural range of fill_.
 #' @param clustering_col_min numeric minimum for col range considered when clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when clustering, default in Inf
 #' @param within_order_strategy one of "hclust" or "sort".  if hclust,
@@ -828,7 +851,9 @@ ssvSignalHeatmap = function(bw_data,
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and
 #' is instead the data used to generate that plot. Default is FALSE.
 #' @param return_unassembled_plots logical. If TRUE, return list of heatmap and cluster-bar ggplots.  Can be customized and passed to \code{\link{assemble_heatmap_cluster_bars}}
+#' @param rel_widths numeric of length 2.  Passed to cowplot::plot_grid.  Default is c(1, 9).
 #' @param ... addtional arguments passed to cowplot::plot_grid
+#'
 #' @import ggplot2
 #' @return ggplot heatmap of signal profiles, facetted by sample
 #' @examples
@@ -849,12 +874,14 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
                                         cluster_ = "cluster_id",
                                         max_rows = 500,
                                         max_cols = 100,
+                                        fill_limits = NULL,
                                         clustering_col_min = -Inf,
                                         clustering_col_max = Inf,
                                         within_order_strategy = c("hclust", "sort")[2],
                                         dcast_fill = NA,
                                         return_data = FALSE,
                                         return_unassembled_plots = FALSE,
+                                        rel_widths = c(1, 9),
                                         ...){
     clust_dt = ssvSignalHeatmap(
         bw_data = bw_data,
@@ -884,6 +911,7 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
         cluster_ = cluster_,
         max_rows = max_rows,
         max_cols = max_cols,
+        fill_limits = fill_limits,
         clustering_col_min = clustering_col_min,
         clustering_col_max = clustering_col_max,
         within_order_strategy = within_order_strategy,
@@ -908,7 +936,7 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
     if(return_unassembled_plots){
         return(plots)
     }
-    assemble_heatmap_cluster_bars(plots, ...)
+    assemble_heatmap_cluster_bars(plots, rel_widths = rel_widths, ...)
 }
 
 #' assemble_heatmap_cluster_bars

@@ -16,6 +16,7 @@ ssvSignalHeatmap(
   cluster_ = "cluster_id",
   max_rows = 500,
   max_cols = 100,
+  fill_limits = NULL,
   clustering_col_min = -Inf,
   clustering_col_max = Inf,
   within_order_strategy = c("hclust", "sort")[2],
@@ -46,6 +47,8 @@ auto considers if row_ has been ordered by being a factor and if cluster_ is a n
 \item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot full data}
 
 \item{max_cols}{for speed columns are sampled to 100 by default, use Inf to plot full data}
+
+\item{fill_limits}{limits for fill legend.  values will be cropped to this range if set.  Default of NULL uses natural range of fill_.}
 
 \item{clustering_col_min}{numeric minimum for col range considered when clustering, default in -Inf}
 

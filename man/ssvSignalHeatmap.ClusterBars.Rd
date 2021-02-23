@@ -16,12 +16,14 @@ ssvSignalHeatmap.ClusterBars(
   cluster_ = "cluster_id",
   max_rows = 500,
   max_cols = 100,
+  fill_limits = NULL,
   clustering_col_min = -Inf,
   clustering_col_max = Inf,
   within_order_strategy = c("hclust", "sort")[2],
   dcast_fill = NA,
   return_data = FALSE,
   return_unassembled_plots = FALSE,
+  rel_widths = c(1, 9),
   ...
 )
 }
@@ -48,6 +50,8 @@ auto considers if row_ has been ordered by being a factor and if cluster_ is a n
 
 \item{max_cols}{for speed columns are sampled to 100 by default, use Inf to plot full data}
 
+\item{fill_limits}{limits for fill legend.  values will be cropped to this range if set.  Default of NULL uses natural range of fill_.}
+
 \item{clustering_col_min}{numeric minimum for col range considered when clustering, default in -Inf}
 
 \item{clustering_col_max}{numeric maximum for col range considered when clustering, default in Inf}
@@ -62,6 +66,8 @@ rosSums.}
 is instead the data used to generate that plot. Default is FALSE.}
 
 \item{return_unassembled_plots}{logical. If TRUE, return list of heatmap and cluster-bar ggplots.  Can be customized and passed to \code{\link{assemble_heatmap_cluster_bars}}}
+
+\item{rel_widths}{numeric of length 2.  Passed to cowplot::plot_grid.  Default is c(1, 9).}
 
 \item{...}{addtional arguments passed to cowplot::plot_grid}
 }
