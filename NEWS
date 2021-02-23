@@ -1,3 +1,8 @@
+# 1.11.4
+
+* feature - fill_limits to ssvSignalHeatmap and ssvSignalHeatmap.ClusterBars to control fill limits
+* tweak - rel_widths default of 1,9 for ssvSignalHeatmap.ClusterBars
+
 # 1.11.3
 
 * feature - ssvSignalClustering accepts memb_table
