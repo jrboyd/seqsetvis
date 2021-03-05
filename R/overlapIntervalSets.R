@@ -110,7 +110,7 @@ ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction =
     resize(gr, width(gr)+2*ext, fix = "center")
   })
 
-  grs_cov = GRanges(coverage(unlist(GRangesList(grs_ext))) >= min_consensus)
+  grs_cov = GRanges(coverage(unlist(GRangesList(grs_ext))) >= max(min_consensus, 1))
   grs_cov = subset(grs_cov, score == TRUE)
   grs_cov$score = NULL
   for(nam in names(grs)){

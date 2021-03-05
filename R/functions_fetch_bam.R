@@ -97,6 +97,7 @@ ssvFetchBam = function(file_paths,
     exp_fragLen = ifelse(is.data.frame(file_paths) || is.data.table(file_paths), nrow(file_paths), length(file_paths))
     stopifnot(length(fragLens) == 1 || length(fragLens) == exp_fragLen)
     if(splice_strategy != "none") fragLens = NA
+    if(return_unprocessed) fragLens = NA
     if(length(fragLens) == 1){
         if (is.data.frame(file_paths) || is.data.table(file_paths)) {
             fragLens = rep(fragLens[1], nrow(file_paths))
@@ -417,11 +418,19 @@ fetchBam = function(bam_f,
             ...)
         bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
         bam_dt = lapply(bam_raw, function(x){
-            data.table(seqnames = x$rname, strand = x$strand,
-                       start = x$pos, width = x$qwidth, cigar = x$cigar,
-                       read_id = x$qname, flag = x$flag, mapq = x$mapq,
-                       mrnm = x$mrnm, mpos = x$mpos, isize = x$isize,
-                       seq = as.character(x$seq), qual = as.character(x$qual))
+            data.table(seqnames = x$rname,
+                       strand = x$strand,
+                       start = x$pos,
+                       width = x$qwidth,
+                       cigar = x$cigar,
+                       qname = x$qname,
+                       flag = x$flag,
+                       mapq = x$mapq,
+                       mrnm = x$mrnm,
+                       mpos = x$mpos,
+                       isize = x$isize,
+                       seq = as.character(x$seq),
+                       qual = as.character(x$qual))
         })
         bam_dt = data.table::rbindlist(bam_dt,
                                        use.names = TRUE,

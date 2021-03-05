@@ -251,8 +251,19 @@ fetchBamPE = function(bam_f,
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
 
     bam_dt = lapply(bam_raw, function(x){
-        data.table(seqnames = x$rname, qname = x$qname, strand = x$strand,
-                   start = x$pos, width = x$qwidth, cigar = x$cigar, isize = x$isize)
+        data.table(seqnames = x$rname,
+                   strand = x$strand,
+                   start = x$pos,
+                   width = x$qwidth,
+                   cigar = x$cigar,
+                   qname = x$qname,
+                   flag = x$flag,
+                   mapq = x$mapq,
+                   mrnm = x$mrnm,
+                   mpos = x$mpos,
+                   isize = x$isize,
+                   seq = as.character(x$seq),
+                   qual = as.character(x$qual))
     })
 
     bam_dt = data.table::rbindlist(bam_dt,

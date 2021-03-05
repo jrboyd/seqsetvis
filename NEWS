@@ -1,3 +1,9 @@
+# 1.11.6
+
+* bugfix when min_number = 0
+* ssvFetchBam return_unprocessed supresses fragLens calc
+* ssvFetchBam & ssvFetchBamPE reutrn_unprocessed yields same variables
+
 # 1.11.5
 
 * feature - fill_limits to ssvSignalHeatmap and ssvSignalHeatmap.ClusterBars to control fill limits
