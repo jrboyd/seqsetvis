@@ -243,17 +243,10 @@ fetchBamPE = function(bam_f,
     stopifnot(max_isize >= min_isize)
     sbgr = qgr
     strand(sbgr) = "*"
-    if(return_unprocessed){
-        sbParam = Rsamtools::ScanBamParam(
-            which = sbgr,
-            what = Rsamtools::scanBamWhat(),
-            ...)
-    }else{
-        sbParam = Rsamtools::ScanBamParam(
-            which = sbgr,
-            what = c("rname", "qname", "isize", "strand", "pos", "qwidth", "cigar"),
-            ...)
-    }
+    sbParam = Rsamtools::ScanBamParam(
+        which = sbgr,
+        what = Rsamtools::scanBamWhat(),
+        ...)
 
     bam_raw = Rsamtools::scanBam(bam_f, param = sbParam)
 
