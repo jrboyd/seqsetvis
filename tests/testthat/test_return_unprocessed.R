@@ -17,6 +17,11 @@ bam_file = system.file("extdata/test.bam", package = "seqsetvis", mustWork = TRU
 bw_file = system.file("extdata/test_loading.bw", package = "seqsetvis", mustWork = TRUE)
 win_size = 50
 
+exp_cn = c("which_label", "seqnames",
+          "qname", "strand", "start",
+          "width", "cigar", "isize", "id",
+          "sample", "flag", "mapq",
+          "mrnm", "mpos", "seq", "qual")
 
 test_that("ssvFetchBamPE - return_unprocessed", {
     pe_file = system.file("extdata/Bcell_PE.mm10.bam", package = "seqsetvis", mustWork = TRUE)
@@ -27,7 +32,7 @@ test_that("ssvFetchBamPE - return_unprocessed", {
     raw_dt = ssvFetchBamPE(pe_file, qgrPE, return_unprocessed = TRUE)
     expect_s3_class(raw_dt, "data.table")
     expect_setequal(colnames(raw_dt),
-                    c("which_label", "seqnames", "qname", "strand", "start", "width", "cigar", "isize", "id", "sample"))
+                    exp_cn)
 })
 
 test_that("ssvFetchBam - return_unprocessed", {
@@ -38,9 +43,7 @@ test_that("ssvFetchBam - return_unprocessed", {
                          return_unprocessed = TRUE)
     expect_s3_class(raw_dt, "data.table")
     expect_setequal(colnames(raw_dt),
-                    c("which_label", 'seqnames', "strand", "start", "width",
-                    "cigar", "read_id", "flag", "mapq", "mrnm", "mpos", "isize",
-                    "seq", "qual", "id", "sample"))
+                    exp_cn)
 })
 
 test_that("ssvFetchBamPE - expandCigar", {
