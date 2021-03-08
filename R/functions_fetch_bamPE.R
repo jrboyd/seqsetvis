@@ -195,7 +195,7 @@ ssvFetchBamPE.single = function(bam_f,
     switch (
         win_method,
         sample = {
-            qgr = prepare_fetch_GRanges(qgr, win_size, skip_centerFix = force_skip_centerFix)
+            qgr = prepare_fetch_GRanges_width(qgr, win_size, skip_centerFix = force_skip_centerFix)
             score_gr = fetchBamPE(bam_f,
                                   qgr,
                                   max_dupes,

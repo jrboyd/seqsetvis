@@ -280,7 +280,7 @@ ssvFetchBam.single = function(bam_f,
         switch (
             win_method,
             sample = {
-                strand_qgr = prepare_fetch_GRanges(strand_qgr, win_size, skip_centerFix = force_skip_centerFix)
+                strand_qgr = prepare_fetch_GRanges_width(strand_qgr, win_size, skip_centerFix = force_skip_centerFix)
                 if(target_strand == "both"){
                     pos_gr = fetchBam(bam_f, strand_qgr, fragLen, "+",
                                       max_dupes, splice_strategy,

@@ -109,12 +109,12 @@ ssvFetchSignal = function(file_paths,
     }
     stopifnot(file.exists(file_paths))
     #if (win_method == "sample") {
-    qgr = prepare_fetch_GRanges(qgr = qgr,
+    qgr = prepare_fetch_GRanges_width(qgr = qgr,
                                 win_size = win_size,
                                 target_size = NULL,
                                 skip_centerFix = win_method != "sample" | force_skip_centerFix)
     #}
-    qgr = .check_qgr(qgr)
+    qgr = prepare_fetch_GRanges_names(qgr, include_id = TRUE)
     stopifnot(is.numeric(n_region_splits))
     if(n_region_splits > length(qgr)){
         n_region_splits = length(qgr)
@@ -177,7 +177,25 @@ ssvFetchSignal = function(file_paths,
     return(out)
 }
 
-.check_qgr = function(qgr){
+#' Creates a named version of input GRanges using the same method seqsetvis uses internally to ensure consistency.
+#'
+#' If $id is set, that value is used as name and duplicates are checked for.
+#'
+#' @param qgr input GRanges object the set/check names on
+#' @param include_id if TRUE, $id is retained. Default is FALSE.
+#'
+#' @return and named GRanges based on input qgr.
+#' @export
+#'
+#' @examples
+#' qgr = seqsetvis::CTCF_in_10a_overlaps_gr
+#' names(qgr) = NULL
+#' #default is to paste "region_" and iteration along length of qgr
+#' prepare_fetch_GRanges_names(qgr)
+#' #id gets used is already set
+#' qgr$id = paste0("peak_", rev(seq_along(qgr)), "_of_", length(qgr))
+#' prepare_fetch_GRanges_names(qgr)
+prepare_fetch_GRanges_names = function(qgr, include_id = FALSE){
     if(is.null(qgr$id)){#need id
         if (!is.null(qgr$name)) {
             qgr$id = qgr$name
@@ -189,6 +207,9 @@ ssvFetchSignal = function(file_paths,
     }
     if(any(duplicated(qgr$id))) stop("qgr$id must be unique. qgr$id is either directly supplied or taken from qgr$name or names(qgr).")
     names(qgr) = qgr$id
+    if(!include_id){
+        qgr$id = NULL
+    }
     qgr
 }
 
@@ -248,7 +269,7 @@ viewGRangesWinSample_dt = function(score_gr,
     stopifnot(is(score_gr, "GRanges"))
     stopifnot(!is.null(mcols(score_gr)[[attrib_var]]))
     stopifnot(is(qgr, "GRanges"))
-    if(is.null(qgr$id)) qgr = .check_qgr(qgr)
+    if(is.null(qgr$id)) qgr = prepare_fetch_GRanges_names(qgr, include_id = TRUE)
     stopifnot(is.numeric(window_size))
     stopifnot(window_size >= 1)
     stopifnot(window_size %% 1 == 0)
@@ -363,7 +384,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     stopifnot(is(score_gr, "GRanges"))
     stopifnot(!is.null(mcols(score_gr)[[attrib_var]]))
     stopifnot(is(qgr, "GRanges"))
-    if(is.null(qgr$id)) qgr = .check_qgr(qgr)
+    if(is.null(qgr$id)) qgr = prepare_fetch_GRanges_names(qgr, include_id = TRUE)
     stopifnot(is.numeric(n_tiles))
     stopifnot(n_tiles >= 1)
     stopifnot(n_tiles %% 1 == 0)
@@ -560,6 +581,8 @@ shift_anchor = function(score_dt, window_size, anchor) {
 
 #' prepares GRanges for windowed fetching.
 #'
+#' Deprecated and renamed as prepare_fetch_GRanges_width
+#'
 #' output GRanges parallels input with consistent width evenly divisible by
 #' win_size.  Has warning if GRanges needed resizing, otherwise no warning
 #' and input GRanges is returned unchanged.
@@ -581,6 +604,37 @@ shift_anchor = function(score_dt, window_size, anchor) {
 #' #no warning if qgr is already valid for windowed fetching
 #' prepare_fetch_GRanges(qgr, win_size = 50)
 prepare_fetch_GRanges = function(qgr,
+                                       win_size,
+                                       min_quantile = .75,
+                                       target_size = NULL,
+                                       skip_centerFix = FALSE) {
+    .Deprecated("prepare_fetch_GRanges_width")
+    prepare_fetch_GRanges_width(qgr, win_size, min_quantile, target_size, skip_centerFix)
+}
+
+#' prepares GRanges for windowed fetching.
+#'
+#' output GRanges parallels input with consistent width evenly divisible by
+#' win_size.  Has warning if GRanges needed resizing, otherwise no warning
+#' and input GRanges is returned unchanged.
+#'
+#' @param qgr GRanges to prepare
+#' @param win_size numeric window size for fetch
+#' @param min_quantile numeric [0,1], lowest possible quantile value.  Only
+#' relevant if target_size is not specified.
+#' @param target_size numeric final width of qgr if known. Default of NULL
+#' leads to quantile based determination of target_size.
+#' @param skip_centerFix boolean, if FALSE (default) all regions will be resized
+#' GenomicRanges::resize(x, w, fix = "center") to a uniform size based on
+#' min_quantile to a width divisible by win_size.
+#' @return GRanges, either identical to qgr or with suitable consistent width
+#' applied.
+#' @export
+#' @examples
+#' qgr = prepare_fetch_GRanges(CTCF_in_10a_overlaps_gr, win_size = 50)
+#' #no warning if qgr is already valid for windowed fetching
+#' prepare_fetch_GRanges(qgr, win_size = 50)
+prepare_fetch_GRanges_width = function(qgr,
                                  win_size,
                                  min_quantile = .75,
                                  target_size = NULL,

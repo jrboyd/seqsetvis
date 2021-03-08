@@ -309,7 +309,7 @@ centerGRangesAtMax = function(prof_dt, qgr, x_ = "x", y_ = "y", by_ = "id", widt
     cent_gr = GenomicRanges::GRanges(cent_dt[, list(seqnames, start = (start + end)/2, end = (start + end)/2)])
     names(cent_gr) = cent_dt[[by_]]
 
-    qgr = .check_qgr(qgr)
+    qgr = prepare_fetch_GRanges_names(qgr)
     GenomicRanges::strand(cent_gr) = GenomicRanges::strand(qgr[names(cent_gr)])
     GenomicRanges::mcols(cent_gr) = GenomicRanges::mcols(qgr[names(cent_gr)])
     cent_gr = cent_gr[names(qgr)]

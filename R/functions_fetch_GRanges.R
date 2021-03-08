@@ -128,7 +128,7 @@ fetchGRanges_as_coverage = function(x, qgr, win_size, win_method, summary_FUN,
                                     fill_value = 0, force_skip_centerFix = FALSE){
     switch(win_method,
            sample = {
-               qgr = prepare_fetch_GRanges(qgr,
+               qgr = prepare_fetch_GRanges_width(qgr,
                                            win_size,
                                            skip_centerFix = force_skip_centerFix)
                if(target_strand == "both"){
@@ -220,7 +220,7 @@ fetchGRanges_by_attrib_var = function(x, qgr, win_size, win_method, summary_FUN,
                                       force_skip_centerFix = FALSE){
     switch(win_method,
            sample = {
-               qgr = prepare_fetch_GRanges(qgr, win_size,
+               qgr = prepare_fetch_GRanges_width(qgr, win_size,
                                            skip_centerFix = force_skip_centerFix)
                if(target_strand == "both"){
                    pos_gr = subset(x, strand == "+")

@@ -1,3 +1,8 @@
+# 1.11.7
+
+* prepare_fetch_GRanges has been deprecated and prepare_fetch_GRanges_width should be used instead.
+* prepare_fetch_GRanges_names has been exposed and allows name seeting of query GRanges with what seqsetvis does internally.
+
 # 1.11.6
 
 * bugfix when min_number = 0

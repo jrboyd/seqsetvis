@@ -136,7 +136,7 @@ ssvFetchBigwig.single = function(bw_file,
     stopifnot(is.numeric(win_size))
     switch (win_method,
             sample = {
-                qgr = prepare_fetch_GRanges(qgr, win_size, skip_centerFix = force_skip_centerFix)
+                qgr = prepare_fetch_GRanges_width(qgr, win_size, skip_centerFix = force_skip_centerFix)
                 fetch_gr = qgr
                 names(fetch_gr) = NULL
                 score_gr = rtracklayer::import.bw(bw_file, which = fetch_gr)
