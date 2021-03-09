@@ -600,9 +600,10 @@ shift_anchor = function(score_dt, window_size, anchor) {
 #' applied.
 #' @export
 #' @examples
-#' qgr = prepare_fetch_GRanges(CTCF_in_10a_overlaps_gr, win_size = 50)
+#' #use prepare_fetch_GRanges_width instead:
+#' qgr = prepare_fetch_GRanges_width(CTCF_in_10a_overlaps_gr, win_size = 50)
 #' #no warning if qgr is already valid for windowed fetching
-#' prepare_fetch_GRanges(qgr, win_size = 50)
+#' prepare_fetch_GRanges_width(qgr, win_size = 50)
 prepare_fetch_GRanges = function(qgr,
                                        win_size,
                                        min_quantile = .75,
@@ -631,9 +632,9 @@ prepare_fetch_GRanges = function(qgr,
 #' applied.
 #' @export
 #' @examples
-#' qgr = prepare_fetch_GRanges(CTCF_in_10a_overlaps_gr, win_size = 50)
+#' qgr = prepare_fetch_GRanges_width(CTCF_in_10a_overlaps_gr, win_size = 50)
 #' #no warning if qgr is already valid for windowed fetching
-#' prepare_fetch_GRanges(qgr, win_size = 50)
+#' prepare_fetch_GRanges_width(qgr, win_size = 50)
 prepare_fetch_GRanges_width = function(qgr,
                                  win_size,
                                  min_quantile = .75,
