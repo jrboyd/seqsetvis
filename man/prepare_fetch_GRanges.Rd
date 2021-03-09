@@ -40,7 +40,8 @@ win_size.  Has warning if GRanges needed resizing, otherwise no warning
 and input GRanges is returned unchanged.
 }
 \examples{
-qgr = prepare_fetch_GRanges(CTCF_in_10a_overlaps_gr, win_size = 50)
+#use prepare_fetch_GRanges_width instead:
+qgr = prepare_fetch_GRanges_width(CTCF_in_10a_overlaps_gr, win_size = 50)
 #no warning if qgr is already valid for windowed fetching
-prepare_fetch_GRanges(qgr, win_size = 50)
+prepare_fetch_GRanges_width(qgr, win_size = 50)
 }
