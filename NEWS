@@ -1,3 +1,7 @@
+# 1.11.11
+
+* compressed large data objects to address warnings : save(obj, file="data/obj.rda", compress='xz')
+
 # 1.11.10
 
 * improved clustering and heatmap messaging
