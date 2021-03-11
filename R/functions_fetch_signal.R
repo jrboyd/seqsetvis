@@ -196,6 +196,7 @@ ssvFetchSignal = function(file_paths,
 #' qgr$id = paste0("peak_", rev(seq_along(qgr)), "_of_", length(qgr))
 #' prepare_fetch_GRanges_names(qgr)
 prepare_fetch_GRanges_names = function(qgr, include_id = FALSE){
+    if(length(qgr) < 1) stop("length of query GRanges was 0!")
     if(is.null(qgr$id)){#need id
         if (!is.null(qgr$name)) {
             qgr$id = qgr$name
@@ -640,6 +641,7 @@ prepare_fetch_GRanges_width = function(qgr,
                                  min_quantile = .75,
                                  target_size = NULL,
                                  skip_centerFix = FALSE) {
+    if(length(qgr) < 1) stop("length of query GRanges was 0!")
     if (!skip_centerFix &&
         (length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0)) {
         if (is.null(target_size)) {

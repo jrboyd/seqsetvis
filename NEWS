@@ -1,3 +1,7 @@
+# 1.11.12
+
+* for ssvFetch*, input of a 0 length query GRanges is now an ERROR.
+
 # 1.11.11
 
 * compressed large data objects to address warnings : save(obj, file="data/obj.rda", compress='xz')
