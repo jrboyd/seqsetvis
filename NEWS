@@ -1,3 +1,8 @@
+# 1.11.10
+
+* improved clustering and heatmap messaging
+* max_rows and max_cols now applies to heatmap call upstream of clustering and independent when data is already clustered.
+
 # 1.11.9
 
 * repaired missing elementType slot warning on older GRanges data objects

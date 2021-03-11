@@ -452,6 +452,7 @@ ssvSignalClustering = function(bw_data, nclust = NULL,
                                clustering_col_max = Inf,
                                within_order_strategy = c("hclust", "sort")[2],
                                dcast_fill = NA){
+    message("clustering...")
     id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
     output_GRanges = FALSE
     if(is(bw_data, "GRanges")){
@@ -661,6 +662,9 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
 
 #' heatmap style representation of membership table.
 #' instead of clustering, each column is sorted starting from the left.
+#'
+#' See \code{\link{ssvSignalHeatmap.ClusterBars}} for an alternative with more control over where the cluster bars appear.
+#'
 #' @export
 #' @param bw_data a GRanges or data.table of bigwig signal.
 #' As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}
@@ -694,6 +698,8 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
 #' #clustering can be done manually beforehand
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 3)
 #' ssvSignalHeatmap(clust_dt)
+#'
+#' ssvSignalHeatmap(clust_dt, max_rows = 20, max_cols = 7)
 ssvSignalHeatmap = function(bw_data,
                             nclust = 6,
                             perform_clustering = c("auto", "yes", "no")[1],
@@ -759,7 +765,6 @@ ssvSignalHeatmap = function(bw_data,
     }
 
     if(do_cluster){
-        message("clustering...")
         plot_dt = ssvSignalClustering(bw_data = bw_data,
                                       nclust = nclust,
                                       row_ = row_,
