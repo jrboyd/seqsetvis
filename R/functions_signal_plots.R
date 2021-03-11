@@ -734,6 +734,30 @@ ssvSignalHeatmap = function(bw_data,
             do_cluster = TRUE
         }
     }
+
+    raw_nc = length(unique(bw_data[[column_]]))
+    if(raw_nc > max_cols){
+        new_scale = (seq_len(max_cols)-1) / (max_cols - 1)
+        old_scale = (seq_len(raw_nc)-1) / (raw_nc - 1)
+        kept = vapply(new_scale, function(v){
+            which.min(abs(v - old_scale))
+        }, 1)
+        kept = sort(unique(bw_data[[column_]]))[kept]
+        bw_data = bw_data[get(column_) %in% kept]
+        message(raw_nc - max_cols,
+                " columns were discarded according to max_cols: ",
+                max_cols)
+    }
+    row_ids = unique(bw_data[[row_]])
+    raw_nr = length(row_ids)
+    if(raw_nr > max_rows){
+        row_ids = sample(row_ids, max_rows)
+        bw_data = bw_data[get(row_) %in% row_ids]
+        message(raw_nr - max_rows,
+                " rows were discarded according to max_rows: ",
+                max_rows)
+    }
+
     if(do_cluster){
         message("clustering...")
         plot_dt = ssvSignalClustering(bw_data = bw_data,
