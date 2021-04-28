@@ -2,8 +2,7 @@
 % Please edit documentation in R/functions_clusteringKmeans.R
 \name{within_clust_sort}
 \alias{within_clust_sort}
-\title{Title
-TODO refactor shared code with clusteringKmeansNestedHclust}
+\title{within_clust_sort}
 \usage{
 within_clust_sort(
   clust_dt,
@@ -19,12 +18,55 @@ within_clust_sort(
 )
 }
 \arguments{
-\item{dcast_fill}{}
+\item{clust_dt}{data.table output from \code{\link{ssvSignalClustering}}}
+
+\item{row_}{variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.}
+
+\item{column_}{varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.}
+
+\item{fill_}{numeric variable to map to fill. Default is "y" and works with ssvFetch* output.}
+
+\item{facet_}{variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.}
+
+\item{cluster_}{variable name to use for cluster info. Default is "cluster_id".}
+
+\item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
+hierarchical clustering will be used. if sort, a simple decreasing sort of
+rosSums.}
+
+\item{clustering_col_min}{numeric minimum for col range considered when
+clustering, default in -Inf}
+
+\item{clustering_col_max}{numeric maximum for col range considered when
+clustering, default in Inf}
+
+\item{dcast_fill}{value to supply to dcast fill argument. default is NA.}
 }
 \value{
-
+data.table matching input clust_dt save for the reassignment of levels of row_ variable.
 }
 \description{
-Title
+Without modifying cluster assignments, modify the order of rows within each cluster based on within_order_strategy.
+}
+\details{
+This is particularly useful when you want to sort within each cluster by a different variable from cluster assignment. Also if you've imported cluster assigments but want to sort within each for the new data for a prettier heatmap.
+
 TODO refactor shared code with clusteringKmeansNestedHclust
+}
+\examples{
+#clustering by relative value per region does a good job highlighting changes
+#however, when then plotting raw values the order within clusters is not smooth
+#this is a good situation to apply a separate sort within clusters.
+prof_dt = CTCF_in_10a_profiles_dt
+prof_dt = append_ynorm(prof_dt)
+prof_dt[, y_relative := y_norm / max(y_norm), .(id)]
+
+clust_dt = ssvSignalClustering(prof_dt, fill_ = "y_relative")
+clust_dt.sort = within_clust_sort(clust_dt)
+
+cowplot::plot_grid(
+  ssvSignalHeatmap(clust_dt) + labs(title = "clustered by relative, sorted by relative"),
+  ssvSignalHeatmap(clust_dt.sort) + labs(title = "clustered by relative, sorted by raw value")
+)
+
 }

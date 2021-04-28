@@ -18,6 +18,7 @@ ssvFetchBamPE.single(
   min_isize = 1,
   max_isize = Inf,
   return_unprocessed = FALSE,
+  return_fragSizes = FALSE,
   force_skip_centerFix = FALSE,
   ...
 )
@@ -53,6 +54,8 @@ over this number are removed, Default is Inf.}
 \item{max_isize}{integer. Read pairs must have an isize less than or equal to this value.  Default is Inf.}
 
 \item{return_unprocessed}{boolean. if TRUE returns read alignment in data.table. Default is FALSE.}
+
+\item{return_fragSizes}{boolean. if TRUE returns fragment sizes for all reads per region.}
 
 \item{force_skip_centerFix}{boolean, if TRUE all query ranges will be
 used "as is".  This is already the case by default if win_method == "summary"
