@@ -57,7 +57,7 @@ safeBrew = function(n, pal = "Dark2"){
     rownames(pal_info) = tolower(rownames(pal_info))
     pal = tolower(pal)
     if(!any(pal == rownames(pal_info)))
-        stop("Palette", pal, "not a valid RColorBrewer palette, ",
+        stop("Palette ", pal, " not a valid RColorBrewer palette, ",
              "see RColorBrewer::brewer.pal.info")
     maxColors = pal_info[pal,]$maxcolors
     nbrew = min(max(n, 3), maxColors)

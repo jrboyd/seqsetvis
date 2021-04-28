@@ -52,6 +52,14 @@ test_that("ssvFetchBamPE normal", {
     )
 })
 
+pe_raw = ssvFetchBamPE(
+    pe_file,
+    qgr,
+    return_data.table = TRUE,
+    win_size = 50,
+    return_fragSizes = TRUE
+)
+
 # pe_raw[isize > 0, mean(isize), .(id)]
 # pe_raw$id = factor(pe_raw$id, levels = qgr$name)
 # ggplot(pe_raw[isize > 0, ], aes(x = isize)) + geom_histogram() + facet_wrap("id")

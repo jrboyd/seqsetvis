@@ -451,7 +451,8 @@ ssvSignalClustering = function(bw_data, nclust = NULL,
                                clustering_col_min = -Inf,
                                clustering_col_max = Inf,
                                within_order_strategy = c("hclust", "sort")[2],
-                               dcast_fill = NA){
+                               dcast_fill = NA,
+                               iter.max = 30){
     message("clustering...")
     id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
     output_GRanges = FALSE
@@ -551,7 +552,8 @@ ssvSignalClustering = function(bw_data, nclust = NULL,
                                              nclust = nclust,
                                              within_order_strategy,
                                              centroids = k_centroids,
-                                             manual_mapping = cluster_assignment)
+                                             manual_mapping = cluster_assignment,
+                                             iter.max = iter.max)
     rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
     plot_dt = plot_dt[get(row_) %in% rclusters[["id"]]]
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[["id"]])
@@ -787,32 +789,39 @@ ssvSignalHeatmap = function(bw_data,
     message("making plot...")
     scale_floor = .1
     scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
+    if(is.numeric(plot_dt[[fill_]])){
+        if(!is.null(fill_limits)){
+            ymax = max(fill_limits)
+            ymin = min(fill_limits)
+            if(any(plot_dt[[fill_]] > ymax)) plot_dt[get(fill_) > ymax][[fill_]] = ymax
+            if(any(plot_dt[[fill_]] < ymin)) plot_dt[get(fill_) < ymin][[fill_]] = ymin
 
-    if(!is.null(fill_limits)){
-        ymax = max(fill_limits)
-        ymin = min(fill_limits)
-        if(any(plot_dt[[fill_]] > ymax)) plot_dt[get(fill_) > ymax][[fill_]] = ymax
-        if(any(plot_dt[[fill_]] < ymin)) plot_dt[get(fill_) < ymin][[fill_]] = ymin
-
-        p = ggplot(plot_dt) +
-            geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
-            theme(axis.line = element_blank(),
-                  axis.text.y = element_blank(),
-                  axis.ticks.y = element_blank(),
-                  panel.background = element_blank()) +
-            scale_fill_distiller(type = "div", palette = "Spectral",
-                                 values = scale_vals, limits = c(ymin, ymax))
+            p = ggplot(plot_dt) +
+                geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
+                theme(axis.line = element_blank(),
+                      axis.text.y = element_blank(),
+                      axis.ticks.y = element_blank(),
+                      panel.background = element_blank()) +
+                scale_fill_distiller(type = "div", palette = "Spectral",
+                                     values = scale_vals, limits = c(ymin, ymax))
+        }else{
+            p = ggplot(plot_dt) +
+                geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
+                theme(axis.line = element_blank(),
+                      axis.text.y = element_blank(),
+                      axis.ticks.y = element_blank(),
+                      panel.background = element_blank()) +
+                scale_fill_distiller(type = "div", palette = "Spectral",
+                                     values = scale_vals)
+        }
     }else{
         p = ggplot(plot_dt) +
             geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
             theme(axis.line = element_blank(),
                   axis.text.y = element_blank(),
                   axis.ticks.y = element_blank(),
-                  panel.background = element_blank()) +
-            scale_fill_distiller(type = "div", palette = "Spectral",
-                                 values = scale_vals)
+                  panel.background = element_blank())
     }
-
 
     if(facet_ != ""){
         p = p +  facet_grid(paste(". ~", facet_))
@@ -903,6 +912,7 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
                                         fill_ = "y",
                                         facet_ = "sample",
                                         cluster_ = "cluster_id",
+                                        FUN_format_heatmap = NULL,
                                         max_rows = 500,
                                         max_cols = 100,
                                         fill_limits = NULL,
@@ -950,6 +960,10 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
         return_data = FALSE,
         show_cluster_bars = FALSE
     ) + labs(y = "")
+
+    if(!is.null(FUN_format_heatmap)){
+        p_heatmap = FUN_format_heatmap(p_heatmap)
+    }
 
     assign_dt = unique(clust_dt[, c(row_, cluster_), with = FALSE])
     tmp_df = data.frame(facet= "")

@@ -11,7 +11,8 @@ clusteringKmeansNestedHclust(
   nclust,
   within_order_strategy = c("hclust", "sort")[2],
   centroids = NULL,
-  manual_mapping = NULL
+  manual_mapping = NULL,
+  iter.max = 30
 )
 }
 \arguments{

@@ -6,7 +6,7 @@
 with order matched cluster assignments. clusters are sorted using hclust on
 centers}
 \usage{
-clusteringKmeans(mat, nclust, centroids = NULL)
+clusteringKmeans(mat, nclust, centroids = NULL, iter.max = 30)
 }
 \arguments{
 \item{mat}{numeric matrix to cluster.}

@@ -1,3 +1,9 @@
+# 1.11.13
+
+* kmeans iter.max
+* inject formating to ssvSignalHeatmap.ClusterBars with FUN_format_heatmap
+* cluster reorder disabled if manual clusters
+
 # 1.11.12
 
 * for ssvFetch*, input of a 0 length query GRanges is now an ERROR.

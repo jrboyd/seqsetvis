@@ -14,6 +14,7 @@ ssvSignalHeatmap.ClusterBars(
   fill_ = "y",
   facet_ = "sample",
   cluster_ = "cluster_id",
+  FUN_format_heatmap = NULL,
   max_rows = 500,
   max_cols = 100,
   fill_limits = NULL,

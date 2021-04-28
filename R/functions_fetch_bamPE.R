@@ -39,6 +39,7 @@
 #' @param min_isize integer. Read pairs must have an isize greater than or equal to this value.  Default is 1.
 #' @param max_isize integer. Read pairs must have an isize less than or equal to this value.  Default is Inf.
 #' @param return_unprocessed boolean. if TRUE returns read alignment in data.table. Default is FALSE.
+#' @param return_fragSizes boolean. if TRUE returns fragment sizes for all reads per region.
 #' @param force_skip_centerFix boolean, if TRUE all query ranges will be
 #' used "as is".  This is already the case by default if win_method == "summary"
 #' but may have applications where win_method == "sample".
@@ -81,6 +82,7 @@ ssvFetchBamPE = function(file_paths,
                          min_isize = 1,
                          max_isize = Inf,
                          return_unprocessed = FALSE,
+                         return_fragSizes = FALSE,
                          force_skip_centerFix = FALSE,
                          ...){
     load_bamPE = function(f, nam, qgr) {
@@ -101,6 +103,7 @@ ssvFetchBamPE = function(file_paths,
             min_isize = min_isize,
             max_isize = max_isize,
             return_unprocessed = return_unprocessed,
+            return_fragSizes = return_fragSizes,
             force_skip_centerFix = force_skip_centerFix,
             ...)
         # dt[[names_variable]] = rep(nam, nrow(dt))
@@ -121,7 +124,7 @@ ssvFetchBamPE = function(file_paths,
                          force_skip_centerFix = force_skip_centerFix)
 
 
-    if(!return_data.table & !return_unprocessed){
+    if(!return_data.table & !return_unprocessed & !return_fragSizes){
         bdt = GRanges(bdt)
     }
     bdt
@@ -152,6 +155,7 @@ ssvFetchBamPE = function(file_paths,
 #' @param min_isize integer. Read pairs must have an isize greater than or equal to this value.  Default is 1.
 #' @param max_isize integer. Read pairs must have an isize less than or equal to this value.  Default is Inf.
 #' @param return_unprocessed boolean. if TRUE returns read alignment in data.table. Default is FALSE.
+#' @param return_fragSizes boolean. if TRUE returns fragment sizes for all reads per region.
 #' @param force_skip_centerFix boolean, if TRUE all query ranges will be
 #' used "as is".  This is already the case by default if win_method == "summary"
 #' but may have applications where win_method == "sample".
@@ -171,6 +175,7 @@ ssvFetchBamPE.single = function(bam_f,
                                 min_isize = 1,
                                 max_isize = Inf,
                                 return_unprocessed = FALSE,
+                                return_fragSizes = FALSE,
                                 force_skip_centerFix = FALSE,
                                 ...) {
     x = id = y = NULL
@@ -188,6 +193,17 @@ ssvFetchBamPE.single = function(bam_f,
                               min_isize,
                               max_isize,
                               return_unprocessed = return_unprocessed,
+                              ...)
+        score_gr = merge(score_gr, data.table(which_label = as.character(qgr), id = names(qgr)), by = "which_label")
+        return(score_gr)
+    }
+    if(return_fragSizes){
+        score_gr = fetchBamPE(bam_f,
+                              qgr,
+                              max_dupes,
+                              min_isize,
+                              max_isize,
+                              return_fragSizes = return_fragSizes,
                               ...)
         score_gr = merge(score_gr, data.table(which_label = as.character(qgr), id = names(qgr)), by = "which_label")
         return(score_gr)
@@ -234,6 +250,7 @@ fetchBamPE = function(bam_f,
                       min_isize = 1,
                       max_isize = Inf,
                       return_unprocessed = FALSE,
+                      return_fragSizes = FALSE,
                       ...
 ){
     isize = paired = qname = which_label = NULL #reserve bindings
@@ -269,9 +286,16 @@ fetchBamPE = function(bam_f,
     bam_dt = data.table::rbindlist(bam_dt,
                                    use.names = TRUE,
                                    idcol = "which_label")
+    if(return_fragSizes){
+        bam_dt = bam_dt[isize > 0]
+        bam_dt[, c("start_min", "end_max") := tstrsplit(which_label, "[:-]", keep = 2:3)]
+        bam_dt = bam_dt[start > start_min & start + width < end_max]
+        return(bam_dt[, .(which_label, fragment_size = isize)])
+    }
     if(return_unprocessed){
         return(bam_dt)
     }
+
     # ggplot(bam_dt[isize >= 0, ], aes(x = isize)) + geom_histogram() + facet_wrap("which_label")
 
     bam_dt = bam_dt[!is.na(width)]

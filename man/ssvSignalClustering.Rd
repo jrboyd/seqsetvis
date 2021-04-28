@@ -22,7 +22,8 @@ ssvSignalClustering(
   clustering_col_min = -Inf,
   clustering_col_max = Inf,
   within_order_strategy = c("hclust", "sort")[2],
-  dcast_fill = NA
+  dcast_fill = NA,
+  iter.max = 30
 )
 }
 \arguments{
