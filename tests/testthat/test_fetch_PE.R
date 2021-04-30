@@ -60,6 +60,49 @@ pe_raw = ssvFetchBamPE(
     return_fragSizes = TRUE
 )
 
+
+test_that("viewGRangesWinSample_dt strand and position functions", {
+    bam_score = seqsetvis:::fetchBamPE(pe_file, qgr = qgr)
+    score_gr = bam_score
+    window_size = 50
+    anchor = "center"
+    qgr_stranded = qgr
+    GenomicRanges::strand(qgr_stranded) = c(rep("+", 2), rep("-", 2))
+
+    b_dt_center = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, anchor = "center")
+
+    b_dt_center_uns = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, anchor = "center_unstranded")
+
+    b_dt_left = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, anchor = "left")
+
+    b_dt_left_uns = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, anchor = "left_unstranded")
+
+    b_dt = rbindlist(list(center = b_dt_center,
+                          center_unstranded = b_dt_center_uns,
+                          left = b_dt_left,
+                          left_unstranded = b_dt_left_uns), use.names = T, idcol = "group")
+    b_dt[, facet_label := paste(id, strand)]
+    cowplot::plot_grid(
+        ggplot(b_dt[grepl("center", group)]) + geom_path(aes(x = x, y = y, color = group)) + facet_wrap("facet_label") + labs(title = "centered"),
+        ggplot(b_dt[!grepl("center", group)]) + geom_path(aes(x = x, y = y, color = group)) + facet_wrap("facet_label") + labs(title = "left")
+
+    )
+
+
+    #verify stranded equal for + and not equal for -
+    expect_true(all(b_dt_center[strand == "+"]$x == b_dt_center_uns[strand == "+"]$x))
+    expect_true(all(!b_dt_center[strand == "-"]$x == b_dt_center_uns[strand == "-"]$x))
+    expect_true(all(b_dt_left[strand == "+"]$x == b_dt_left_uns[strand == "+"]$x))
+    expect_true(all(!b_dt_left[strand == "-"]$x == b_dt_left_uns[strand == "-"]$x))
+    #verify center and left not equal
+    expect_true(all(!b_dt_center$x == b_dt_left$x))
+    expect_true(all(!b_dt_center_uns$x == b_dt_left_uns$x))
+    #verify center and left ARE equal if minus min
+    expect_true(all(b_dt_center$x - min(b_dt_center$x) == b_dt_left$x - min(b_dt_left$x)))
+    expect_true(all(b_dt_center_uns$x - min(b_dt_center_uns$x) == b_dt_left_uns$x - min(b_dt_left_uns$x)))
+})
+
+
 # pe_raw[isize > 0, mean(isize), .(id)]
 # pe_raw$id = factor(pe_raw$id, levels = qgr$name)
 # ggplot(pe_raw[isize > 0, ], aes(x = isize)) + geom_histogram() + facet_wrap("id")

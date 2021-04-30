@@ -114,13 +114,22 @@ ssvFetchBam = function(file_paths,
     names(fragLens) = unique_names
     names(file_paths) = unique_names
 
-    for(nam in unique_names){
-        if(!is.na(fragLens[nam]) && fragLens[nam] == "auto"){
-            fl = fragLen_calcStranded(file_paths[nam], qgr, flip_strand = flip_strand)
-            fragLens[nam] = fl
-            message("fragLen for ", basename(nam), " was calculated as: ", fl)
-        }
+    if(any(fragLens == 'auto', na.rm = TRUE)){
+        message("Calculating average fragment length for ", sum(fragLens == "auto", na.rm = TRUE), " bam file(s).")
+        calc_fl = pbmcapply::pbmclapply(names(fragLens), function(nam){
+            if(!is.na(fragLens[nam]) && fragLens[nam] == "auto"){
+                fl = fragLen_calcStranded(file_paths[nam], qgr, flip_strand = flip_strand)
+                message("fragLen for ", basename(nam), " was calculated as: ", fl)
+            }else{
+                fl = fragLens[nam]
+            }
+            fl
+        })
+        calc_fl = unlist(calc_fl)
+        names(calc_fl) = names(fragLens)
+        fragLens = calc_fl
     }
+
     fragLens = as.numeric(fragLens)
     names(fragLens) = unique_names
 

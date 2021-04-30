@@ -54,13 +54,16 @@ test_that("viewGRangesWinSample_dt strand and position functions", {
 
     b_dt_left_uns = viewGRangesWinSample_dt(bam_score, qgr_stranded, 50, anchor = "left_unstranded")
 
-    # b_dt = rbindlist(list(center = b_dt_center,
-    #                       center_unstranded = b_dt_center_uns,
-    #                       left = b_dt_left,
-    #                       left_unstranded = b_dt_left_uns), use.names = T, idcol = "group")
-    # b_dt[, facet_label := paste(id, strand)]
-    # ggplot(b_dt[grepl("center", group)]) + geom_path(aes(x = x, y = y, color = group)) + facet_wrap("facet_label")
-    # ggplot(b_dt[!grepl("center", group)]) + geom_path(aes(x = x, y = y, color = group)) + facet_wrap("facet_label")
+    b_dt = rbindlist(list(center = b_dt_center,
+                          center_unstranded = b_dt_center_uns,
+                          left = b_dt_left,
+                          left_unstranded = b_dt_left_uns), use.names = T, idcol = "group")
+    b_dt[, facet_label := paste(id, strand)]
+    cowplot::plot_grid(
+        ggplot(b_dt[grepl("center", group)]) + geom_path(aes(x = x, y = y, color = group)) + facet_wrap("facet_label") + labs(title = "centered"),
+        ggplot(b_dt[!grepl("center", group)]) + geom_path(aes(x = x, y = y, color = group)) + facet_wrap("facet_label") + labs(title = "left")
+
+    )
 
 
     #verify stranded equal for + and not equal for -
