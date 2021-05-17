@@ -190,11 +190,16 @@ ssvFeatureUpset = function(object,
     up_df = ifelse(up_df, 1, 0)
     up_df = as.data.frame(up_df)
     if(is.null(nsets)) nsets = ncol(up_df)
-    p_up = UpSetR::upset(up_df,
-                         nsets = nsets,
-                         nintersects = nintersects,
-                         order.by = order.by,
-                         ...)
+    if(ncol(up_df) > 1){
+        p_up = UpSetR::upset(up_df,
+                             nsets = nsets,
+                             nintersects = nintersects,
+                             order.by = order.by,
+                             ...)
+    }else{
+        p_up = ggplot() + theme_void() +
+            labs(title = "cannot run UpSetR on only 1 set.")
+    }
     if(return_UpSetR){
         return(p_up)
     }
