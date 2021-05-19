@@ -67,6 +67,8 @@ hierarchical clustering will be used. if sort, a simple decreasing sort of
 rosSums.}
 
 \item{dcast_fill}{value to supply to dcast fill argument. default is NA.}
+
+\item{iter.max}{Number of max iterations to allow for k-means. Default is 30.}
 }
 \value{
 data.table of signal profiles, ready for ssvSignalHeatmap

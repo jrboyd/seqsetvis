@@ -31,6 +31,8 @@ of NULL results in randomly initialized k-means.}
 \item{manual_mapping}{optional named vector manually specififying cluster
 assignments. names should be item ids and values should be cluster names
 the items are assigned to. Default of NULL allows clustering to proceed.}
+
+\item{iter.max}{Number of max iterations to allow for k-means. Default is 30.}
 }
 \value{
 data.table with 2 columns of cluster info. id column corresponds with

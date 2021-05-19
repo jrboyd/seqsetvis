@@ -59,7 +59,7 @@ TODO refactor shared code with clusteringKmeansNestedHclust
 #this is a good situation to apply a separate sort within clusters.
 prof_dt = CTCF_in_10a_profiles_dt
 prof_dt = append_ynorm(prof_dt)
-prof_dt[, y_relative := y_norm / max(y_norm), .(id)]
+prof_dt[, y_relative := y_norm / max(y_norm), list(id)]
 
 clust_dt = ssvSignalClustering(prof_dt, fill_ = "y_relative")
 clust_dt.sort = within_clust_sort(clust_dt)

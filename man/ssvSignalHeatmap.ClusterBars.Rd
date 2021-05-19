@@ -47,6 +47,8 @@ auto considers if row_ has been ordered by being a factor and if cluster_ is a n
 
 \item{cluster_}{variable name to use for cluster info. Default is "cluster_id".}
 
+\item{FUN_format_heatmap}{optional function to modify main ggplot (labels, themes, scales, etc.).  Take a ggplot and returns a ggplot. Default is NULL.}
+
 \item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot full data}
 
 \item{max_cols}{for speed columns are sampled to 100 by default, use Inf to plot full data}

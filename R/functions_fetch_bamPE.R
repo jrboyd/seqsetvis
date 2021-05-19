@@ -253,7 +253,7 @@ fetchBamPE = function(bam_f,
                       return_fragSizes = FALSE,
                       ...
 ){
-    isize = paired = qname = which_label = NULL #reserve bindings
+    isize = paired = qname = which_label = start_min = end_max = NULL #reserve bindings
     stopifnot(is.numeric(min_isize))
     stopifnot(is.numeric(max_isize))
     stopifnot(min_isize > 0)
@@ -290,7 +290,7 @@ fetchBamPE = function(bam_f,
         bam_dt = bam_dt[isize > 0]
         bam_dt[, c("start_min", "end_max") := tstrsplit(which_label, "[:-]", keep = 2:3)]
         bam_dt = bam_dt[start > start_min & start + width < end_max]
-        return(bam_dt[, .(which_label, fragment_size = isize)])
+        return(bam_dt[, list(which_label, fragment_size = isize)])
     }
     if(return_unprocessed){
         return(bam_dt)

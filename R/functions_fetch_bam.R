@@ -177,12 +177,6 @@ ssvFetchBam = function(file_paths,
                          n_region_splits = n_region_splits,
                          force_skip_centerFix = force_skip_centerFix)
 
-    # if(flip_strand){
-    #     if(target_strand != "*"){
-    #         bdt[, strand := ifelse(strand == "+", "-", "+")]
-    #     }
-    # }
-
     if(!return_data.table & !return_unprocessed){
         bdt = GRanges(bdt)
     }
@@ -245,7 +239,7 @@ ssvFetchBam.single = function(bam_f,
                               return_unprocessed = FALSE,
                               force_skip_centerFix = FALSE,
                               ...) {
-    x = id = y = NULL
+    x = id = y = NULL #binding for data.table
     stopifnot(is.character(win_method))
     stopifnot(length(win_method) == 1)
     stopifnot(is(qgr, "GRanges"))

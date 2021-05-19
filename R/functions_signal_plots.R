@@ -693,6 +693,7 @@ ssvSignalHeatmap = function(bw_data,
 #' @param fill_ numeric variable to map to fill. Default is "y" and works with ssvFetch* output.
 #' @param facet_ variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.
 #' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
+#' @param FUN_format_heatmap optional function to modify main ggplot (labels, themes, scales, etc.).  Take a ggplot and returns a ggplot. Default is NULL.
 #' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot full data
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to plot full data
 #' @param fill_limits limits for fill legend.  values will be cropped to this range if set.  Default of NULL uses natural range of fill_.

@@ -16,6 +16,8 @@ clusteringKmeans(mat, nclust, centroids = NULL, iter.max = 30)
 \item{centroids}{optional matrix with same columns as mat and one centroid
 per row to base clusters off of.  Overrides any setting to nclust. Default
 of NULL results in randomly initialized k-means.}
+
+\item{iter.max}{Number of max iterations to allow for k-means. Default is 30.}
 }
 \value{
 data.table with group variable indicating cluster membership and id

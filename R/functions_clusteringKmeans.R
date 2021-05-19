@@ -40,6 +40,7 @@
 #'   hierarchical clustering will be used. if sort, a simple decreasing sort of
 #'   rosSums.
 #' @param dcast_fill value to supply to dcast fill argument. default is NA.
+#' @param iter.max Number of max iterations to allow for k-means. Default is 30.
 #'
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @return data.table of signal profiles, ready for ssvSignalHeatmap
@@ -193,6 +194,7 @@ ssvSignalClustering = function(bw_data, nclust = NULL,
 #' @param centroids optional matrix with same columns as mat and one centroid
 #'   per row to base clusters off of.  Overrides any setting to nclust. Default
 #'   of NULL results in randomly initialized k-means.
+#' @param iter.max Number of max iterations to allow for k-means. Default is 30.
 #'
 #' @return data.table with group variable indicating cluster membership and id
 #'   variable that is a factor indicating order based on within cluster
@@ -271,6 +273,8 @@ clusteringKmeans = function(mat, nclust, centroids = NULL, iter.max = 30) {
 #' @param manual_mapping optional named vector manually specififying cluster
 #'   assignments. names should be item ids and values should be cluster names
 #'   the items are assigned to. Default of NULL allows clustering to proceed.
+#' @param iter.max Number of max iterations to allow for k-means. Default is 30.
+#'
 #' @export
 #' @importFrom stats  hclust dist
 #' @return data.table with 2 columns of cluster info. id column corresponds with
@@ -355,7 +359,7 @@ clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("
 #' #this is a good situation to apply a separate sort within clusters.
 #' prof_dt = CTCF_in_10a_profiles_dt
 #' prof_dt = append_ynorm(prof_dt)
-#' prof_dt[, y_relative := y_norm / max(y_norm), .(id)]
+#' prof_dt[, y_relative := y_norm / max(y_norm), list(id)]
 #'
 #' clust_dt = ssvSignalClustering(prof_dt, fill_ = "y_relative")
 #' clust_dt.sort = within_clust_sort(clust_dt)
@@ -397,7 +401,7 @@ within_clust_sort = function(clust_dt,
     stopifnot(within_order_strategy %in% c("hclust", "sort"))
     group = id = within_o = NULL#declare binding for data.table
 
-    mat_dt = unique(clust_dt[, .(id = get(row_), group = get(cluster_))])
+    mat_dt = unique(clust_dt[, list(id = get(row_), group = get(cluster_))])
     mat_dt$within_o = as.numeric(-1)
     for (i in unique(mat_dt$group)) {
         cmat = mat[mat_dt[group == i, id], , drop = FALSE]
