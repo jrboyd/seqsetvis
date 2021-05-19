@@ -59,7 +59,7 @@
 #'                       target_strand = "*",
 #'                       return_data.table = TRUE)
 #'
-#'     set(dt, j = "sample", value = nam)
+#'     data.table::set(dt, j = "sample", value = nam)
 #'     message("finished loading ", nam, ".")
 #'     dt
 #' }
@@ -162,6 +162,9 @@ ssvFetchSignal = function(file_paths,
 
 
     for (i in seq_along(bw_list)) {
+        if(truelength(bw_list[[i]]) < 200){#data.table specific check
+            bw_list[[i]] = setalloccol(bw_list[[i]])
+        }
         for (attrib in colnames(file_attribs)) {
             if(nrow(bw_list[[i]]) == 0){
                 set(bw_list[[i]], j = attrib, value = file_attribs[[attrib]][0])
