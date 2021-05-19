@@ -91,7 +91,8 @@ load_bam = function(f, nam, qgr) {
                       fragLen = NULL,
                       target_strand = "*",
                       return_data.table = TRUE)
-    dt[["sample"]] = nam
+
+    set(dt, j = "sample", value = nam)
     message("finished loading ", nam, ".")
     dt
 }
