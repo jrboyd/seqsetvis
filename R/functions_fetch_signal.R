@@ -58,7 +58,8 @@
 #'                       fragLen = NULL,
 #'                       target_strand = "*",
 #'                       return_data.table = TRUE)
-#'     dt[["sample"]] = nam
+#'
+#'     set(dt, j = "sample", value = nam)
 #'     message("finished loading ", nam, ".")
 #'     dt
 #' }
@@ -163,14 +164,14 @@ ssvFetchSignal = function(file_paths,
     for (i in seq_along(bw_list)) {
         for (attrib in colnames(file_attribs)) {
             if(nrow(bw_list[[i]]) == 0){
-                bw_list[[i]][[attrib]] = file_attribs[[attrib]][0]
+                set(bw_list[[i]], j = attrib, value = file_attribs[[attrib]][0])
             }else{
-                bw_list[[i]][[attrib]] = file_attribs[[attrib]][i]
+                set(bw_list[[i]], j = attrib, value = file_attribs[[attrib]][i])
             }
         }
     }
     out = data.table::rbindlist(bw_list)
-    out[[names_variable]] = factor(out[[names_variable]], levels = unique_names)
+    set(out, j = names_variable, value = factor(out[[names_variable]], levels = unique_names))
     if (!return_data.table) {
         out = GRanges(out)
     }
