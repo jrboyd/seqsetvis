@@ -1,8 +1,4 @@
-# 1.11.15
-
-* docs to address warnings and notes
-
-# 1.11.14
+# 1.13.1
 
 * calling ssvFeatureUpset with a single set now produces plot with message instead of uncaught error.
 * data.table assignments by [[]] switched to set() to avoid invalid .internal.selref warnings
@@ -10,13 +6,10 @@
 * added easyLoad_FUN to allow arbitrary load functions
 * added easyLoad_IDRmerged
 * added within_cluster_sort for sorting within clusters by different values/data.
-
-
-# 1.11.13
-
 * kmeans iter.max
 * inject formating to ssvSignalHeatmap.ClusterBars with FUN_format_heatmap
 * cluster reorder disabled if manual clusters
+* docs to address warnings and notes
 
 # 1.11.12
 
