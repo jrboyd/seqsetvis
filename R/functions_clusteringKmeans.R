@@ -415,8 +415,6 @@ within_clust_sort = function(clust_dt,
         }else if(within_order_strategy == "sort"){
             mat_dt[group == i, ]$within_o = rank(-rowSums(cmat))
         }
-
-
     }
     mat_dt = mat_dt[order(within_o), ][order(group), ]
     mat_dt$id = factor(mat_dt$id, levels = mat_dt$id)
