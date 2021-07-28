@@ -77,7 +77,6 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
         dt = bw_data[get(by_) == td, list(qs = list(list(stats::quantile(get(y_), q2do)))), by = x_]
         qmat = matrix(unlist(dt$qs), nrow = nrow(dt), ncol = length(q2do), byrow = TRUE)
         colnames(qmat) = paste0(q2do*100, "%")
-        # sapply(dt$qs, function(x)x[[1]])
         dt = cbind(dt, qmat)
         dt$qs = NULL
         dtm = data.table::melt(dt, id.vars = x_)
@@ -816,11 +815,11 @@ assemble_heatmap_cluster_bars = function(plots, ...){
     cowplot::plot_grid(plotlist = grobs, ...)
 }
 
-sync_height = function(my_plots){
-    stopifnot(class(my_plots) == "list")
-    is_ok = sapply(my_plots, function(x){
+sync_height = function(my_plots, sync_width = FALSE){
+    stopifnot(is(my_plots, "list"))
+    is_ok = vapply(my_plots, function(x){
         "ggplot" %in% class(x) | "grob" %in% class(x)
-    })
+    }, FUN.VALUE = TRUE)
     stopifnot(all(is_ok))
     my_grobs = lapply(my_plots, function(x){
         if(grid::is.grob(x)){
@@ -830,17 +829,22 @@ sync_height = function(my_plots){
         }
     })
 
-    my_widths = lapply(my_grobs, function(gt){
-        gt$heights
+    if(sync_width){
+        val = "widths"
+    }else{
+        val = "heights"
+    }
+    dim_sizes = lapply(my_grobs, function(gt){
+        gt[[val]]
     })
-    maxWidth = my_widths[[1]]
-    if(length(my_widths) > 1){
-        for(i in 2:length(my_widths)){
-            maxWidth = grid::unit.pmax(maxWidth, my_widths[[i]])
+    max_dim_size = dim_sizes[[1]]
+    if(length(dim_sizes) > 1){
+        for(i in seq(2, length(dim_sizes))){
+            max_dim_size = grid::unit.pmax(max_dim_size, dim_sizes[[i]])
         }
     }
-    for(j in 1:length(my_grobs)){
-        my_grobs[[j]]$heights = maxWidth
+    for(j in seq_along(my_grobs)){
+        my_grobs[[j]][[val]] = max_dim_size
     }
     my_grobs
 }

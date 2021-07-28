@@ -75,7 +75,7 @@ easyLoad_IDRmerged = function(file_paths,
     chr1 = start1 = start2 = stop1 = stop2 = sig.value1 = sig.value2 = idr.local = IDR = NULL
     load_idr = function(f, max_idr = .05){
         idr_dt = suppressWarnings({data.table::fread(f)[IDR <= max_idr]})
-        GenomicRanges::GRanges(idr_dt[, .(seqnames = chr1, start = pmin(start1, start2), end = pmax(stop1, stop2), sig.value1, sig.value2, idr.local, IDR)])
+        GenomicRanges::GRanges(idr_dt[, list(seqnames = chr1, start = pmin(start1, start2), end = pmax(stop1, stop2), sig.value1, sig.value2, idr.local, IDR)])
     }
     easyLoad_FUN(file_paths, load_idr, file_names, n_cores, max_idr = max_idr)
 }

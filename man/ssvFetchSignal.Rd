@@ -92,7 +92,7 @@ load_bam = function(f, nam, qgr) {
                       target_strand = "*",
                       return_data.table = TRUE)
 
-    set(dt, j = "sample", value = nam)
+    data.table::set(dt, j = "sample", value = nam)
     message("finished loading ", nam, ".")
     dt
 }
