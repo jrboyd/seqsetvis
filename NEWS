@@ -1,3 +1,7 @@
+# 1.13.2
+
+* bugfix to avoid using pbmclapply on windows
+
 # 1.13.1
 
 * calling ssvFeatureUpset with a single set now produces plot with message instead of uncaught error.
