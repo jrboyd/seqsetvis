@@ -56,6 +56,7 @@
 #'   10, values from positions chr1 5,15,25...85, and 95 will be retrieved from
 #'   \code{bw_file}
 #' @importFrom stats weighted.mean
+#' @importFrom pbapply pblapply
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
 #' library(GenomicRanges)
@@ -116,15 +117,28 @@ ssvFetchBam = function(file_paths,
 
     if(any(fragLens == 'auto', na.rm = TRUE)){
         message("Calculating average fragment length for ", sum(fragLens == "auto", na.rm = TRUE), " bam file(s).")
-        calc_fl = pbmcapply::pbmclapply(names(fragLens), function(nam){
-            if(!is.na(fragLens[nam]) && fragLens[nam] == "auto"){
-                fl = fragLen_calcStranded(file_paths[nam], qgr, flip_strand = flip_strand)
-                message("fragLen for ", basename(nam), " was calculated as: ", fl)
-            }else{
-                fl = fragLens[nam]
-            }
-            fl
-        })
+        if(.Platform$OS.type == "windows") {
+            calc_fl = pbapply::pblapply(names(fragLens), function(nam){
+                if(!is.na(fragLens[nam]) && fragLens[nam] == "auto"){
+                    fl = fragLen_calcStranded(file_paths[nam], qgr, flip_strand = flip_strand)
+                    message("fragLen for ", basename(nam), " was calculated as: ", fl)
+                }else{
+                    fl = fragLens[nam]
+                }
+                fl
+            })
+        } else {
+            calc_fl = pbmcapply::pbmclapply(names(fragLens), function(nam){
+                if(!is.na(fragLens[nam]) && fragLens[nam] == "auto"){
+                    fl = fragLen_calcStranded(file_paths[nam], qgr, flip_strand = flip_strand)
+                    message("fragLen for ", basename(nam), " was calculated as: ", fl)
+                }else{
+                    fl = fragLens[nam]
+                }
+                fl
+            })
+        }
+
         calc_fl = unlist(calc_fl)
         names(calc_fl) = names(fragLens)
         fragLens = calc_fl
