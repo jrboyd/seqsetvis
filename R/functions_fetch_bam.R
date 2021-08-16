@@ -117,8 +117,7 @@ ssvFetchBam = function(file_paths,
 
     if(any(fragLens == 'auto', na.rm = TRUE)){
         message("Calculating average fragment length for ", sum(fragLens == "auto", na.rm = TRUE), " bam file(s).")
-        if(.Platform$OS.type == "windows") {
-            calc_fl = pbapply::pblapply(names(fragLens), function(nam){
+            calc_fl = ssv_mclapply(names(fragLens), function(nam){
                 if(!is.na(fragLens[nam]) && fragLens[nam] == "auto"){
                     fl = fragLen_calcStranded(file_paths[nam], qgr, flip_strand = flip_strand)
                     message("fragLen for ", basename(nam), " was calculated as: ", fl)
@@ -127,17 +126,6 @@ ssvFetchBam = function(file_paths,
                 }
                 fl
             })
-        } else {
-            calc_fl = pbmcapply::pbmclapply(names(fragLens), function(nam){
-                if(!is.na(fragLens[nam]) && fragLens[nam] == "auto"){
-                    fl = fragLen_calcStranded(file_paths[nam], qgr, flip_strand = flip_strand)
-                    message("fragLen for ", basename(nam), " was calculated as: ", fl)
-                }else{
-                    fl = fragLens[nam]
-                }
-                fl
-            })
-        }
 
         calc_fl = unlist(calc_fl)
         names(calc_fl) = names(fragLens)

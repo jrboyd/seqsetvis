@@ -42,7 +42,7 @@ easyLoad_FUN = function(file_paths, load_FUN,
         grs <- lapply(
             file_paths, load_FUN, ...)
     }else{
-        grs = pbmcapply::pbmclapply(
+        grs = ssv_mclapply(
             file_paths,
             load_FUN,
             mc.cores = n_cores, ...)

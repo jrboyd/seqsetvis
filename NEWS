@@ -1,3 +1,7 @@
+# 1.13.3
+
+* better bugfix to avoid using pbmclapply on windows via ssv_mclapply
+
 # 1.13.2
 
 * bugfix to avoid using pbmclapply on windows
