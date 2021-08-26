@@ -58,7 +58,8 @@
 #' clust_dt4 = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 2,
 #'     clustering_col_min = 150, clustering_col_max = 250)
 #' ssvSignalHeatmap(clust_dt4)
-ssvSignalClustering = function(bw_data, nclust = NULL,
+ssvSignalClustering = function(bw_data,
+                               nclust = NULL,
                                k_centroids = NULL,
                                memb_table = NULL,
                                row_ = "id",
@@ -294,6 +295,12 @@ clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("
     stopifnot(is.numeric(nclust))
     stopifnot(within_order_strategy %in% c("hclust", "sort"))
     group = id = within_o = NULL#declare binding for data.table
+
+    if(nclust > (nrow(mat)-1) & is.null(centroids)){
+        nclust = nrow(mat)-1
+        message("nclust too high for number of items. Reducing to ", nclust)
+    }
+
     if(is.null(manual_mapping)){
         mat_dt = clusteringKmeans(mat, nclust, centroids, iter.max)
     }else{

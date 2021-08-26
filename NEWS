@@ -1,3 +1,7 @@
+# 1.13.4
+
+* auto reduce nclust when too high
+
 # 1.13.3
 
 * better bugfix to avoid using pbmclapply on windows via ssv_mclapply
