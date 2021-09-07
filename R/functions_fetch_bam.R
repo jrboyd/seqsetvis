@@ -117,15 +117,15 @@ ssvFetchBam = function(file_paths,
 
     if(any(fragLens == 'auto', na.rm = TRUE)){
         message("Calculating average fragment length for ", sum(fragLens == "auto", na.rm = TRUE), " bam file(s).")
-            calc_fl = ssv_mclapply(names(fragLens), function(nam){
-                if(!is.na(fragLens[nam]) && fragLens[nam] == "auto"){
-                    fl = fragLen_calcStranded(file_paths[nam], qgr, flip_strand = flip_strand)
-                    message("fragLen for ", basename(nam), " was calculated as: ", fl)
-                }else{
-                    fl = fragLens[nam]
-                }
-                fl
-            })
+        calc_fl = ssv_mclapply(names(fragLens), function(nam){
+            if(!is.na(fragLens[nam]) && fragLens[nam] == "auto"){
+                fl = fragLen_calcStranded(file_paths[nam], qgr, flip_strand = flip_strand)
+                message("fragLen for ", basename(nam), " was calculated as: ", fl)
+            }else{
+                fl = fragLens[nam]
+            }
+            fl
+        })
 
         calc_fl = unlist(calc_fl)
         names(calc_fl) = names(fragLens)
@@ -556,6 +556,15 @@ fetchBam = function(bam_f,
 #' seqlengths(gr2)
 harmonize_seqlengths = function(gr, bam_file){
     chr_lengths = Rsamtools::scanBamHeader(bam_file)[[1]]$targets
+    if(!all(as.character(seqnames(gr)) %in% names(chr_lengths))){
+        stop("There are chromosomes present in query GRanges (",
+             paste(setdiff(as.character(seqnames(gr)), names(chr_lengths)), collapse = ", "),
+                   ") not present in bam file (", bam_file, ")!")
+    }
+    to_remove =setdiff(names(GenomeInfoDb::seqlengths(gr)), unique(as.character(seqnames(gr))))
+    if(length(to_remove) > 0){
+        gr = GenomeInfoDb::dropSeqlevels(gr, to_remove)
+    }
     GenomeInfoDb::seqlengths(gr) =
         chr_lengths[names(GenomeInfoDb::seqlengths(gr))]
     too_long = end(gr) >
