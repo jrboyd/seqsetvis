@@ -1,3 +1,7 @@
+# 1.13.5
+
+more robust harmonize_seqlengths
+
 # 1.13.4
 
 * auto reduce nclust when too high
