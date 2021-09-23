@@ -610,12 +610,14 @@ getReadLength = function(bam_file,
         Param <- Rsamtools::ScanBamParam(which=sample(query_gr),
                                          what=c("flag","mapq"))
         temp <- GenomicAlignments::readGAlignments(bam_file,param=Param)
-        if(length(temp) == 0){
-            stop("No reads could be found in query_gr to determine read length. ",
-                 "Please verify that query_gr is appropriate for bam_file: ", bam_file)
-        }
     }
-    readlength=as.numeric(names(sort(table(width(temp)), decreasing = TRUE))[1])
+    if(length(temp) == 0){
+        warning("No reads could be found in query_gr to determine read length. Setting to 180.",
+                "Please verify that query_gr is appropriate for bam_file: ", bam_file)
+        readlength = 180
+    }else{
+        readlength=as.numeric(names(sort(table(width(temp)), decreasing = TRUE))[1])
+    }
     readlength
 }
 
