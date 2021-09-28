@@ -177,7 +177,7 @@ ssvSignalClustering = function(bw_data,
                                              iter.max = iter.max)
     rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
     plot_dt = plot_dt[get(row_) %in% rclusters[["id"]]]
-    plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rclusters[["id"]])
+    plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rev(rclusters[["id"]]))
     data.table::setkey(rclusters, id)
     plot_dt[[cluster_]] = rclusters[list(plot_dt[[row_]]), group]
     if(output_GRanges){
@@ -408,29 +408,53 @@ within_clust_sort = function(clust_dt,
     stopifnot(within_order_strategy %in% c("hclust", "sort"))
     group = id = within_o = NULL#declare binding for data.table
 
-    mat_dt = unique(clust_dt[, list(id = get(row_), group = get(cluster_))])
+    mat_dt = unique(clust_dt[, list(id__ = get(row_), group__ = get(cluster_))])
     mat_dt$within_o = as.numeric(-1)
-    for (i in unique(mat_dt$group)) {
-        cmat = mat[mat_dt[group == i, id], , drop = FALSE]
+    for (i in unique(mat_dt$group__)) {
+        cmat = mat[mat_dt[group__ == i, id__], , drop = FALSE]
         if(within_order_strategy == "hclust"){
             if (nrow(cmat) > 2) {
-                mat_dt[group == i, ]$within_o =
+                mat_dt[group__ == i, ]$within_o =
                     stats::hclust(stats::dist((cmat)))$order
             } else {
-                mat_dt[group == i, ]$within_o = seq_len(nrow(cmat))
+                mat_dt[group__ == i, ]$within_o = seq_len(nrow(cmat))
             }
         }else if(within_order_strategy == "sort"){
-            mat_dt[group == i, ]$within_o = rank(-rowSums(cmat))
+            mat_dt[group__ == i, ]$within_o = rank(-rowSums(cmat))
         }
     }
-    mat_dt = mat_dt[order(within_o), ][order(group), ]
-    mat_dt$id = factor(mat_dt$id, levels = mat_dt$id)
+    mat_dt = mat_dt[order(within_o), ][order(group__), ]
+    mat_dt$id__ = factor(mat_dt$id__, levels = mat_dt$id__)
     mat_dt$within_o = NULL
-    if(!is.factor(mat_dt$group)){
-        mat_dt$group = factor(mat_dt$group)
+    if(!is.factor(mat_dt$group__)){
+        mat_dt$group__ = factor(mat_dt$group__, levels = unique(mat_dt$group))
     }
 
-    clust_dt$id = factor(clust_dt$id, levels = rev(levels(mat_dt$id)))
+    #repair var names
+    clust_dt[[row_]] = factor(clust_dt[[row_]], levels = rev(levels(mat_dt$id__)))
+    # clust_dt[[cluster_]] = factor(clust_dt[[cluster_]], levels = levels(mat_dt$group__))
 
     return(clust_dt)
 }
+#
+# reorder_clusters_stepdown = function(clust_dt){
+#
+# }
+#
+# reorder_clusters_hclust = function(clust_dt){
+#
+# }
+#
+# clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt)
+# ssvSignalHeatmap(clust_dt)
+# manual_order = c(2)
+# cluster_ = "cluster_id"
+# row_ = "id"
+# reorder_clusters_manual = function(clust_dt, manual_order, cluster_ = "cluster_id", row_ = "id"){
+#     new_dt = copy(clust_dt[order(get(row_))])
+#     if(!is.factor(new_dt[[cluster_]])){
+#         new_dt[[cluster_]] = factor(new_dt[[cluster_]], levels = rev(unique(new_dt[[cluster_]])))
+#     }
+#     new_dt$cluster_id
+#     new_dt[order(get(cluster_))]
+# }

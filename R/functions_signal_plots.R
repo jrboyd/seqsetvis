@@ -602,6 +602,8 @@ ssvSignalHeatmap = function(bw_data,
     message("making plot...")
     scale_floor = .1
     scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
+    plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rev(levels(plot_dt[[row_]])))
+
     if(is.numeric(plot_dt[[fill_]])){
         if(!is.null(fill_limits)){
             ymax = max(fill_limits)
