@@ -1,6 +1,14 @@
+# 1.13.6
+
+* added "left" and "right" within_order_strategy options to within_clust_sort
+* added  function reorder_clusters_stepdown - attempts to arrange clusters so that more signal is on the left at the top and right at the bottom
+* added  function reorder_clusters_hclust - arranges clusters using hierarchical clustering of centroids
+* added  function reorder_clusters_manual - manually specify cluster order, brings manually specified clusters to top
+* added  function merge_clusters - merges multiple clusters together
+
 # 1.13.5
 
-more robust harmonize_seqlengths
+* more robust harmonize_seqlengths
 
 # 1.13.4
 
