@@ -336,18 +336,27 @@ clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("
 
 #' within_clust_sort
 #'
-#' Without modifying cluster assignments, modify the order of rows within each cluster based on within_order_strategy.
+#' Without modifying cluster assignments, modify the order of rows within each
+#' cluster based on within_order_strategy.
 #'
-#' This is particularly useful when you want to sort within each cluster by a different variable from cluster assignment. Also if you've imported cluster assigments but want to sort within each for the new data for a prettier heatmap.
+#' This is particularly useful when you want to sort within each cluster by a
+#' different variable from cluster assignment. Also if you've imported cluster
+#' assigments but want to sort within each for the new data for a prettier
+#' heatmap.
 #'
 #' TODO refactor shared code with clusteringKmeansNestedHclust
 #'
 #' @param clust_dt data.table output from \code{\link{ssvSignalClustering}}
-#' @param row_ variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.
-#' @param column_ varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.
-#' @param fill_ numeric variable to map to fill. Default is "y" and works with ssvFetch* output.
-#' @param facet_ variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.
-#' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data.
+#'   Default is "id" and works with ssvFetch* output.
+#' @param column_ varaible mapped to column, likely bp position for ngs data.
+#'   Default is "x" and works with ssvFetch* output.
+#' @param fill_ numeric variable to map to fill. Default is "y" and works with
+#'   ssvFetch* output.
+#' @param facet_ variable name to facet horizontally by. Default is "sample" and
+#'   works with ssvFetch* output. Set to "" if data is not facetted.
+#' @param cluster_ variable name to use for cluster info. Default is
+#'   "cluster_id".
 #' @param clustering_col_min numeric minimum for col range considered when
 #'   clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when
@@ -357,7 +366,8 @@ clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("
 #'   rosSums.
 #' @param dcast_fill value to supply to dcast fill argument. default is NA.
 #'
-#' @return data.table matching input clust_dt save for the reassignment of levels of row_ variable.
+#' @return data.table matching input clust_dt save for the reassignment of
+#'   levels of row_ variable.
 #' @export
 #'
 #' @examples
@@ -382,7 +392,7 @@ within_clust_sort = function(clust_dt,
                              fill_ = "y",
                              facet_ = "sample",
                              cluster_ = "cluster_id",
-                             within_order_strategy = c("hclust", "sort")[2],
+                             within_order_strategy = c("hclust", "sort", "left", "right")[2],
                              clustering_col_min = -Inf,
                              clustering_col_max = Inf,
                              dcast_fill = NA) {
@@ -405,7 +415,7 @@ within_clust_sort = function(clust_dt,
         dcast_fill = dcast_fill
     )
 
-    stopifnot(within_order_strategy %in% c("hclust", "sort"))
+    stopifnot(within_order_strategy %in% c("hclust", "sort", "left", "right"))
     group = id = within_o = NULL#declare binding for data.table
 
     mat_dt = unique(clust_dt[, list(id__ = get(row_), group__ = get(cluster_))])
@@ -421,6 +431,10 @@ within_clust_sort = function(clust_dt,
             }
         }else if(within_order_strategy == "sort"){
             mat_dt[group__ == i, ]$within_o = rank(-rowSums(cmat))
+        }else if(within_order_strategy == "left"){
+          mat_dt[group__ == i, ]$within_o = rank(apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
+        }else if(within_order_strategy == "right"){
+          mat_dt[group__ == i, ]$within_o = rank(-apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
         }
     }
     mat_dt = mat_dt[order(within_o), ][order(group__), ]
@@ -431,30 +445,186 @@ within_clust_sort = function(clust_dt,
     }
 
     #repair var names
-    clust_dt[[row_]] = factor(clust_dt[[row_]], levels = rev(levels(mat_dt$id__)))
+    clust_dt[[row_]] = factor(clust_dt[[row_]], levels = levels(mat_dt$id__))
     # clust_dt[[cluster_]] = factor(clust_dt[[cluster_]], levels = levels(mat_dt$group__))
 
     return(clust_dt)
 }
+
+
+
+#' reorder_clusters_stepdown
+#'
+#' Attempts to reorder clusters so that rows with highest signal on the left
+#' relative to the right appear at the top. Signal should have a roughly
+#' diagonal pattern in a "stepdown" pattern.
+#'
+#' This can be down by column (step_by_column = TRUE) which averages across
+#' facets.  By facet (step_by_column = FALSE, step_by_facet = TRUE) which
+#' averages all columns per facet. Or both column and facet (step_by_column =
+#' TRUE, step_by_facet = TRUE), which does no averaging so it looks at the full
+#' matrix as plotted.
+#'
+#' @param clust_dt data.table output from \code{\link{ssvSignalClustering}}
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data.
+#'   Default is "id" and works with ssvFetch* output.
+#' @param column_ varaible mapped to column, likely bp position for ngs data.
+#'   Default is "x" and works with ssvFetch* output.
+#' @param fill_ numeric variable to map to fill. Default is "y" and works with
+#'   ssvFetch* output.
+#' @param facet_ variable name to facet horizontally by. Default is "sample" and
+#'   works with ssvFetch* output. Set to "" if data is not facetted.
+#' @param cluster_ variable name to use for cluster info. Default is
+#'   "cluster_id".
+#' @param reapply_cluster_names If TRUE, clusters will be renamed according to
+#'   new order instead of their original names. Default is TRUE.
+#' @param step_by_column If TRUE, column is considered for left-right cluster
+#'   balance. Default is TRUE.
+#' @param step_by_facet If TRUE, facet is considered for left-right cluster
+#'   balance. Default is FALSE.
+#'
+#' @return data.table as output from \code{\link{ssvSignalClustering}}
+#' @export
+#'
+#' @examples
+#' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 10)
+#' new_dt = reorder_clusters_stepdown(clust_dt)
+#' cowplot::plot_grid(
+#'     ssvSignalHeatmap(clust_dt),
+#'     ssvSignalHeatmap(new_dt)
+#' )
+reorder_clusters_stepdown = function(clust_dt,
+                                     row_ = "id",
+                                     column_ = "x",
+                                     fill_ = "y",
+                                     facet_ = "sample",
+                                     cluster_ = "cluster_id",
+                                     reapply_cluster_names = TRUE,
+                                     step_by_column = TRUE,
+                                     step_by_facet = FALSE
+                                     ){
+    new_dt = copy(clust_dt)
+    if(facet_ != ""){
+        if(!is.factor(new_dt[[facet_]])){
+            new_dt[[facet_]] = factor(new_dt[[facet_]], levels = unique(new_dt[[facet_]]))
+        }
+    }
+    agg_dt = new_dt[, .(y = mean(get(fill_))), c(cluster_, column_, ifelse(facet_ == "", character(), facet_))]
+    agg_dt = agg_dt[order(get(column_))][order(get(facet_))]
+
+    if(step_by_column & step_by_facet){
+        wide_dt = dcast(agg_dt, paste0(cluster_, "~", ifelse(facet_ == "", character(), paste0(facet_, "+")), column_), value.var = fill_, fun.aggregate = mean)
+    }else if(step_by_column){
+        wide_dt = dcast(agg_dt, paste0(cluster_, "~", column_), value.var = fill_, fun.aggregate = mean)
+    }else if(step_by_facet){
+        wide_dt = dcast(agg_dt, paste0(cluster_, "~", ifelse(facet_ == "", character(), facet_)), value.var = fill_, fun.aggregate = mean)
+    }
+
+
+    mat = as.matrix(wide_dt[,-1])
+    rownames(mat) = wide_dt[[cluster_]]
+
+    wm_o = sort(apply(mat, 1, function(x){
+      weighted.mean(seq_along(x), x)
+    }))
+    reorder_clusters_manual(new_dt, manual_order = names(wm_o), cluster_ = cluster_, row_ = row_)
+}
+
+
+
+#' reorder_clusters_hclust
+#'
+#' Applies hierarchical clustering to centroids of clusters to reorder.
+#'
+#' @param clust_dt data.table output from \code{\link{ssvSignalClustering}}
+#' @param hclust hclust result returned by a previous call of this function with identical paramters when return_hclust = TRUE.
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data.
+#'   Default is "id" and works with ssvFetch* output.
+#' @param column_ varaible mapped to column, likely bp position for ngs data.
+#'   Default is "x" and works with ssvFetch* output.
+#' @param fill_ numeric variable to map to fill. Default is "y" and works with
+#'   ssvFetch* output.
+#' @param facet_ variable name to facet horizontally by. Default is "sample" and
+#'   works with ssvFetch* output. Set to "" if data is not facetted.
+#' @param cluster_ variable name to use for cluster info. Default is
+#'   "cluster_id".
+#' @param reapply_cluster_names If TRUE, clusters will be renamed according to
+#'   new order instead of their original names. Default is TRUE.
+#' @param return_hclust If TRUE, return the result of hclust instead of the reordered clustering data.table. Default is FALSE.  Ignored if hclust_result is supplied.
+#'
+#' @return data.table as output from \code{\link{ssvSignalClustering}}
+#' @export
+#'
+#' @examples
+#' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 10)
+#' new_dt = reorder_clusters_hclust(clust_dt)
+#' cowplot::plot_grid(
+#'     ssvSignalHeatmap(clust_dt),
+#'     ssvSignalHeatmap(new_dt)
+#' )
+reorder_clusters_hclust = function(clust_dt,
+                                   hclust_result = NULL,
+                                   row_ = "id",
+                                   column_ = "x",
+                                   fill_ = "y",
+                                   facet_ = "sample",
+                                   cluster_ = "cluster_id",
+                                   reapply_cluster_names = TRUE,
+                                   return_hclust = FALSE){
+    new_dt = copy(clust_dt)
+    if(is.null(hclust_result)){
+      agg_dt = new_dt[, .(y = mean(get(fill_))), c(cluster_, column_, ifelse(facet_ == "", character(), facet_))]
+      setnames(agg_dt, "y", fill_)
+      wide_dt = dcast(agg_dt, paste0(cluster_, "~", column_, ifelse(facet_ == "", character(), paste0("+", facet_))), value.var = fill_)
+      mat = as.matrix(wide_dt[,-1])
+      rownames(mat) = wide_dt[[cluster_]]
+      hclust_result = hclust(dist(mat))
+      if(return_hclust){
+        return(hclust_result)
+      }
+    }
+    clust_lev = levels(new_dt[[cluster_]])[hclust_result$order]
+    reorder_clusters_manual(clust_dt, manual_order = clust_lev, cluster_ = cluster_, row_ = row_, reapply_cluster_names = reapply_cluster_names)
+}
 #
-# reorder_clusters_stepdown = function(clust_dt){
-#
-# }
-#
-# reorder_clusters_hclust = function(clust_dt){
-#
-# }
-#
-# clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt)
-# ssvSignalHeatmap(clust_dt)
-# manual_order = c(2)
-# cluster_ = "cluster_id"
-# row_ = "id"
-# reorder_clusters_manual = function(clust_dt, manual_order, cluster_ = "cluster_id", row_ = "id"){
-#     new_dt = copy(clust_dt[order(get(row_))])
-#     if(!is.factor(new_dt[[cluster_]])){
-#         new_dt[[cluster_]] = factor(new_dt[[cluster_]], levels = rev(unique(new_dt[[cluster_]])))
-#     }
-#     new_dt$cluster_id
-#     new_dt[order(get(cluster_))]
-# }
+
+
+#' reorder_clusters_manual
+#'
+#' Manually applies a new order (top to bottom) for cluster using the result of ssvSignalClustering.
+#'
+#' @param clust_dt data.table output from \code{\link{ssvSignalClustering}}
+#' @param manual_order New order for clusters  Does not need to include all clusters.  Any colors not included will be at the bottom in their original order.
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.
+#' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
+#' @param reapply_cluster_names If TRUE, clusters will be renamed according to new order instead of their original names. Default is TRUE.
+#'
+#' @return data.table as output from \code{\link{ssvSignalClustering}}
+#' @export
+#'
+#' @examples
+#' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
+#' new_dt = reorder_clusters_manual(clust_dt = clust_dt, manual_order = 2)
+#' cowplot::plot_grid(
+#'     ssvSignalHeatmap(clust_dt),
+#'     ssvSignalHeatmap(new_dt)
+#' )
+reorder_clusters_manual = function(clust_dt,
+                                   manual_order,
+                                   row_ = "id",
+                                   cluster_ = "cluster_id",
+                                   reapply_cluster_names = TRUE){
+    stopifnot(manual_order %in% clust_dt[[cluster_]])
+    new_dt = copy(clust_dt[order(get(row_))])
+    if(!is.factor(new_dt[[cluster_]])){
+        new_dt[[cluster_]] = factor(new_dt[[cluster_]], levels = rev(unique(new_dt[[cluster_]])))
+    }
+    manual_levels = c(manual_order, setdiff(levels(new_dt[[cluster_]]), manual_order))
+    new_dt[[cluster_]] = factor(new_dt[[cluster_]], levels = manual_levels)
+    new_dt = new_dt[order(get(cluster_))]
+    new_dt[[row_]] = factor(new_dt[[row_]], levels = unique(new_dt[[row_]]))
+    if(reapply_cluster_names){
+        levels(new_dt[[cluster_]]) = seq_along(unique(new_dt[[cluster_]]))
+    }
+    new_dt
+}

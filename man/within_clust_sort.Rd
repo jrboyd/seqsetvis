@@ -20,15 +20,20 @@ within_clust_sort(
 \arguments{
 \item{clust_dt}{data.table output from \code{\link{ssvSignalClustering}}}
 
-\item{row_}{variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.}
+\item{row_}{variable name mapped to row, likely id or gene name for ngs data.
+Default is "id" and works with ssvFetch* output.}
 
-\item{column_}{varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.}
+\item{column_}{varaible mapped to column, likely bp position for ngs data.
+Default is "x" and works with ssvFetch* output.}
 
-\item{fill_}{numeric variable to map to fill. Default is "y" and works with ssvFetch* output.}
+\item{fill_}{numeric variable to map to fill. Default is "y" and works with
+ssvFetch* output.}
 
-\item{facet_}{variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.}
+\item{facet_}{variable name to facet horizontally by. Default is "sample" and
+works with ssvFetch* output. Set to "" if data is not facetted.}
 
-\item{cluster_}{variable name to use for cluster info. Default is "cluster_id".}
+\item{cluster_}{variable name to use for cluster info. Default is
+"cluster_id".}
 
 \item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
 hierarchical clustering will be used. if sort, a simple decreasing sort of
@@ -43,13 +48,18 @@ clustering, default in Inf}
 \item{dcast_fill}{value to supply to dcast fill argument. default is NA.}
 }
 \value{
-data.table matching input clust_dt save for the reassignment of levels of row_ variable.
+data.table matching input clust_dt save for the reassignment of
+  levels of row_ variable.
 }
 \description{
-Without modifying cluster assignments, modify the order of rows within each cluster based on within_order_strategy.
+Without modifying cluster assignments, modify the order of rows within each
+cluster based on within_order_strategy.
 }
 \details{
-This is particularly useful when you want to sort within each cluster by a different variable from cluster assignment. Also if you've imported cluster assigments but want to sort within each for the new data for a prettier heatmap.
+This is particularly useful when you want to sort within each cluster by a
+different variable from cluster assignment. Also if you've imported cluster
+assigments but want to sort within each for the new data for a prettier
+heatmap.
 
 TODO refactor shared code with clusteringKmeansNestedHclust
 }
