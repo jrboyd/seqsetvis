@@ -27,7 +27,7 @@ reorder_clusters_manual(
 data.table as output from \code{\link{ssvSignalClustering}}
 }
 \description{
-reorder_clusters_manual
+Manually applies a new order (top to bottom) for cluster using the result of ssvSignalClustering.
 }
 \examples{
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)

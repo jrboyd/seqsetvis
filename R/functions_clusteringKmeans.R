@@ -74,116 +74,116 @@ ssvSignalClustering = function(bw_data,
                                within_order_strategy = c("hclust", "sort")[2],
                                dcast_fill = NA,
                                iter.max = 30){
-    message("clustering...")
-    id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
-    output_GRanges = FALSE
-    if(is(bw_data, "GRanges")){
-        bw_data = data.table::as.data.table(bw_data)
-        output_GRanges = TRUE
-    }
-    stopifnot(is.data.table(bw_data))
-    if(!is.null(k_centroids) & !is.null(memb_table)){
-        stop("only one of k_centroids or memb_table is allowed.")
-    }
-    if(!is.null(k_centroids)){
-        nclust = nrow(k_centroids)
-    }
-    if(!is.null(memb_table)){ #memb_table get handled to provide row_ to cluster_ mapping
-        if(is.data.frame(memb_table)){
-            if(!is.null(memb_table[[row_]]) & !is.null(memb_table[[cluster_]])){
-                #in this case memb_table is already a valid row_ to cluster_ mapping
-                #nothing needs done
-            }else{
-                if(is.null(memb_table[[row_]])){
-                    memb_table[[row_]] = memb_table[["id"]]
-                    memb_table[["id"]] = NULL
-                }
-                if(is.null(memb_table[[cluster_]])){
-                    memb_table[[cluster_]] = memb_table[["group"]]
-                    memb_table[["group"]] = NULL
-                }
-            }
-        }else{
-            memb_table = ssvFactorizeMembTable(memb_table)
-            if(is.null(memb_table[[row_]])){
-                memb_table[[row_]] = memb_table[["id"]]
-                memb_table[["id"]] = NULL
-            }
-            if(is.null(memb_table[[cluster_]])){
-                memb_table[[cluster_]] = memb_table[["group"]]
-                memb_table[["group"]] = NULL
-            }
+  message("clustering...")
+  id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
+  output_GRanges = FALSE
+  if(is(bw_data, "GRanges")){
+    bw_data = data.table::as.data.table(bw_data)
+    output_GRanges = TRUE
+  }
+  stopifnot(is.data.table(bw_data))
+  if(!is.null(k_centroids) & !is.null(memb_table)){
+    stop("only one of k_centroids or memb_table is allowed.")
+  }
+  if(!is.null(k_centroids)){
+    nclust = nrow(k_centroids)
+  }
+  if(!is.null(memb_table)){ #memb_table get handled to provide row_ to cluster_ mapping
+    if(is.data.frame(memb_table)){
+      if(!is.null(memb_table[[row_]]) & !is.null(memb_table[[cluster_]])){
+        #in this case memb_table is already a valid row_ to cluster_ mapping
+        #nothing needs done
+      }else{
+        if(is.null(memb_table[[row_]])){
+          memb_table[[row_]] = memb_table[["id"]]
+          memb_table[["id"]] = NULL
         }
-        if(is.null(memb_table[[row_]])) stop("Could not correctly handle memb_table. It should look like output of ssvMakeMembTable or ssvFactorizeMembTable.")
-        if(is.null(memb_table[[cluster_]])) stop("Could not correctly handle memb_table. It should look like output of ssvMakeMembTable or ssvFactorizeMembTable.")
-        nclust = length(unique(memb_table[[cluster_]]))
-        cluster_assignment = memb_table[[cluster_]]
-        names(cluster_assignment) = memb_table[[row_]]
+        if(is.null(memb_table[[cluster_]])){
+          memb_table[[cluster_]] = memb_table[["group"]]
+          memb_table[["group"]] = NULL
+        }
+      }
     }else{
-        cluster_assignment = NULL
+      memb_table = ssvFactorizeMembTable(memb_table)
+      if(is.null(memb_table[[row_]])){
+        memb_table[[row_]] = memb_table[["id"]]
+        memb_table[["id"]] = NULL
+      }
+      if(is.null(memb_table[[cluster_]])){
+        memb_table[[cluster_]] = memb_table[["group"]]
+        memb_table[["group"]] = NULL
+      }
     }
-    if(is.null(nclust) & is.null(k_centroids) & is.null(memb_table)){
-        nclust = 6
-        # stop("one of nclust, k_centroids, or memb_table must be set.")
-    }
-    stopifnot(is.numeric(nclust))
-    stopifnot(is.character(row_), is.character(column_), is.character(fill_),
-              is.character(facet_), is.character(cluster_))
-    stopifnot(row_ %in% colnames(bw_data), column_ %in% colnames(bw_data),
-              fill_ %in% colnames(bw_data))
-    stopifnot(facet_ %in% colnames(bw_data) || facet_ == "")
-    stopifnot(is.numeric(max_rows), is.numeric(max_cols),
-              is.numeric(clustering_col_min), is.numeric(clustering_col_max))
+    if(is.null(memb_table[[row_]])) stop("Could not correctly handle memb_table. It should look like output of ssvMakeMembTable or ssvFactorizeMembTable.")
+    if(is.null(memb_table[[cluster_]])) stop("Could not correctly handle memb_table. It should look like output of ssvMakeMembTable or ssvFactorizeMembTable.")
+    nclust = length(unique(memb_table[[cluster_]]))
+    cluster_assignment = memb_table[[cluster_]]
+    names(cluster_assignment) = memb_table[[row_]]
+  }else{
+    cluster_assignment = NULL
+  }
+  if(is.null(nclust) & is.null(k_centroids) & is.null(memb_table)){
+    nclust = 6
+    # stop("one of nclust, k_centroids, or memb_table must be set.")
+  }
+  stopifnot(is.numeric(nclust))
+  stopifnot(is.character(row_), is.character(column_), is.character(fill_),
+            is.character(facet_), is.character(cluster_))
+  stopifnot(row_ %in% colnames(bw_data), column_ %in% colnames(bw_data),
+            fill_ %in% colnames(bw_data))
+  stopifnot(facet_ %in% colnames(bw_data) || facet_ == "")
+  stopifnot(is.numeric(max_rows), is.numeric(max_cols),
+            is.numeric(clustering_col_min), is.numeric(clustering_col_max))
 
-    plot_dt = data.table::copy(bw_data)
-    dc_mat = make_clustering_matrix(
-        plot_dt,
-        row_ = row_,
+  plot_dt = data.table::copy(bw_data)
+  dc_mat = make_clustering_matrix(
+    plot_dt,
+    row_ = row_,
+    column_ = column_,
+    fill_ = fill_, facet_ = facet_,
+    max_rows = max_rows,
+    max_cols = max_cols,
+    clustering_col_min = clustering_col_min,
+    clustering_col_max = clustering_col_max,
+    dcast_fill = dcast_fill
+
+  )
+
+  if(!is.null(k_centroids)){
+    if(!is.matrix(k_centroids)){
+      if(!is.data.table(k_centroids)) stop("k_centroids must be a wide matrix of centroids or a tidy data.table")
+      if(is.null(k_centroids[[cluster_]])) stop("k_centroids looks like a tidy data.table but is missing the cluster variable ", cluster_)
+      k_centroids = make_clustering_matrix(
+        k_centroids,
+        row_ = cluster_,
         column_ = column_,
         fill_ = fill_, facet_ = facet_,
-        max_rows = max_rows,
+        max_rows = Inf,
         max_cols = max_cols,
         clustering_col_min = clustering_col_min,
         clustering_col_max = clustering_col_max,
         dcast_fill = dcast_fill
 
-    )
-
-    if(!is.null(k_centroids)){
-        if(!is.matrix(k_centroids)){
-            if(!is.data.table(k_centroids)) stop("k_centroids must be a wide matrix of centroids or a tidy data.table")
-            if(is.null(k_centroids[[cluster_]])) stop("k_centroids looks like a tidy data.table but is missing the cluster variable ", cluster_)
-            k_centroids = make_clustering_matrix(
-                k_centroids,
-                row_ = cluster_,
-                column_ = column_,
-                fill_ = fill_, facet_ = facet_,
-                max_rows = Inf,
-                max_cols = max_cols,
-                clustering_col_min = clustering_col_min,
-                clustering_col_max = clustering_col_max,
-                dcast_fill = dcast_fill
-
-            )
-        }
+      )
     }
+  }
 
 
-    rclusters = clusteringKmeansNestedHclust(dc_mat,
-                                             nclust = nclust,
-                                             within_order_strategy,
-                                             centroids = k_centroids,
-                                             manual_mapping = cluster_assignment,
-                                             iter.max = iter.max)
-    rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
-    plot_dt = plot_dt[get(row_) %in% rclusters[["id"]]]
-    plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rev(rclusters[["id"]]))
-    data.table::setkey(rclusters, id)
-    plot_dt[[cluster_]] = rclusters[list(plot_dt[[row_]]), group]
-    if(output_GRanges){
-        plot_dt = GRanges(plot_dt)
-    }
-    return(plot_dt)
+  rclusters = clusteringKmeansNestedHclust(dc_mat,
+                                           nclust = nclust,
+                                           within_order_strategy,
+                                           centroids = k_centroids,
+                                           manual_mapping = cluster_assignment,
+                                           iter.max = iter.max)
+  rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
+  plot_dt = plot_dt[get(row_) %in% rclusters[["id"]]]
+  plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rev(rclusters[["id"]]))
+  data.table::setkey(rclusters, id)
+  plot_dt[[cluster_]] = rclusters[list(plot_dt[[row_]]), group]
+  if(output_GRanges){
+    plot_dt = GRanges(plot_dt)
+  }
+  return(plot_dt)
 }
 
 #' perform kmeans clustering on matrix rows and return reordered matrix along
@@ -213,50 +213,50 @@ ssvSignalClustering = function(bw_data,
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
 clusteringKmeans = function(mat, nclust, centroids = NULL, iter.max = 30) {
-    if(!is.null(centroids)){
-        if(!all(colnames(mat) == colnames(centroids))){
-            stop("provided centroids matrix did not have identical column names to mat matrix.")
-        }
-        nclust = nrow(centroids)
-        centers_arg = centroids
-    }else{
-        centers_arg = nclust
+  if(!is.null(centroids)){
+    if(!all(colnames(mat) == colnames(centroids))){
+      stop("provided centroids matrix did not have identical column names to mat matrix.")
     }
-    stopifnot(is.numeric(nclust))
-    cluster_ordered = mat_name = NULL#declare binding for data.table
-    if(nrow(mat) <= nclust){
-        nclust = nrow(mat)
-        mat_kmclust = list(
-            centers = mat,
-            cluster = seq(nrow(mat))
-        )
-        names(mat_kmclust$cluster) = seq(nrow(mat))
+    nclust = nrow(centroids)
+    centers_arg = centroids
+  }else{
+    centers_arg = nclust
+  }
+  stopifnot(is.numeric(nclust))
+  cluster_ordered = mat_name = NULL#declare binding for data.table
+  if(nrow(mat) <= nclust){
+    nclust = nrow(mat)
+    mat_kmclust = list(
+      centers = mat,
+      cluster = seq(nrow(mat))
+    )
+    names(mat_kmclust$cluster) = seq(nrow(mat))
 
-    }else{
-        if(nrow(unique(mat)) < nclust){
-            nclust = nrow(unique(mat))
-            warning("Reducing nclust to ", nclust,
-                    " - maximum number of clusters allowed due to ",
-                    "low uniqueness.")
-        }
-        mat_kmclust = stats::kmeans(mat, centers = centers_arg, iter.max = iter.max)
+  }else{
+    if(nrow(unique(mat)) < nclust){
+      nclust = nrow(unique(mat))
+      warning("Reducing nclust to ", nclust,
+              " - maximum number of clusters allowed due to ",
+              "low uniqueness.")
     }
+    mat_kmclust = stats::kmeans(mat, centers = centers_arg, iter.max = iter.max)
+  }
 
-    if(nclust < 3 || !is.null(centroids)){
-        center_o = seq(nclust)
-    }else{
-        center_o = stats::hclust(stats::dist(mat_kmclust$centers))$order
-    }
-    center_reo = seq_along(center_o)
-    names(center_reo) = center_o
-    center_reo[as.character(mat_kmclust$cluster)]
-    mat_dt = data.table::data.table(
-        mat_name = names(mat_kmclust$cluster),
-        cluster = mat_kmclust$cluster,
-        cluster_ordered = center_reo[as.character(mat_kmclust$cluster)])
-    mat_dt = mat_dt[order(cluster_ordered),
-                    list(id = mat_name, group = cluster_ordered)]
-    return(mat_dt)
+  if(nclust < 3 || !is.null(centroids)){
+    center_o = seq(nclust)
+  }else{
+    center_o = stats::hclust(stats::dist(mat_kmclust$centers))$order
+  }
+  center_reo = seq_along(center_o)
+  names(center_reo) = center_o
+  center_reo[as.character(mat_kmclust$cluster)]
+  mat_dt = data.table::data.table(
+    mat_name = names(mat_kmclust$cluster),
+    cluster = mat_kmclust$cluster,
+    cluster_ordered = center_reo[as.character(mat_kmclust$cluster)])
+  mat_dt = mat_dt[order(cluster_ordered),
+                  list(id = mat_name, group = cluster_ordered)]
+  return(mat_dt)
 }
 
 
@@ -292,46 +292,46 @@ clusteringKmeans = function(mat, nclust, centroids = NULL, iter.max = 30) {
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
 clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("hclust", "sort")[2], centroids = NULL, manual_mapping = NULL, iter.max = 30) {
-    stopifnot(is.numeric(nclust))
-    stopifnot(within_order_strategy %in% c("hclust", "sort"))
-    group = id = within_o = NULL#declare binding for data.table
+  stopifnot(is.numeric(nclust))
+  stopifnot(within_order_strategy %in% c("hclust", "sort"))
+  group = id = within_o = NULL#declare binding for data.table
 
-    if(nclust > (nrow(mat)-1) & is.null(centroids)){
-        nclust = nrow(mat)-1
-        message("nclust too high for number of items. Reducing to ", nclust)
+  if(nclust > (nrow(mat)-1) & is.null(centroids)){
+    nclust = nrow(mat)-1
+    message("nclust too high for number of items. Reducing to ", nclust)
+  }
+
+  if(is.null(manual_mapping)){
+    mat_dt = clusteringKmeans(mat, nclust, centroids, iter.max)
+  }else{
+    manual_mapping
+    mat_dt = data.table(id = names(manual_mapping), group = manual_mapping)
+    mat_dt = mat_dt[order(group)]
+  }
+
+  mat_dt$within_o = as.numeric(-1)
+  for (i in unique(mat_dt$group)) {
+    cmat = mat[mat_dt[group == i, id], , drop = FALSE]
+    if(within_order_strategy == "hclust"){
+      if (nrow(cmat) > 2) {
+        mat_dt[group == i, ]$within_o =
+          stats::hclust(stats::dist((cmat)))$order
+      } else {
+        mat_dt[group == i, ]$within_o = seq_len(nrow(cmat))
+      }
+    }else if(within_order_strategy == "sort"){
+      mat_dt[group == i, ]$within_o = rank(-rowSums(cmat))
     }
 
-    if(is.null(manual_mapping)){
-        mat_dt = clusteringKmeans(mat, nclust, centroids, iter.max)
-    }else{
-        manual_mapping
-        mat_dt = data.table(id = names(manual_mapping), group = manual_mapping)
-        mat_dt = mat_dt[order(group)]
-    }
 
-    mat_dt$within_o = as.numeric(-1)
-    for (i in unique(mat_dt$group)) {
-        cmat = mat[mat_dt[group == i, id], , drop = FALSE]
-        if(within_order_strategy == "hclust"){
-            if (nrow(cmat) > 2) {
-                mat_dt[group == i, ]$within_o =
-                    stats::hclust(stats::dist((cmat)))$order
-            } else {
-                mat_dt[group == i, ]$within_o = seq_len(nrow(cmat))
-            }
-        }else if(within_order_strategy == "sort"){
-            mat_dt[group == i, ]$within_o = rank(-rowSums(cmat))
-        }
-
-
-    }
-    mat_dt = mat_dt[order(within_o), ][order(group), ]
-    mat_dt$id = factor(mat_dt$id, levels = mat_dt$id)
-    mat_dt$within_o = NULL
-    if(!is.factor(mat_dt$group)){
-        mat_dt$group = factor(mat_dt$group)
-    }
-    return(mat_dt)
+  }
+  mat_dt = mat_dt[order(within_o), ][order(group), ]
+  mat_dt$id = factor(mat_dt$id, levels = mat_dt$id)
+  mat_dt$within_o = NULL
+  if(!is.factor(mat_dt$group)){
+    mat_dt$group = factor(mat_dt$group)
+  }
+  return(mat_dt)
 }
 
 #' within_clust_sort
@@ -396,59 +396,59 @@ within_clust_sort = function(clust_dt,
                              clustering_col_min = -Inf,
                              clustering_col_max = Inf,
                              dcast_fill = NA) {
-    output_GRanges = FALSE
-    if(is(clust_dt, "GRanges")){
-        clust_dt = data.table::as.data.table(clust_dt)
-        output_GRanges = TRUE
+  output_GRanges = FALSE
+  if(is(clust_dt, "GRanges")){
+    clust_dt = data.table::as.data.table(clust_dt)
+    output_GRanges = TRUE
+  }
+  stopifnot(is.data.table(clust_dt))
+  mat = make_clustering_matrix(
+    clust_dt,
+    row_ = row_,
+    column_ = column_,
+    fill_ = fill_,
+    facet_ = facet_,
+    max_rows = Inf,
+    max_cols = Inf,
+    clustering_col_min = clustering_col_min,
+    clustering_col_max = clustering_col_max,
+    dcast_fill = dcast_fill
+  )
+
+  stopifnot(within_order_strategy %in% c("hclust", "sort", "left", "right"))
+  group = id = within_o = NULL#declare binding for data.table
+
+  mat_dt = unique(clust_dt[, list(id__ = get(row_), group__ = get(cluster_))])
+  mat_dt$within_o = as.numeric(-1)
+  for (i in unique(mat_dt$group__)) {
+    cmat = mat[mat_dt[group__ == i, id__], , drop = FALSE]
+    if(within_order_strategy == "hclust"){
+      if (nrow(cmat) > 2) {
+        mat_dt[group__ == i, ]$within_o =
+          stats::hclust(stats::dist((cmat)))$order
+      } else {
+        mat_dt[group__ == i, ]$within_o = seq_len(nrow(cmat))
+      }
+    }else if(within_order_strategy == "sort"){
+      mat_dt[group__ == i, ]$within_o = rank(-rowSums(cmat))
+    }else if(within_order_strategy == "left"){
+      mat_dt[group__ == i, ]$within_o = rank(apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
+    }else if(within_order_strategy == "right"){
+      mat_dt[group__ == i, ]$within_o = rank(-apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
     }
-    stopifnot(is.data.table(clust_dt))
-    mat = make_clustering_matrix(
-        clust_dt,
-        row_ = row_,
-        column_ = column_,
-        fill_ = fill_,
-        facet_ = facet_,
-        max_rows = Inf,
-        max_cols = Inf,
-        clustering_col_min = clustering_col_min,
-        clustering_col_max = clustering_col_max,
-        dcast_fill = dcast_fill
-    )
+  }
+  mat_dt = mat_dt[order(within_o), ][order(group__), ]
+  mat_dt$id__ = factor(mat_dt$id__, levels = mat_dt$id__)
+  mat_dt$within_o = NULL
+  if(!is.factor(mat_dt$group__)){
+    mat_dt$group__ = factor(mat_dt$group__, levels = unique(mat_dt$group))
+  }
 
-    stopifnot(within_order_strategy %in% c("hclust", "sort", "left", "right"))
-    group = id = within_o = NULL#declare binding for data.table
+  #repair var names
+  clust_dt[[row_]] = factor(clust_dt[[row_]], levels = levels(mat_dt$id__))
+  # clust_dt[[cluster_]] = factor(clust_dt[[cluster_]], levels = levels(mat_dt$group__))
 
-    mat_dt = unique(clust_dt[, list(id__ = get(row_), group__ = get(cluster_))])
-    mat_dt$within_o = as.numeric(-1)
-    for (i in unique(mat_dt$group__)) {
-        cmat = mat[mat_dt[group__ == i, id__], , drop = FALSE]
-        if(within_order_strategy == "hclust"){
-            if (nrow(cmat) > 2) {
-                mat_dt[group__ == i, ]$within_o =
-                    stats::hclust(stats::dist((cmat)))$order
-            } else {
-                mat_dt[group__ == i, ]$within_o = seq_len(nrow(cmat))
-            }
-        }else if(within_order_strategy == "sort"){
-            mat_dt[group__ == i, ]$within_o = rank(-rowSums(cmat))
-        }else if(within_order_strategy == "left"){
-          mat_dt[group__ == i, ]$within_o = rank(apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
-        }else if(within_order_strategy == "right"){
-          mat_dt[group__ == i, ]$within_o = rank(-apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
-        }
-    }
-    mat_dt = mat_dt[order(within_o), ][order(group__), ]
-    mat_dt$id__ = factor(mat_dt$id__, levels = mat_dt$id__)
-    mat_dt$within_o = NULL
-    if(!is.factor(mat_dt$group__)){
-        mat_dt$group__ = factor(mat_dt$group__, levels = unique(mat_dt$group))
-    }
-
-    #repair var names
-    clust_dt[[row_]] = factor(clust_dt[[row_]], levels = levels(mat_dt$id__))
-    # clust_dt[[cluster_]] = factor(clust_dt[[cluster_]], levels = levels(mat_dt$group__))
-
-    return(clust_dt)
+  return(clust_dt)
 }
 
 
@@ -502,32 +502,32 @@ reorder_clusters_stepdown = function(clust_dt,
                                      reapply_cluster_names = TRUE,
                                      step_by_column = TRUE,
                                      step_by_facet = FALSE
-                                     ){
-    new_dt = copy(clust_dt)
-    if(facet_ != ""){
-        if(!is.factor(new_dt[[facet_]])){
-            new_dt[[facet_]] = factor(new_dt[[facet_]], levels = unique(new_dt[[facet_]]))
-        }
+){
+  new_dt = copy(clust_dt)
+  if(facet_ != ""){
+    if(!is.factor(new_dt[[facet_]])){
+      new_dt[[facet_]] = factor(new_dt[[facet_]], levels = unique(new_dt[[facet_]]))
     }
-    agg_dt = new_dt[, .(y = mean(get(fill_))), c(cluster_, column_, ifelse(facet_ == "", character(), facet_))]
-    agg_dt = agg_dt[order(get(column_))][order(get(facet_))]
+  }
+  agg_dt = new_dt[, .(y = mean(get(fill_))), c(cluster_, column_, ifelse(facet_ == "", character(), facet_))]
+  agg_dt = agg_dt[order(get(column_))][order(get(facet_))]
 
-    if(step_by_column & step_by_facet){
-        wide_dt = dcast(agg_dt, paste0(cluster_, "~", ifelse(facet_ == "", character(), paste0(facet_, "+")), column_), value.var = fill_, fun.aggregate = mean)
-    }else if(step_by_column){
-        wide_dt = dcast(agg_dt, paste0(cluster_, "~", column_), value.var = fill_, fun.aggregate = mean)
-    }else if(step_by_facet){
-        wide_dt = dcast(agg_dt, paste0(cluster_, "~", ifelse(facet_ == "", character(), facet_)), value.var = fill_, fun.aggregate = mean)
-    }
+  if(step_by_column & step_by_facet){
+    wide_dt = dcast(agg_dt, paste0(cluster_, "~", ifelse(facet_ == "", character(), paste0(facet_, "+")), column_), value.var = fill_, fun.aggregate = mean)
+  }else if(step_by_column){
+    wide_dt = dcast(agg_dt, paste0(cluster_, "~", column_), value.var = fill_, fun.aggregate = mean)
+  }else if(step_by_facet){
+    wide_dt = dcast(agg_dt, paste0(cluster_, "~", ifelse(facet_ == "", character(), facet_)), value.var = fill_, fun.aggregate = mean)
+  }
 
 
-    mat = as.matrix(wide_dt[,-1])
-    rownames(mat) = wide_dt[[cluster_]]
+  mat = as.matrix(wide_dt[,-1])
+  rownames(mat) = wide_dt[[cluster_]]
 
-    wm_o = sort(apply(mat, 1, function(x){
-      weighted.mean(seq_along(x), x)
-    }))
-    reorder_clusters_manual(new_dt, manual_order = names(wm_o), cluster_ = cluster_, row_ = row_)
+  wm_o = sort(apply(mat, 1, function(x){
+    weighted.mean(seq_along(x), x)
+  }))
+  reorder_clusters_manual(new_dt, manual_order = names(wm_o), cluster_ = cluster_, row_ = row_)
 }
 
 
@@ -571,20 +571,20 @@ reorder_clusters_hclust = function(clust_dt,
                                    cluster_ = "cluster_id",
                                    reapply_cluster_names = TRUE,
                                    return_hclust = FALSE){
-    new_dt = copy(clust_dt)
-    if(is.null(hclust_result)){
-      agg_dt = new_dt[, .(y = mean(get(fill_))), c(cluster_, column_, ifelse(facet_ == "", character(), facet_))]
-      setnames(agg_dt, "y", fill_)
-      wide_dt = dcast(agg_dt, paste0(cluster_, "~", column_, ifelse(facet_ == "", character(), paste0("+", facet_))), value.var = fill_)
-      mat = as.matrix(wide_dt[,-1])
-      rownames(mat) = wide_dt[[cluster_]]
-      hclust_result = hclust(dist(mat))
-      if(return_hclust){
-        return(hclust_result)
-      }
+  new_dt = copy(clust_dt)
+  if(is.null(hclust_result)){
+    agg_dt = new_dt[, .(y = mean(get(fill_))), c(cluster_, column_, ifelse(facet_ == "", character(), facet_))]
+    setnames(agg_dt, "y", fill_)
+    wide_dt = dcast(agg_dt, paste0(cluster_, "~", column_, ifelse(facet_ == "", character(), paste0("+", facet_))), value.var = fill_)
+    mat = as.matrix(wide_dt[,-1])
+    rownames(mat) = wide_dt[[cluster_]]
+    hclust_result = hclust(dist(mat))
+    if(return_hclust){
+      return(hclust_result)
     }
-    clust_lev = levels(new_dt[[cluster_]])[hclust_result$order]
-    reorder_clusters_manual(clust_dt, manual_order = clust_lev, cluster_ = cluster_, row_ = row_, reapply_cluster_names = reapply_cluster_names)
+  }
+  clust_lev = levels(new_dt[[cluster_]])[hclust_result$order]
+  reorder_clusters_manual(clust_dt, manual_order = clust_lev, cluster_ = cluster_, row_ = row_, reapply_cluster_names = reapply_cluster_names)
 }
 #
 
@@ -614,17 +614,83 @@ reorder_clusters_manual = function(clust_dt,
                                    row_ = "id",
                                    cluster_ = "cluster_id",
                                    reapply_cluster_names = TRUE){
-    stopifnot(manual_order %in% clust_dt[[cluster_]])
-    new_dt = copy(clust_dt[order(get(row_))])
-    if(!is.factor(new_dt[[cluster_]])){
-        new_dt[[cluster_]] = factor(new_dt[[cluster_]], levels = rev(unique(new_dt[[cluster_]])))
-    }
-    manual_levels = c(manual_order, setdiff(levels(new_dt[[cluster_]]), manual_order))
-    new_dt[[cluster_]] = factor(new_dt[[cluster_]], levels = manual_levels)
-    new_dt = new_dt[order(get(cluster_))]
-    new_dt[[row_]] = factor(new_dt[[row_]], levels = unique(new_dt[[row_]]))
-    if(reapply_cluster_names){
-        levels(new_dt[[cluster_]]) = seq_along(unique(new_dt[[cluster_]]))
-    }
-    new_dt
+  stopifnot(manual_order %in% clust_dt[[cluster_]])
+  new_dt = copy(clust_dt[order(get(row_))])
+  if(!is.factor(new_dt[[cluster_]])){
+    new_dt[[cluster_]] = factor(new_dt[[cluster_]], levels = rev(unique(new_dt[[cluster_]])))
+  }
+  manual_levels = c(manual_order, setdiff(levels(new_dt[[cluster_]]), manual_order))
+  new_dt[[cluster_]] = factor(new_dt[[cluster_]], levels = manual_levels)
+  new_dt = new_dt[order(get(cluster_))]
+  new_dt[[row_]] = factor(new_dt[[row_]], levels = unique(new_dt[[row_]]))
+  if(reapply_cluster_names){
+    levels(new_dt[[cluster_]]) = seq_along(unique(new_dt[[cluster_]]))
+  }
+  new_dt
 }
+
+
+
+#' merge_clusters
+#'
+#' @param clust_dt data.table output from \code{\link{ssvSignalClustering}}
+#' @param to_merge Clusters to merge. Must be items in clust_dt variable defined by cluster_ parameter.
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.
+#' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
+#' @param reapply_cluster_names If TRUE, clusters will be renamed according to new order instead of their original names. Default is TRUE.
+#'
+#' @return data.table as output from \code{\link{ssvSignalClustering}}
+#' @export
+#'
+#' @examples
+#' set.seed(0)
+#' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 6)
+#' ssvSignalHeatmap(clust_dt)
+#' agg_dt = clust_dt[, .(y = mean(y)), .(x, cluster_id, sample)]
+#' ggplot(agg_dt, aes(x = x, y = y, color = sample)) +
+#'   geom_path() +
+#'   facet_grid(cluster_id~.)
+#'
+#' to_merge = c(2, 3, 5)
+#' # debug(merge_clusters)
+#' new_dt = merge_clusters(clust_dt, c(2, 3, 5), reapply_cluster_names = FALSE)
+#' new_dt.relabel = merge_clusters(clust_dt, c(2, 3, 5), reapply_cluster_names = TRUE)
+#' new_dt.relabel.sort = within_clust_sort(new_dt.relabel, within_order_strategy = "sort")
+#'
+#' table(clust_dt$cluster_id)
+#' table(new_dt$cluster_id)
+#'
+#' cowplot::plot_grid(
+#'   ssvSignalHeatmap(clust_dt) + labs(title = "original"),
+#'   ssvSignalHeatmap(new_dt) + labs(title = "2,3,5 merged"),
+#'   ssvSignalHeatmap(new_dt.relabel) + labs(title = "2,3,5 merged, renumbered"),
+#'   ssvSignalHeatmap(new_dt.relabel.sort) + labs(title = "2,3,5 merged, renumbered and sorted")
+#' )
+#'
+#'
+#'
+#'
+merge_clusters = function(clust_dt,
+                          to_merge,
+                          row_ = "id",
+                          cluster_ = "cluster_id",
+                          reapply_cluster_names = TRUE){
+  to_merge = as.character(to_merge)
+  clust_lev = levels(clust_dt[[cluster_]])
+  stopifnot(all(to_merge %in% clust_lev))
+  first_clust = min(which(clust_lev %in% to_merge))
+  new_order = union(clust_lev[seq(1, first_clust)], to_merge)
+
+  new_dt = reorder_clusters_manual(clust_dt, manual_order = new_order, row_ = row_, cluster_ = cluster_, reapply_cluster_names = FALSE)
+  new_name = paste(to_merge, collapse = "-")
+
+  data.table::set(new_dt, i = which(new_dt[[cluster_]] %in% to_merge), j = cluster_, value = new_name)
+  # new_dt[[row_]] = factor(new_dt[[row_]], levels = unique(new_dt[[row_]]))
+  new_dt[[cluster_]] = factor(new_dt[[cluster_]], levels = unique(new_dt[[cluster_]]))
+  if(reapply_cluster_names){
+    levels(new_dt[[cluster_]]) = seq_along(unique(new_dt[[cluster_]]))
+  }
+  new_dt
+
+}
+
