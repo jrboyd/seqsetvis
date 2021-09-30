@@ -1,7 +1,8 @@
-# 1.13.7
+# 1.13.8
 
 * added "reverse" within_order_strategy options to within_clust_sort
-* added  function reverse_clusters - reverses cluster orders
+* added function reverse_clusters - reverses cluster orders
+* added function split_cluster - splits existing cluster up
 
 # 1.13.6
 

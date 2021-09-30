@@ -153,3 +153,29 @@ test_that("reorder_clusters_hclust", {
     expect_failure(expect_setequal(clust_dt[cluster_id == 1]$id, rev_dt[cluster_id == 1]$id))
     expect_failure(expect_setequal(clust_dt[cluster_id == 1]$id, rev_dt.not_rows[cluster_id == 1]$id))
 })
+
+test_that("split_cluster", {
+    clust_dt = clust_dt[order(id)]
+    split_dt = split_cluster(clust_dt, to_split = 2, nclust = 3)
+    split_dt.no_rename = split_cluster(clust_dt, to_split = 2, nclust = 3, reapply_cluster_names = FALSE)
+    if(show_plots){
+        cowplot::plot_grid(nrow = 1,
+                           ssvSignalHeatmap(clust_dt),
+                           ssvSignalHeatmap(split_dt),
+                           ssvSignalHeatmap(split_dt.no_rename)
+        )
+    }
+    expect_failure(expect_equal(levels(clust_dt$id), levels(split_dt$id)))
+    expect_failure(expect_equal(levels(clust_dt$id), levels(split_dt.no_rename$id)))
+    expect_setequal(levels(clust_dt$id), levels(split_dt$id))
+    expect_setequal(levels(clust_dt$id), levels(split_dt.no_rename$id))
+
+    expect_equal(as.character(clust_dt[cluster_id == 1]$id), as.character(split_dt[cluster_id == 1]$id))
+    expect_equal(as.character(clust_dt[cluster_id == 3]$id), as.character(split_dt[cluster_id == 5]$id))
+
+    expect_failure(expect_equal(as.character(clust_dt[cluster_id == 2]$id), as.character(split_dt[cluster_id == 2]$id)))
+
+    expect_equal(as.character(split_dt.no_rename[cluster_id == "2a"]$id), as.character(split_dt[cluster_id == "2"]$id))
+    expect_equal(as.character(split_dt.no_rename[cluster_id == "2b"]$id), as.character(split_dt[cluster_id == "3"]$id))
+})
+

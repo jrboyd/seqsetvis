@@ -784,3 +784,68 @@ reverse_clusters = function(clust_dt,
   }
   new_dt
 }
+
+#' split_cluster
+#'
+#' Splits one specified cluster in number of new clusters determined by nclust
+#'
+#' @param clust_dt data.table output from \code{\link{ssvSignalClustering}}
+#' @param to_split Cluster to split.
+#' @param nclust Number of new clusters to create.
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data.
+#'   Default is "id" and works with ssvFetch* output.
+#' @param column_ varaible mapped to column, likely bp position for ngs data.
+#'   Default is "x" and works with ssvFetch* output.
+#' @param fill_ numeric variable to map to fill. Default is "y" and works with
+#'   ssvFetch* output.
+#' @param facet_ variable name to facet horizontally by. Default is "sample" and
+#'   works with ssvFetch* output. Set to "" if data is not facetted.
+#' @param cluster_ variable name to use for cluster info. Default is
+#'   "cluster_id".
+#' @param reapply_cluster_names If TRUE, clusters will be renamed according to
+#'   new order instead of their original names. Default is TRUE.
+#'
+#' @return data.table as output from \code{\link{ssvSignalClustering}}
+#' @export
+#'
+#' @examples
+#' set.seed(0)
+#' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
+#' split_dt = split_cluster(clust_dt, to_split = 2, nclust = 3)
+#' split_dt.no_rename = split_cluster(clust_dt, to_split = 2, nclust = 3, reapply_cluster_names = FALSE)
+#' cowplot::plot_grid(nrow = 1,
+#'   ssvSignalHeatmap(clust_dt),
+#'   ssvSignalHeatmap(split_dt),
+#'   ssvSignalHeatmap(split_dt.no_rename)
+#' )
+#'
+split_cluster = function(clust_dt,
+                         to_split,
+                         nclust = 2,
+                         row_ = "id",
+                         column_ = "x",
+                         fill_ = "y",
+                         facet_ = "sample",
+                         cluster_ = "cluster_id",
+                         reapply_cluster_names = TRUE){
+  to_split = as.character(to_split)
+  stopifnot(to_split %in% clust_dt[[cluster_]])
+  split_dt = clust_dt[clust_dt[[cluster_]] == to_split]
+  split_dt = ssvSignalClustering(split_dt, nclust = nclust, row_ = row_, column_ = column_, fill_ = fill_, facet_ = facet_, cluster_ = cluster_)
+  new_lev = paste0(to_split, letters[seq_len(nclust)])
+  levels(split_dt[[cluster_]]) = new_lev
+  insert_at = which(levels(clust_dt[[cluster_]]) == to_split)
+
+  new_dt =rbind(split_dt, clust_dt[clust_dt[[cluster_]] != to_split])
+  new_dt$cluster_id = droplevels(new_dt$cluster_id)
+  c_lev = levels(clust_dt[[cluster_]])
+  new_lev = c(c_lev[seq_along(c_lev) < insert_at], new_lev, c_lev[seq_along(c_lev) > insert_at])
+
+  stopifnot(setequal(new_lev, levels(new_dt$cluster_id)))
+  new_dt$cluster_id = factor(new_dt$cluster_id, levels = new_lev)
+  reorder_clusters_manual(new_dt,
+                          manual_order = new_lev,
+                          row_ = row_,
+                          cluster_ = cluster_,
+                          reapply_cluster_names = reapply_cluster_names)
+}
