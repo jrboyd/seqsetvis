@@ -16,3 +16,5 @@ inst/doc
 doc
 Meta
 *.tar.gz
+tests/testthat/testthat-problems.rds
+tests/testthat/test_improved_calc_fragLen.R

@@ -156,7 +156,9 @@ test_that("reorder_clusters_hclust", {
 
 test_that("split_cluster", {
     clust_dt = clust_dt[order(id)]
+    set.seed(0)
     split_dt = split_cluster(clust_dt, to_split = 2, nclust = 3)
+    set.seed(0)
     split_dt.no_rename = split_cluster(clust_dt, to_split = 2, nclust = 3, reapply_cluster_names = FALSE)
     if(show_plots){
         cowplot::plot_grid(nrow = 1,
