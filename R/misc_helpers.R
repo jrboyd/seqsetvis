@@ -279,6 +279,19 @@ ggellipse = function(xcentres,
 
 #' ssv_mclapply
 #'
+#' @param X For pbsapply and pblapply, a vector (atomic or list) or an
+#'   expressions vector (other objects including classed objects will be coerced
+#'   by as.list.) For pbapply an array, including a matrix. For pbtapply an R
+#'   object for which a split method exists. Typically vector-like, allowing
+#'   subsetting with "[".
+#' @param FUN The function to be applied to each element of X: see apply,
+#'   sapply, and lapply. In the case of functions like +, '%*%', etc., the
+#'   function name must be backquoted or quoted. If FUN is NULL, pbtapply
+#'   returns a vector which can be used to subscript the multi-way array
+#'   pbtapply normally produces.
+#' @param mc.cores Number of cores to use for pbmclapply. Defaults to option
+#'   mc.cores.
+#' @param ... passed to pbapply::pblapply or pbmcapply::pbmclapply
 #' @return result of either pblapply or pbmclapply
 #'
 #' @importFrom pbapply pblapply

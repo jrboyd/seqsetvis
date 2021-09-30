@@ -1,4 +1,6 @@
 
+valid_sort_strategies = c("hclust", "sort", "left", "right", "reverse")
+
 #' Clustering as for a heatmap.  This is used internally by
 #' \code{\link{ssvSignalHeatmap}} but can also be run before calling
 #' ssvSignalHeatmap for greater control and access to clustering results
@@ -23,11 +25,16 @@
 #' @param memb_table Membership table as from \code{\link{ssvMakeMembTable}}.
 #'   Logical groups from membership table will be clusters. Incompatible with
 #'   nclust or k_centroids.
-#' @param row_ variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.
-#' @param column_ varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.
-#' @param fill_ numeric variable to map to fill. Default is "y" and works with ssvFetch* output.
-#' @param facet_ variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.
-#' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data.
+#'   Default is "id" and works with ssvFetch* output.
+#' @param column_ varaible mapped to column, likely bp position for ngs data.
+#'   Default is "x" and works with ssvFetch* output.
+#' @param fill_ numeric variable to map to fill. Default is "y" and works with
+#'   ssvFetch* output.
+#' @param facet_ variable name to facet horizontally by. Default is "sample" and
+#'   works with ssvFetch* output. Set to "" if data is not facetted.
+#' @param cluster_ variable name to use for cluster info. Default is
+#'   "cluster_id".
 #' @param max_rows for speed rows are sampled to 500 by default, use Inf to plot
 #'   full data
 #' @param max_cols for speed columns are sampled to 100 by default, use Inf to
@@ -36,9 +43,11 @@
 #'   clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when
 #'   clustering, default in Inf
-#' @param within_order_strategy one of "hclust" or "sort".  if hclust,
-#'   hierarchical clustering will be used. if sort, a simple decreasing sort of
-#'   rosSums.
+#' @param within_order_strategy one of "hclust", "sort", "right", "left",
+#'   "reverse".  If "hclust", hierarchical clustering will be used. If "sort", a
+#'   simple decreasing sort of rosSums.  If "left", will atttempt to put high
+#'   signal on left ("right" is opposite).  If "reverse" reverses existing order
+#'   (should only be used after meaningful order imposed).
 #' @param dcast_fill value to supply to dcast fill argument. default is NA.
 #' @param iter.max Number of max iterations to allow for k-means. Default is 30.
 #'
@@ -71,11 +80,11 @@ ssvSignalClustering = function(bw_data,
                                max_cols = 100,
                                clustering_col_min = -Inf,
                                clustering_col_max = Inf,
-                               within_order_strategy = c("hclust", "sort")[2],
+                               within_order_strategy = valid_sort_strategies[2],
                                dcast_fill = NA,
                                iter.max = 30){
   message("clustering...")
-  id = xbp = x = to_disp = y = hit = val = y = y_gap = group =  NULL#declare binding for data.table
+  id__ = xbp = x = to_disp = y = hit = val = y = y_gap = group__ =  NULL#declare binding for data.table
   output_GRanges = FALSE
   if(is(bw_data, "GRanges")){
     bw_data = data.table::as.data.table(bw_data)
@@ -176,10 +185,10 @@ ssvSignalClustering = function(bw_data,
                                            manual_mapping = cluster_assignment,
                                            iter.max = iter.max)
   rclusters = rclusters[rev(seq_len(nrow(rclusters))),]
-  plot_dt = plot_dt[get(row_) %in% rclusters[["id"]]]
-  plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rev(rclusters[["id"]]))
-  data.table::setkey(rclusters, id)
-  plot_dt[[cluster_]] = rclusters[list(plot_dt[[row_]]), group]
+  plot_dt = plot_dt[get(row_) %in% rclusters[["id__"]]]
+  plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rev(rclusters[["id__"]]))
+  data.table::setkey(rclusters, id__)
+  plot_dt[[cluster_]] = rclusters[list(plot_dt[[row_]]), group__]
   if(output_GRanges){
     plot_dt = GRanges(plot_dt)
   }
@@ -197,7 +206,7 @@ ssvSignalClustering = function(bw_data,
 #'   of NULL results in randomly initialized k-means.
 #' @param iter.max Number of max iterations to allow for k-means. Default is 30.
 #'
-#' @return data.table with group variable indicating cluster membership and id
+#' @return data.table with group__ variable indicating cluster membership and id__
 #'   variable that is a factor indicating order based on within cluster
 #'   similarity
 #' @export
@@ -209,7 +218,7 @@ ssvSignalClustering = function(bw_data,
 #' mat = as.matrix(mat[,-1])
 #' rownames(mat) = rn
 #' clust_dt = clusteringKmeans(mat, nclust = 3)
-#' dt = merge(dt, clust_dt)
+#' dt = merge(dt, clust_dt[, .(id = id__, group = group__)])
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
 clusteringKmeans = function(mat, nclust, centroids = NULL, iter.max = 30) {
@@ -255,7 +264,7 @@ clusteringKmeans = function(mat, nclust, centroids = NULL, iter.max = 30) {
     cluster = mat_kmclust$cluster,
     cluster_ordered = center_reo[as.character(mat_kmclust$cluster)])
   mat_dt = mat_dt[order(cluster_ordered),
-                  list(id = mat_name, group = cluster_ordered)]
+                  list(id__ = mat_name, group__ = cluster_ordered)]
   return(mat_dt)
 }
 
@@ -265,9 +274,11 @@ clusteringKmeans = function(mat, nclust, centroids = NULL, iter.max = 30) {
 #' centers the contents of each cluster are sorted using hclust
 #' @param mat A wide format matrix
 #' @param nclust the number of clusters
-#' @param within_order_strategy one of "hclust" or "sort".  if hclust,
-#'   hierarchical clustering will be used. if sort, a simple decreasing sort of
-#'   rosSums.
+#' @param within_order_strategy one of "hclust", "sort", "right", "left",
+#'   "reverse".  If "hclust", hierarchical clustering will be used. If "sort", a
+#'   simple decreasing sort of rosSums.  If "left", will atttempt to put high
+#'   signal on left ("right" is opposite).  If "reverse" reverses existing order
+#'   (should only be used after meaningful order imposed).
 #' @param centroids optional matrix with same columns as mat and one centroid
 #'   per row to base clusters off of.  Overrides any setting to nclust. Default
 #'   of NULL results in randomly initialized k-means.
@@ -278,9 +289,9 @@ clusteringKmeans = function(mat, nclust, centroids = NULL, iter.max = 30) {
 #'
 #' @export
 #' @importFrom stats  hclust dist
-#' @return data.table with 2 columns of cluster info. id column corresponds with
+#' @return data.table with 2 columns of cluster info. id__ column corresponds with
 #'   input matrix rownames and is sorted within each cluster using hierarchical
-#'   clusering group column indicates cluster assignment
+#'   clusering group__ column indicates cluster assignment
 #' @examples
 #' dt = data.table::copy(CTCF_in_10a_profiles_dt)
 #' mat = data.table::dcast(dt, id ~ sample + x, value.var = "y" )
@@ -291,10 +302,15 @@ clusteringKmeans = function(mat, nclust, centroids = NULL, iter.max = 30) {
 #' dt = merge(dt, clust_dt)
 #' dt$id = factor(dt$id, levels = clust_dt$id)
 #' dt[order(id)]
-clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("hclust", "sort")[2], centroids = NULL, manual_mapping = NULL, iter.max = 30) {
+clusteringKmeansNestedHclust = function(mat,
+                                        nclust,
+                                        within_order_strategy = valid_sort_strategies,
+                                        centroids = NULL,
+                                        manual_mapping = NULL,
+                                        iter.max = 30) {
   stopifnot(is.numeric(nclust))
-  stopifnot(within_order_strategy %in% c("hclust", "sort"))
-  group = id = within_o = NULL#declare binding for data.table
+  stopifnot(within_order_strategy %in% valid_sort_strategies)
+  group__ = id__ = within_o = NULL#declare binding for data.table
 
   if(nclust > (nrow(mat)-1) & is.null(centroids)){
     nclust = nrow(mat)-1
@@ -305,33 +321,46 @@ clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("
     mat_dt = clusteringKmeans(mat, nclust, centroids, iter.max)
   }else{
     manual_mapping
-    mat_dt = data.table(id = names(manual_mapping), group = manual_mapping)
-    mat_dt = mat_dt[order(group)]
+    mat_dt = data.table(id__ = names(manual_mapping), group__ = manual_mapping)
+    mat_dt = mat_dt[order(group__)]
   }
 
+  within_clust_sort.mat_dt(mat_dt = mat_dt,
+                           mat = mat,
+                           within_order_strategy = within_order_strategy)
+}
+
+
+within_clust_sort.mat_dt = function(mat_dt, mat, within_order_strategy){
+  group__ = id__ = within_o = NULL
+  stopifnot(within_order_strategy %in% valid_sort_strategies)
   mat_dt$within_o = as.numeric(-1)
-  for (i in unique(mat_dt$group)) {
-    cmat = mat[mat_dt[group == i, id], , drop = FALSE]
+  for (i in unique(mat_dt$group__)) {
+    cmat = mat[mat_dt[group__ == i, id__], , drop = FALSE]
     if(within_order_strategy == "hclust"){
       if (nrow(cmat) > 2) {
-        mat_dt[group == i, ]$within_o =
+        mat_dt[group__ == i, ]$within_o =
           stats::hclust(stats::dist((cmat)))$order
       } else {
-        mat_dt[group == i, ]$within_o = seq_len(nrow(cmat))
+        mat_dt[group__ == i, ]$within_o = seq_len(nrow(cmat))
       }
     }else if(within_order_strategy == "sort"){
-      mat_dt[group == i, ]$within_o = rank(-rowSums(cmat))
+      mat_dt[group__ == i, ]$within_o = rank(-rowSums(cmat))
+    }else if(within_order_strategy == "left"){
+      mat_dt[group__ == i, ]$within_o = rank(apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
+    }else if(within_order_strategy == "right"){
+      mat_dt[group__ == i, ]$within_o = rank(-apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
+    }else if(within_order_strategy == "reverse"){
+      mat_dt[group__ == i, ]$within_o = rev(seq_len(nrow(cmat)))
     }
-
-
   }
-  mat_dt = mat_dt[order(within_o), ][order(group), ]
-  mat_dt$id = factor(mat_dt$id, levels = mat_dt$id)
+  mat_dt = mat_dt[order(within_o), ][order(group__), ]
+  mat_dt$id__ = factor(mat_dt$id__, levels = mat_dt$id__)
   mat_dt$within_o = NULL
-  if(!is.factor(mat_dt$group)){
-    mat_dt$group = factor(mat_dt$group)
+  if(!is.factor(mat_dt$group__)){
+    mat_dt$group__ = factor(mat_dt$group__, levels = unique(mat_dt$group__))
   }
-  return(mat_dt)
+  mat_dt
 }
 
 #' within_clust_sort
@@ -361,9 +390,11 @@ clusteringKmeansNestedHclust = function(mat, nclust, within_order_strategy = c("
 #'   clustering, default in -Inf
 #' @param clustering_col_max numeric maximum for col range considered when
 #'   clustering, default in Inf
-#' @param within_order_strategy one of "hclust" or "sort".  if hclust,
-#'   hierarchical clustering will be used. if sort, a simple decreasing sort of
-#'   rosSums.
+#' @param within_order_strategy one of "hclust", "sort", "right", "left",
+#'   "reverse".  If "hclust", hierarchical clustering will be used. If "sort", a
+#'   simple decreasing sort of rosSums.  If "left", will atttempt to put high
+#'   signal on left ("right" is opposite).  If "reverse" reverses existing order
+#'   (should only be used after meaningful order imposed).
 #' @param dcast_fill value to supply to dcast fill argument. default is NA.
 #'
 #' @return data.table matching input clust_dt save for the reassignment of
@@ -415,39 +446,14 @@ within_clust_sort = function(clust_dt,
     dcast_fill = dcast_fill
   )
 
-  stopifnot(within_order_strategy %in% c("hclust", "sort", "left", "right"))
-  group = id = within_o = NULL#declare binding for data.table
+
+  group__ = id__ = within_o = NULL#declare binding for data.table
 
   mat_dt = unique(clust_dt[, list(id__ = get(row_), group__ = get(cluster_))])
-  mat_dt$within_o = as.numeric(-1)
-  for (i in unique(mat_dt$group__)) {
-    cmat = mat[mat_dt[group__ == i, id__], , drop = FALSE]
-    if(within_order_strategy == "hclust"){
-      if (nrow(cmat) > 2) {
-        mat_dt[group__ == i, ]$within_o =
-          stats::hclust(stats::dist((cmat)))$order
-      } else {
-        mat_dt[group__ == i, ]$within_o = seq_len(nrow(cmat))
-      }
-    }else if(within_order_strategy == "sort"){
-      mat_dt[group__ == i, ]$within_o = rank(-rowSums(cmat))
-    }else if(within_order_strategy == "left"){
-      mat_dt[group__ == i, ]$within_o = rank(apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
-    }else if(within_order_strategy == "right"){
-      mat_dt[group__ == i, ]$within_o = rank(-apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
-    }
-  }
-  mat_dt = mat_dt[order(within_o), ][order(group__), ]
-  mat_dt$id__ = factor(mat_dt$id__, levels = mat_dt$id__)
-  mat_dt$within_o = NULL
-  if(!is.factor(mat_dt$group__)){
-    mat_dt$group__ = factor(mat_dt$group__, levels = unique(mat_dt$group))
-  }
-
+  mat_dt = within_clust_sort.mat_dt(mat_dt, mat, within_order_strategy = within_order_strategy)
   #repair var names
   clust_dt[[row_]] = factor(clust_dt[[row_]], levels = levels(mat_dt$id__))
   # clust_dt[[cluster_]] = factor(clust_dt[[cluster_]], levels = levels(mat_dt$group__))
-
   return(clust_dt)
 }
 
@@ -509,15 +515,24 @@ reorder_clusters_stepdown = function(clust_dt,
       new_dt[[facet_]] = factor(new_dt[[facet_]], levels = unique(new_dt[[facet_]]))
     }
   }
-  agg_dt = new_dt[, .(y = mean(get(fill_))), c(cluster_, column_, ifelse(facet_ == "", character(), facet_))]
+  agg_dt = new_dt[, list(y = mean(get(fill_))), c(cluster_, column_, ifelse(facet_ == "", character(), facet_))]
   agg_dt = agg_dt[order(get(column_))][order(get(facet_))]
 
   if(step_by_column & step_by_facet){
-    wide_dt = dcast(agg_dt, paste0(cluster_, "~", ifelse(facet_ == "", character(), paste0(facet_, "+")), column_), value.var = fill_, fun.aggregate = mean)
+    wide_dt = dcast(agg_dt,
+                    paste0(cluster_, "~", ifelse(facet_ == "", character(), paste0(facet_, "+")), column_),
+                    value.var = fill_,
+                    fun.aggregate = mean)
   }else if(step_by_column){
-    wide_dt = dcast(agg_dt, paste0(cluster_, "~", column_), value.var = fill_, fun.aggregate = mean)
+    wide_dt = dcast(agg_dt,
+                    paste0(cluster_, "~", column_),
+                    value.var = fill_,
+                    fun.aggregate = mean)
   }else if(step_by_facet){
-    wide_dt = dcast(agg_dt, paste0(cluster_, "~", ifelse(facet_ == "", character(), facet_)), value.var = fill_, fun.aggregate = mean)
+    wide_dt = dcast(agg_dt,
+                    paste0(cluster_, "~", ifelse(facet_ == "", character(), facet_)),
+                    value.var = fill_,
+                    fun.aggregate = mean)
   }
 
 
@@ -527,7 +542,9 @@ reorder_clusters_stepdown = function(clust_dt,
   wm_o = sort(apply(mat, 1, function(x){
     weighted.mean(seq_along(x), x)
   }))
-  reorder_clusters_manual(new_dt, manual_order = names(wm_o), cluster_ = cluster_, row_ = row_)
+  reorder_clusters_manual(new_dt,
+                          manual_order = names(wm_o),
+                          cluster_ = cluster_, row_ = row_)
 }
 
 
@@ -537,7 +554,8 @@ reorder_clusters_stepdown = function(clust_dt,
 #' Applies hierarchical clustering to centroids of clusters to reorder.
 #'
 #' @param clust_dt data.table output from \code{\link{ssvSignalClustering}}
-#' @param hclust hclust result returned by a previous call of this function with identical paramters when return_hclust = TRUE.
+#' @param hclust_result hclust result returned by a previous call of this function with
+#'   identical paramters when return_hclust = TRUE.
 #' @param row_ variable name mapped to row, likely id or gene name for ngs data.
 #'   Default is "id" and works with ssvFetch* output.
 #' @param column_ varaible mapped to column, likely bp position for ngs data.
@@ -550,7 +568,9 @@ reorder_clusters_stepdown = function(clust_dt,
 #'   "cluster_id".
 #' @param reapply_cluster_names If TRUE, clusters will be renamed according to
 #'   new order instead of their original names. Default is TRUE.
-#' @param return_hclust If TRUE, return the result of hclust instead of the reordered clustering data.table. Default is FALSE.  Ignored if hclust_result is supplied.
+#' @param return_hclust If TRUE, return the result of hclust instead of the
+#'   reordered clustering data.table. Default is FALSE.  Ignored if
+#'   hclust_result is supplied.
 #'
 #' @return data.table as output from \code{\link{ssvSignalClustering}}
 #' @export
@@ -573,7 +593,7 @@ reorder_clusters_hclust = function(clust_dt,
                                    return_hclust = FALSE){
   new_dt = copy(clust_dt)
   if(is.null(hclust_result)){
-    agg_dt = new_dt[, .(y = mean(get(fill_))), c(cluster_, column_, ifelse(facet_ == "", character(), facet_))]
+    agg_dt = new_dt[, list(y = mean(get(fill_))), c(cluster_, column_, ifelse(facet_ == "", character(), facet_))]
     setnames(agg_dt, "y", fill_)
     wide_dt = dcast(agg_dt, paste0(cluster_, "~", column_, ifelse(facet_ == "", character(), paste0("+", facet_))), value.var = fill_)
     mat = as.matrix(wide_dt[,-1])
@@ -584,20 +604,30 @@ reorder_clusters_hclust = function(clust_dt,
     }
   }
   clust_lev = levels(new_dt[[cluster_]])[hclust_result$order]
-  reorder_clusters_manual(clust_dt, manual_order = clust_lev, cluster_ = cluster_, row_ = row_, reapply_cluster_names = reapply_cluster_names)
+  reorder_clusters_manual(clust_dt,
+                          manual_order = clust_lev,
+                          cluster_ = cluster_,
+                          row_ = row_,
+                          reapply_cluster_names = reapply_cluster_names)
 }
 #
 
 
 #' reorder_clusters_manual
 #'
-#' Manually applies a new order (top to bottom) for cluster using the result of ssvSignalClustering.
+#' Manually applies a new order (top to bottom) for cluster using the result of
+#' ssvSignalClustering.
 #'
 #' @param clust_dt data.table output from \code{\link{ssvSignalClustering}}
-#' @param manual_order New order for clusters  Does not need to include all clusters.  Any colors not included will be at the bottom in their original order.
-#' @param row_ variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.
-#' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
-#' @param reapply_cluster_names If TRUE, clusters will be renamed according to new order instead of their original names. Default is TRUE.
+#' @param manual_order New order for clusters  Does not need to include all
+#'   clusters.  Any colors not included will be at the bottom in their original
+#'   order.
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data.
+#'   Default is "id" and works with ssvFetch* output.
+#' @param cluster_ variable name to use for cluster info. Default is
+#'   "cluster_id".
+#' @param reapply_cluster_names If TRUE, clusters will be renamed according to
+#'   new order instead of their original names. Default is TRUE.
 #'
 #' @return data.table as output from \code{\link{ssvSignalClustering}}
 #' @export
@@ -634,10 +664,14 @@ reorder_clusters_manual = function(clust_dt,
 #' merge_clusters
 #'
 #' @param clust_dt data.table output from \code{\link{ssvSignalClustering}}
-#' @param to_merge Clusters to merge. Must be items in clust_dt variable defined by cluster_ parameter.
-#' @param row_ variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.
-#' @param cluster_ variable name to use for cluster info. Default is "cluster_id".
-#' @param reapply_cluster_names If TRUE, clusters will be renamed according to new order instead of their original names. Default is TRUE.
+#' @param to_merge Clusters to merge. Must be items in clust_dt variable defined
+#'   by cluster_ parameter.
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data.
+#'   Default is "id" and works with ssvFetch* output.
+#' @param cluster_ variable name to use for cluster info. Default is
+#'   "cluster_id".
+#' @param reapply_cluster_names If TRUE, clusters will be renamed according to
+#'   new order instead of their original names. Default is TRUE.
 #'
 #' @return data.table as output from \code{\link{ssvSignalClustering}}
 #' @export
@@ -646,7 +680,7 @@ reorder_clusters_manual = function(clust_dt,
 #' set.seed(0)
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 6)
 #' ssvSignalHeatmap(clust_dt)
-#' agg_dt = clust_dt[, .(y = mean(y)), .(x, cluster_id, sample)]
+#' agg_dt = clust_dt[, list(y = mean(y)), list(x, cluster_id, sample)]
 #' ggplot(agg_dt, aes(x = x, y = y, color = sample)) +
 #'   geom_path() +
 #'   facet_grid(cluster_id~.)
@@ -694,3 +728,59 @@ merge_clusters = function(clust_dt,
 
 }
 
+#' reverse_clusters
+#'
+#' @param clust_dt data.table output from \code{\link{ssvSignalClustering}}
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data.
+#'   Default is "id" and works with ssvFetch* output.
+#' @param column_ varaible mapped to column, likely bp position for ngs data.
+#'   Default is "x" and works with ssvFetch* output.
+#' @param fill_ numeric variable to map to fill. Default is "y" and works with
+#'   ssvFetch* output.
+#' @param facet_ variable name to facet horizontally by. Default is "sample" and
+#'   works with ssvFetch* output. Set to "" if data is not facetted.
+#' @param cluster_ variable name to use for cluster info. Default is
+#'   "cluster_id".
+#' @param reverse_rows_within If TRUE, rows within clusters will be reversed as well. Default is TRUE.
+#' @param reapply_cluster_names If TRUE, clusters will be renamed according to
+#'   new order instead of their original names. Default is TRUE.
+#'
+#' @return data.table as output from \code{\link{ssvSignalClustering}}
+#'
+#' @export
+#'
+#' @examples
+#' set.seed(0)
+#' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
+#' rev_dt = reverse_clusters(clust_dt)
+#' rev_dt.no_relabel = reverse_clusters(clust_dt, reapply_cluster_names = FALSE)
+#' rev_dt.not_rows = reverse_clusters(clust_dt, reverse_rows_within = FALSE)
+#' cowplot::plot_grid(nrow = 1,
+#'   ssvSignalHeatmap(clust_dt) + labs(title = "original"),
+#'   ssvSignalHeatmap(rev_dt) + labs(title = "reversed"),
+#'   ssvSignalHeatmap(rev_dt.no_relabel) + labs(title = "reversed, no relabel"),
+#'   ssvSignalHeatmap(rev_dt.not_rows) + labs(title = "reversed, not rows")
+#' )
+reverse_clusters = function(clust_dt,
+                            row_ = "id",
+                            column_ = "x",
+                            fill_ = "y",
+                            facet_ = "sample",
+                            cluster_ = "cluster_id",
+                            reverse_rows_within = TRUE,
+                            reapply_cluster_names = TRUE){
+  new_dt = reorder_clusters_manual(clust_dt,
+                                   manual_order = rev(levels(clust_dt[[cluster_]])),
+                                   row_ = row_,
+                                   cluster_ = cluster_,
+                                   reapply_cluster_names = reapply_cluster_names)
+  if(reverse_rows_within){
+    new_dt = within_clust_sort(new_dt,
+                               row_ = row_,
+                               column_ = column_,
+                               fill_ = fill_,
+                               facet_ = facet_,
+                               cluster_ = cluster_, within_order_strategy = "reverse")
+  }
+  new_dt
+}

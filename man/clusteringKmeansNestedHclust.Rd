@@ -9,7 +9,7 @@ centers the contents of each cluster are sorted using hclust}
 clusteringKmeansNestedHclust(
   mat,
   nclust,
-  within_order_strategy = c("hclust", "sort")[2],
+  within_order_strategy = valid_sort_strategies,
   centroids = NULL,
   manual_mapping = NULL,
   iter.max = 30
@@ -20,9 +20,11 @@ clusteringKmeansNestedHclust(
 
 \item{nclust}{the number of clusters}
 
-\item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
-hierarchical clustering will be used. if sort, a simple decreasing sort of
-rosSums.}
+\item{within_order_strategy}{one of "hclust", "sort", "right", "left",
+"reverse".  If "hclust", hierarchical clustering will be used. If "sort", a
+simple decreasing sort of rosSums.  If "left", will atttempt to put high
+signal on left ("right" is opposite).  If "reverse" reverses existing order
+(should only be used after meaningful order imposed).}
 
 \item{centroids}{optional matrix with same columns as mat and one centroid
 per row to base clusters off of.  Overrides any setting to nclust. Default
@@ -35,9 +37,9 @@ the items are assigned to. Default of NULL allows clustering to proceed.}
 \item{iter.max}{Number of max iterations to allow for k-means. Default is 30.}
 }
 \value{
-data.table with 2 columns of cluster info. id column corresponds with
+data.table with 2 columns of cluster info. id__ column corresponds with
   input matrix rownames and is sorted within each cluster using hierarchical
-  clusering group column indicates cluster assignment
+  clusering group__ column indicates cluster assignment
 }
 \description{
 perform kmeans clustering on matrix rows and return reordered matrix along

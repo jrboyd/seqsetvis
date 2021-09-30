@@ -15,19 +15,25 @@ reorder_clusters_manual(
 \arguments{
 \item{clust_dt}{data.table output from \code{\link{ssvSignalClustering}}}
 
-\item{manual_order}{New order for clusters  Does not need to include all clusters.  Any colors not included will be at the bottom in their original order.}
+\item{manual_order}{New order for clusters  Does not need to include all
+clusters.  Any colors not included will be at the bottom in their original
+order.}
 
-\item{row_}{variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.}
+\item{row_}{variable name mapped to row, likely id or gene name for ngs data.
+Default is "id" and works with ssvFetch* output.}
 
-\item{cluster_}{variable name to use for cluster info. Default is "cluster_id".}
+\item{cluster_}{variable name to use for cluster info. Default is
+"cluster_id".}
 
-\item{reapply_cluster_names}{If TRUE, clusters will be renamed according to new order instead of their original names. Default is TRUE.}
+\item{reapply_cluster_names}{If TRUE, clusters will be renamed according to
+new order instead of their original names. Default is TRUE.}
 }
 \value{
 data.table as output from \code{\link{ssvSignalClustering}}
 }
 \description{
-Manually applies a new order (top to bottom) for cluster using the result of ssvSignalClustering.
+Manually applies a new order (top to bottom) for cluster using the result of
+ssvSignalClustering.
 }
 \examples{
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)

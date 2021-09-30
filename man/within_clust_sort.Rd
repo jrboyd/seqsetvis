@@ -35,9 +35,11 @@ works with ssvFetch* output. Set to "" if data is not facetted.}
 \item{cluster_}{variable name to use for cluster info. Default is
 "cluster_id".}
 
-\item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
-hierarchical clustering will be used. if sort, a simple decreasing sort of
-rosSums.}
+\item{within_order_strategy}{one of "hclust", "sort", "right", "left",
+"reverse".  If "hclust", hierarchical clustering will be used. If "sort", a
+simple decreasing sort of rosSums.  If "left", will atttempt to put high
+signal on left ("right" is opposite).  If "reverse" reverses existing order
+(should only be used after meaningful order imposed).}
 
 \item{clustering_col_min}{numeric minimum for col range considered when
 clustering, default in -Inf}

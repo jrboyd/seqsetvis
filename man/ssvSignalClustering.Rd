@@ -21,7 +21,7 @@ ssvSignalClustering(
   max_cols = 100,
   clustering_col_min = -Inf,
   clustering_col_max = Inf,
-  within_order_strategy = c("hclust", "sort")[2],
+  within_order_strategy = valid_sort_strategies[2],
   dcast_fill = NA,
   iter.max = 30
 )
@@ -40,15 +40,20 @@ with nclust or memb_table.}
 Logical groups from membership table will be clusters. Incompatible with
 nclust or k_centroids.}
 
-\item{row_}{variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.}
+\item{row_}{variable name mapped to row, likely id or gene name for ngs data.
+Default is "id" and works with ssvFetch* output.}
 
-\item{column_}{varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.}
+\item{column_}{varaible mapped to column, likely bp position for ngs data.
+Default is "x" and works with ssvFetch* output.}
 
-\item{fill_}{numeric variable to map to fill. Default is "y" and works with ssvFetch* output.}
+\item{fill_}{numeric variable to map to fill. Default is "y" and works with
+ssvFetch* output.}
 
-\item{facet_}{variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.}
+\item{facet_}{variable name to facet horizontally by. Default is "sample" and
+works with ssvFetch* output. Set to "" if data is not facetted.}
 
-\item{cluster_}{variable name to use for cluster info. Default is "cluster_id".}
+\item{cluster_}{variable name to use for cluster info. Default is
+"cluster_id".}
 
 \item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot
 full data}
@@ -62,9 +67,11 @@ clustering, default in -Inf}
 \item{clustering_col_max}{numeric maximum for col range considered when
 clustering, default in Inf}
 
-\item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
-hierarchical clustering will be used. if sort, a simple decreasing sort of
-rosSums.}
+\item{within_order_strategy}{one of "hclust", "sort", "right", "left",
+"reverse".  If "hclust", hierarchical clustering will be used. If "sort", a
+simple decreasing sort of rosSums.  If "left", will atttempt to put high
+signal on left ("right" is opposite).  If "reverse" reverses existing order
+(should only be used after meaningful order imposed).}
 
 \item{dcast_fill}{value to supply to dcast fill argument. default is NA.}
 

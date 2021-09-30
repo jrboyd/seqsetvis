@@ -127,12 +127,29 @@ test_that("reorder_clusters_hclust", {
         }else if(all(all_membs[[1]][[i]] != all_membs[[3]][[i]])){
             num_fail_2 = num_fail_2 + 1
         }
-
-        # expect_equal()
-        # #this cluster should not
-        # expect_failure(expect_equal(all_membs[[1]][[i]], all_membs[[3]][[i]]))
-        # # expect_setequal(all_membs[[1]][[i]], all_membs[[3]][[i]])
     }
     expect_gt(num_fail_1, 0)
     expect_equal(num_fail_2, 0)
+})
+
+test_that("reorder_clusters_hclust", {
+    set.seed(0)
+    rev_dt = reverse_clusters(clust_dt)
+    rev_dt.no_relabel = reverse_clusters(clust_dt, reapply_cluster_names = FALSE)
+    rev_dt.not_rows = reverse_clusters(clust_dt, reverse_rows_within = FALSE)
+    if(show_plots){
+        cowplot::plot_grid(nrow = 1,
+                           ssvSignalHeatmap(clust_dt) + labs(title = "original"),
+                           ssvSignalHeatmap(rev_dt) + labs(title = "reversed"),
+                           ssvSignalHeatmap(rev_dt.no_relabel) + labs(title = "reversed, no relabel"),
+                           ssvSignalHeatmap(rev_dt.not_rows) + labs(title = "reversed, not rows")
+        )
+    }
+    expect_equal(levels(clust_dt$id), rev(levels(rev_dt$id)))
+    expect_equal(levels(clust_dt$id), rev(levels(rev_dt.no_relabel$id)))
+    expect_failure(expect_equal(levels(clust_dt$id), rev(levels(rev_dt.not_rows$id))))
+
+    expect_setequal(clust_dt[cluster_id == 1]$id, rev_dt.no_relabel[cluster_id == 1]$id)
+    expect_failure(expect_setequal(clust_dt[cluster_id == 1]$id, rev_dt[cluster_id == 1]$id))
+    expect_failure(expect_setequal(clust_dt[cluster_id == 1]$id, rev_dt.not_rows[cluster_id == 1]$id))
 })

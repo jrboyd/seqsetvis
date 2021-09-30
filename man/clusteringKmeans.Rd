@@ -20,7 +20,7 @@ of NULL results in randomly initialized k-means.}
 \item{iter.max}{Number of max iterations to allow for k-means. Default is 30.}
 }
 \value{
-data.table with group variable indicating cluster membership and id
+data.table with group__ variable indicating cluster membership and id__
   variable that is a factor indicating order based on within cluster
   similarity
 }
@@ -36,7 +36,7 @@ rn = mat$id
 mat = as.matrix(mat[,-1])
 rownames(mat) = rn
 clust_dt = clusteringKmeans(mat, nclust = 3)
-dt = merge(dt, clust_dt)
+dt = merge(dt, clust_dt[, .(id = id__, group = group__)])
 dt$id = factor(dt$id, levels = clust_dt$id)
 dt[order(id)]
 }

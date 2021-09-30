@@ -15,44 +15,47 @@ merge_clusters(
 \arguments{
 \item{clust_dt}{data.table output from \code{\link{ssvSignalClustering}}}
 
-\item{to_merge}{Clusters to merge. Must be items in clust_dt variable defined by cluster_ parameter.}
+\item{to_merge}{Clusters to merge. Must be items in clust_dt variable defined
+by cluster_ parameter.}
 
-\item{row_}{variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.}
+\item{row_}{variable name mapped to row, likely id or gene name for ngs data.
+Default is "id" and works with ssvFetch* output.}
 
-\item{cluster_}{variable name to use for cluster info. Default is "cluster_id".}
+\item{cluster_}{variable name to use for cluster info. Default is
+"cluster_id".}
 
-\item{reapply_cluster_names}{If TRUE, clusters will be renamed according to new order instead of their original names. Default is TRUE.}
+\item{reapply_cluster_names}{If TRUE, clusters will be renamed according to
+new order instead of their original names. Default is TRUE.}
 }
 \value{
-
+data.table as output from \code{\link{ssvSignalClustering}}
 }
 \description{
 merge_clusters
 }
 \examples{
-library(seqsetvis)
 set.seed(0)
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 6)
 ssvSignalHeatmap(clust_dt)
-agg_dt = clust_dt[, .(y = mean(y)), .(x, cluster_id, sample)]
+agg_dt = clust_dt[, list(y = mean(y)), list(x, cluster_id, sample)]
 ggplot(agg_dt, aes(x = x, y = y, color = sample)) +
   geom_path() +
   facet_grid(cluster_id~.)
 
 to_merge = c(2, 3, 5)
 # debug(merge_clusters)
-new_dt = merge_clusters(clust_dt, c(2, 3, 5))
+new_dt = merge_clusters(clust_dt, c(2, 3, 5), reapply_cluster_names = FALSE)
 new_dt.relabel = merge_clusters(clust_dt, c(2, 3, 5), reapply_cluster_names = TRUE)
-new_dt.relabel.sort = within_clust_sort(new_dt.relabel)
+new_dt.relabel.sort = within_clust_sort(new_dt.relabel, within_order_strategy = "sort")
 
 table(clust_dt$cluster_id)
 table(new_dt$cluster_id)
 
 cowplot::plot_grid(
-  ssvSignalHeatmap(clust_dt),
-  ssvSignalHeatmap(new_dt),
-  ssvSignalHeatmap(new_dt.relabel),
-  ssvSignalHeatmap(new_dt.relabel.sort)
+  ssvSignalHeatmap(clust_dt) + labs(title = "original"),
+  ssvSignalHeatmap(new_dt) + labs(title = "2,3,5 merged"),
+  ssvSignalHeatmap(new_dt.relabel) + labs(title = "2,3,5 merged, renumbered"),
+  ssvSignalHeatmap(new_dt.relabel.sort) + labs(title = "2,3,5 merged, renumbered and sorted")
 )
 
 
