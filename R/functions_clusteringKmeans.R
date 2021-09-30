@@ -831,7 +831,15 @@ split_cluster = function(clust_dt,
   to_split = as.character(to_split)
   stopifnot(to_split %in% clust_dt[[cluster_]])
   split_dt = clust_dt[clust_dt[[cluster_]] == to_split]
-  split_dt = ssvSignalClustering(split_dt, nclust = nclust, row_ = row_, column_ = column_, fill_ = fill_, facet_ = facet_, cluster_ = cluster_)
+  split_dt = ssvSignalClustering(split_dt,
+                                 nclust = nclust,
+                                 row_ = row_,
+                                 column_ = column_,
+                                 fill_ = fill_,
+                                 facet_ = facet_,
+                                 cluster_ = cluster_,
+                                 max_rows = Inf,
+                                 max_cols = Inf)
   new_lev = paste0(to_split, letters[seq_len(nclust)])
   levels(split_dt[[cluster_]]) = new_lev
   insert_at = which(levels(clust_dt[[cluster_]]) == to_split)
