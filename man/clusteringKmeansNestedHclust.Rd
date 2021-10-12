@@ -9,7 +9,7 @@ centers the contents of each cluster are sorted using hclust}
 clusteringKmeansNestedHclust(
   mat,
   nclust,
-  within_order_strategy = valid_sort_strategies,
+  within_order_strategy = valid_sort_strategies[2],
   centroids = NULL,
   manual_mapping = NULL,
   iter.max = 30

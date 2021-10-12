@@ -45,7 +45,7 @@ Imports:
     S4Vectors, 
     stats,
     UpSetR
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
 VignetteBuilder: knitr
 NeedsCompilation: no
 Packaged: 2018-01-08 17:54:19 UTC; joeboyd

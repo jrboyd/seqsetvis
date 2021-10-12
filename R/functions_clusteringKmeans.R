@@ -302,7 +302,7 @@ clusteringKmeans = function(mat, nclust, centroids = NULL, iter.max = 30) {
 #' clust_dt
 clusteringKmeansNestedHclust = function(mat,
                                         nclust,
-                                        within_order_strategy = valid_sort_strategies,
+                                        within_order_strategy = valid_sort_strategies[2],
                                         centroids = NULL,
                                         manual_mapping = NULL,
                                         iter.max = 30) {
