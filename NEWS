@@ -1,6 +1,5 @@
-# 1.13.9
+# 1.13.10
 
-* bugfix for expandCigar with negative aligned reads (off by 1)
 * bugfix fixed bad example in clusteringKmeansNestedHclust
 
 # 1.13.8

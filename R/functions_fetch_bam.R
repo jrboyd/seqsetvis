@@ -650,8 +650,6 @@ expandCigar = function(cigar_dt, op_2count = c("M", "D", "=", "X"), return_data.
     }
     stopifnot(c("which_label", "seqnames", "strand", "start", "cigar") %in% colnames(cigar_dt))
     res = .expand_cigar_dt(cigar_dt, op_2count)
-    res[ strand == "-", start := start - 1]
-    res[ strand == "-", end := end - 1]
     if(!return_data.table){
         res = GRanges(res)
     }
