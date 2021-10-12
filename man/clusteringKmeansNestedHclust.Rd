@@ -9,7 +9,7 @@ centers the contents of each cluster are sorted using hclust}
 clusteringKmeansNestedHclust(
   mat,
   nclust,
-  within_order_strategy = valid_sort_strategies,
+  within_order_strategy = valid_sort_strategies[2],
   centroids = NULL,
   manual_mapping = NULL,
   iter.max = 30
@@ -53,7 +53,5 @@ rn = mat$id
 mat = as.matrix(mat[,-1])
 rownames(mat) = rn
 clust_dt = clusteringKmeansNestedHclust(mat, nclust = 3)
-dt = merge(dt, clust_dt)
-dt$id = factor(dt$id, levels = clust_dt$id)
-dt[order(id)]
+clust_dt
 }
