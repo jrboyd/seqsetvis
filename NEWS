@@ -1,3 +1,7 @@
+# 1.13.11
+
+* optimization of ssvFactorizeMembTable
+
 # 1.13.10
 
 * bugfix fixed bad example in clusteringKmeansNestedHclust
