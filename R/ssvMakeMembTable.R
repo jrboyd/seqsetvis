@@ -57,9 +57,9 @@ setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
 #' ssvMakeMembTable(GRangesList(gr_list))
 setMethod("ssvMakeMembTable",
           signature(object = "GRangesList"), function(object){
-    GRlist_object = object
-    ssvMakeMembTable(ssvOverlapIntervalSets(GRlist_object))
-})
+              GRlist_object = object
+              ssvMakeMembTable(ssvOverlapIntervalSets(GRlist_object))
+          })
 
 
 
@@ -122,16 +122,16 @@ setMethod("ssvMakeMembTable", signature(object = "matrix"), function(object){
 #' ssvMakeMembTable(memb_df)
 setMethod("ssvMakeMembTable",
           signature(object = "data.frame"), function(object){
-    if (is.null(colnames(object))) {
-        colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])
-    }
-    if(all(colnames(object) == paste0("V", seq_len(ncol(object))))){
-        colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])
-    }
-    mat = as.matrix(object)
-    rownames(mat) = rownames(object)
-    return(mat)
-})
+              if (is.null(colnames(object))) {
+                  colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])
+              }
+              if(all(colnames(object) == paste0("V", seq_len(ncol(object))))){
+                  colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])
+              }
+              mat = as.matrix(object)
+              rownames(mat) = rownames(object)
+              return(mat)
+          })
 
 #' Convert any object accepted by ssvMakeMembTable to a factor
 #' To avoid ambiguity,
@@ -149,30 +149,16 @@ setMethod("ssvMakeMembTable",
 #' ssvFactorizeMembTable(list(1:4, 2:3, 4:6))
 ssvFactorizeMembTable = function(object){
     memb = ssvMakeMembTable(object)
-    keys = expand.grid(lapply(seq_len(ncol(memb)), function(x)0:1))
-    keys = keys == 1
-    for(i in rev(seq_len(ncol(keys)))){
-        keys = keys[order(keys[,i, drop = FALSE], decreasing = TRUE), ,
-                    drop = FALSE]
-    }
-    keys = keys[order(rowSums(keys), decreasing = TRUE), , drop = FALSE]
-    keys_rn = apply(keys, 1, function(k){
-        paste(colnames(memb)[k], collapse = " & ")
-    })
-    keys_rn[keys_rn == ""] = "none"
-
+    id_lev = names(rev(sort(rowSums(memb))))
+    group_lev = names(rev(sort(colSums(memb))))
     grps = apply(memb, 1, function(x){
-        keys_rn[apply(keys, 1, function(y){
-            all(x == y)
-        })]
+        paste(names(x)[x], collapse = " & ")
     })
-    ids = names(grps)
-    if(is.null(ids)){
-        ids = seq_along(grps)
-    }
-    ids = factor(ids, levels = ids)
-    names(grps) = NULL
-    grps = factor(grps, levels = keys_rn)
-    grp_df = data.frame(id = ids, group = grps)
+    grp_counts = table(grps)
+    grp_counts = rev(sort(grp_counts))
+    grp_df = data.frame(id = names(grps), group = grps)
+    rownames(grp_df) = NULL
+    grp_df$id = factor(grp_df$id, levels = id_lev)
+    grp_df$group = factor(grp_df$group, levels = names(grp_counts))
     return(grp_df)
 }
