@@ -447,7 +447,8 @@ ssvFeaturePie = function(object, slice_colors = NULL, return_data = FALSE) {
 #' ssvFeatureBinaryHeatmap(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 #' ssvFeatureBinaryHeatmap(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,3:2])
-ssvFeatureBinaryHeatmap = function(object, raster_approximation = FALSE,
+ssvFeatureBinaryHeatmap = function(object,
+                                   raster_approximation = TRUE,
                                    true_color = "black",
                                    false_color = "#EFEFEF",
                                    raster_width_min = 1000,
