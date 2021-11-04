@@ -433,7 +433,7 @@ ssvFeaturePie = function(object, slice_colors = NULL, return_data = FALSE) {
 #' @param raster_height_min raster height will be minimum multiple of number of
 #' rows over this number  ignored if raster_approximation is FALSE
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and
-#' is instead the data used to generate that plot. Default is FALSE.
+#' is instead the data used to generate that plot. Default is TRUE
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @return ggplot using geom_tile of membership table sorted from left to right.
 #' @import png
