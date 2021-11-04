@@ -1,3 +1,7 @@
+# 1.15.3
+
+* build warning fix - didn't update docs when changing raster_approximation default for ssvBinaryHeatmap
+
 # 1.15.2
 
 * default for ssvFeatureBinaryHeatmap is now raster_approximation = TRUE
