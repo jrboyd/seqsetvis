@@ -1,7 +1,7 @@
 Package: seqsetvis
 Type: Package
 Title: Set Based Visualizations for Next-Gen Sequencing Data
-Version: 1.15.3
+Version: 1.15.5
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"))
 Description: seqsetvis enables the visualization and analysis of sets of 
@@ -19,12 +19,12 @@ Suggests:
     BiocStyle,
     ChIPpeakAnno,
     covr, 
-    cowplot, 
     knitr, 
     rmarkdown, 
     testthat
 Depends: R (>= 3.6), ggplot2
 Imports: 
+    cowplot, 
     data.table, 
     eulerr, 
     GenomeInfoDb,

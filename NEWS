@@ -1,3 +1,7 @@
+# 1.15.5
+* cowplot added to imports
+* bugfixes with seqlevels in view functions(Bioc 15 new).
+
 # 1.15.3
 
 * build warning fix - didn't update docs when changing raster_approximation default for ssvBinaryHeatmap

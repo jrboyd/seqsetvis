@@ -307,9 +307,10 @@ viewGRangesWinSample_dt = function(score_gr,
             )
         )[order(queryHits)]
         suppressWarnings({
-            patch_gr = GRanges("chrPatchZero",
+            patch_gr = GRanges(seqlevels(score_gr)[1],
                                IRanges::IRanges(1, 1))
             mcols(patch_gr)[[attrib_var]] = fill_value
+            seqlevels(patch_gr) = seqlevels(score_gr)
             score_gr = c(score_gr,
                          patch_gr)
         })
@@ -420,9 +421,10 @@ viewGRangesWinSummary_dt = function (score_gr,
             )
         )[order(queryHits)]
         suppressWarnings({
-            patch_gr = GRanges("chrPatchZero",
+            patch_gr = GRanges(seqlevels(score_gr)[1],
                                IRanges::IRanges(1, 1))
             mcols(patch_gr)[[attrib_var]] = NA
+            seqlevels(patch_gr) = seqlevels(score_gr)
             score_gr = c(score_gr,
                          patch_gr
             )
@@ -475,9 +477,6 @@ viewGRangesWinSummary_dt = function (score_gr,
     )]
     setnames(repair_dt, "score", attrib_var)
     cov_dt = rbind(cov_dt, repair_dt)
-
-
-
 
     if(attrib_type == "qualitative"){
         density_dt = cov_dt[, list(tile_density = summary_FUN(score_width / tile_width, rep(1, length(width)))),

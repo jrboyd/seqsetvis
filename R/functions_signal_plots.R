@@ -807,6 +807,7 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
 #'
 #' @return A grob produced by cowplot::plot_grid
 #' @export
+#' @import cowplot
 #'
 #' @examples
 #' plots = ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, return_unassembled_plots = TRUE)
