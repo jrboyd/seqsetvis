@@ -248,6 +248,7 @@ prepare_fetch_GRanges_names = function(qgr, include_id = FALSE){
 #'   "center_unstranded", "left", "left_unstranded"). Default is "center".
 #' @return data.table that is GRanges compatible
 #' @export
+#' @import GenomeInfoDb
 #' @examples
 #' bam_file = system.file("extdata/test.bam",
 #'     package = "seqsetvis")
@@ -307,10 +308,10 @@ viewGRangesWinSample_dt = function(score_gr,
             )
         )[order(queryHits)]
         suppressWarnings({
-            patch_gr = GRanges(seqlevels(score_gr)[1],
+            patch_gr = GRanges(GenomeInfoDb::seqlevels(score_gr)[1],
                                IRanges::IRanges(1, 1))
             mcols(patch_gr)[[attrib_var]] = fill_value
-            seqlevels(patch_gr) = seqlevels(score_gr)
+            GenomeInfoDb::seqlevels(patch_gr) = GenomeInfoDb::seqlevels(score_gr)
             score_gr = c(score_gr,
                          patch_gr)
         })
@@ -421,10 +422,10 @@ viewGRangesWinSummary_dt = function (score_gr,
             )
         )[order(queryHits)]
         suppressWarnings({
-            patch_gr = GRanges(seqlevels(score_gr)[1],
+            patch_gr = GRanges(GenomeInfoDb::seqlevels(score_gr)[1],
                                IRanges::IRanges(1, 1))
             mcols(patch_gr)[[attrib_var]] = NA
-            seqlevels(patch_gr) = seqlevels(score_gr)
+            GenomeInfoDb::seqlevels(patch_gr) = GenomeInfoDb::seqlevels(score_gr)
             score_gr = c(score_gr,
                          patch_gr
             )

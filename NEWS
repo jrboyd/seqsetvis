@@ -1,4 +1,9 @@
+# 1.15.6
+
+* bugfix, needed explicit GenomeInfoDb::seqlevels
+
 # 1.15.5
+
 * cowplot added to imports
 * bugfixes with seqlevels in view functions(Bioc 15 new).
 
