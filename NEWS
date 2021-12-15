@@ -1,3 +1,8 @@
+# 1.14.1
+
+* bugfix for "invalid class "GRanges" object:
+    'seqlevels(seqinfo(x))' and 'levels(seqnames(x))' are not identical"
+
 # 1.13.10
 
 * bugfix fixed bad example in clusteringKmeansNestedHclust
