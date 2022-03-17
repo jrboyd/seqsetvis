@@ -1,6 +1,7 @@
 # 1.14.2
 
 * more robust seqnames handling in harmonize_seqlengths with user instruction to resolve issues.
+* bugfix for seqlengths in fetch_bamPE
 
 # 1.14.1
 
