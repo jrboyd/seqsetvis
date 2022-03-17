@@ -1,3 +1,7 @@
+# 1.14.2
+
+* more robust seqnames handling in harmonize_seqlengths with user instruction to resolve issues.
+
 # 1.14.1
 
 * bugfix for "invalid class "GRanges" object:
