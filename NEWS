@@ -1,3 +1,7 @@
+# 1.14.3
+
+* ssvSignalHeatmap.ClusterBars refined annotation bar placement
+
 # 1.14.2
 
 * more robust seqnames handling in harmonize_seqlengths with user instruction to resolve issues.
