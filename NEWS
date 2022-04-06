@@ -1,3 +1,8 @@
+# 1.15.7
+
+* safeBrew now accepts character and factor inputs and returns named colors accordingly.
+* ssvSignalHeatmap.ClusterBars refined annotation bar placement
+
 # 1.15.6
 
 * bugfix, needed explicit GenomeInfoDb::seqlevels
@@ -15,6 +20,16 @@
 
 * default for ssvFeatureBinaryHeatmap is now raster_approximation = TRUE
 * optimization of ssvFactorizeMembTable
+
+# 1.14.2
+
+* more robust seqnames handling in harmonize_seqlengths with user instruction to resolve issues.
+* bugfix for seqlengths in fetch_bamPE
+
+# 1.14.1
+
+* bugfix for "invalid class "GRanges" object:
+    'seqlevels(seqinfo(x))' and 'levels(seqnames(x))' are not identical"
 
 # 1.13.10
 

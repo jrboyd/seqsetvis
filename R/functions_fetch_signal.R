@@ -111,9 +111,9 @@ ssvFetchSignal = function(file_paths,
     stopifnot(file.exists(file_paths))
     #if (win_method == "sample") {
     qgr = prepare_fetch_GRanges_width(qgr = qgr,
-                                win_size = win_size,
-                                target_size = NULL,
-                                skip_centerFix = win_method != "sample" | force_skip_centerFix)
+                                      win_size = win_size,
+                                      target_size = NULL,
+                                      skip_centerFix = win_method != "sample" | force_skip_centerFix)
     #}
     qgr = prepare_fetch_GRanges_names(qgr, include_id = TRUE)
     stopifnot(is.numeric(n_region_splits))
@@ -133,8 +133,8 @@ ssvFetchSignal = function(file_paths,
                              nam_load_signal)
         }else{
             bw_list = ssv_mclapply(unique_names,
-                                            nam_load_signal,
-                                            mc.cores = n_cores)
+                                   nam_load_signal,
+                                   mc.cores = n_cores)
         }
 
     }else{
@@ -154,8 +154,8 @@ ssvFetchSignal = function(file_paths,
                              nam_load_signal)
         }else{
             bw_list = ssv_mclapply(rownames(task_df),
-                                            nam_load_signal,
-                                            mc.cores = n_cores)
+                                   nam_load_signal,
+                                   mc.cores = n_cores)
         }
 
     }
@@ -359,6 +359,7 @@ viewGRangesWinSample_dt = function(score_gr,
 #'   x=score and w=width numeric vectors as only arguments. default is
 #'   weighted.mean.  limma::weighted.median is a good alternative.
 #' @return data.table that is GRanges compatible
+#' @importFrom GenomeInfoDb seqlevels
 #' @export
 #' @importFrom stats weighted.mean
 #' @examples
@@ -610,10 +611,10 @@ shift_anchor = function(score_dt, window_size, anchor) {
 #' #no warning if qgr is already valid for windowed fetching
 #' prepare_fetch_GRanges_width(qgr, win_size = 50)
 prepare_fetch_GRanges = function(qgr,
-                                       win_size,
-                                       min_quantile = .75,
-                                       target_size = NULL,
-                                       skip_centerFix = FALSE) {
+                                 win_size,
+                                 min_quantile = .75,
+                                 target_size = NULL,
+                                 skip_centerFix = FALSE) {
     .Deprecated("prepare_fetch_GRanges_width")
     prepare_fetch_GRanges_width(qgr, win_size, min_quantile, target_size, skip_centerFix)
 }
@@ -641,10 +642,10 @@ prepare_fetch_GRanges = function(qgr,
 #' #no warning if qgr is already valid for windowed fetching
 #' prepare_fetch_GRanges_width(qgr, win_size = 50)
 prepare_fetch_GRanges_width = function(qgr,
-                                 win_size,
-                                 min_quantile = .75,
-                                 target_size = NULL,
-                                 skip_centerFix = FALSE) {
+                                       win_size,
+                                       min_quantile = .75,
+                                       target_size = NULL,
+                                       skip_centerFix = FALSE) {
     if(length(qgr) < 1) stop("length of query GRanges was 0!")
     if (!skip_centerFix &&
         (length(unique(width(qgr))) > 1 || width(qgr)[1] %% win_size != 0)) {

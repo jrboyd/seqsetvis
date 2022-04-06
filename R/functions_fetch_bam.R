@@ -538,54 +538,63 @@ fetchBam = function(bam_f,
 #'
 #' ensures compatibility between seqlength of gr and bam_file based on header
 #'
-#' @param gr GRanges, object to harmonize seqlengths for
+#' @param query_gr GRanges, object to harmonize seqlengths for
 #' @param bam_file character, a path to a valid bam file
+#' @param force_fix Logical, if TRUE incompatible seqnames are removed from the query_gr.  Default is FALSE.
 #'
-#' @return gr with seqlengths matching bam_file
+#' @return GRanges with seqlengths matching bam_file
 #' @importFrom GenomeInfoDb seqlengths
 #' @importFrom Rsamtools scanBamHeader
 #' @export
 #' @examples
 #' library(GenomicRanges)
-#' gr = GRanges("chr1", IRanges(1, 100))
+#' query_gr = GRanges("chr1", IRanges(1, 100))
 #' #seqlengths has not been set
-#' seqlengths(gr)
+#' seqlengths(query_gr)
 #' bam = system.file("extdata/test.bam", package = "seqsetvis")
-#' gr2 = harmonize_seqlengths(gr, bam)
+#' gr2 = harmonize_seqlengths(query_gr, bam)
 #' #seqlengths now set
 #' seqlengths(gr2)
-harmonize_seqlengths = function(gr, bam_file){
+harmonize_seqlengths = function(query_gr, bam_file, force_fix = FALSE){
     chr_lengths = Rsamtools::scanBamHeader(bam_file)[[1]]$targets
-    if(!all(as.character(seqnames(gr)) %in% names(chr_lengths))){
+    if(!all(as.character(seqnames(query_gr)) %in% names(chr_lengths))){
+        if(force_fix){
+            len.orig = length(query_gr)
+            query_gr = subset(query_gr, seqnames %in% names(chr_lengths))
+            len.new = length(query_gr)
+            message(len.orig - len.new, " regions were removed due to force_fix = TRUE where seqnames were missing from bam file.")
+        }else{
         stop("There are chromosomes present in query GRanges (",
-             paste(setdiff(as.character(seqnames(gr)), names(chr_lengths)), collapse = ", "),
-                   ") not present in bam file (", bam_file, ")!")
+             paste(setdiff(as.character(seqnames(query_gr)), names(chr_lengths)), collapse = ", "),
+                   ") not present in bam file (", bam_file, ")!\n",
+             "If you want to proceed, run harmonize_seqlengths with force_fix = TRUE on query_gr to remove incompatible seqnames and retry.")
+        }
     }
-    to_remove =setdiff(names(GenomeInfoDb::seqlengths(gr)), unique(as.character(seqnames(gr))))
+    to_remove =setdiff(names(GenomeInfoDb::seqlengths(query_gr)), unique(as.character(seqnames(query_gr))))
     if(length(to_remove) > 0){
-        gr = GenomeInfoDb::dropSeqlevels(gr, to_remove)
+        query_gr = GenomeInfoDb::dropSeqlevels(query_gr, to_remove)
     }
-    GenomeInfoDb::seqlengths(gr) =
-        chr_lengths[names(GenomeInfoDb::seqlengths(gr))]
-    too_long = end(gr) >
-        GenomeInfoDb::seqlengths(gr)[as.character(seqnames(gr))]
+    GenomeInfoDb::seqlengths(query_gr) =
+        chr_lengths[names(GenomeInfoDb::seqlengths(query_gr))]
+    too_long = end(query_gr) >
+        GenomeInfoDb::seqlengths(query_gr)[as.character(seqnames(query_gr))]
     if(any(too_long)){
         message(sum(too_long),
                 " region shifted for extending beyond seqlengths")
-        fix_gr = gr[too_long]
+        fix_gr = query_gr[too_long]
         shift_by = -(end(fix_gr) - GenomeInfoDb::seqlengths(fix_gr)[
             as.character(seqnames(fix_gr))])
-        gr[too_long] = GenomicRanges::shift(fix_gr, shift_by)
+        query_gr[too_long] = GenomicRanges::shift(fix_gr, shift_by)
     }
-    too_short = start(gr) < 1
+    too_short = start(query_gr) < 1
     if(any(too_short)){
         message(sum(too_short),
                 " region shifted for starting before seqlengths")
-        fix_gr = gr[too_short]
+        fix_gr = query_gr[too_short]
         shift_by = 1 - start(fix_gr)
-        gr[too_short] = GenomicRanges::shift(fix_gr, shift_by)
+        query_gr[too_short] = GenomicRanges::shift(fix_gr, shift_by)
     }
-    gr
+    query_gr
 }
 
 #' determine the most common read length for input bam_file.  uses 50 randomly

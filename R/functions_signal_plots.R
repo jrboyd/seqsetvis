@@ -718,7 +718,7 @@ ssvSignalHeatmap = function(bw_data,
 #' ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, rel_widths = c(1, 5))
 #'
 #' #clustering can be done manually beforehand
-#' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 3)
+#' clust_dt = ssvSignalClustering(data.table::as.data.table(CTCF_in_10a_profiles_gr), nclust = 3)
 #' ssvSignalHeatmap.ClusterBars(clust_dt)
 ssvSignalHeatmap.ClusterBars = function(bw_data,
                                         nclust = 6,
@@ -757,6 +757,9 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
         return_data = TRUE
     )
     if(return_data) return(clust_dt)
+
+    assign_dt = unique(clust_dt[, c(row_, cluster_), with = FALSE])
+
     p_heatmap = ssvSignalHeatmap(
         bw_data = clust_dt,
         nclust = nclust,
@@ -775,17 +778,26 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
         dcast_fill = dcast_fill,
         return_data = FALSE,
         show_cluster_bars = FALSE
-    ) + labs(y = "")
+    ) +
+        labs(y = "") +
+        coord_cartesian(ylim = c(0, nrow(assign_dt))+.5, expand = FALSE)
 
     if(!is.null(FUN_format_heatmap)){
         p_heatmap = FUN_format_heatmap(p_heatmap)
     }
 
-    assign_dt = unique(clust_dt[, c(row_, cluster_), with = FALSE])
     tmp_df = data.frame(facet= "")
     p_cluster_bar = ggplot(tmp_df) +
-        coord_cartesian(xlim = c(0, 1), ylim = c(0, nrow(assign_dt)), expand = FALSE) +
-        theme_void() +
+        coord_cartesian(xlim = c(0, 1), ylim = c(0, nrow(assign_dt))+.5, expand = FALSE) +
+        # theme_void() +
+        theme(panel.grid = element_blank(),
+              panel.background = element_blank(),
+              strip.background = element_blank(),
+              axis.text.x = element_blank(),
+              axis.text.y = element_blank(),
+              axis.ticks.x = element_blank(),
+              axis.ticks.y = element_blank()) +
+        labs(x = "", y = "") +
         facet_grid(.~facet)
     p_cluster_bar = add_cluster_annotation(
         cluster_ids = assign_dt[[cluster_]],
