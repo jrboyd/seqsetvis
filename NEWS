@@ -1,3 +1,7 @@
+# 1.14.4
+
+* safeBrew now accepts character and factor inputs and returns named colors accordingly.
+
 # 1.14.3
 
 * ssvSignalHeatmap.ClusterBars refined annotation bar placement

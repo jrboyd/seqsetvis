@@ -38,20 +38,31 @@ set_list2memb = function(set_list) {
 #' allows RColorBrew to handle n values less than 3 and greater than 8 without
 #' warnings and return expected number of colors.
 #' @export
-#' @param n integer value of number of colors to make palette for
+#' @param n integer value of number of colors to make palette for. Alternatively
+#'   a character or factor, in which case palette will be generated for each
+#'   unique item or factor level repsectively.
 #' @param pal palette recognized by RColorBrewer
 #' @importFrom RColorBrewer brewer.pal brewer.pal.info
 #' @return a character vector of hex coded colors o flength n from the color
-#' brewer palette pal
+#'   brewer palette pal. If n is supplied as character or factor, output will be
+#'   named accordingly.
 #' @examples
 #' plot(1:2, rep(0, 2),  col = safeBrew(2, "dark2"), pch = 16, cex = 6)
 #' plot(1:12, rep(0, 12),  col = safeBrew(12, "set1"), pch = 16, cex = 6)
 #' plot(1:12, rep(0, 12),  col = safeBrew(12, "set2"), pch = 16, cex = 6)
 #' plot(1:12, rep(0, 12),  col = safeBrew(12, "set3"), pch = 16, cex = 6)
 safeBrew = function(n, pal = "Dark2"){
-    stopifnot(is.numeric(n))
+    if(is.numeric(n)){
+        n_lev = n
+    }else if(is.character(n)){
+        n_lev = length(unique(n))
+    }else if(is.factor(n)){
+        n_lev = length(levels(n))
+    }
+
+    stopifnot(is.numeric(n_lev))
     stopifnot(is.character(pal))
-    if(n < 1) stop("n must be at least 1")
+    if(n_lev < 1) stop("n must be at least 1")
     pal_info = RColorBrewer::brewer.pal.info
     pal_info$brewName = rownames(pal_info)
     rownames(pal_info) = tolower(rownames(pal_info))
@@ -60,10 +71,17 @@ safeBrew = function(n, pal = "Dark2"){
         stop("Palette ", pal, " not a valid RColorBrewer palette, ",
              "see RColorBrewer::brewer.pal.info")
     maxColors = pal_info[pal,]$maxcolors
-    nbrew = min(max(n, 3), maxColors)
-    RColorBrewer::brewer.pal(
+    nbrew = min(max(n_lev, 3), maxColors)
+    cols = RColorBrewer::brewer.pal(
         n = nbrew,
-        name = pal_info[pal,]$brewName)[(seq_len(n)-1) %% maxColors + 1]
+        name = pal_info[pal,]$brewName)[(seq_len(n_lev)-1) %% maxColors + 1]
+    if(is.character(n)){
+        names(cols) = unique(n)
+    }
+    if(is.factor(n)){
+        names(cols) = levels(n)
+    }
+    cols
 }
 
 # x: the vector n: the number of samples centered: if FALSE, then average
