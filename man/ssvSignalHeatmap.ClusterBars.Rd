@@ -86,6 +86,6 @@ ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr)
 ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, rel_widths = c(1, 5))
 
 #clustering can be done manually beforehand
-clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 3)
+clust_dt = ssvSignalClustering(data.table::as.data.table(CTCF_in_10a_profiles_gr), nclust = 3)
 ssvSignalHeatmap.ClusterBars(clust_dt)
 }

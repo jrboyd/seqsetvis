@@ -1,3 +1,9 @@
+# 1.15.8
+
+* added copy_clust_info to duplicate cluster info (row order and cluster assignment) from one ssvSignalClustering result to any ssvFetch* result.
+* added get_mapped_reads functiont to retrieve mamped read counts from bam files
+* fixed data.table shallow copy warning in within_clust_order
+
 # 1.15.7
 
 * safeBrew now accepts character and factor inputs and returns named colors accordingly.

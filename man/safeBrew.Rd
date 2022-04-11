@@ -8,13 +8,16 @@ warnings and return expected number of colors.}
 safeBrew(n, pal = "Dark2")
 }
 \arguments{
-\item{n}{integer value of number of colors to make palette for}
+\item{n}{integer value of number of colors to make palette for. Alternatively
+a character or factor, in which case palette will be generated for each
+unique item or factor level repsectively.}
 
 \item{pal}{palette recognized by RColorBrewer}
 }
 \value{
 a character vector of hex coded colors o flength n from the color
-brewer palette pal
+  brewer palette pal. If n is supplied as character or factor, output will be
+  named accordingly.
 }
 \description{
 allows RColorBrew to handle n values less than 3 and greater than 8 without

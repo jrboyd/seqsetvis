@@ -4,26 +4,28 @@
 \alias{harmonize_seqlengths}
 \title{harmonize_seqlengths}
 \usage{
-harmonize_seqlengths(gr, bam_file)
+harmonize_seqlengths(query_gr, bam_file, force_fix = FALSE)
 }
 \arguments{
-\item{gr}{GRanges, object to harmonize seqlengths for}
+\item{query_gr}{GRanges, object to harmonize seqlengths for}
 
 \item{bam_file}{character, a path to a valid bam file}
+
+\item{force_fix}{Logical, if TRUE incompatible seqnames are removed from the query_gr.  Default is FALSE.}
 }
 \value{
-gr with seqlengths matching bam_file
+GRanges with seqlengths matching bam_file
 }
 \description{
 ensures compatibility between seqlength of gr and bam_file based on header
 }
 \examples{
 library(GenomicRanges)
-gr = GRanges("chr1", IRanges(1, 100))
+query_gr = GRanges("chr1", IRanges(1, 100))
 #seqlengths has not been set
-seqlengths(gr)
+seqlengths(query_gr)
 bam = system.file("extdata/test.bam", package = "seqsetvis")
-gr2 = harmonize_seqlengths(gr, bam)
+gr2 = harmonize_seqlengths(query_gr, bam)
 #seqlengths now set
 seqlengths(gr2)
 }

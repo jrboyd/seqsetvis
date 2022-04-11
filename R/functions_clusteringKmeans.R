@@ -354,10 +354,10 @@ within_clust_sort.mat_dt = function(mat_dt, mat, within_order_strategy){
     }
   }
   mat_dt = mat_dt[order(within_o), ][order(group__), ]
-  mat_dt$id__ = factor(mat_dt$id__, levels = mat_dt$id__)
+  data.table::set(mat_dt, j = "id__", value = factor(mat_dt$id__, levels = mat_dt$id__))
   mat_dt$within_o = NULL
   if(!is.factor(mat_dt$group__)){
-    mat_dt$group__ = factor(mat_dt$group__, levels = unique(mat_dt$group__))
+    data.table::set(mat_dt, j = "group__", value = factor(mat_dt$group__, levels = unique(mat_dt$group__)))
   }
   mat_dt
 }
@@ -430,6 +430,8 @@ within_clust_sort = function(clust_dt,
   if(is(clust_dt, "GRanges")){
     clust_dt = data.table::as.data.table(clust_dt)
     output_GRanges = TRUE
+  }else{
+    clust_dt = data.table::copy(clust_dt)
   }
   stopifnot(is.data.table(clust_dt))
   mat = make_clustering_matrix(
@@ -451,11 +453,61 @@ within_clust_sort = function(clust_dt,
   mat_dt = unique(clust_dt[, list(id__ = get(row_), group__ = get(cluster_))])
   mat_dt = within_clust_sort.mat_dt(mat_dt, mat, within_order_strategy = within_order_strategy)
   #repair var names
-  clust_dt[[row_]] = factor(clust_dt[[row_]], levels = levels(mat_dt$id__))
-  # clust_dt[[cluster_]] = factor(clust_dt[[cluster_]], levels = levels(mat_dt$group__))
-  return(clust_dt)
+  data.table::set(clust_dt, j = row_, value = factor(clust_dt[[row_]], levels = levels(mat_dt$id__)))
+  return(clust_dt[])
 }
 
+#' copy_clust_info
+#'
+#' @param target A data.table or GRanges returned from ssvFetch*, the target to
+#'   which cluster info will be added.
+#' @param to_copy A data.table or GRanges returned from ssvSignalClustering,
+#'   from which to copy cluster if.
+#' @param row_ variable name mapped to row, likely id or gene name for ngs data.
+#'   Default is "id" and works with ssvFetch* output.
+#' @param cluster_ variable name to use for cluster info. Default is
+#'   "cluster_id".
+#'
+#' @return data.table or GRanges (whichever target is) containing row order and
+#'   cluster assignment derived from to_copy. Suitable for ssvSignalHeatmap and
+#'   related functions.
+#' @export
+#'
+#' @examples
+#' #this takes cluster info from signal and applies to peak hits to create a heatmap of peak hits clustered by signal.
+#' clust_dt1 = ssvSignalClustering(CTCF_in_10a_profiles_dt)
+#' peak_hit_gr = ssvFetchGRanges(CTCF_in_10a_narrowPeak_grs, qgr = CTCF_in_10a_overlaps_gr)
+#' peak_hit_gr.clust = copy_clust_info(peak_hit_gr, clust_dt1)
+#' peak_hit_gr.clust$hit = peak_hit_gr.clust$y > 0
+#' ssvSignalHeatmap(peak_hit_gr.clust, fill_ = "hit") +
+#'   scale_fill_manual(values = c("FALSE" = "gray90", "TRUE" = "black"))
+copy_clust_info = function(target, to_copy, row_ = "id", cluster_ = "cluster_id"){
+  output_GRanges = FALSE
+  if(is(target, "GRanges")){
+    target = data.table::as.data.table(target)
+    output_GRanges = TRUE
+  }else{
+    target = data.table::copy(target)
+  }
+  to_copy = data.table::as.data.table(to_copy)
+
+  stopifnot(!is.null(target[[row_]]))
+  stopifnot(!is.null(to_copy[[row_]]))
+  stopifnot(!is.null(to_copy[[cluster_]]))
+  stopifnot(length(intersect(target[[row_]], to_copy[[row_]])) > 0)
+
+  if(!all(target[[row_]] %in% to_copy[[row_]])){
+    warning("Some '", row_, "' items missing from to_copy, items will be lost from target.")
+  }
+
+  target[[cluster_]] = NULL
+  target = merge(target, unique(to_copy[, c(row_, cluster_), with = FALSE]), by = row_)
+  data.table::set(target, j = row_, value = factor(target[[row_]], levels = levels(to_copy[[row_]])))
+  if(output_GRanges){
+    target = GenomicRanges::GRanges(target)
+  }
+  target
+}
 
 
 #' reorder_clusters_stepdown

@@ -167,14 +167,14 @@ ssvFetchSignal = function(file_paths,
         }
         for (attrib in colnames(file_attribs)) {
             if(nrow(bw_list[[i]]) == 0){
-                set(bw_list[[i]], j = attrib, value = file_attribs[[attrib]][0])
+                data.table::set(bw_list[[i]], j = attrib, value = file_attribs[[attrib]][0])
             }else{
-                set(bw_list[[i]], j = attrib, value = file_attribs[[attrib]][i])
+                data.table::set(bw_list[[i]], j = attrib, value = file_attribs[[attrib]][i])
             }
         }
     }
     out = data.table::rbindlist(bw_list)
-    set(out, j = names_variable, value = factor(out[[names_variable]], levels = unique_names))
+    data.table::set(out, j = names_variable, value = factor(out[[names_variable]], levels = unique_names))
     if (!return_data.table) {
         out = GRanges(out)
     }
@@ -449,7 +449,7 @@ viewGRangesWinSummary_dt = function (score_gr,
     if(all(is.na(cov_dt[[attrib_var]]))){
         cov_dt[[attrib_var]] = fill_value
     }
-    set(cov_dt, i = which(is.na(cov_dt[[attrib_var]])), j = attrib_var, value = fill_value)
+    data.table::set(cov_dt, i = which(is.na(cov_dt[[attrib_var]])), j = attrib_var, value = fill_value)
 
     if(is.null(attrib_type)){
         if(any(class(cov_dt[[attrib_var]]) %in% c("character", "factor"))){

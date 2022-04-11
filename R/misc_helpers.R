@@ -323,3 +323,24 @@ ssv_mclapply = function(X, FUN, mc.cores = getOption("mc.cores", 1), ...){
     }
 }
 
+
+#' get_mapped_reads
+#'
+#' @param bam_files Path to 1 or more bam files.  Must be indexed.
+#'
+#' @return the total mapped reads in each bam file as a named numeric vector.
+#' @export
+#'
+#' @examples
+#' bam_file = system.file("extdata/test.bam", package = "seqsetvis", mustWork = TRUE)
+#' get_mapped_reads(bam_file)
+get_mapped_reads = function(bam_files){
+    if(is.null(names(bam_files))){
+        names(bam_files) = bam_files
+    }
+    .get_mapped_reads.single = function(f){
+        stats = Rsamtools::idxstatsBam(f)
+        sum(stats[,3])
+    }
+    vapply(bam_files, .get_mapped_reads.single, FUN.VALUE = c())
+}
