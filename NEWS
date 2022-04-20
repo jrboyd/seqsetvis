@@ -1,4 +1,4 @@
-# 1.15.8
+# 1.15.9
 
 * added copy_clust_info to duplicate cluster info (row order and cluster assignment) from one ssvSignalClustering result to any ssvFetch* result.
 * added get_mapped_reads functiont to retrieve mamped read counts from bam files

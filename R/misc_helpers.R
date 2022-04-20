@@ -342,5 +342,5 @@ get_mapped_reads = function(bam_files){
         stats = Rsamtools::idxstatsBam(f)
         sum(stats[,3])
     }
-    vapply(bam_files, .get_mapped_reads.single, FUN.VALUE = c())
+    vapply(bam_files, .get_mapped_reads.single, FUN.VALUE = c(1))
 }
