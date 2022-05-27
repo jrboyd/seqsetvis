@@ -65,7 +65,11 @@ ssvFetchGRanges = function(grs,
                            n_cores = getOption("mc.cores", 1),
                            force_skip_centerFix = FALSE){
     if(!is.list(grs)){
-        grs = list(grs)
+        if(is(grs, "GRangesList")){
+            grs = as.list(grs)
+        }else{
+            grs = list(grs)
+        }
     }
     all_gr = all(vapply(grs, function(x){
         "GRanges" %in% class(x)
