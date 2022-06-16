@@ -26,8 +26,8 @@ fail_tests = function(met_nam){
 }
 
 for(met_nam in c("easyLoad_bed",
-             "easyLoad_broadPeak",
-             "easyLoad_narrowPeak")){
+                 "easyLoad_broadPeak",
+                 "easyLoad_narrowPeak")){
     fail_tests(met_nam)
 }
 
@@ -78,7 +78,7 @@ test_that("easyLoad_bed works, 1 file", {
     expect_is(tgr[[1]], "GRanges")
     expect_equal(length(tgr), 1)
     expect_equal(names(tgr), "test_loading.bed")
-    expect_equal(ncol(mcols(tgr[[1]])), 1)
+    expect_equal(ncol(mcols(tgr[[1]])), 2)
 })
 
 test_that("easyLoad_bed works, 3 files and names", {
@@ -87,6 +87,30 @@ test_that("easyLoad_bed works, 3 files and names", {
     expect_is(tgr[[1]], "GRanges")
     expect_equal(length(tgr), 3)
     expect_equal(names(tgr), LETTERS[1:3])
-    expect_equal(ncol(mcols(tgr[[1]])), 1)
+    expect_equal(ncol(mcols(tgr[[1]])), 2)
 })
 
+test_that("easyLoad_bed empty file", {
+    empty_bed_file = dir(test_dir, pattern = "empty.bed", full.names = TRUE)
+    bed_empty = easyLoad_bed(empty_bed_file)[[1]]
+    bed_normal = easyLoad_bed(test_files[3])[[1]]
+    expect_is(bed_empty, "GRanges")
+    expect_equal(length(bed_empty), 0)
+    expect_equal(
+        colnames(GenomicRanges::mcols(bed_empty)),
+        colnames(GenomicRanges::mcols(bed_normal))
+    )
+
+})
+
+test_that("easyLoad_bed empty file", {
+    empty_np_file = dir(test_dir, pattern = "empty.narrowPeak", full.names = TRUE)
+    np_empty = easyLoad_narrowPeak(empty_np_file)[[1]]
+    np_normal = easyLoad_narrowPeak(test_files[1])[[1]]
+    expect_is(np_empty, "GRanges")
+    expect_equal(length(np_empty), 0)
+    expect_equal(
+        colnames(GenomicRanges::mcols(np_empty)),
+        colnames(GenomicRanges::mcols(np_normal))
+    )
+})

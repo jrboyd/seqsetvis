@@ -1,3 +1,7 @@
+# 1.15.11
+
+* added support for empty bed and np files to easyLoad_*
+
 # 1.15.10
 
 * ssvFetchGRanges no accepts GrangesList properly

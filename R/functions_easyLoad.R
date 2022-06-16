@@ -106,8 +106,30 @@ easyLoad_bed = function(file_paths,
                         extraCols = character(),
                         n_cores = getOption("mc.cores", 1)) {
     load_bed = function(f){
-        rtracklayer::import(f, format = "BED",
-                            extraCols = extraCols)
+        gr = rtracklayer::import(f, format = "BED",
+                                 extraCols = extraCols)
+        missed = setdiff(c("name", "score", names(extraCols)), colnames(mcols(gr)))
+        for(m in missed){
+            if(m == "name"){
+                mcols(gr)[[m]] = rep("DEFAULT", length(gr))
+            }else if(m == "score"){
+                mcols(gr)[[m]] = rep(0, length(gr))
+            }else{
+                def = switch(extraCols[m],
+                             numeric = {
+                                 0L
+                             },
+                             character = {
+                                 "DEFAULT"
+                             },
+                             integer = {
+                                 0
+                             })
+                mcols(gr)[[m]] = rep(def, length(gr))
+            }
+
+        }
+        gr
     }
 
     easyLoad_FUN(file_paths,
