@@ -1,3 +1,7 @@
+# 1.15.12
+
+* minor bugfix for nclust reduction in ssvSignalClustering in for low uniqueness.
+
 # 1.15.11
 
 * added support for empty bed and np files to easyLoad_*
