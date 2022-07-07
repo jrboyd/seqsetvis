@@ -14,6 +14,7 @@ ssvFetchBigwig(
   win_size = 50,
   win_method = c("sample", "summary")[1],
   summary_FUN = stats::weighted.mean,
+  fragLens = "not_used",
   anchor = c("left", "left_unstranded", "center", "center_unstranded")[3],
   return_data.table = FALSE,
   n_cores = getOption("mc.cores", 1),
@@ -44,6 +45,8 @@ qgr.}
 
 \item{summary_FUN}{function.  only relevant if win_method is "summary".
 passed to \code{\link{viewGRangesWinSummary_dt}}.}
+
+\item{fragLens}{never used by ssvFetchBigwig. Ignore.}
 
 \item{anchor}{character, one of c("center", "center_unstranded",
 "left", "left_unstranded")}

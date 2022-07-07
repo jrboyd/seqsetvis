@@ -1,3 +1,7 @@
+# 1.15.13
+
+* added fragLens as a dummy argument to ssvFetchBigwig to increase flexibility
+
 # 1.15.12
 
 * minor bugfix for nclust reduction in ssvSignalClustering in for low uniqueness.
