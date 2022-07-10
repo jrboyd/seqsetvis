@@ -1,6 +1,6 @@
-# 1.15.13
+# 1.15.14
 
-* added fragLens as a dummy argument to ssvFetchBigwig to increase flexibility
+* added fragLens as a dummy argument to ssvFetchBigwig and ssvFetchBamPE to increase flexibility
 
 # 1.15.12
 
