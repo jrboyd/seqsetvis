@@ -709,6 +709,14 @@ ssvSignalHeatmap = function(bw_data,
 #' @param return_unassembled_plots logical. If TRUE, return list of heatmap and cluster-bar ggplots.  Can be customized and passed to \code{\link{assemble_heatmap_cluster_bars}}
 #' @param rel_widths numeric of length 2.  Passed to cowplot::plot_grid.  Default is c(1, 9).
 #' @param ... addtional arguments passed to cowplot::plot_grid
+#' @param rect_colors colors of rectangle fill, repeat to match number of
+#'   clusters. Default is c("black", "gray").
+#' @param text_colors colors of text, repeat to match number of clusters.
+#'   Default is reverse of rect_colors.
+#' @param show_labels logical, shoud rectangles be labelled with cluster
+#'   identity.  Default is TRUE.
+#' @param label_angle angle to add clusters labels at.  Default is 0, which is
+#'   horizontal.
 #'
 #' @import ggplot2
 #' @return ggplot heatmap of signal profiles, facetted by sample
@@ -739,6 +747,11 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
                                         return_data = FALSE,
                                         return_unassembled_plots = FALSE,
                                         rel_widths = c(1, 9),
+                                        #add_an
+                                        rect_colors = c("black", "gray"),
+                                        text_colors = rev(rect_colors),
+                                        show_labels = TRUE,
+                                        label_angle = 0,
                                         ...){
     clust_dt = ssvSignalHeatmap(
         bw_data = bw_data,
@@ -799,12 +812,16 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
               axis.ticks.y = element_blank()) +
         labs(x = "", y = "") +
         facet_grid(.~facet)
+
     p_cluster_bar = add_cluster_annotation(
         cluster_ids = assign_dt[[cluster_]],
         p = p_cluster_bar,
         xleft = 0,
         xright = 1,
-        show_labels = TRUE, label_angle = 0)
+        rect_colors = rect_colors,
+        text_colors = text_colors,
+        show_labels = show_labels,
+        label_angle = label_angle)
     plots = list(cluster_bars = p_cluster_bar, heatmap = p_heatmap)
     if(return_unassembled_plots){
         return(plots)

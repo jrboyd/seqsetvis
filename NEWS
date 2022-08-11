@@ -1,3 +1,7 @@
+# 1.15.15
+
+* added certain add_cluster_annotation arguments to ssvSignalHeatmap.ClusterBars
+
 # 1.15.14
 
 * added fragLens as a dummy argument to ssvFetchBigwig and ssvFetchBamPE to increase flexibility
