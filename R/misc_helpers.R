@@ -58,6 +58,8 @@ safeBrew = function(n, pal = "Dark2"){
         n_lev = length(unique(n))
     }else if(is.factor(n)){
         n_lev = length(levels(n))
+    }else{
+        stop("n must be one of numeric, character, or factor. was:", paste(class(n), collapse = ", "))
     }
 
     stopifnot(is.numeric(n_lev))

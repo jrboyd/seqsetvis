@@ -28,9 +28,13 @@ data.table or GRanges (whichever target is) containing row order and
 copy_clust_info
 }
 \examples{
-#this takes cluster info from signal and applies to peak hits to create a heatmap of peak hits clustered by signal.
+#this takes cluster info from signal and applies to peak hits to
+#create a heatmap of peak hits clustered by signal.
 clust_dt1 = ssvSignalClustering(CTCF_in_10a_profiles_dt)
-peak_hit_gr = ssvFetchGRanges(CTCF_in_10a_narrowPeak_grs, qgr = CTCF_in_10a_overlaps_gr)
+peak_hit_gr = ssvFetchGRanges(
+  CTCF_in_10a_narrowPeak_grs,
+  qgr = CTCF_in_10a_overlaps_gr
+)
 peak_hit_gr.clust = copy_clust_info(peak_hit_gr, clust_dt1)
 peak_hit_gr.clust$hit = peak_hit_gr.clust$y > 0
 ssvSignalHeatmap(peak_hit_gr.clust, fill_ = "hit") +

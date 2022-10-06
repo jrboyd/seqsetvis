@@ -2,8 +2,8 @@
 % Please edit documentation in R/functions_signal_plots.R
 \name{ssvSignalHeatmap.ClusterBars}
 \alias{ssvSignalHeatmap.ClusterBars}
-\title{heatmap style representation of membership table.
-instead of clustering, each column is sorted starting from the left.}
+\title{heatmap style representation of membership table. instead of clustering, each
+column is sorted starting from the left.}
 \usage{
 ssvSignalHeatmap.ClusterBars(
   bw_data,
@@ -25,39 +25,57 @@ ssvSignalHeatmap.ClusterBars(
   return_data = FALSE,
   return_unassembled_plots = FALSE,
   rel_widths = c(1, 9),
+  rect_colors = c("black", "gray"),
+  text_colors = rev(rect_colors),
+  show_labels = TRUE,
+  label_angle = 0,
+  fun.aggregate = "mean",
   ...
 )
 }
 \arguments{
-\item{bw_data}{a GRanges or data.table of bigwig signal.
-As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
+\item{bw_data}{a GRanges or data.table of bigwig signal. As returned from
+\code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 
 \item{nclust}{number of clusters}
 
-\item{perform_clustering}{should clustering be done? default is auto.
-auto considers if row_ has been ordered by being a factor and if cluster_ is a numeric.}
+\item{perform_clustering}{should clustering be done? default is auto. auto
+considers if row_ has been ordered by being a factor and if cluster_ is a
+numeric.}
 
-\item{row_}{variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.}
+\item{row_}{variable name mapped to row, likely id or gene name for ngs data.
+Default is "id" and works with ssvFetch* output.}
 
-\item{column_}{varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.}
+\item{column_}{varaible mapped to column, likely bp position for ngs data.
+Default is "x" and works with ssvFetch* output.}
 
-\item{fill_}{numeric variable to map to fill. Default is "y" and works with ssvFetch* output.}
+\item{fill_}{numeric variable to map to fill. Default is "y" and works with
+ssvFetch* output.}
 
-\item{facet_}{variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.}
+\item{facet_}{variable name to facet horizontally by. Default is "sample" and
+works with ssvFetch* output. Set to "" if data is not facetted.}
 
-\item{cluster_}{variable name to use for cluster info. Default is "cluster_id".}
+\item{cluster_}{variable name to use for cluster info. Default is
+"cluster_id".}
 
-\item{FUN_format_heatmap}{optional function to modify main ggplot (labels, themes, scales, etc.).  Take a ggplot and returns a ggplot. Default is NULL.}
+\item{FUN_format_heatmap}{optional function to modify main ggplot (labels,
+themes, scales, etc.).  Take a ggplot and returns a ggplot. Default is
+NULL.}
 
-\item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot full data}
+\item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot
+full data}
 
-\item{max_cols}{for speed columns are sampled to 100 by default, use Inf to plot full data}
+\item{max_cols}{for speed columns are sampled to 100 by default, use Inf to
+plot full data}
 
-\item{fill_limits}{limits for fill legend.  values will be cropped to this range if set.  Default of NULL uses natural range of fill_.}
+\item{fill_limits}{limits for fill legend.  values will be cropped to this
+range if set.  Default of NULL uses natural range of fill_.}
 
-\item{clustering_col_min}{numeric minimum for col range considered when clustering, default in -Inf}
+\item{clustering_col_min}{numeric minimum for col range considered when
+clustering, default in -Inf}
 
-\item{clustering_col_max}{numeric maximum for col range considered when clustering, default in Inf}
+\item{clustering_col_max}{numeric maximum for col range considered when
+clustering, default in Inf}
 
 \item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
 hierarchical clustering will be used. if sort, a simple decreasing sort of
@@ -65,12 +83,32 @@ rosSums.}
 
 \item{dcast_fill}{value to supply to dcast fill argument. default is NA.}
 
-\item{return_data}{logical.  If TRUE, return value is no longer ggplot and
-is instead the data used to generate that plot. Default is FALSE.}
+\item{return_data}{logical.  If TRUE, return value is no longer ggplot and is
+instead the data used to generate that plot. Default is FALSE.}
 
-\item{return_unassembled_plots}{logical. If TRUE, return list of heatmap and cluster-bar ggplots.  Can be customized and passed to \code{\link{assemble_heatmap_cluster_bars}}}
+\item{return_unassembled_plots}{logical. If TRUE, return list of heatmap and
+cluster-bar ggplots.  Can be customized and passed to
+\code{\link{assemble_heatmap_cluster_bars}}}
 
-\item{rel_widths}{numeric of length 2.  Passed to cowplot::plot_grid.  Default is c(1, 9).}
+\item{rel_widths}{numeric of length 2.  Passed to cowplot::plot_grid. Default
+is c(1, 9).}
+
+\item{rect_colors}{colors of rectangle fill, repeat to match number of
+clusters. Default is c("black", "gray").}
+
+\item{text_colors}{colors of text, repeat to match number of clusters.
+Default is reverse of rect_colors.}
+
+\item{show_labels}{logical, shoud rectangles be labelled with cluster
+identity.  Default is TRUE.}
+
+\item{label_angle}{angle to add clusters labels at.  Default is 0, which is
+horizontal.}
+
+\item{fun.aggregate}{Function to aggregate when multiple values present for
+facet_, row_, and column_. Affects both clustering and plotting. The
+function should accept a single vector argument or be a character string
+naming such a function.}
 
 \item{...}{addtional arguments passed to cowplot::plot_grid}
 }
@@ -78,7 +116,8 @@ is instead the data used to generate that plot. Default is FALSE.}
 ggplot heatmap of signal profiles, facetted by sample
 }
 \description{
-Compared to ssvSignalHeatmap, cluster_bars are displayed on the left once instead of for each facet
+Compared to ssvSignalHeatmap, cluster_bars are displayed on the left once
+instead of for each facet
 }
 \examples{
 #the simplest use
@@ -88,4 +127,10 @@ ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, rel_widths = c(1, 5))
 #clustering can be done manually beforehand
 clust_dt = ssvSignalClustering(data.table::as.data.table(CTCF_in_10a_profiles_gr), nclust = 3)
 ssvSignalHeatmap.ClusterBars(clust_dt)
+
+# aggregation, when facet_ is shared by multiple samples
+prof_gr = CTCF_in_10a_profiles_gr
+prof_gr$mark = "CTCF"
+ssvSignalHeatmap.ClusterBars(prof_gr, facet_ = "mark", fun.aggregate = mean)
+ssvSignalHeatmap.ClusterBars(prof_gr, facet_ = "mark", fun.aggregate = "sum")
 }

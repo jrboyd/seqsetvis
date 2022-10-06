@@ -1,3 +1,7 @@
+# 1.15.16
+
+* ssvSignalHeatmap, ssvSignalHeatmap.ClusterBars, and ssvSignalClustering now support fun.aggregate to combine values when facet covers multiple samples.
+
 # 1.15.15
 
 * added certain add_cluster_annotation arguments to ssvSignalHeatmap.ClusterBars

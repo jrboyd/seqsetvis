@@ -2,8 +2,8 @@
 % Please edit documentation in R/functions_signal_plots.R
 \name{ssvSignalHeatmap}
 \alias{ssvSignalHeatmap}
-\title{heatmap style representation of membership table.
-instead of clustering, each column is sorted starting from the left.}
+\title{heatmap style representation of membership table. instead of clustering, each
+column is sorted starting from the left.}
 \usage{
 ssvSignalHeatmap(
   bw_data,
@@ -22,37 +22,49 @@ ssvSignalHeatmap(
   within_order_strategy = c("hclust", "sort")[2],
   dcast_fill = NA,
   return_data = FALSE,
-  show_cluster_bars = TRUE
+  show_cluster_bars = TRUE,
+  fun.aggregate = "mean"
 )
 }
 \arguments{
-\item{bw_data}{a GRanges or data.table of bigwig signal.
-As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
+\item{bw_data}{a GRanges or data.table of bigwig signal. As returned from
+\code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 
 \item{nclust}{number of clusters}
 
-\item{perform_clustering}{should clustering be done? default is auto.
-auto considers if row_ has been ordered by being a factor and if cluster_ is a numeric.}
+\item{perform_clustering}{should clustering be done? default is auto. auto
+considers if row_ has been ordered by being a factor and if cluster_ is a
+numeric.}
 
-\item{row_}{variable name mapped to row, likely id or gene name for ngs data. Default is "id" and works with ssvFetch* output.}
+\item{row_}{variable name mapped to row, likely id or gene name for ngs data.
+Default is "id" and works with ssvFetch* output.}
 
-\item{column_}{varaible mapped to column, likely bp position for ngs data. Default is "x" and works with ssvFetch* output.}
+\item{column_}{varaible mapped to column, likely bp position for ngs data.
+Default is "x" and works with ssvFetch* output.}
 
-\item{fill_}{numeric variable to map to fill. Default is "y" and works with ssvFetch* output.}
+\item{fill_}{numeric variable to map to fill. Default is "y" and works with
+ssvFetch* output.}
 
-\item{facet_}{variable name to facet horizontally by. Default is "sample" and works with ssvFetch* output. Set to "" if data is not facetted.}
+\item{facet_}{variable name to facet horizontally by. Default is "sample" and
+works with ssvFetch* output. Set to "" if data is not facetted.}
 
-\item{cluster_}{variable name to use for cluster info. Default is "cluster_id".}
+\item{cluster_}{variable name to use for cluster info. Default is
+"cluster_id".}
 
-\item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot full data}
+\item{max_rows}{for speed rows are sampled to 500 by default, use Inf to plot
+full data}
 
-\item{max_cols}{for speed columns are sampled to 100 by default, use Inf to plot full data}
+\item{max_cols}{for speed columns are sampled to 100 by default, use Inf to
+plot full data}
 
-\item{fill_limits}{limits for fill legend.  values will be cropped to this range if set.  Default of NULL uses natural range of fill_.}
+\item{fill_limits}{limits for fill legend.  values will be cropped to this
+range if set.  Default of NULL uses natural range of fill_.}
 
-\item{clustering_col_min}{numeric minimum for col range considered when clustering, default in -Inf}
+\item{clustering_col_min}{numeric minimum for col range considered when
+clustering, default in -Inf}
 
-\item{clustering_col_max}{numeric maximum for col range considered when clustering, default in Inf}
+\item{clustering_col_max}{numeric maximum for col range considered when
+clustering, default in Inf}
 
 \item{within_order_strategy}{one of "hclust" or "sort".  if hclust,
 hierarchical clustering will be used. if sort, a simple decreasing sort of
@@ -60,16 +72,22 @@ rosSums.}
 
 \item{dcast_fill}{value to supply to dcast fill argument. default is NA.}
 
-\item{return_data}{logical.  If TRUE, return value is no longer ggplot and
-is instead the data used to generate that plot. Default is FALSE.}
+\item{return_data}{logical.  If TRUE, return value is no longer ggplot and is
+instead the data used to generate that plot. Default is FALSE.}
 
 \item{show_cluster_bars}{if TRUE, show bars indicating cluster membership.}
+
+\item{fun.aggregate}{Function to aggregate when multiple values present for
+facet_, row_, and column_. Affects both clustering and plotting. The
+function should accept a single vector argument or be a character string
+naming such a function.}
 }
 \value{
 ggplot heatmap of signal profiles, facetted by sample
 }
 \description{
-See \code{\link{ssvSignalHeatmap.ClusterBars}} for an alternative with more control over where the cluster bars appear.
+See \code{\link{ssvSignalHeatmap.ClusterBars}} for an alternative with more
+control over where the cluster bars appear.
 }
 \examples{
 #the simplest use
@@ -81,4 +99,20 @@ clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 3)
 ssvSignalHeatmap(clust_dt)
 
 ssvSignalHeatmap(clust_dt, max_rows = 20, max_cols = 7)
+
+# aggregation, when facet_ is shared by multiple samples
+prof_gr = CTCF_in_10a_profiles_gr
+prof_gr$mark = "CTCF"
+clust_gr = ssvSignalClustering(
+  prof_gr,
+  facet_ = "mark",
+  fun.aggregate = function(x)as.numeric(x > 10)
+)
+table(clust_gr$y)
+ssvSignalHeatmap(prof_gr, facet_ = "mark",
+  fun.aggregate = function(x)as.numeric(x > 10))
+ssvSignalHeatmap(prof_gr, facet_ = "mark",
+  fun.aggregate = max)
+ssvSignalHeatmap(prof_gr, facet_ = "mark",
+  fun.aggregate = min)
 }

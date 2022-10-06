@@ -51,7 +51,12 @@ Splits one specified cluster in number of new clusters determined by nclust
 set.seed(0)
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 split_dt = split_cluster(clust_dt, to_split = 2, nclust = 3)
-split_dt.no_rename = split_cluster(clust_dt, to_split = 2, nclust = 3, reapply_cluster_names = FALSE)
+split_dt.no_rename = split_cluster(
+  clust_dt,
+  to_split = 2,
+  nclust = 3,
+  reapply_cluster_names = FALSE
+)
 cowplot::plot_grid(nrow = 1,
   ssvSignalHeatmap(clust_dt),
   ssvSignalHeatmap(split_dt),

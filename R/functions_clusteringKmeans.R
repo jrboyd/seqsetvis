@@ -50,7 +50,10 @@ valid_sort_strategies = c("hclust", "sort", "left", "right", "reverse")
 #'   (should only be used after meaningful order imposed).
 #' @param dcast_fill value to supply to dcast fill argument. default is NA.
 #' @param iter.max Number of max iterations to allow for k-means. Default is 30.
-#'
+#' @param fun.aggregate Function to aggregate when multiple values present for
+#'   facet_, row_, and column_. The
+#'   function should accept a single vector argument or be a character string
+#'   naming such a function.
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @return data.table of signal profiles, ready for ssvSignalHeatmap
 #' @examples
@@ -82,7 +85,8 @@ ssvSignalClustering = function(bw_data,
                                clustering_col_max = Inf,
                                within_order_strategy = valid_sort_strategies[2],
                                dcast_fill = NA,
-                               iter.max = 30){
+                               iter.max = 30,
+                               fun.aggregate = "mean"){
     message("clustering...")
     id__ = xbp = x = to_disp = y = hit = val = y = y_gap = group__ =  NULL#declare binding for data.table
     output_GRanges = FALSE
@@ -155,7 +159,8 @@ ssvSignalClustering = function(bw_data,
         max_cols = max_cols,
         clustering_col_min = clustering_col_min,
         clustering_col_max = clustering_col_max,
-        dcast_fill = dcast_fill
+        dcast_fill = dcast_fill,
+        fun.aggregate = fun.aggregate
 
     )
 
@@ -173,7 +178,6 @@ ssvSignalClustering = function(bw_data,
                 clustering_col_min = clustering_col_min,
                 clustering_col_max = clustering_col_max,
                 dcast_fill = dcast_fill
-
             )
         }
     }
@@ -190,10 +194,23 @@ ssvSignalClustering = function(bw_data,
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rev(rclusters[["id__"]]))
     data.table::setkey(rclusters, id__)
     plot_dt[[cluster_]] = rclusters[list(plot_dt[[row_]]), group__]
-    if(output_GRanges){
-        plot_dt = GRanges(plot_dt)
+    agg_required = max(plot_dt[, .N, c(row_, column_, facet_)]$N) > 1
+    if(agg_required){
+        #apply fun.aggregate to plotted data
+        constant_cn = c("seqnames", "start", "end", 'width', "strand", "cluster_id")
+        if(is.character(fun.aggregate)){
+            fun.aggregate = get(fun.aggregate)
+        }
+        plot_dt.agg = plot_dt[, fun.aggregate(get(fill_)), c(unique(c(row_, column_, facet_, constant_cn)))]
+        setnames(plot_dt.agg, "V1", fill_)
+        message("Aggregation has occured (multiple samples per facet), some variables have been dropped.")
+    }else{
+        plot_dt.agg = plot_dt
     }
-    return(plot_dt)
+    if(output_GRanges){
+        plot_dt.agg = GRanges(plot_dt.agg)
+    }
+    return(plot_dt.agg)
 }
 
 #' perform kmeans clustering on matrix rows and return reordered matrix along
@@ -478,9 +495,13 @@ within_clust_sort = function(clust_dt,
 #' @export
 #'
 #' @examples
-#' #this takes cluster info from signal and applies to peak hits to create a heatmap of peak hits clustered by signal.
+#' #this takes cluster info from signal and applies to peak hits to
+#' #create a heatmap of peak hits clustered by signal.
 #' clust_dt1 = ssvSignalClustering(CTCF_in_10a_profiles_dt)
-#' peak_hit_gr = ssvFetchGRanges(CTCF_in_10a_narrowPeak_grs, qgr = CTCF_in_10a_overlaps_gr)
+#' peak_hit_gr = ssvFetchGRanges(
+#'   CTCF_in_10a_narrowPeak_grs,
+#'   qgr = CTCF_in_10a_overlaps_gr
+#' )
 #' peak_hit_gr.clust = copy_clust_info(peak_hit_gr, clust_dt1)
 #' peak_hit_gr.clust$hit = peak_hit_gr.clust$y > 0
 #' ssvSignalHeatmap(peak_hit_gr.clust, fill_ = "hit") +
@@ -824,18 +845,22 @@ reverse_clusters = function(clust_dt,
                             cluster_ = "cluster_id",
                             reverse_rows_within = TRUE,
                             reapply_cluster_names = TRUE){
-    new_dt = reorder_clusters_manual(clust_dt,
-                                     manual_order = rev(levels(clust_dt[[cluster_]])),
-                                     row_ = row_,
-                                     cluster_ = cluster_,
-                                     reapply_cluster_names = reapply_cluster_names)
+    new_dt = reorder_clusters_manual(
+        clust_dt,
+        manual_order = rev(levels(clust_dt[[cluster_]])),
+        row_ = row_,
+        cluster_ = cluster_,
+        reapply_cluster_names = reapply_cluster_names
+    )
     if(reverse_rows_within){
-        new_dt = within_clust_sort(new_dt,
-                                   row_ = row_,
-                                   column_ = column_,
-                                   fill_ = fill_,
-                                   facet_ = facet_,
-                                   cluster_ = cluster_, within_order_strategy = "reverse")
+        new_dt = within_clust_sort(
+            new_dt,
+            row_ = row_,
+            column_ = column_,
+            fill_ = fill_,
+            facet_ = facet_,
+            cluster_ = cluster_, within_order_strategy = "reverse"
+        )
     }
     new_dt
 }
@@ -867,7 +892,12 @@ reverse_clusters = function(clust_dt,
 #' set.seed(0)
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 #' split_dt = split_cluster(clust_dt, to_split = 2, nclust = 3)
-#' split_dt.no_rename = split_cluster(clust_dt, to_split = 2, nclust = 3, reapply_cluster_names = FALSE)
+#' split_dt.no_rename = split_cluster(
+#'   clust_dt,
+#'   to_split = 2,
+#'   nclust = 3,
+#'   reapply_cluster_names = FALSE
+#' )
 #' cowplot::plot_grid(nrow = 1,
 #'   ssvSignalHeatmap(clust_dt),
 #'   ssvSignalHeatmap(split_dt),

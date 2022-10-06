@@ -23,7 +23,8 @@ ssvSignalClustering(
   clustering_col_max = Inf,
   within_order_strategy = valid_sort_strategies[2],
   dcast_fill = NA,
-  iter.max = 30
+  iter.max = 30,
+  fun.aggregate = "mean"
 )
 }
 \arguments{
@@ -76,6 +77,11 @@ signal on left ("right" is opposite).  If "reverse" reverses existing order
 \item{dcast_fill}{value to supply to dcast fill argument. default is NA.}
 
 \item{iter.max}{Number of max iterations to allow for k-means. Default is 30.}
+
+\item{fun.aggregate}{Function to aggregate when multiple values present for
+facet_, row_, and column_. The
+function should accept a single vector argument or be a character string
+naming such a function.}
 }
 \value{
 data.table of signal profiles, ready for ssvSignalHeatmap

@@ -14,7 +14,8 @@ make_clustering_matrix(
   max_cols = 100,
   clustering_col_min = -Inf,
   clustering_col_max = Inf,
-  dcast_fill = NA
+  dcast_fill = NA,
+  fun.aggregate = "mean"
 )
 }
 \arguments{
@@ -43,6 +44,11 @@ clustering, default in -Inf}
 clustering, default in Inf}
 
 \item{dcast_fill}{value to supply to dcast fill argument. default is NA.}
+
+\item{fun.aggregate}{Function to aggregate when multiple values present for
+facet_, row_, and column_. The
+function should accept a single vector argument or be a character string
+naming such a function.}
 }
 \value{
 A wide matrix version of input tidy data.table
