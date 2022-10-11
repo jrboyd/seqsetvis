@@ -200,6 +200,7 @@ ssvSignalClustering = function(bw_data,
     if(agg_required){
         #apply fun.aggregate to plotted data
         constant_cn = c("seqnames", "start", "end", 'width', "strand", "cluster_id")
+        constant_cn = constant_cn[constant_cn %in% colnames(plot_dt)]
         if(is.character(fun.aggregate)){
             fun.aggregate = get(fun.aggregate)
         }
