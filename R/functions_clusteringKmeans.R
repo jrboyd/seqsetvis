@@ -194,14 +194,16 @@ ssvSignalClustering = function(bw_data,
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rev(rclusters[["id__"]]))
     data.table::setkey(rclusters, id__)
     plot_dt[[cluster_]] = rclusters[list(plot_dt[[row_]]), group__]
-    agg_required = max(plot_dt[, .N, c(row_, column_, facet_)]$N) > 1
+    agg_cn = c(row_, column_, facet_)
+    agg_cn = agg_cn[agg_cn != ""]
+    agg_required = max(plot_dt[, .N, c(agg_cn)]$N) > 1
     if(agg_required){
         #apply fun.aggregate to plotted data
         constant_cn = c("seqnames", "start", "end", 'width', "strand", "cluster_id")
         if(is.character(fun.aggregate)){
             fun.aggregate = get(fun.aggregate)
         }
-        plot_dt.agg = plot_dt[, fun.aggregate(get(fill_)), c(unique(c(row_, column_, facet_, constant_cn)))]
+        plot_dt.agg = plot_dt[, fun.aggregate(get(fill_)), c(unique(c(agg_cn, constant_cn)))]
         setnames(plot_dt.agg, "V1", fill_)
         message("Aggregation has occured (multiple samples per facet), some variables have been dropped.")
     }else{
