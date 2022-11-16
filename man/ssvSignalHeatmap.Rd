@@ -23,6 +23,10 @@ ssvSignalHeatmap(
   dcast_fill = NA,
   return_data = FALSE,
   show_cluster_bars = TRUE,
+  rect_colors = c("black", "gray"),
+  text_colors = rev(rect_colors),
+  show_labels = TRUE,
+  label_angle = 0,
   fun.aggregate = "mean"
 )
 }
@@ -76,6 +80,18 @@ rosSums.}
 instead the data used to generate that plot. Default is FALSE.}
 
 \item{show_cluster_bars}{if TRUE, show bars indicating cluster membership.}
+
+\item{rect_colors}{colors of rectangle fill, repeat to match number of
+clusters. Default is c("black", "gray").}
+
+\item{text_colors}{colors of text, repeat to match number of clusters.
+Default is reverse of rect_colors.}
+
+\item{show_labels}{logical, shoud rectangles be labelled with cluster
+identity.  Default is TRUE.}
+
+\item{label_angle}{angle to add clusters labels at.  Default is 0, which is
+horizontal.}
 
 \item{fun.aggregate}{Function to aggregate when multiple values present for
 facet_, row_, and column_. Affects both clustering and plotting. The

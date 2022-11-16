@@ -424,11 +424,27 @@ make_clustering_matrix = function(tidy_dt,
 #' assign_dt = unique(clust_dt[, .(id, cluster_id)])[order(id)]
 #' p_heat = ssvSignalHeatmap(clust_dt, show_cluster_bars = FALSE)
 #' add_cluster_annotation(assign_dt$cluster_id, p_heat,
-#'   xleft = -400, xright = -360, rect_colors = rainbow(3), text_colors = "gray")
+#'   xleft = -500, xright = -360, rect_colors = rainbow(3), text_colors = "gray")
+#'
+#' #when colors are named, the names are used rather that just the order
+#' rect_colors = safeBrew(assign_dt$cluster_id)
+#' text_colors = safeBrew(assign_dt$cluster_id, "greys")
 #' p_clusters = add_cluster_annotation(assign_dt$cluster_id,
-#'   rect_colors = rainbow(3), text_colors = "gray")
+#'   rect_colors = rect_colors, text_colors = text_colors)
 #' #specialized use as plot outside of heatmap
-#' assemble_heatmap_cluster_bars(plots = list(p_clusters, p_heat), rel_widths = c(1, 3))
+#' p1 = assemble_heatmap_cluster_bars(plots = list(p_clusters, p_heat), rel_widths = c(1, 3))
+#'
+#' #when colors are named, the names are used rather that just the order
+#' #these plots will be identical even though order of colors changes.
+#' rect_colors = rect_colors[c(2, 3, 1)]
+#' text_colors = text_colors[c(3, 1, 2)]
+#' p_clusters = add_cluster_annotation(assign_dt$cluster_id,
+#'   rect_colors = rect_colors, text_colors = text_colors)
+#' #specialized use as plot outside of heatmap
+#' p2 = assemble_heatmap_cluster_bars(plots = list(p_clusters, p_heat), rel_widths = c(1, 3))
+#'
+#' cowplot::plot_grid(p1, p2, ncol = 1)
+#'
 add_cluster_annotation = function(cluster_ids, p = NULL,
                                   xleft = 0, xright = 1,
                                   rect_colors = c("black", "gray"),
@@ -455,6 +471,7 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
     ends = cumsum(rev(table(cluster_ids)))
     starts = c(1, ends[-length(ends)] + 1)
     starts = starts - .5
+    names(starts) = names(ends)
     ends = ends + .5
 
 
@@ -462,8 +479,18 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
                           xmax = xright,
                           ymin = starts,
                           ymax = ends)
-    df_rects$fill = rect_colors[seq_len(nrow(df_rects))%%length(rect_colors)+1]
-    df_rects$color = text_colors[seq_len(nrow(df_rects))%%length(text_colors)+1]
+    if(setequal(names(rect_colors), rownames(df_rects))){
+        df_rects$fill = rect_colors[rownames(df_rects)]
+    }else{
+        df_rects$fill = rect_colors[seq_len(nrow(df_rects))%%length(rect_colors)+1]
+    }
+    if(setequal(names(text_colors), rownames(df_rects))){
+        df_rects$color = text_colors[rownames(df_rects)]
+    }else{
+        df_rects$color = text_colors[seq_len(nrow(df_rects))%%length(text_colors)+1]
+    }
+
+
     df_rects = df_rects[rev(seq_len(nrow(df_rects))),]
     cluster_labels = levels(cluster_ids)
     for(i in seq_len(nrow(df_rects))){
@@ -525,6 +552,14 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and is
 #'   instead the data used to generate that plot. Default is FALSE.
 #' @param show_cluster_bars if TRUE, show bars indicating cluster membership.
+#' @param rect_colors colors of rectangle fill, repeat to match number of
+#'   clusters. Default is c("black", "gray").
+#' @param text_colors colors of text, repeat to match number of clusters.
+#'   Default is reverse of rect_colors.
+#' @param show_labels logical, shoud rectangles be labelled with cluster
+#'   identity.  Default is TRUE.
+#' @param label_angle angle to add clusters labels at.  Default is 0, which is
+#'   horizontal.
 #' @param fun.aggregate Function to aggregate when multiple values present for
 #'   facet_, row_, and column_. Affects both clustering and plotting. The
 #'   function should accept a single vector argument or be a character string
@@ -574,6 +609,10 @@ ssvSignalHeatmap = function(bw_data,
                             dcast_fill = NA,
                             return_data = FALSE,
                             show_cluster_bars = TRUE,
+                            rect_colors = c("black", "gray"),
+                            text_colors = rev(rect_colors),
+                            show_labels = TRUE,
+                            label_angle = 0,
                             fun.aggregate = "mean"){
     id = xbp = x = to_disp = y = hit = val = y = y_gap = cluster_id = NULL#declare binding for data.table
     if(is(bw_data, "GRanges")){

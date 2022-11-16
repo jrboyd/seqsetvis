@@ -1,3 +1,8 @@
+# 1.15.18
+
+* Added named color vector support to rect_color and text_color to add_cluster_annotation.
+* ssvSignalHeatmap and ssvSignalHeatmap.ClusterBars both support basic add_cluster_annotation arguments. (rect_color, text_color, label_angle, show_label)
+
 # 1.15.16
 
 * ssvSignalHeatmap, ssvSignalHeatmap.ClusterBars, and ssvSignalClustering now support fun.aggregate to combine values when facet covers multiple samples.

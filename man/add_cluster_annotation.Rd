@@ -61,9 +61,25 @@ clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 assign_dt = unique(clust_dt[, .(id, cluster_id)])[order(id)]
 p_heat = ssvSignalHeatmap(clust_dt, show_cluster_bars = FALSE)
 add_cluster_annotation(assign_dt$cluster_id, p_heat,
-  xleft = -400, xright = -360, rect_colors = rainbow(3), text_colors = "gray")
+  xleft = -500, xright = -360, rect_colors = rainbow(3), text_colors = "gray")
+
+#when colors are named, the names are used rather that just the order
+rect_colors = safeBrew(assign_dt$cluster_id)
+text_colors = safeBrew(assign_dt$cluster_id, "greys")
 p_clusters = add_cluster_annotation(assign_dt$cluster_id,
-  rect_colors = rainbow(3), text_colors = "gray")
+  rect_colors = rect_colors, text_colors = text_colors)
 #specialized use as plot outside of heatmap
-assemble_heatmap_cluster_bars(plots = list(p_clusters, p_heat), rel_widths = c(1, 3))
+p1 = assemble_heatmap_cluster_bars(plots = list(p_clusters, p_heat), rel_widths = c(1, 3))
+
+#when colors are named, the names are used rather that just the order
+#these plots will be identical even though order of colors changes.
+rect_colors = rect_colors[c(2, 3, 1)]
+text_colors = text_colors[c(3, 1, 2)]
+p_clusters = add_cluster_annotation(assign_dt$cluster_id,
+  rect_colors = rect_colors, text_colors = text_colors)
+#specialized use as plot outside of heatmap
+p2 = assemble_heatmap_cluster_bars(plots = list(p_clusters, p_heat), rel_widths = c(1, 3))
+
+cowplot::plot_grid(p1, p2, ncol = 1)
+
 }
