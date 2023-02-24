@@ -287,13 +287,13 @@ ggellipse = function(xcentres,
                                         y = y,
                                         # fill = NA,
                                         col = group,
-                                        size = line_width
+                                        linewidth = line_width
         ), fill = "#00000000") +
         scale_alpha_identity() +
         guides(alpha = "none") +
         scale_fill_manual(values = fill_scale) +
         scale_color_manual(values = line_scale) +
-        scale_size_identity()
+        scale_linewidth_identity()
     p
 }
 

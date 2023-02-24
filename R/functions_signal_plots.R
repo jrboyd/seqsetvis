@@ -134,9 +134,12 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
     if(return_data){
         return(plot_dt)
     }
-    p = ggplot(plot_dt) + geom_ribbon(aes_(x = ~x, ymin = ~low, ymax = ~high, fill = ~q_range)) +
+
+    p = ggplot(plot_dt) +
+        geom_ribbon(aes(x = x, ymin = low, ymax = high, fill = q_range)) +
         labs(fill = "quantile band",
-             y = y_, x = "bp",
+             y = y_,
+             x = "bp",
              title = "Enrichment Profiles",
              subtitle = "aggregated by quantile range") +
         scale_fill_manual(values = cols) +
@@ -687,6 +690,18 @@ ssvSignalHeatmap = function(bw_data,
     scale_vals = c(0, scale_floor + 0:10/10*(1 - scale_floor))
     plot_dt[[row_]] = factor(plot_dt[[row_]], levels = rev(levels(plot_dt[[row_]])))
 
+    .base_raster_plot = function(){
+        #ensym and !! are necessary to reproduce aes_string behavior using tidy ideom
+        column_ = ensym(column_)
+        row_ = ensym(row_)
+        fill_ = ensym(fill_)
+        ggplot(plot_dt) +
+            geom_raster(aes(x = !!column_, y = !!row_, fill = !!fill_)) +
+            theme(axis.line = element_blank(),
+                  axis.text.y = element_blank(),
+                  axis.ticks.y = element_blank(),
+                  panel.background = element_blank())
+    }
     if(is.numeric(plot_dt[[fill_]])){
         if(!is.null(fill_limits)){
             ymax = max(fill_limits)
@@ -694,31 +709,16 @@ ssvSignalHeatmap = function(bw_data,
             if(any(plot_dt[[fill_]] > ymax)) plot_dt[get(fill_) > ymax][[fill_]] = ymax
             if(any(plot_dt[[fill_]] < ymin)) plot_dt[get(fill_) < ymin][[fill_]] = ymin
 
-            p = ggplot(plot_dt) +
-                geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
-                theme(axis.line = element_blank(),
-                      axis.text.y = element_blank(),
-                      axis.ticks.y = element_blank(),
-                      panel.background = element_blank()) +
+            p = .base_raster_plot() +
                 scale_fill_distiller(type = "div", palette = "Spectral",
                                      values = scale_vals, limits = c(ymin, ymax))
         }else{
-            p = ggplot(plot_dt) +
-                geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
-                theme(axis.line = element_blank(),
-                      axis.text.y = element_blank(),
-                      axis.ticks.y = element_blank(),
-                      panel.background = element_blank()) +
+            p = .base_raster_plot() +
                 scale_fill_distiller(type = "div", palette = "Spectral",
                                      values = scale_vals)
         }
     }else{
-        p = ggplot(plot_dt) +
-            geom_raster(aes_string(x = column_, y = row_, fill = fill_)) +
-            theme(axis.line = element_blank(),
-                  axis.text.y = element_blank(),
-                  axis.ticks.y = element_blank(),
-                  panel.background = element_blank())
+        p = .base_raster_plot()
     }
 
     if(facet_ != ""){
@@ -1066,10 +1066,15 @@ ssvSignalLineplot = function(bw_data, x_ = "x", y_ = "y", color_ = "sample",
     if(return_data){
         return(plot_dt)
     }
-    ggplot(plot_dt) + geom_path(aes_string(x = x_,
-                                           y = y_,
-                                           col = color_,
-                                           group = group_),
+    #ensym and !! are necessary to reproduce aes_string behavior using tidy ideom
+    x_ = ensym(x_)
+    y_ = ensym(y_)
+    color_ = ensym(color_)
+    group_ = ensym(group_)
+    ggplot(plot_dt) + geom_path(aes(x = !!x_,
+                                           y = !!y_,
+                                           col = !!color_,
+                                           group = !!group_),
                                 alpha = line_alpha) +
         facet_method(facet_)
 }
@@ -1144,8 +1149,15 @@ ssvSignalLineplotAgg = function(bw_data,
     if(return_data){
         return(plot_dt)
     }
-    ggplot(plot_dt) +
-        geom_path(aes_string(x = x_, y = y_, col = color_, group = "group_var"))
+
+    #ensym and !! are necessary to reproduce aes_string behavior using tidy ideom
+    x_ = ensym(x_)
+    y_ = ensym(y_)
+    color_ = ensym(color_)
+    ggplot(plot_dt) + geom_path(aes(x = !!x_,
+                                    y = !!y_,
+                                    col = !!color_,
+                                    group = group_var))
 }
 
 
