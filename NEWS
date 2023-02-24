@@ -1,3 +1,7 @@
+# 1.18.1
+
+* Catch up release to recent development
+
 # 1.15.18
 
 * Added named color vector support to rect_color and text_color to add_cluster_annotation.
