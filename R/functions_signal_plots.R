@@ -1139,7 +1139,7 @@ ssvSignalLineplotAgg = function(bw_data,
                      by = c(unique(c(group_, color_, sample_, x_)))]
 
     if(!is.null(spline_n)){
-        plot_dt = applySpline(agg_dt, n = spline_n, x_ = x_, y_ = y_,
+        plot_dt = applySpline(agg_dt, n = spline_n, x_ = x_, y_ = "y",
                               by_ = c(group_, sample_))
     }else{
         plot_dt = agg_dt
@@ -1152,12 +1152,12 @@ ssvSignalLineplotAgg = function(bw_data,
 
     #ensym and !! are necessary to reproduce aes_string behavior using tidy ideom
     x_ = ensym(x_)
-    y_ = ensym(y_)
     color_ = ensym(color_)
     ggplot(plot_dt) + geom_path(aes(x = !!x_,
-                                    y = !!y_,
+                                    y = y,
                                     col = !!color_,
-                                    group = group_var))
+                                    group = group_var)) +
+        labs(y = y_)
 }
 
 
