@@ -1,3 +1,7 @@
+# 1.19.3
+
+* bugifx: ssvSignalLineplotAgg now uses non-default values of y_ properly
+
 # 1.19.2
 
 * Update all aes_string calls to aes with tidy ideoms to avoid deprecated aes_string
