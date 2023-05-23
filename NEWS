@@ -1,3 +1,9 @@
+# 1.19.5
+* added counts_as_percent and percentage_digits to ssvFeatureVenn to allow percentages to be displayed
+
+# 1.19.4
+* added count_label_size = 8 to ssvFeatureBars
+
 # 1.19.3
 
 * bugifx: ssvSignalLineplotAgg now uses non-default values of y_ properly

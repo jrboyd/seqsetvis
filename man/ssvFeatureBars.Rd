@@ -9,7 +9,8 @@ ssvFeatureBars(
   show_counts = TRUE,
   bar_colors = NULL,
   counts_text_colors = NULL,
-  return_data = FALSE
+  return_data = FALSE,
+  count_label_size = 8
 )
 }
 \arguments{
@@ -26,6 +27,8 @@ uses RColorBrewer Dark2. Will repeat to match number of samples.}
 
 \item{return_data}{logical.  If TRUE, return value is no longer ggplot and
 is instead the data used to generate that plot. Default is FALSE.}
+
+\item{count_label_size}{Font size bar count labels. Default is 8.}
 }
 \value{
 ggplot of bar plot of set sizes
@@ -35,6 +38,6 @@ bar plots of set sizes
 }
 \examples{
 ssvFeatureBars(list(1:3, 2:6))
-ssvFeatureBars(CTCF_in_10a_overlaps_gr)
+ssvFeatureBars(CTCF_in_10a_overlaps_gr, count_label_size = 10)
 ssvFeatureBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 }

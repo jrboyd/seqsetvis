@@ -14,6 +14,7 @@
 #' more than 3 sets. ssvFeatureEuler can work too but can take a very long time
 #' to run for more than 5 or so.
 #' @export
+#'
 #' @param object will be passed to \code{\link{ssvMakeMembTable}} for
 #' conversion to membership matrix
 #' @param group_names useful if names weren't provided or were lost in
@@ -29,6 +30,9 @@
 #' @param fill_alpha alpha value to use for fill, defaults to .3.
 #' @param line_alpha numeric [0,1], alpha value for circle line
 #' @param counts_color character. single color to use for displaying counts
+#' @param counts_as_percent if TRUE, convert counts to percentages in plots.
+#' @param percentage_digits The number of digits to round percentages to, default is 1.
+#' @param percentage_suffix The character to append to percentages, default is "\%".
 #' @param n_points integer.  number of points to approximate circle with.
 #' default is 200.
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and
@@ -41,6 +45,16 @@
 #' ssvFeatureVenn(list(1:3, 2:6))
 #' ssvFeatureVenn(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureVenn(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+#'
+#' ssvFeatureVenn(list(1:3, 2:6),
+#'   counts_as_percent = TRUE,
+#'   percentage_digits = 2)
+#'
+#' ssvFeatureVenn(list(1:3, 2:6),
+#'   counts_as_percent = TRUE,
+#'   percentage_digits = 0,
+#'   percentage_suffix = "",
+#'   counts_txt_size = 12)
 ssvFeatureVenn = function(object,
                           group_names = NULL,
                           counts_txt_size = 5,
@@ -51,6 +65,9 @@ ssvFeatureVenn = function(object,
                           fill_alpha = .3,
                           line_alpha = 1,
                           counts_color = NULL,
+                          counts_as_percent = FALSE,
+                          percentage_digits = 1,
+                          percentage_suffix = "%",
                           n_points = 200,
                           return_data = FALSE) {
     size = group = x = y = label = NULL#declare binding for data.table
@@ -62,6 +79,11 @@ ssvFeatureVenn = function(object,
     all(apply(object, 2, class) == "logical")
     object <- limma::vennCounts(object)
     set_counts <- object[, "Counts"]
+    if(counts_as_percent){
+        set_counts = set_counts / sum(set_counts)
+        set_counts = paste0(round(set_counts * 100, digits = percentage_digits), percentage_suffix)
+    }
+
     nsets <- ncol(object) - 1
     if (nsets > 3)
         stop("Can't plot Venn diagram for more than 3 sets")
@@ -140,17 +162,18 @@ ssvFeatureVenn = function(object,
 
     counts_method = ifelse(counts_as_labels, geom_label, geom_text)
     p = p + counts_method(data = df_text,
-                          mapping = aes(x = x, y = y,
-                                        label = label, size = size))
+                          mapping = aes(x = x,
+                                        y = y,
+                                        label = label,
+                                        size = size),
+                          show.legend = FALSE)
     if(return_data){
         return(
-
             data.table(xcentres = xcentres,
                        ycentres = ycentres,
                        r = r,
                        r2 = r,
-                       phi = rep(0,
-                                 length(xcentres)),
+                       phi = rep(0, length(xcentres)),
                        group_names = group_names)
         )
     }
@@ -292,18 +315,20 @@ ssvFeatureEuler = function(object,
 #' uses RColorBrewer Dark2. Will repeat to match number of samples.
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and
 #' is instead the data used to generate that plot. Default is FALSE.
+#' @param count_label_size Font size bar count labels. Default is 8.
 #' @return ggplot of bar plot of set sizes
 #' @import ggplot2
 #' @import S4Vectors
 #' @examples
 #' ssvFeatureBars(list(1:3, 2:6))
-#' ssvFeatureBars(CTCF_in_10a_overlaps_gr)
+#' ssvFeatureBars(CTCF_in_10a_overlaps_gr, count_label_size = 10)
 #' ssvFeatureBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
 ssvFeatureBars = function(object,
                           show_counts = TRUE,
                           bar_colors = NULL,
                           counts_text_colors = NULL,
-                          return_data = FALSE) {
+                          return_data = FALSE,
+                          count_label_size = 8) {
     group = count = NULL#declare binding for data.table
     object = ssvMakeMembTable(object)
     stopifnot(is.logical(show_counts))
@@ -350,7 +375,8 @@ ssvFeatureBars = function(object,
                          y = hit_counts/2,
                          x = seq_along(hit_counts),
                          label = hit_counts,
-                         color = counts_text_colors)
+                         color = counts_text_colors,
+                         size = count_label_size/ggplot2:::.pt)
     return(p)
 }
 

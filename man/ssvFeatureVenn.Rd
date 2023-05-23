@@ -18,6 +18,9 @@ ssvFeatureVenn(
   fill_alpha = 0.3,
   line_alpha = 1,
   counts_color = NULL,
+  counts_as_percent = FALSE,
+  percentage_digits = 1,
+  percentage_suffix = "\%",
   n_points = 200,
   return_data = FALSE
 )
@@ -48,6 +51,12 @@ from RColorBrewer by default.}
 
 \item{counts_color}{character. single color to use for displaying counts}
 
+\item{counts_as_percent}{if TRUE, convert counts to percentages in plots.}
+
+\item{percentage_digits}{The number of digits to round percentages to, default is 1.}
+
+\item{percentage_suffix}{The character to append to percentages, default is "\%".}
+
 \item{n_points}{integer.  number of points to approximate circle with.
 default is 200.}
 
@@ -67,4 +76,14 @@ to run for more than 5 or so.
 ssvFeatureVenn(list(1:3, 2:6))
 ssvFeatureVenn(CTCF_in_10a_overlaps_gr)
 ssvFeatureVenn(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
+
+ssvFeatureVenn(list(1:3, 2:6),
+  counts_as_percent = TRUE,
+  percentage_digits = 2)
+
+ssvFeatureVenn(list(1:3, 2:6),
+  counts_as_percent = TRUE,
+  percentage_digits = 0,
+  percentage_suffix = "",
+  counts_txt_size = 12)
 }
