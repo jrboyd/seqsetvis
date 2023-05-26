@@ -1,3 +1,9 @@
+# 1.21.3
+* added do_not_scaleTo1 to append_ynorm.
+
+# 1.21.2
+* added findMaxPos
+
 # 1.21.1
 * added counts_as_percent and percentage_digits to ssvFeatureVenn to allow percentages to be displayed
 

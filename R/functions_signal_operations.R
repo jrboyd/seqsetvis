@@ -315,3 +315,28 @@ centerGRangesAtMax = function(prof_dt, qgr, x_ = "x", y_ = "y", by_ = "id", widt
     cent_gr = cent_gr[names(qgr)]
     GenomicRanges::resize(cent_gr, width, fix = "center")
 }
+
+#' findMaxPos
+#'
+#' @param prof_dt a GRanges or data.table as returned by ssvFetch*.
+#' @param qgr the GRanges used to query ssvFetch* as the qgr argument.
+#' @param x_ positional variable.  Should almost always be the default, "x".
+#' @param y_ the signal value variable.  Likely the default value of "y" but
+#'   could be "y_norm" if append_ynorm was applied to data.
+#' @param by_ region identifier variable. Should almost always be the default,
+#'   "id".
+#' @param width Desired width of final regions.  Default is 1.
+#'
+#' @return data.table of relative x position from center per id
+#' @export
+#'
+#' @examples
+#' findMaxPos(CTCF_in_10a_profiles_dt, CTCF_in_10a_overlaps_gr)
+#' findMaxPos(CTCF_in_10a_profiles_gr, CTCF_in_10a_overlaps_gr)
+findMaxPos = function(prof_dt, qgr, x_ = "x", y_ = "y", by_ = "id", width = 1){
+    if(length(by_) > 1) stop("only by_ of length 1 supported.")
+    if(is(prof_dt, "GRanges")){
+        prof_dt = data.table::as.data.table(prof_dt)
+    }
+    prof_dt[, list(x = x[which.max(y)[1]]), list(id)]
+}

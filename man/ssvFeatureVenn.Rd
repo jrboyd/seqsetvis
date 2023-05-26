@@ -84,6 +84,6 @@ ssvFeatureVenn(list(1:3, 2:6),
 ssvFeatureVenn(list(1:3, 2:6),
   counts_as_percent = TRUE,
   percentage_digits = 0,
-  percentage_suffix = "",
+  percentage_suffix = " \%",
   counts_txt_size = 12)
 }
