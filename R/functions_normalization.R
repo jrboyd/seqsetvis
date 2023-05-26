@@ -86,7 +86,7 @@ append_ynorm = function(full_dt,
                         do_not_scaleTo1 = FALSE,
                         force_append = FALSE
 ){
-    if(!do_not_cap && !do_not_scaleTo1){
+    if(do_not_cap && do_not_scaleTo1){
         warning("With do_not_cap and do_not_scaleTo1, only cap_value will be appended and normalized value will be unchanged. This is not likely what you want.")
     }
     stopifnot(data.table::is.data.table(full_dt))
