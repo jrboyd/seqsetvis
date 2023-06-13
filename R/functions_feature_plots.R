@@ -376,7 +376,7 @@ ssvFeatureBars = function(object,
                          x = seq_along(hit_counts),
                          label = hit_counts,
                          color = counts_text_colors,
-                         size = count_label_size/ggplot2:::.pt)
+                         size = count_label_size/ggplot2::.pt)
     return(p)
 }
 

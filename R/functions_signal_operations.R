@@ -334,6 +334,8 @@ centerGRangesAtMax = function(prof_dt, qgr, x_ = "x", y_ = "y", by_ = "id", widt
 #' findMaxPos(CTCF_in_10a_profiles_dt, CTCF_in_10a_overlaps_gr)
 #' findMaxPos(CTCF_in_10a_profiles_gr, CTCF_in_10a_overlaps_gr)
 findMaxPos = function(prof_dt, qgr, x_ = "x", y_ = "y", by_ = "id", width = 1){
+    #binding for data.table
+    x = y = id = NULL
     if(length(by_) > 1) stop("only by_ of length 1 supported.")
     if(is(prof_dt, "GRanges")){
         prof_dt = data.table::as.data.table(prof_dt)

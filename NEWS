@@ -1,3 +1,6 @@
+# 1.21.4
+* bugfix for assembling more than 2 heatmap elements, now nrow = 1
+
 # 1.21.3
 * added do_not_scaleTo1 to append_ynorm.
 

@@ -46,6 +46,8 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
                                     n_quantile = 18, quantile_min = 0.05, quantile_max = 0.95,
                                     return_data = FALSE
 ) {
+    #binding for data.table
+    x = NULL
     if(is(bw_data, "GRanges")){
         bw_data = data.table::as.data.table(bw_data)
     }
@@ -955,7 +957,7 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
 assemble_heatmap_cluster_bars = function(plots, ...){
     # plots = list(heatmap = p_heatmap, cluster_bars = p_cluster_bar)
     grobs = sync_height(plots)
-    cowplot::plot_grid(plotlist = grobs, ...)
+    cowplot::plot_grid(plotlist = grobs, ..., nrow = 1)
 }
 
 sync_height = function(my_plots, sync_width = FALSE){
@@ -1120,7 +1122,7 @@ ssvSignalLineplotAgg = function(bw_data,
                                 agg_fun = mean,
                                 spline_n = NULL,
                                 return_data = FALSE){
-    group_var = NULL # reserve for data.table
+    group_var = y = NULL # reserve for data.table
     if(is(bw_data, "GRanges")){
         bw_data = data.table::as.data.table(bw_data)
     }
