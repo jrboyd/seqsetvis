@@ -1,3 +1,9 @@
+# 1.21.6
+* splice_count target_strand and flip_strand now behaves consistently and is tested
+
+# 1.21.5
+* bugfix for flip_strand when splice_strategy == "splice_count", was not being applied
+
 # 1.21.4
 * bugfix for assembling more than 2 heatmap elements, now nrow = 1
 

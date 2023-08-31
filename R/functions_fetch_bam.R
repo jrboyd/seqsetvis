@@ -267,13 +267,36 @@ ssvFetchBam.single = function(bam_f,
         return(score_gr)
     }
     if(splice_strategy == "splice_count"){
-        return(fetchBam(bam_f,
-                        qgr,
-                        fragLen = NA,
-                        target_strand = target_strand,
-                        max_dupes, splice_strategy,
-                        flip_strand = flip_strand,
-                        ...))
+        splice_res = list()
+        if(target_strand == "*"){
+            splice_res[["star"]] = fetchBam(bam_f,
+                                            qgr,
+                                            fragLen = NA,
+                                            target_strand = target_strand,
+                                            max_dupes, splice_strategy,
+                                            flip_strand = flip_strand,
+                                            ...)
+        }else{
+            if(target_strand == "both" | target_strand == "+"){
+                splice_res[["pos"]] = fetchBam(bam_f,
+                                               qgr,
+                                               fragLen = NA,
+                                               target_strand = "+",
+                                               max_dupes, splice_strategy,
+                                               flip_strand = flip_strand,
+                                               ...)
+            }
+            if(target_strand == "both" | target_strand == "-"){
+                splice_res[["neg"]] = fetchBam(bam_f,
+                                               qgr,
+                                               fragLen = NA,
+                                               target_strand = "-",
+                                               max_dupes, splice_strategy,
+                                               flip_strand = flip_strand,
+                                               ...)
+            }
+        }
+        return(rbindlist(splice_res))
     }
 
     #splitting by qgr strand is necessary for strand sensitive fetch when
@@ -396,6 +419,8 @@ fetchBam = function(bam_f,
     which_label = NULL #reserve binding
     stopifnot(is.numeric(max_dupes))
     stopifnot(max_dupes >= 1)
+    if(target_strand == "both") target_strand = "*"
+    stopifnot(target_strand %in% c("*", "+", "-"))
     if(!is.na(fragLen) && splice_strategy != "none"){
         stop("fragLen must be NA if splice_strategy is not 'none'.")
     }
@@ -468,18 +493,19 @@ fetchBam = function(bam_f,
             paste0(seqnames(gr), ":", start(gr), "-", end(gr))
         }
     }
+    # it does not make sense to use query gr strand in reference to splice count
+    if(splice_strategy == "splice_count"){
+        toflip = character()
+    }else{
+        toflip = gr_as.character(subset(qgr, strand == "-"))
+    }
 
-    toflip = gr_as.character(subset(qgr, strand == "-"))
     if(target_strand %in% c("+", "-")){
-        if(!flip_strand){
-            bam_dt = bam_dt[strand == target_strand & !(which_label %in% toflip) |
-                                strand != target_strand & which_label %in% toflip]
-        }else{
-            bam_dt = bam_dt[strand != target_strand & !(which_label %in% toflip) |
-                                strand == target_strand & which_label %in% toflip]
+        if(flip_strand){
             bam_dt[, strand := ifelse(strand == "+", "-", "+")]
         }
-
+        bam_dt = bam_dt[strand == target_strand & !(which_label %in% toflip) |
+                            strand != target_strand & (which_label %in% toflip)]
     }
 
     bam_dt[, end := start + width - 1L]
@@ -487,6 +513,7 @@ fetchBam = function(bam_f,
     if(max_dupes < Inf){
         bam_dt = .rm_dupes(bam_dt, max_dupes)
     }
+    # browser()
     if(is.na(fragLen)){
         bam_dt = switch(
             splice_strategy,
@@ -508,12 +535,17 @@ fetchBam = function(bam_f,
         }
 
     }
+    bam_dt$strand = target_strand
     if(splice_strategy == "splice_count"){
+        # browser()
         sp_dt = bam_dt[, .N,
                        by = list(which_label, seqnames, start, end, strand)]
-        if(target_strand %in% c("+", "-")){
-            sp_dt = sp_dt[strand == target_strand]
-        }
+        # if(flip_strand){
+        #     sp_dt$strand = as.character(GenomicRanges::invertStrand(sp_dt$strand))
+        # }
+        # if(target_strand %in% c("+", "-")){
+        #     sp_dt = sp_dt[strand == target_strand]
+        # }
         return(sp_dt)
     }
     ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))
@@ -525,12 +557,13 @@ fetchBam = function(bam_f,
         mcols(score_gr) = NULL
         score_gr$score = 0
     }
-    if(target_strand == "+"){
-        strand(score_gr) = "+"
-    }
-    if(target_strand == "-"){
-        strand(score_gr) = "-"
-    }
+    # if(target_strand == "+"){
+    #     strand(score_gr) = "+"
+    # }
+    # if(target_strand == "-"){
+    #     strand(score_gr) = "-"
+    # }
+
     return(score_gr)
 }
 
@@ -564,10 +597,10 @@ harmonize_seqlengths = function(query_gr, bam_file, force_fix = FALSE){
             len.new = length(query_gr)
             message(len.orig - len.new, " regions were removed due to force_fix = TRUE where seqnames were missing from bam file.")
         }else{
-        stop("There are chromosomes present in query GRanges (",
-             paste(setdiff(as.character(seqnames(query_gr)), names(chr_lengths)), collapse = ", "),
-                   ") not present in bam file (", bam_file, ")!\n",
-             "If you want to proceed, run harmonize_seqlengths with force_fix = TRUE on query_gr to remove incompatible seqnames and retry.")
+            stop("There are chromosomes present in query GRanges (",
+                 paste(setdiff(as.character(seqnames(query_gr)), names(chr_lengths)), collapse = ", "),
+                 ") not present in bam file (", bam_file, ")!\n",
+                 "If you want to proceed, run harmonize_seqlengths with force_fix = TRUE on query_gr to remove incompatible seqnames and retry.")
         }
     }
     to_remove =setdiff(names(GenomeInfoDb::seqlengths(query_gr)), unique(as.character(seqnames(query_gr))))
