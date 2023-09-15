@@ -6,7 +6,7 @@ library(testthat)
 #### positive strand query_gr ####
 query_gr = GenomicRanges::GRanges("chr6:151656691-152129619:+")
 se_rna_bam_file = system.file(package = "seqsetvis", "extdata/MCF7_R1.ESR1_RNA.bam", mustWork = TRUE)
-pe_rna_bam_file = system.file(package = "seqsetvis", "extdata/H1_ESC_PE_R1.ESR1_RNA.bam", mustWork = TRUE)
+# pe_rna_bam_file = system.file(package = "seqsetvis", "extdata/H1_ESC_PE_R1.ESR1_RNA.bam", mustWork = TRUE)
 
 
 prof_dt.no_flip = ssvFetchBam(
