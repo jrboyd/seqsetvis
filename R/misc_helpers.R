@@ -222,7 +222,7 @@ applyMovingAverage = function(dt, n, centered = TRUE, x_ = "x", y_ = "y", by_ = 
                     " duplicated xs.")
         extra_cols = setdiff(colnames(dt), c(x_, y_, by_))
         # sdt = dt[, list(n = floor(.N * n)), by = by_]
-        sdt = dt[, .(y = maFun(y = get(y_), n = n, centered = centered), x= get(x_)), by = by_]
+        sdt = dt[, list(y = maFun(y = get(y_), n = n, centered = centered), x= get(x_)), by = by_]
         colnames(sdt)[colnames(sdt) == "x"] = x_
         colnames(sdt)[colnames(sdt) == "y"] = y_
 
