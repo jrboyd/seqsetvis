@@ -4,7 +4,14 @@
 \alias{applySpline}
 \title{applies a spline smoothing to a tidy data.table containing x and y values.}
 \usage{
-applySpline(dt, n, x_ = "x", y_ = "y", by_ = "", splineFun = stats::spline)
+applySpline(
+  dt,
+  n,
+  x_ = "x",
+  y_ = "y",
+  by_ = c("id", "sample"),
+  splineFun = stats::spline
+)
 }
 \arguments{
 \item{dt}{a tidy data.table containing two-dimensional data}

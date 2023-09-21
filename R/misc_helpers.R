@@ -86,12 +86,13 @@ safeBrew = function(n, pal = "Dark2"){
     cols
 }
 
-# x: the vector n: the number of samples centered: if FALSE, then average
+# x: the vector
+# n: the number of samples centered: if FALSE, then average
 # current sample and previous (n-1) samples if TRUE, then average
 # symmetrically in past and
 # future. (If n is even, use one more sample from future.)
 # from http://www.cookbook-r.com/Manipulating_data/Calculating_a_moving_average/
-movingAverage <- function(x, n = 1, centered = TRUE) {
+movingAverage <- function(y, n = 1, centered = TRUE) {
 
     if (centered) {
         before <- floor((n - 1)/2)
@@ -102,11 +103,11 @@ movingAverage <- function(x, n = 1, centered = TRUE) {
     }
 
     # Track the sum and count of number of non-NA items
-    s <- rep(0, length(x))
-    count <- rep(0, length(x))
+    s <- rep(0, length(y))
+    count <- rep(0, length(y))
 
     # Add the centered data
-    new <- x
+    new <- y
     # Add to count list wherever there isn't a
     count <- count + (!is.na(new))
     # Now replace NA_s with 0_s and add to total
@@ -117,7 +118,7 @@ movingAverage <- function(x, n = 1, centered = TRUE) {
     i <- 1
     while (i <= before) {
         # This is the vector with offset values to add
-        new <- c(rep(NA, i), x[seq_len(length(x) - i)])
+        new <- c(rep(NA, i), y[seq_len(length(y) - i)])
 
         count <- count + (!is.na(new))
         new[is.na(new)] <- 0
@@ -130,7 +131,7 @@ movingAverage <- function(x, n = 1, centered = TRUE) {
     i <- 1
     while (i <= after) {
         # This is the vector with offset values to add
-        new <- c(x[(i + 1):length(x)], rep(NA, i))
+        new <- c(y[(i + 1):length(y)], rep(NA, i))
 
         count <- count + (!is.na(new))
         new[is.na(new)] <- 0
@@ -141,6 +142,116 @@ movingAverage <- function(x, n = 1, centered = TRUE) {
 
     # return sum divided by count
     s/count
+}
+
+#' applyMovingAverage
+#'
+#' http://www.cookbook-r.com/Manipulating_data/Calculating_a_moving_average/
+#'
+#' @param dt a tidy data.table containing two-dimensional data
+#' @param n the number of samples centered: if FALSE, then average
+#' @param centered current sample and previous (n-1) samples if TRUE, then
+#'   average symmetrically in past and future. (If n is even, use one more
+#'   sample from future.)
+#' @param x_ the variable name of the x-values
+#' @param y_ the variable name of the y-values
+#' @param by_ optionally, any variables that provide grouping to the data.
+#' default is none. see details.
+#' @param maFun a function that accepts x, y, and n as arguments and
+#' returns a list of length 2 with named elements x and y.
+#'
+#' @return a newly derived data.table where a movingAverage has been applied.
+#' @export
+#'
+#' @examples
+#' agg_dt = CTCF_in_10a_profiles_dt[, list(y = mean(y)), by = list(sample, x)]
+#' ggplot(agg_dt) +
+#'     geom_line(aes(x = x, y = y, color = sample))
+#'
+#' splined_smooth = applyMovingAverage(agg_dt, n = 5,
+#'     y_ = 'y', by_ = c('sample'))
+#' ggplot(splined_smooth) +
+#'     geom_line(aes(x = x, y = y, color = sample))
+#'
+#' splined_smooth$method = "moving_average"
+#' agg_dt$method = "none"
+#' ggplot(rbind(splined_smooth, agg_dt)) +
+#'     geom_line(aes(x = x, y = y, color = method)) +
+#'     facet_wrap(~sample)
+applyMovingAverage = function(dt, n, centered = TRUE, x_ = "x", y_ = "y", by_ = c("id", "sample"),
+                              maFun = movingAverage){
+        output_GRanges = FALSE
+        if(is(dt, "GRanges")){
+            dt = as.data.table(dt)
+            output_GRanges = TRUE
+        }
+        stopifnot(data.table::is.data.table(dt))
+        stopifnot(is.character(x_), is.character(y_), is.character(by_))
+        stopifnot(is.function(maFun))
+        if (!any(x_ == colnames(dt))) {
+            stop("applyMovingAverage : x_ (", x_,
+                 ") not found in colnames of input data.table")
+        }
+        if (!any(y_ == colnames(dt))) {
+            stop("applyMovingAverage : y_ (", y_,
+                 ") not found in colnames of input data.table")
+        }
+        if (by_[1] != "" | length(by_) > 1)
+            if (!all(by_ %in% colnames(dt))) {
+                stop("applyMovingAverage : by_ (", by_,
+                     ") not found in colnames of input data.table")
+            }
+        max_n = floor(length(unique(dt[[x_]]))/2)
+        if(n > max_n){
+            stop("n is too large to be meaningful. max allowed: ", max_n, ", n: ", n)
+        }
+        dt = dt[order(get(x_))]
+        if(by_[1] != ""){
+            for(.by_ in by_){
+                dt = dt[order(get(.by_))]
+            }
+        }
+
+        stopifnot(n > 1)
+        dupe_x_within_by = suppressWarnings(
+            any(dt[, any(duplicated(get(x_))), by = by_]$V1))
+        if (dupe_x_within_by)
+            warning("applyMovingAverage : Duplicate values of x_ (\"", x_,
+                    "\") exist within groups defined with by_ (\"", by_, "\"). ",
+                    "This Results in averages through the means of yvalues at",
+                    " duplicated xs.")
+        extra_cols = setdiff(colnames(dt), c(x_, y_, by_))
+        # sdt = dt[, list(n = floor(.N * n)), by = by_]
+        sdt = dt[, .(y = maFun(y = get(y_), n = n, centered = centered), x= get(x_)), by = by_]
+        colnames(sdt)[colnames(sdt) == "x"] = x_
+        colnames(sdt)[colnames(sdt) == "y"] = y_
+
+        #repair with columns dropped in by_ apply spline
+        #each row will be duplicated n times
+        if(length(extra_cols) > 0){
+            if(n > 1){
+                repair = dt[rep(seq_len(nrow(dt)), each = n),
+                            c(extra_cols, by_[by_ != ""]), with = FALSE]
+                sdt = cbind(sdt, repair)
+            }else{
+                # warning("")
+                # repair = unique(dt[, c(extra_cols, by_, x_), with = FALSE])
+                # repair = dt
+                # sdt
+                # merge(sdt, repair, by = by_)
+                # unique(sdt[, by_, with = FALSE])
+                # merge(sdt, repair, by = by_)
+            }
+
+        }
+
+        k = colnames(dt) %in% colnames(sdt)
+        sdt = sdt[, colnames(dt)[k], with = FALSE]
+        if(output_GRanges){
+            sdt = GRanges(sdt)
+        }
+        return(sdt)
+
 }
 
 #' returns a ggplot with ellipses drawn using specified parameters

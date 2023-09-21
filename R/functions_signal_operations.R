@@ -66,7 +66,7 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #'     y_ = 'y', by_ = c('id', 'sample'))
 #' ggplot(splined_smooth[, list(y = mean(y)), by = list(sample, x)]) +
 #'     geom_line(aes(x = x, y = y, color = sample))
-applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = "",
+applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = c("id", "sample"),
                        splineFun = stats::spline) {
     output_GRanges = FALSE
     if(is(dt, "GRanges")){

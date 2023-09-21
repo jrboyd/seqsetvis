@@ -37,7 +37,7 @@ doTest_applySpline = function(test_object){
     })
 
     test_that("applySpline warnings for by_ specification", {
-        expect_warning(applySpline(test_object, x_ = "xvals", y_ = "yvals", n = 4), regexp = "applySpline")
+        expect_warning(applySpline(test_object, x_ = "xvals", y_ = "yvals", n = 4, by_ = ""), regexp = "applySpline")
         expect_failure(expect_warning(applySpline(test_object, x_ = "xvals", y_ = "yvals", n = 4, by_ = "grp")))
     })
 

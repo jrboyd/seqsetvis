@@ -1,3 +1,6 @@
+# 1.21.8
+* added applyMovingAverage equivalent of applySpline
+
 # 1.21.7
 * rm bad file in test causing bioc error
 
