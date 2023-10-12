@@ -1,3 +1,6 @@
+# 1.21.10
+* added gg/ggplot/ggplot2 pal to safeBrew to reproduce ggplot default colors
+
 # 1.21.9
 * added applyMovingAverage equivalent of applySpline
 

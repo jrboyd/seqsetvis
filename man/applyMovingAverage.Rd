@@ -44,14 +44,14 @@ agg_dt = CTCF_in_10a_profiles_dt[, list(y = mean(y)), by = list(sample, x)]
 ggplot(agg_dt) +
     geom_line(aes(x = x, y = y, color = sample))
 
-splined_smooth = applyMovingAverage(agg_dt, n = 5,
+ma_smooth = applyMovingAverage(agg_dt, n = 5,
     y_ = 'y', by_ = c('sample'))
-ggplot(splined_smooth) +
+ggplot(ma_smooth) +
     geom_line(aes(x = x, y = y, color = sample))
 
-splined_smooth$method = "moving_average"
+ma_smooth$method = "moving_average"
 agg_dt$method = "none"
-ggplot(rbind(splined_smooth, agg_dt)) +
+ggplot(rbind(ma_smooth, agg_dt)) +
     geom_line(aes(x = x, y = y, color = method)) +
     facet_wrap(~sample)
 }

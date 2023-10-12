@@ -35,15 +35,24 @@ set_list2memb = function(set_list) {
     return(memb)
 }
 
-#' allows RColorBrew to handle n values less than 3 and greater than 8 without
+#' Allows RColorBrew to handle n values less than 3 and greater than 8 without
 #' warnings and return expected number of colors.
+#'
+#' For convenience, instead of the number n requested, n may be a character or
+#' factor vector and outputs will be appropriately named for use with
+#' scale_color/fill_manual.
+#'
+#' Additionally, accepts pal as "gg", "ggplot", or "ggplot2" to reproduce
+#' default ggplot colors in the same way.
+#'
 #' @export
 #' @param n integer value of number of colors to make palette for. Alternatively
 #'   a character or factor, in which case palette will be generated for each
 #'   unique item or factor level repsectively.
 #' @param pal palette recognized by RColorBrewer
 #' @importFrom RColorBrewer brewer.pal brewer.pal.info
-#' @return a character vector of hex coded colors o flength n from the color
+#' @importFrom scales hue_pal
+#' @return a character vector of hex coded colors of length n from the color
 #'   brewer palette pal. If n is supplied as character or factor, output will be
 #'   named accordingly.
 #' @examples
@@ -69,14 +78,21 @@ safeBrew = function(n, pal = "Dark2"){
     pal_info$brewName = rownames(pal_info)
     rownames(pal_info) = tolower(rownames(pal_info))
     pal = tolower(pal)
-    if(!any(pal == rownames(pal_info)))
-        stop("Palette ", pal, " not a valid RColorBrewer palette, ",
-             "see RColorBrewer::brewer.pal.info")
-    maxColors = pal_info[pal,]$maxcolors
-    nbrew = min(max(n_lev, 3), maxColors)
-    cols = RColorBrewer::brewer.pal(
-        n = nbrew,
-        name = pal_info[pal,]$brewName)[(seq_len(n_lev)-1) %% maxColors + 1]
+    if(!any(pal == rownames(pal_info))){
+        if(pal %in% c("gg", "ggplot", "ggplot2")){
+            cols = scales::hue_pal()(n_lev)
+        }else{
+            stop("Palette ", pal, " not a valid RColorBrewer palette, ",
+                 "see RColorBrewer::brewer.pal.info")
+        }
+    }else{
+        maxColors = pal_info[pal,]$maxcolors
+        nbrew = min(max(n_lev, 3), maxColors)
+        cols = RColorBrewer::brewer.pal(
+            n = nbrew,
+            name = pal_info[pal,]$brewName)[(seq_len(n_lev)-1) %% maxColors + 1]
+    }
+
     if(is.character(n)){
         names(cols) = unique(n)
     }
@@ -168,89 +184,89 @@ movingAverage <- function(y, n = 1, centered = TRUE) {
 #' ggplot(agg_dt) +
 #'     geom_line(aes(x = x, y = y, color = sample))
 #'
-#' splined_smooth = applyMovingAverage(agg_dt, n = 5,
+#' ma_smooth = applyMovingAverage(agg_dt, n = 5,
 #'     y_ = 'y', by_ = c('sample'))
-#' ggplot(splined_smooth) +
+#' ggplot(ma_smooth) +
 #'     geom_line(aes(x = x, y = y, color = sample))
 #'
-#' splined_smooth$method = "moving_average"
+#' ma_smooth$method = "moving_average"
 #' agg_dt$method = "none"
-#' ggplot(rbind(splined_smooth, agg_dt)) +
+#' ggplot(rbind(ma_smooth, agg_dt)) +
 #'     geom_line(aes(x = x, y = y, color = method)) +
 #'     facet_wrap(~sample)
 applyMovingAverage = function(dt, n, centered = TRUE, x_ = "x", y_ = "y", by_ = c("id", "sample"),
                               maFun = movingAverage){
-        output_GRanges = FALSE
-        if(is(dt, "GRanges")){
-            dt = as.data.table(dt)
-            output_GRanges = TRUE
-        }
-        stopifnot(data.table::is.data.table(dt))
-        stopifnot(is.character(x_), is.character(y_), is.character(by_))
-        stopifnot(is.function(maFun))
-        if (!any(x_ == colnames(dt))) {
-            stop("applyMovingAverage : x_ (", x_,
+    output_GRanges = FALSE
+    if(is(dt, "GRanges")){
+        dt = as.data.table(dt)
+        output_GRanges = TRUE
+    }
+    stopifnot(data.table::is.data.table(dt))
+    stopifnot(is.character(x_), is.character(y_), is.character(by_))
+    stopifnot(is.function(maFun))
+    if (!any(x_ == colnames(dt))) {
+        stop("applyMovingAverage : x_ (", x_,
+             ") not found in colnames of input data.table")
+    }
+    if (!any(y_ == colnames(dt))) {
+        stop("applyMovingAverage : y_ (", y_,
+             ") not found in colnames of input data.table")
+    }
+    if (by_[1] != "" | length(by_) > 1)
+        if (!all(by_ %in% colnames(dt))) {
+            stop("applyMovingAverage : by_ (", by_,
                  ") not found in colnames of input data.table")
         }
-        if (!any(y_ == colnames(dt))) {
-            stop("applyMovingAverage : y_ (", y_,
-                 ") not found in colnames of input data.table")
+    max_n = floor(length(unique(dt[[x_]]))/2)
+    if(n > max_n){
+        stop("n is too large to be meaningful. max allowed: ", max_n, ", n: ", n)
+    }
+    dt = dt[order(get(x_))]
+    if(by_[1] != ""){
+        for(.by_ in by_){
+            dt = dt[order(get(.by_))]
         }
-        if (by_[1] != "" | length(by_) > 1)
-            if (!all(by_ %in% colnames(dt))) {
-                stop("applyMovingAverage : by_ (", by_,
-                     ") not found in colnames of input data.table")
-            }
-        max_n = floor(length(unique(dt[[x_]]))/2)
-        if(n > max_n){
-            stop("n is too large to be meaningful. max allowed: ", max_n, ", n: ", n)
-        }
-        dt = dt[order(get(x_))]
-        if(by_[1] != ""){
-            for(.by_ in by_){
-                dt = dt[order(get(.by_))]
-            }
+    }
+
+    stopifnot(n > 1)
+    dupe_x_within_by = suppressWarnings(
+        any(dt[, any(duplicated(get(x_))), by = by_]$V1))
+    if (dupe_x_within_by)
+        warning("applyMovingAverage : Duplicate values of x_ (\"", x_,
+                "\") exist within groups defined with by_ (\"", by_, "\"). ",
+                "This Results in averages through the means of yvalues at",
+                " duplicated xs.")
+    extra_cols = setdiff(colnames(dt), c(x_, y_, by_))
+    # sdt = dt[, list(n = floor(.N * n)), by = by_]
+    sdt = dt[, list(y = maFun(y = get(y_), n = n, centered = centered), x= get(x_)), by = by_]
+    colnames(sdt)[colnames(sdt) == "x"] = x_
+    colnames(sdt)[colnames(sdt) == "y"] = y_
+
+    #repair with columns dropped in by_ apply spline
+    #each row will be duplicated n times
+    if(length(extra_cols) > 0){
+        if(n > 1){
+            repair = dt[rep(seq_len(nrow(dt)), each = n),
+                        c(extra_cols, by_[by_ != ""]), with = FALSE]
+            sdt = cbind(sdt, repair)
+        }else{
+            # warning("")
+            # repair = unique(dt[, c(extra_cols, by_, x_), with = FALSE])
+            # repair = dt
+            # sdt
+            # merge(sdt, repair, by = by_)
+            # unique(sdt[, by_, with = FALSE])
+            # merge(sdt, repair, by = by_)
         }
 
-        stopifnot(n > 1)
-        dupe_x_within_by = suppressWarnings(
-            any(dt[, any(duplicated(get(x_))), by = by_]$V1))
-        if (dupe_x_within_by)
-            warning("applyMovingAverage : Duplicate values of x_ (\"", x_,
-                    "\") exist within groups defined with by_ (\"", by_, "\"). ",
-                    "This Results in averages through the means of yvalues at",
-                    " duplicated xs.")
-        extra_cols = setdiff(colnames(dt), c(x_, y_, by_))
-        # sdt = dt[, list(n = floor(.N * n)), by = by_]
-        sdt = dt[, list(y = maFun(y = get(y_), n = n, centered = centered), x= get(x_)), by = by_]
-        colnames(sdt)[colnames(sdt) == "x"] = x_
-        colnames(sdt)[colnames(sdt) == "y"] = y_
+    }
 
-        #repair with columns dropped in by_ apply spline
-        #each row will be duplicated n times
-        if(length(extra_cols) > 0){
-            if(n > 1){
-                repair = dt[rep(seq_len(nrow(dt)), each = n),
-                            c(extra_cols, by_[by_ != ""]), with = FALSE]
-                sdt = cbind(sdt, repair)
-            }else{
-                # warning("")
-                # repair = unique(dt[, c(extra_cols, by_, x_), with = FALSE])
-                # repair = dt
-                # sdt
-                # merge(sdt, repair, by = by_)
-                # unique(sdt[, by_, with = FALSE])
-                # merge(sdt, repair, by = by_)
-            }
-
-        }
-
-        k = colnames(dt) %in% colnames(sdt)
-        sdt = sdt[, colnames(dt)[k], with = FALSE]
-        if(output_GRanges){
-            sdt = GRanges(sdt)
-        }
-        return(sdt)
+    k = colnames(dt) %in% colnames(sdt)
+    sdt = sdt[, colnames(dt)[k], with = FALSE]
+    if(output_GRanges){
+        sdt = GRanges(sdt)
+    }
+    return(sdt)
 
 }
 
@@ -429,7 +445,7 @@ ggellipse = function(xcentres,
 #' @importFrom pbmcapply pbmclapply
 ssv_mclapply = function(X, FUN, mc.cores = getOption("mc.cores", 1), ...){
     if(.Platform$OS.type == "windows" || mc.cores == 1) {
-            pbapply::pblapply(X = X, FUN = FUN, ...)
+        pbapply::pblapply(X = X, FUN = FUN, ...)
 
     } else {
         pbmcapply::pbmclapply(X = X, FUN = FUN, mc.cores = mc.cores, ...)
