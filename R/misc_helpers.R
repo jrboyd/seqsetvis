@@ -61,6 +61,9 @@ set_list2memb = function(set_list) {
 #' plot(1:12, rep(0, 12),  col = safeBrew(12, "set2"), pch = 16, cex = 6)
 #' plot(1:12, rep(0, 12),  col = safeBrew(12, "set3"), pch = 16, cex = 6)
 safeBrew = function(n, pal = "Dark2"){
+    if(is.logical(n)){
+        n = as.character(n)
+    }
     if(is.numeric(n)){
         n_lev = n
     }else if(is.character(n)){

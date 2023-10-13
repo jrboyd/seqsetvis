@@ -1,3 +1,6 @@
+# 1.21.12
+* safeBrew accepts logical as n
+
 # 1.21.11
 * bugfix where centerGRangesAtMax was not passing x_ to centerAtMax
 
