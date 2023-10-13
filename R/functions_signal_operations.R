@@ -304,7 +304,7 @@ centerGRangesAtMax = function(prof_dt, qgr, x_ = "x", y_ = "y", by_ = "id", widt
     if(is(prof_dt, "GRanges")){
         prof_dt = data.table::as.data.table(prof_dt)
     }
-    cent_dt = centerAtMax(prof_dt, y_ = y_, by_ = by_, check_by_dupes = FALSE)
+    cent_dt = centerAtMax(prof_dt, x_ = x_, y_ = y_, by_ = by_, check_by_dupes = FALSE)
     cent_dt = cent_dt[, .SD[which(get(x_) == min(abs(get(x_))))[1],], c(by_)]
     cent_gr = GenomicRanges::GRanges(cent_dt[, list(seqnames, start = (start + end)/2, end = (start + end)/2)])
     names(cent_gr) = cent_dt[[by_]]

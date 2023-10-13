@@ -1,3 +1,6 @@
+# 1.21.11
+* bugfix where centerGRangesAtMax was not passing x_ to centerAtMax
+
 # 1.21.10
 * added gg/ggplot/ggplot2 pal to safeBrew to reproduce ggplot default colors
 
