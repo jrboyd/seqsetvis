@@ -22,6 +22,9 @@ test_that("ssvFactorizeMembTable expected output values for GRanges", {
 
 test_that("ssvFactorizeMembTable expected output values for list", {
     setL = list(1:3, 2:3, c(3:5))
+    setL = lapply(setL, function(x){
+        LETTERS[x]
+    })
     fac = ssvFactorizeMembTable(setL)
     expect_equal(nrow(fac), 5)
     expect_equal(as.character(fac$group[1]), "set_A")

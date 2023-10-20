@@ -1,3 +1,6 @@
+# 1.21.13
+* ssvMakeMembTable now tolerates NA values with a warning.
+
 # 1.21.12
 * safeBrew accepts logical as n
 

@@ -25,6 +25,13 @@ set_list2memb = function(set_list) {
         names(set_list) = paste0("set_", LETTERS[seq_along(set_list)])
     }
     rn = unique(unlist(set_list))
+    if(any(is.na(rn))){
+        warning("Removing NA values from input. Is this correct?")
+        rn = rn[!is.na(rn)]
+        set_list = lapply(set_list, function(x){
+            x[!is.na(x)]
+        })
+    }
     cn = names(set_list)
     memb = matrix(FALSE, nrow = length(rn), ncol = length(cn))
     rownames(memb) = rn

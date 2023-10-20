@@ -12,11 +12,17 @@ gr_c = GRanges("chr1", IRanges(set_c*10+-4, set_c*10+1))
 
 expected_table = as.matrix(data.frame("set_A" = 1:10 %in% set_a,
                                       "set_B" = 1:10 %in% set_b,
-                                      "set_C" = 1:10 %in% set_c, row.names = 1:10))
+                                      "set_C" = 1:10 %in% set_c,
+                                      row.names = 1:10))
 
 expected_table_named = as.matrix(data.frame("named_set_A" = 1:10 %in% set_a,
                                             "named_set_B" = 1:10 %in% set_b,
-                                            "named_set_C" = 1:10 %in% set_c, row.names = 1:10))
+                                            "named_set_C" = 1:10 %in% set_c,
+                                            row.names = 1:10))
+
+set_a = as.character(set_a)
+set_b = as.character(set_b)
+set_c = as.character(set_c)
 
 test_that("ssvMakeMembTable unnamed numeric set list", {
     sets_list = list(set_a, set_b, set_c)
@@ -29,11 +35,10 @@ test_that("ssvMakeMembTable unnamed numeric set list", {
 
 test_that("ssvMakeMembTable unnamed character set list", {
     sets_list = list(set_a, set_b, set_c)
-    sets_list = lapply(sets_list, function(x)letters[x])
     mt = ssvMakeMembTable(sets_list)
     expect_is(mt, "matrix")
     expect_equal(as.logical(mt), as.logical(expected_table))
-    expect_equal(rownames(mt), letters[1:nrow(expected_table)])
+    expect_equal(rownames(mt), as.character(1:nrow(expected_table)))
     expect_equal(colnames(mt), colnames(expected_table))
 })
 
@@ -81,5 +86,12 @@ test_that("ssvMakeMembTable NAMED list of GRanges", {
 })
 
 test_that("ssvMakeMembTable on mixed type list causes error", {
-    expect_error(ssvMakeMembTable(list(1, "a")))
+    expect_warning(ssvMakeMembTable(list(1, "a")), regexp = "Converting all non-character items to characters.")
 })
+
+test_that("ssvMakeMembTable tolerates NA values with a warning", {
+    expect_warning(ssvMakeMembTable(list(c("a", "b", NA), "a")), regexp = "Removing NA values")
+    expect_warning(ssvMakeMembTable(list(c("a", "b", NA), NA)), regexp = "Converting all non-character items to characters.")
+    expect_warning(ssvMakeMembTable(list(c("a", "b", NA), NA)), regexp = "Removing NA values")
+})
+

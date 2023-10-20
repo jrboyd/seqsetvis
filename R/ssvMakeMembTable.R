@@ -32,14 +32,16 @@ setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
     if (all(vapply(object, class, "character") == "GRanges")) {
         return(ssvMakeMembTable(GRangesList(object)))
     }
-    if (all(vapply(object, class, "character") != "character")) {
+    if (any(vapply(object, class, "character") != "character")) {
+        warning("Converting all non-character items to characters.")
         object = lapply(object, as.character)
     }
     if (all(vapply(object, class, "character") == "character")) {
         char_object = object
         object = set_list2memb(char_object)
     } else {
-        stop("can't handle list of non-character classes as object: ",
+        #This may not be reachable anymore but I'm leaving as a backstop
+        stop("Can't handle list of non-character classes as object: ",
              paste(vapply(object, class, "character"), collapse = ", "))
     }
     return(object)
