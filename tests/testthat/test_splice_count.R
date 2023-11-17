@@ -57,22 +57,22 @@ my_test_strand = function(dt, pos_exp, neg_exp, ns_exp){
 }
 
 test_that("splice_count strand - default", {
-    my_test_strand(prof_dt.no_flip, 0, 0, 80)
+    my_test_strand(prof_dt.no_flip, 0, 0, 54)
 })
 
 test_that("splice_count strand - flip", {
-    my_test_strand(prof_dt.flip, 0, 0, 80)
+    my_test_strand(prof_dt.flip, 0, 0, 54)
 })
 
 test_that("splice_count strand - no flip and target_strand", {
-    my_test_strand(prof_dt.no_flip.both, 9, 75, 0)
+    my_test_strand(prof_dt.no_flip.both, 9, 50, 0)
     my_test_strand(prof_dt.no_flip.pos, 9, 0, 0)
-    my_test_strand(prof_dt.no_flip.neg, 0, 75, 0)
+    my_test_strand(prof_dt.no_flip.neg, 0, 50, 0)
 })
 
 test_that("splice_count strand - flip and target_strand", {
-    my_test_strand(prof_dt.flip.both, 75, 9, 0)
-    my_test_strand(prof_dt.flip.pos, 75, 0, 0)
+    my_test_strand(prof_dt.flip.both, 50, 9, 0)
+    my_test_strand(prof_dt.flip.pos, 50, 0, 0)
     my_test_strand(prof_dt.flip.neg, 0, 9, 0)
 })
 #### star strand query_gr ####
@@ -94,9 +94,9 @@ prof_dt.no_flip.both = ssvFetchBam(
 
 
 test_that("splice_count strand - no flip and target_strand", {
-    my_test_strand(prof_dt.no_flip.both, 9, 75, 0)
+    my_test_strand(prof_dt.no_flip.both, 9, 50, 0)
     my_test_strand(prof_dt.no_flip.pos, 9, 0, 0)
-    my_test_strand(prof_dt.no_flip.neg, 0, 75, 0)
+    my_test_strand(prof_dt.no_flip.neg, 0, 50, 0)
 })
 
 
@@ -120,9 +120,9 @@ prof_dt.no_flip.both = ssvFetchBam(
 
 
 test_that("splice_count strand - no flip and target_strand", {
-    my_test_strand(prof_dt.no_flip.both, 9, 75, 0)
+    my_test_strand(prof_dt.no_flip.both, 9, 50, 0)
     my_test_strand(prof_dt.no_flip.pos, 9, 0, 0)
-    my_test_strand(prof_dt.no_flip.neg, 0, 75, 0)
+    my_test_strand(prof_dt.no_flip.neg, 0, 50, 0)
 })
 
 

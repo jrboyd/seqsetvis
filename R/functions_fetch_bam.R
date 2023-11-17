@@ -738,23 +738,25 @@ expandCigar = function(cigar_dt, op_2count = c("M", "D", "=", "X"), return_data.
                     "strand", "start",
                     "cigar") %in% colnames(cigar_dt)))
     reg1 = regexpr("[MIDNSHP=X]", cigar_dt$cigar)
-    cigar_dt[, cigar_w := as.integer(substr(cigar, 1, reg1-1)) - 1L]
+    cigar_dt[, cigar_w := as.integer(substr(cigar, 1, reg1-1))]
     cigar_dt[, cigar_type :=
                  substr(cigar, reg1, reg1+attr(reg1, "match.length")-1L)]
     cigar_dt[, tmp := substring(cigar, reg1 + 1)]
     # these do not consume reference
     cigar_dt[cigar_type %in% c("I", "S", "H", "P"), cigar_w := 0L]
 
+    cigar_dt$end_adj = -1L
+    cigar_dt[cigar_type %in% c("I", "S", "H", "P"), end_adj := 0L]
 
     ass1 = cigar_dt[, list(which_label, seqnames, strand,
-                           start, end  = start + cigar_w, cigar_type)]
+                           start, end  = start + cigar_w + end_adj, cigar_type)]
 
 
     next_dt = cigar_dt[tmp != "", list(which_label,
                                        seqnames,
                                        strand,
-                                       start = end + cigar_w + 1L,
-                                       end = end + cigar_w + 1L,
+                                       start = end + cigar_w,
+                                       end = end + cigar_w,
                                        cigar = tmp)]
     if(nrow(next_dt) > 0){
         return(rbind(ass1,

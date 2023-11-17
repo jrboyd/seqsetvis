@@ -10,6 +10,7 @@ bam_dt = fread(system.file("extdata/test_cigar_dt.csv", package = "seqsetvis"))
 bam_dt[, start := start - min(start) + 1]
 bam_dt = bam_dt[order(start)]
 expand_cigar_dt = seqsetvis:::.expand_cigar_dt
+
 test_that("expand_cigar_dt simple alignment", {
     bdt = bam_dt[cigar == "82M"]
     exp_dt = expand_cigar_dt(bdt)
