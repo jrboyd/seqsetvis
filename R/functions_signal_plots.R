@@ -748,7 +748,7 @@ ssvSignalHeatmap = function(bw_data,
     rclust = plot_dt[, list(cluster_id = unique(get(cluster_))), by = get(row_)]
 
     xfactor = diff(range(xs))
-    xfloor = min(xs) - .5 - xfactor/20
+    xfloor = min(xs) - xfactor/20
     xleft = xfloor - .12*xfactor
     xright = xfloor - .03*xfactor
     if(show_cluster_bars){

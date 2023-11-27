@@ -1,3 +1,6 @@
+# 1.23.2
+* bigfix - heatmaps generated with min_method = "summary" had inappropriate cluster bar spacing.
+
 # 1.23.1
 * BUGFIX for splice_strategy = "splice_count" soft clippped reads would improperly shift position by 1.
 
