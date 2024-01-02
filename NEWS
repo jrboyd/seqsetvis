@@ -1,3 +1,6 @@
+# 1.23.3
+* bugfix - easyLoad_bed (and specifically easyLoad_seacr) now assign unique values of `name` as default.
+
 # 1.23.2
 * bigfix - heatmaps generated with min_method = "summary" had inappropriate cluster bar spacing.
 
