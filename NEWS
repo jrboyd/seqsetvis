@@ -1,3 +1,7 @@
+# 1.23.4
+* bugfix for previous bugfix - easyLoad_FUN was failing when source file was empty
+* bugfix for "center" anchor. Uses shifted result of same code as "left" now.
+
 # 1.23.3
 * bugfix - easyLoad_bed (and specifically easyLoad_seacr) now assign unique values of `name` as default.
 

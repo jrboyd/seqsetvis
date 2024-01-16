@@ -157,10 +157,7 @@ ssvFetchSignal = function(file_paths,
                                    nam_load_signal,
                                    mc.cores = n_cores)
         }
-
     }
-
-
     for (i in seq_along(bw_list)) {
         if(truelength(bw_list[[i]]) < 200){#data.table specific check
             bw_list[[i]] = setalloccol(bw_list[[i]])
@@ -552,13 +549,21 @@ shift_anchor = function(score_dt, window_size, anchor) {
     switch(
         anchor,
         center = {
-            score_dt[, x := start - min(start) + shift, by = id]
+            # score_dt[, x := start - min(start) + shift, by = id]
+            # score_dt[, x := x - round(mean(x)), by = id]
+            # if(window_size %% 2 == 0){
+            #     score_dt[strand == "-", x := -1 * x]
+            # }else{
+            #     score_dt[strand == "-", x := -1 * x - fudge]
+            # }
+            score_dt[, x := -1]
+            score_dt[strand != "-", x := start - min(start) + shift,
+                     by = id]
+            #flip negative
+
+            score_dt[strand == "-", x := -1 * (end - max(end) - shift),
+                     by = id]
             score_dt[, x := x - round(mean(x)), by = id]
-            if(window_size %% 2 == 0){
-                score_dt[strand == "-", x := -1 * x]
-            }else{
-                score_dt[strand == "-", x := -1 * x + fudge]
-            }
 
         },
         center_unstranded = {

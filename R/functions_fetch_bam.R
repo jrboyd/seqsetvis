@@ -372,10 +372,6 @@ ssvFetchBam.single = function(bam_f,
         out_l[[s]] = out
     }
     out = rbindlist(out_l)
-    # if(any(strand(qgr) == "-")){
-    #     toflip = names(subset(qgr, strand == "-"))
-    #     out[id %in% toflip & strand != "*", strand := ifelse(strand == "+", "-", "+")]
-    # }
     out = out[order(x)][order(id)][order(strand)]
 
     if(!return_data.table){
@@ -513,7 +509,6 @@ fetchBam = function(bam_f,
     if(max_dupes < Inf){
         bam_dt = .rm_dupes(bam_dt, max_dupes)
     }
-    # browser()
     if(is.na(fragLen)){
         bam_dt = switch(
             splice_strategy,
@@ -537,15 +532,8 @@ fetchBam = function(bam_f,
     }
     bam_dt$strand = target_strand
     if(splice_strategy == "splice_count"){
-        # browser()
         sp_dt = bam_dt[, .N,
                        by = list(which_label, seqnames, start, end, strand)]
-        # if(flip_strand){
-        #     sp_dt$strand = as.character(GenomicRanges::invertStrand(sp_dt$strand))
-        # }
-        # if(target_strand %in% c("+", "-")){
-        #     sp_dt = sp_dt[strand == target_strand]
-        # }
         return(sp_dt)
     }
     ext_cov = coverage(split(GRanges(bam_dt), bam_dt$which_label))

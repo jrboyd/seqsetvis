@@ -111,7 +111,11 @@ easyLoad_bed = function(file_paths,
         missed = setdiff(c("name", "score", names(extraCols)), colnames(mcols(gr)))
         for(m in missed){
             if(m == "name"){
-                mcols(gr)[[m]] = paste0("DEFAULT_", seq_along(gr))
+                if(length(gr) == 0){
+                    mcols(gr)[[m]] = character()
+                }else{
+                    mcols(gr)[[m]] = paste0("DEFAULT_", seq_along(gr))
+                }
             }else if(m == "score"){
                 mcols(gr)[[m]] = rep(0, length(gr))
             }else{
