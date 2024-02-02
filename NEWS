@@ -1,3 +1,6 @@
+# 1.23.5
+* bugfix to handle edge case of query width less than window size for summary
+
 # 1.23.4
 * bugfix for previous bugfix - easyLoad_FUN was failing when source file was empty
 * bugfix for "center" anchor. Uses shifted result of same code as "left" now.
