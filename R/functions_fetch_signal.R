@@ -109,7 +109,6 @@ ssvFetchSignal = function(file_paths,
              "intended to load duplicate files.")
     }
     stopifnot(file.exists(file_paths))
-    #if (win_method == "sample") {
     qgr = prepare_fetch_GRanges_width(qgr = qgr,
                                       win_size = win_size,
                                       target_size = NULL,
@@ -122,6 +121,13 @@ ssvFetchSignal = function(file_paths,
     }
     n_region_splits = round(n_region_splits)
     stopifnot(n_region_splits >= 1)
+    if (win_method == "summary") {
+        if(any(win_size > width(qgr))){
+            warning("Some query regions (", sum(win_size > width(qgr)), " of ", length(qgr), ") are smaller than the number of windows specified.\n",
+                    "Consider reducing the number of windows or increasing the width of query regions.\n",
+                    "In affected regions, the same base position will be represented at multiple values of x.")
+        }
+    }
 
     if(n_region_splits == 1){
         nam_load_signal = function(nam) {
@@ -395,7 +401,20 @@ viewGRangesWinSummary_dt = function (score_gr,
     stopifnot(n_tiles %% 1 == 0)
     stopifnot(anchor %in% c("center", "center_unstranded", "left",
                             "left_unstranded"))
-    tiles = tile(qgr, n_tiles)
+    if(any(n_tiles > width(qgr))){
+        qgr.sp = split(qgr, ifelse(n_tiles > width(qgr), "too_small", "ok"))
+        tiles.ok = tile(qgr.sp$ok, n_tiles)
+        tiles.too_small = tile(qgr.sp$too_small, width(qgr.sp$too_small))
+        for(i in seq_along(tiles.too_small)){
+            gr_i = tiles.too_small[[i]]
+            idx = round(seq_len(n_tiles)/n_tiles*length(gr_i))
+            tiles.too_small[[i]] = gr_i[idx]
+        }
+        tiles = c(tiles.too_small, tiles.ok)
+    }else{
+        tiles = tile(qgr, n_tiles)
+    }
+
     names(tiles) = NULL
     tiles = unlist(tiles)
     tiles$id = names(tiles)
