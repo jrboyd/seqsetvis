@@ -721,7 +721,7 @@ expandCigar = function(cigar_dt, op_2count = c("M", "D", "=", "X"), return_data.
 #'
 #' @return data.table with cigar entries expanded
 .expand_cigar_dt_recursive = function(cigar_dt){
-    cigar_w = cigar = cigar_type = tmp = which_label = NULL #dt bindings
+    cigar_w = cigar = cigar_type = tmp = which_label = end_adj = NULL #dt bindings
     stopifnot(all(c("which_label", "seqnames",
                     "strand", "start",
                     "cigar") %in% colnames(cigar_dt)))
