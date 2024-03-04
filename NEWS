@@ -1,3 +1,6 @@
+# 1.23.6
+* bugfix for 1.23.5 fix where query width < 1/2 window size for summary
+
 # 1.23.5
 * bugfix to handle edge case of query width less than window size for summary
 

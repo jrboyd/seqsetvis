@@ -407,7 +407,7 @@ viewGRangesWinSummary_dt = function (score_gr,
         tiles.too_small = tile(qgr.sp$too_small, width(qgr.sp$too_small))
         for(i in seq_along(tiles.too_small)){
             gr_i = tiles.too_small[[i]]
-            idx = round(seq_len(n_tiles)/n_tiles*length(gr_i))
+            idx = ceiling(seq_len(n_tiles)/n_tiles*length(gr_i))
             tiles.too_small[[i]] = gr_i[idx]
         }
         tiles = c(tiles.too_small, tiles.ok)
