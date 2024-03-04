@@ -138,14 +138,14 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
     }
 
     p = ggplot(plot_dt) +
-        geom_ribbon(aes(x = x, ymin = low, ymax = high, fill = q_range)) +
+        geom_ribbon(aes(x = x, ymin = low, ymax = high, fill = q_range, color = q_range)) +
         labs(fill = "quantile band",
              y = y_,
              x = "bp",
              title = "Enrichment Profiles",
              subtitle = "aggregated by quantile range") +
         scale_fill_manual(values = cols) +
-        scale_color_manual(breaks = q2do, palette = cols)
+        scale_color_manual(breaks = q2do, values = cols)
     if(length(todo) > 1){
         p = p +
             facet_grid(facet_group ~ .) +
