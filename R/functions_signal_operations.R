@@ -70,7 +70,7 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = c("id", "sample"),
                        splineFun = stats::spline) {
     output_GRanges = FALSE
     if(is(dt, "GRanges")){
-        dt = as.data.table(dt)
+        dt = data.table::as.data.table(dt)
         output_GRanges = TRUE
     }
     stopifnot(data.table::is.data.table(dt))

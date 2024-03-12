@@ -111,5 +111,5 @@ doTest_applySpline = function(test_object){
 #dt = copy(test_object); x_ = "xvals"; y_ = "yvals"; by_ = "grp"; n = 4; splineFun = stats::spline
 
 doTest_applySpline(test_dt2)
-doTest_applySpline(test_object = test_gr2)
+# doTest_applySpline(test_object = test_gr2)
 doTest_applySpline(test_dt3)

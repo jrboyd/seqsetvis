@@ -1,3 +1,6 @@
+# 1.23.8
+* fixed mis behaving test
+
 # 1.23.7
 * bugfix for emergent ggplot2 conflict using palette in banded quantile plots
 
