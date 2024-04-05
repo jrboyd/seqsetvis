@@ -1,3 +1,6 @@
+# 1.23.11
+* make_facet_str - to handle facets
+
 # 1.23.9
 * fixed mis behaving test
 

@@ -306,6 +306,23 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
     p
 }
 
+make_facet_str = function(facet_rows = character(), facet_columns = character()){
+    facet_rows = facet_rows[facet_rows != ""]
+    facet_columns = facet_columns[facet_columns != ""]
+    if(length(facet_rows) > 0){
+        row_str = paste0("`", paste(facet_rows, collapse = "`+`"), "`")
+    }else{
+        row_str = "."
+    }
+    if(length(facet_columns) > 0){
+        col_str = paste0("`", paste(facet_columns, collapse = "`+`"), "`")
+    }else{
+        col_str = "."
+    }
+
+    paste0(row_str, "~", col_str)
+}
+
 #' make_clustering_matrix
 #'
 #' Create a wide matrix from a tidy data.table more suitable for clustering
@@ -370,7 +387,8 @@ make_clustering_matrix = function(tidy_dt,
                 max_rows)
     }
 
-    dc_formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + "))
+    # dc_formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + "))
+    dc_formula = make_facet_str(facet_rows = row_, facet_columns = c(facet_, column_))
     if(is.character(fun.aggregate)){
         fun.aggregate = get(fun.aggregate)
     }

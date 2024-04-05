@@ -122,3 +122,4 @@ ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction =
   GenomeInfoDb::seqlengths(grs_cov) = NA
   grs_cov
 }
+
