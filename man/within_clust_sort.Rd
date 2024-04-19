@@ -51,7 +51,7 @@ clustering, default in Inf}
 }
 \value{
 data.table matching input clust_dt save for the reassignment of
-  levels of row_ variable.
+levels of row_ variable.
 }
 \description{
 Without modifying cluster assignments, modify the order of rows within each

@@ -21,8 +21,8 @@ of NULL results in randomly initialized k-means.}
 }
 \value{
 data.table with group__ variable indicating cluster membership and id__
-  variable that is a factor indicating order based on within cluster
-  similarity
+variable that is a factor indicating order based on within cluster
+similarity
 }
 \description{
 perform kmeans clustering on matrix rows and return reordered matrix along

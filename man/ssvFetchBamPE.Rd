@@ -84,7 +84,7 @@ Uses mc.cores option if not supplied.}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing
-  fetched values.
+fetched values.
 }
 \description{
 Iterates a character vector (ideally named) and calls
@@ -99,8 +99,8 @@ not an issue as each read pair represents a fragment of exact size.
 \code{\link{ssvFetchBamPE.single}} for more info.
 
 if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
-  10, values from positions chr1 5,15,25...85, and 95 will be retrieved from
-  \code{bw_file}
+10, values from positions chr1 5,15,25...85, and 95 will be retrieved from
+\code{bw_file}
 }
 \examples{
 if(Sys.info()['sysname'] != "Windows"){

@@ -21,8 +21,8 @@ Default is "id" and works with ssvFetch* output.}
 }
 \value{
 data.table or GRanges (whichever target is) containing row order and
-  cluster assignment derived from to_copy. Suitable for ssvSignalHeatmap and
-  related functions.
+cluster assignment derived from to_copy. Suitable for ssvSignalHeatmap and
+related functions.
 }
 \description{
 copy_clust_info

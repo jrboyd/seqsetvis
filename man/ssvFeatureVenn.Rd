@@ -2,10 +2,7 @@
 % Please edit documentation in R/functions_feature_plots.R
 \name{ssvFeatureVenn}
 \alias{ssvFeatureVenn}
-\title{ggplot implementation of vennDiagram from limma package.  currently limited
-at 3 sets.  ssvFeatureUpset and ssvFeatureBinaryHeatmap are good options for
-more than 3 sets. ssvFeatureEuler can work too but can take a very long time
-to run for more than 5 or so.}
+\title{ssvFeatureVenn}
 \usage{
 ssvFeatureVenn(
   object,
@@ -26,7 +23,7 @@ ssvFeatureVenn(
 )
 }
 \arguments{
-\item{object}{will be passed to \code{\link{ssvMakeMembTable}} for
+\item{object}{will be passed to \link{ssvMakeMembTable} for
 conversion to membership matrix}
 
 \item{group_names}{useful if names weren't provided or were lost in
@@ -47,7 +44,7 @@ from RColorBrewer by default.}
 
 \item{fill_alpha}{alpha value to use for fill, defaults to .3.}
 
-\item{line_alpha}{numeric [0,1], alpha value for circle line}
+\item{line_alpha}{numeric \link{0,1}, alpha value for circle line}
 
 \item{counts_color}{character. single color to use for displaying counts}
 
@@ -67,9 +64,9 @@ is instead the data used to generate that plot. Default is FALSE.}
 ggplot venn diagram
 }
 \description{
-ggplot implementation of vennDiagram from limma package.  currently limited
-at 3 sets.  ssvFeatureUpset and ssvFeatureBinaryHeatmap are good options for
-more than 3 sets. ssvFeatureEuler can work too but can take a very long time
+ggplot implementation of vennDiagram from limma package.  Currently limited
+at 3 sets.  \link{ssvFeatureUpset} and \link{ssvFeatureBinaryHeatmap} are good options for
+more than 3 sets. \link{ssvFeatureEuler} can work too but can take a very long time
 to run for more than 5 or so.
 }
 \examples{

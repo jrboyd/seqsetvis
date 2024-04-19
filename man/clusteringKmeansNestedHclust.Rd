@@ -38,8 +38,8 @@ the items are assigned to. Default of NULL allows clustering to proceed.}
 }
 \value{
 data.table with 2 columns of cluster info. id__ column corresponds with
-  input matrix rownames and is sorted within each cluster using hierarchical
-  clusering group__ column indicates cluster assignment
+input matrix rownames and is sorted within each cluster using hierarchical
+clusering group__ column indicates cluster assignment
 }
 \description{
 perform kmeans clustering on matrix rows and return reordered matrix along

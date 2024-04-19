@@ -65,7 +65,7 @@ but may have applications where win_method == "sample".}
 }
 \value{
 tidy GRanges (or data.table if specified) with pileups from bam file.
-  pileup is calculated only every win_size bp.
+pileup is calculated only every win_size bp.
 }
 \description{
 fetch a windowed version of a paired-end bam file, returns GRanges

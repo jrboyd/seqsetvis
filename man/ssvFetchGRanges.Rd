@@ -79,7 +79,7 @@ but may have applications where win_method == "sample".}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing
-  fetched values.
+fetched values.
 }
 \description{
 \code{ssvFetchGRanges} Gets coverage values for each region of the query

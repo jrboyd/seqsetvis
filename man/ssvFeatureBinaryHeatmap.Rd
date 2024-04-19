@@ -2,9 +2,7 @@
 % Please edit documentation in R/functions_feature_plots.R
 \name{ssvFeatureBinaryHeatmap}
 \alias{ssvFeatureBinaryHeatmap}
-\title{binary heatmap indicating membership.
-heatmap is sorted by column left to right.
-change column order to reveal patterns}
+\title{ssvFeatureBinaryHeatmap}
 \usage{
 ssvFeatureBinaryHeatmap(
   object,
@@ -42,9 +40,15 @@ is instead the data used to generate that plot. Default is TRUE}
 ggplot using geom_tile of membership table sorted from left to right.
 }
 \description{
-binary heatmap indicating membership.
-heatmap is sorted by column left to right.
-change column order to reveal patterns
+Outputs a ggplot binary heatmap, where color indicates TRUE and the other
+indicates FALSE in a membership table. The heatmap is sorted, TRUE at the
+top, by column left to right. Changes to column order can reveal different
+patterns.
+}
+\details{
+As a svg output, the final plot can be unwieldy. The default of
+\code{raster_approximation} = TRUE is easier to work with, especially for larger
+membership tables.
 }
 \examples{
 ssvFeatureBinaryHeatmap(list(1:3, 2:6))

@@ -15,7 +15,7 @@ overlap of MCF10A CTCF with MCF7 chromHMM states, hg38.
 part of \code{\link{chromHMM_demo_data}}
 
 the result of ssvOverlapIntervalSets() on MCF10A CTCF peaks and
-         MCF7 chromHMM states with use_first = TRUE
+MCF7 chromHMM states with use_first = TRUE
 
 first (the MCF10A peaks) and no_hit columns have been removed
 each remaining column represents MCF10A peaks overlapping with a state.

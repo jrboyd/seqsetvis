@@ -17,7 +17,7 @@ prepare_fetch_GRanges_width(
 
 \item{win_size}{numeric window size for fetch}
 
-\item{min_quantile}{numeric [0,1], lowest possible quantile value.  Only
+\item{min_quantile}{numeric \link{0,1}, lowest possible quantile value.  Only
 relevant if target_size is not specified.}
 
 \item{target_size}{numeric final width of qgr if known. Default of NULL

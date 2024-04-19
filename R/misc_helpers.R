@@ -42,6 +42,8 @@ set_list2memb = function(set_list) {
     return(memb)
 }
 
+#' safeBrew
+#'
 #' Allows RColorBrew to handle n values less than 3 and greater than 8 without
 #' warnings and return expected number of colors.
 #'
@@ -280,6 +282,8 @@ applyMovingAverage = function(dt, n, centered = TRUE, x_ = "x", y_ = "y", by_ = 
 
 }
 
+#' ggellipse
+#'
 #' returns a ggplot with ellipses drawn using specified parameters
 #' used by ssvFeatureVenn and ssvFeatureEuler
 #'

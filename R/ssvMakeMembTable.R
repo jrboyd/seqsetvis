@@ -76,7 +76,7 @@ setMethod("ssvMakeMembTable",
 #' gr$set_b = c(FALSE, TRUE, TRUE)
 #' ssvMakeMembTable(gr)
 setMethod("ssvMakeMembTable", signature(object = "GRanges"), function(object){
-    mc_object = mcols(object)
+    mc_object = GenomicRanges::mcols(object)
     rownames(mc_object) = names(object)
     ssvMakeMembTable(mc_object)
 })
@@ -124,6 +124,14 @@ setMethod("ssvMakeMembTable", signature(object = "matrix"), function(object){
 #' ssvMakeMembTable(memb_df)
 setMethod("ssvMakeMembTable",
           signature(object = "data.frame"), function(object){
+              col_is_logical = vapply(X = seq(ncol(object)),
+                                   FUN = function(i)is.logical(object[,i]),
+                                   FUN.VALUE = TRUE)
+              if(!all(col_is_logical)){
+                  message("Non-logical class columns have been dropped.")
+                  object = object[, col_is_logical, drop = FALSE]
+              }
+
               if (is.null(colnames(object))) {
                   colnames(object) = paste0("set_", LETTERS[seq_len(ncol(object))])
               }

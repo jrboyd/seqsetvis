@@ -14,7 +14,7 @@ object for which a split method exists. Typically vector-like, allowing
 subsetting with "[".}
 
 \item{FUN}{The function to be applied to each element of X: see apply,
-sapply, and lapply. In the case of functions like +, '%*%', etc., the
+sapply, and lapply. In the case of functions like +, '\%*\%', etc., the
 function name must be backquoted or quoted. If FUN is NULL, pbtapply
 returns a vector which can be used to subscript the multi-way array
 pbtapply normally produces.}

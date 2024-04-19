@@ -38,7 +38,7 @@ bigwig. Default is 'sample'}
 \item{target_strand}{character. if one of "+" or "-", reads are filtered to
 match. ignored if any other value.}
 
-\item{absolute_strand}{If TRUE, strandedness of `qgr` will be ignored. This
+\item{absolute_strand}{If TRUE, strandedness of \code{qgr} will be ignored. This
 is useful when creating tracks for similar.}
 
 \item{splice_strategy}{character, one of c("none", "ignore", "add", "only",
@@ -75,7 +75,7 @@ parallelization. Default is 1, no split.}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing
-  fetched values.
+fetched values.
 }
 \description{
 ssvFetchBamPE.RNA

@@ -10,25 +10,29 @@
 ssvAnnotateSubjectGRanges(
   annotation_source,
   subject_gr,
-  annotation_name = NULL
+  annotation_name = NULL,
+  multi_resolver_FUN = "default"
 )
 
 \S4method{ssvAnnotateSubjectGRanges}{GRanges}(
   annotation_source,
   subject_gr,
-  annotation_name = NULL
+  annotation_name = NULL,
+  multi_resolver_FUN = "default"
 )
 
 \S4method{ssvAnnotateSubjectGRanges}{list}(
   annotation_source,
   subject_gr,
-  annotation_name = NULL
+  annotation_name = NULL,
+  multi_resolver_FUN = "default"
 )
 
 \S4method{ssvAnnotateSubjectGRanges}{GRangesList}(
   annotation_source,
   subject_gr,
-  annotation_name = NULL
+  annotation_name = NULL,
+  multi_resolver_FUN = "default"
 )
 }
 \arguments{
@@ -37,9 +41,16 @@ ssvAnnotateSubjectGRanges(
 \item{subject_gr}{The base GRanges to add annotation mcols to.}
 
 \item{annotation_name}{Optional name for single GRanges. Required for list inputs if list does not have names.}
+
+\item{multi_resolver_FUN}{Optional function to resolve multiple overlapping
+annotation source regions per subject region. This function must accept 2
+arguments. \code{x} is the values in a single mcol attribute and \code{variable.name}
+is the name of variable. A single value must be returned or an error will
+be generated. The default of "default" can handle numeric, logical,
+character, and factor types.}
 }
 \value{
-GRanges with the same regions as `subject_gr` but with addtional mcols added from annotation_source.
+GRanges with the same regions as \code{subject_gr} but with addtional mcols added from annotation_source.
 }
 \description{
 ssvAnnotateSubjectGRanges
