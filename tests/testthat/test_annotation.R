@@ -117,23 +117,57 @@ test_that("ssvAnnotateSubjectGRanges - list of GRs - error no names", {
     expect_error(ssvAnnotateSubjectGRanges(bad_grs, olap_gr), "annotation_source must have names set.")
 })
 
-test_that("ssvAnnotateSubjectGranges - multiple overlapping annotatation_source", {
+test_that("ssvOverlapIntervalSets and ssvConsensusIntervalSets - message", {
+    #when np_grs overlap multi-multi it's not clear which metadata should be preserved.
+    expect_message({
+        olap_anno_gr = ssvOverlapIntervalSets(np_grs, preserve_mcols = TRUE, ext = 50000000)
+    },
+    "Resolving multiple overlapping annotatation_source items with default function"
+    )
+
+    expect_message({
+        cons_anno_gr = ssvConsensusIntervalSets(np_grs, preserve_mcols = TRUE, ext = 500000)
+    },
+    "Resolving multiple overlapping annotatation_source items with default function"
+    )
+
+    expect_message({
+        anno_gr = ssvAnnotateSubjectGRanges(annotation_source = np_grs$MCF10A_CTCF, subject_gr = olap_anno_gr[1])
+    },
+    "Resolving multiple overlapping annotatation_source items with default function"
+    )
+
 
 })
 
-#when np_grs overlap multi-multi it's not clear which metadata should be preserved.
-olap_anno_gr = ssvOverlapIntervalSets(np_grs, preserve_mcols = TRUE, ext = 50000000)
-subsetByOverlaps(np_grs$MCF10A_CTCF, olap_anno_gr[1])
-olap_anno_gr[1]
+test_that("ssvAnnotateSubjectGranges - multiple overlapping annotatation_source", {
+    test_multi_resolver_FUN = function(x, variable.name = NULL){
+        if(is.character(x)){
+            x = "a"
+        }else if(is.numeric(x)){
+            x = 1
+        }else if(is.factor(x)){
+            x = factor("a")
+        }else if(is.logical(x)){
+            x = TRUE
+        }
+        x
+    }
 
-cons_anno_gr = ssvConsensusIntervalSets(np_grs, preserve_mcols = TRUE, ext = 500000)
-cons_anno_gr
+    olap_anno_gr = ssvOverlapIntervalSets(np_grs, preserve_mcols = TRUE, ext = 50000000)
+    mcols(olap_anno_gr) = NULL
 
-verify_olaps = findOverlaps(olap_anno_gr, cons_anno_gr)
-any(duplicated(subjectHits(verify_olaps)))
-any(duplicated(queryHits(verify_olaps)))
+    anno_multi = ssvAnnotateSubjectGRanges(annotation_source = np_grs, subject_gr = olap_anno_gr[1])
+    expect_equal(length(anno_multi), 1)
+    expect_equal(anno_multi$score.MCF10A_CTCF, 3683)
+    expect_equal(anno_multi$name.MCF10A_CTCF, "MCF10A_CTCF_pooled_peak_1190-from_11")
+
+    anno_test = ssvAnnotateSubjectGRanges(annotation_source = np_grs, subject_gr = olap_anno_gr[1], multi_resolver_FUN = test_multi_resolver_FUN)
+    expect_equal(length(anno_test), 1)
+    expect_equal(anno_test$score.MCF10A_CTCF, 1)
+    expect_equal(anno_test$name.MCF10A_CTCF, "a")
+
+})
 
 
-ssvAnnotateSubjectGRanges(annotation_source = np_grs$MCF10A_CTCF, subject_gr = olap_anno_gr[1])
-annotation_source = np_grs$MCF10A_CTCF
-subject_gr = olap_anno_gr[1:3]
+
