@@ -23,7 +23,7 @@ could be "y_norm" if append_ynorm was applied to data.}
 }
 \value{
 a GRanges with same mcols as qgr that has been centered based on
-  signal in prof_dt and with regions of specified width.
+signal in prof_dt and with regions of specified width.
 }
 \description{
 Centers query GRanges at maximum signal in prof_dt.

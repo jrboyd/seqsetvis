@@ -65,8 +65,8 @@ but may have applications where win_method == "sample".}
 }
 \value{
 A GRanges with values read from file_paths at intervals of win_size.
-  Originating file is coded by unique_names and assigned to column of name
-  names_variable.  Output is data.table is return_data.table is TRUE.
+Originating file is coded by unique_names and assigned to column of name
+names_variable.  Output is data.table is return_data.table is TRUE.
 }
 \description{
 Does nothing unless load_signal is overridden to carry out reading data from
@@ -75,8 +75,8 @@ file_paths (likely via the appropriate ssvFetch* function, ie.
 }
 \details{
 load_signal is passed f, nam, and qgr and is executed in the
-  environment where load_signal is defined. See \code{\link{ssvFetchBigwig}}
-  and \code{\link{ssvFetchBam}} for examples.
+environment where load_signal is defined. See \code{\link{ssvFetchBigwig}}
+and \code{\link{ssvFetchBam}} for examples.
 }
 \examples{
 library(GenomicRanges)

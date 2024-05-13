@@ -8,6 +8,12 @@
 #' merge
 #' @param use_first A logical.  If True, instead of merging all grs, only use
 #' first and add metadata logicals for others.
+#' @param preserve_mcols Controls carrying forward mcols metadata from input
+#'   list of GRanges. If TRUE, all mcols will be carried forward with the item
+#'   name appended. If a character vector, only those attributes will be carried
+#'   and all must be present in all GRanges. The default of FALSE will carry
+#'   nothing forward and only membership table will be generated.
+#'   [ssvAnnotateSubjectGRanges] is used internally.
 #' @param ... arguments passed to IRanges::findOverlaps, i.e. maxgap, minoverlap, type, select, invert.
 #' @return GRanges with metadata columns describing overlap of input grs.
 #' @examples
@@ -16,7 +22,7 @@
 #' b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
 #' ssvOverlapIntervalSets(list(a, b))
 #' @import GenomicRanges
-ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE, ...){
+ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE, preserve_mcols = FALSE, ...){
   queryHits = NULL
   if(is(grs, "GRangesList")){
     grs = as.list(grs)
@@ -51,6 +57,9 @@ ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE, ...){
     }
   })
   names(base_gr) = seq_along(base_gr)
+  if(preserve_mcols){
+      base_gr = ssvAnnotateSubjectGRanges(grs, base_gr)
+  }
   return(base_gr)
 }
 
@@ -67,6 +76,12 @@ ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE, ...){
 #'   grs that must overlap for a site to be considered consensus.
 #' @param min_fraction A numeric between 0 and 1 specifying the fraction of grs
 #'   that must overlap to be considered consensus.
+#' @param preserve_mcols Controls carrying forward mcols metadata from input
+#'   list of GRanges. If TRUE, all mcols will be carried forward with the item
+#'   name appended. If a character vector, only those attributes will be carried
+#'   and all must be present in all GRanges. The default of FALSE will carry
+#'   nothing forward and only membership table will be generated.
+#'   [ssvAnnotateSubjectGRanges] is used internally.
 #' @param ... arguments passed to IRanges::findOverlaps, i.e. maxgap, minoverlap, type, select, invert.
 #' @details Only the most stringent of min_number or min_fraction will be
 #'   applied.
@@ -80,7 +95,7 @@ ssvOverlapIntervalSets = function(grs, ext = 0, use_first = FALSE, ...){
 #' a = GRanges("chr1", IRanges(1:7*10, 1:7*10))
 #' b = GRanges("chr1", IRanges(5:10*10, 5:10*10))
 #' ssvConsensusIntervalSets(list(a, b))
-ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction = .5, ...){
+ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction = .5, preserve_mcols = FALSE, ...){
   if(is(grs, "GRangesList")){
     grs = as.list(grs)
   }
@@ -120,5 +135,9 @@ ssvConsensusIntervalSets = function(grs, ext = 0, min_number = 2, min_fraction =
     mcols(grs_cov)[[nam]][queryHits(olaps)] = TRUE
   }
   GenomeInfoDb::seqlengths(grs_cov) = NA
+  if(preserve_mcols){
+      grs_cov = ssvAnnotateSubjectGRanges(annotation_source = grs, subject_gr = grs_cov)
+  }
   grs_cov
 }
+

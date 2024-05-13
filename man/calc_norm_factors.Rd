@@ -37,10 +37,11 @@ data.table mapping by2 to cap_value_.
 Calculate normalization factors in a two step process:
 }
 \details{
-1) summarize every region for each sample (default summary function is max)
-
-2) caclulate a value to cap each sample to based on regions (default is 95th
+\enumerate{
+\item summarize every region for each sample (default summary function is max)
+\item caclulate a value to cap each sample to based on regions (default is 95th
 quantile).
+}
 
 The uderlying assumption here is that meaningful enrichment is present at the
 majority of regions provided.  If prevalence varies by a specific factor, say

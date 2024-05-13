@@ -59,8 +59,8 @@ passed to \code{\link{viewGRangesWinSummary_dt}}.}
 default value "auto" causes an automatic calculation from 100 regions in
 qgr.  NA causes no extension of reads to fragment size.}
 
-\item{target_strand}{character. One of c("*", "+", "-"). Controls filtering
-of reads by strand.  Default of "*" combines both strands.}
+\item{target_strand}{character. One of c("\emph{", "+", "-"). Controls filtering
+of reads by strand.  Default of "}" combines both strands.}
 
 \item{flip_strand}{boolean. if TRUE strands are flipped.}
 
@@ -96,7 +96,7 @@ but may have applications where win_method == "sample".}
 }
 \value{
 A tidy formatted GRanges (or data.table if specified) containing
-  fetched values.
+fetched values.
 }
 \description{
 \code{ssvFetchBam} iteratively calls \code{fetchWindowedBam.single}. See
@@ -104,8 +104,8 @@ A tidy formatted GRanges (or data.table if specified) containing
 }
 \details{
 if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
-  10, values from positions chr1 5,15,25...85, and 95 will be retrieved from
-  \code{bw_file}
+10, values from positions chr1 5,15,25...85, and 95 will be retrieved from
+\code{bw_file}
 }
 \examples{
 if(Sys.info()['sysname'] != "Windows"){

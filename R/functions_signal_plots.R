@@ -6,8 +6,8 @@
 #' @param x_ the variable name in bw_data for x axis in plot
 #' @param by_ the variable name in bw_data to facet on
 #' @param hsv_reverse logical, should color scale be reversed? default FALSE
-#' @param hsv_saturation numeric [0, 1] saturation for color scale. default 1
-#' @param hsv_value numeric [0, 1] value for color scale. default 1
+#' @param hsv_saturation numeric value from 0 to 1. Saturation for color scale. default 1
+#' @param hsv_value numeric value from 0 to 1. Value for color scale. default 1
 #' @param hsv_grayscale logical, if TRUE gray() is used instead of rainbow(). default FALSE
 #' @param hsv_hue_min numeric [0, hsv_hue_max) hue min of color scale
 #' @param hsv_hue_max numeric (hsv_hue_min, 1] hue max of color scale
@@ -306,6 +306,23 @@ ssvSignalScatterplot = function(bw_data, x_name, y_name,
     p
 }
 
+make_facet_str = function(facet_rows = character(), facet_columns = character()){
+    facet_rows = facet_rows[facet_rows != ""]
+    facet_columns = facet_columns[facet_columns != ""]
+    if(length(facet_rows) > 0){
+        row_str = paste0("`", paste(facet_rows, collapse = "`+`"), "`")
+    }else{
+        row_str = "."
+    }
+    if(length(facet_columns) > 0){
+        col_str = paste0("`", paste(facet_columns, collapse = "`+`"), "`")
+    }else{
+        col_str = "."
+    }
+
+    paste0(row_str, "~", col_str)
+}
+
 #' make_clustering_matrix
 #'
 #' Create a wide matrix from a tidy data.table more suitable for clustering
@@ -370,7 +387,8 @@ make_clustering_matrix = function(tidy_dt,
                 max_rows)
     }
 
-    dc_formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + "))
+    # dc_formula = paste(row_, "~", paste(c(facet_, column_), collapse = " + "))
+    dc_formula = make_facet_str(facet_rows = row_, facet_columns = c(facet_, column_))
     if(is.character(fun.aggregate)){
         fun.aggregate = get(fun.aggregate)
     }

@@ -9,13 +9,16 @@
 #   - list containing character vectors of set members
 #   - list of GRanges
 
-#' ggplot implementation of vennDiagram from limma package.  currently limited
-#' at 3 sets.  ssvFeatureUpset and ssvFeatureBinaryHeatmap are good options for
-#' more than 3 sets. ssvFeatureEuler can work too but can take a very long time
+#' ssvFeatureVenn
+#'
+#' ggplot implementation of vennDiagram from limma package.  Currently limited
+#' at 3 sets.  [ssvFeatureUpset] and [ssvFeatureBinaryHeatmap] are good options for
+#' more than 3 sets. [ssvFeatureEuler] can work too but can take a very long time
 #' to run for more than 5 or so.
+#'
 #' @export
 #'
-#' @param object will be passed to \code{\link{ssvMakeMembTable}} for
+#' @param object will be passed to [ssvMakeMembTable] for
 #' conversion to membership matrix
 #' @param group_names useful if names weren't provided or were lost in
 #' creating membership matrix
@@ -28,11 +31,11 @@
 #' @param circle_colors colors to use for circle line colors. Uses Dark2 set
 #' from RColorBrewer by default.
 #' @param fill_alpha alpha value to use for fill, defaults to .3.
-#' @param line_alpha numeric [0,1], alpha value for circle line
+#' @param line_alpha numeric value from 0 to 1. Alpha value for circle line
 #' @param counts_color character. single color to use for displaying counts
 #' @param counts_as_percent if TRUE, convert counts to percentages in plots.
 #' @param percentage_digits The number of digits to round percentages to, default is 1.
-#' @param percentage_suffix The character to append to percentages, default is "\%".
+#' @param percentage_suffix The character to append to percentages, default is "%".
 #' @param n_points integer.  number of points to approximate circle with.
 #' default is 200.
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and
@@ -183,15 +186,20 @@ ssvFeatureVenn = function(object,
 
 #' ssvFeatureUpset
 #'
-#' Uses the UpSetR package to create an upset plot of overlaps.
+#' Uses the UpSetR package to create an [UpSetR::upset] plot of region overlaps.
 #'
-#' @param object will be passed to \code{\link{ssvMakeMembTable}} for
-#' conversion to membership matrix
-#' @param return_UpSetR If TRUE, return the UpSetR object, The default is FALSE and results in a ggplotified version compatible with cowplot etc.
+#' @param object will be passed to \code{\link{ssvMakeMembTable}} for conversion
+#'   to membership matrix
+#' @param return_UpSetR If TRUE, return the UpSetR object, The default is FALSE
+#'   and results in a ggplotified version compatible with cowplot etc.
 #' @param nsets Number of sets to look at
-#' @param nintersects Number of intersections to plot. If set to NA, all intersections will be plotted.
-#' @param order.by How the intersections in the matrix should be ordered by. Options include frequency (entered as "freq"), degree, or both in any order.
-#' @param ... Additional parameters passed to \code{\link[UpSetR]{upset}} in the UpSetR  package.
+#' @param nintersects Number of intersections to plot. If set to NA, all
+#'   intersections will be plotted.
+#' @param order.by How the intersections in the matrix should be ordered by.
+#'   Options include frequency (entered as "freq"), degree, or both in any
+#'   order.
+#' @param ... Additional parameters passed to \code{\link[UpSetR]{upset}} in the
+#'   UpSetR  package.
 #'
 #' @return ggplot version of UpSetR plot
 #' @export
@@ -239,8 +247,8 @@ ssvFeatureUpset = function(object,
 #' @param shape shape argument passed to eulerr::euler
 #' @param n_points number of points to use for drawing ellipses, passed to
 #' eulerr:::ellipse
-#' @param fill_alpha numeric [0,1], alpha value for circle fill
-#' @param line_alpha numeric [0,1], alpha value for circle line
+#' @param fill_alpha numeric value from 0 to 1. Alpha value for circle fill
+#' @param line_alpha numeric value from 0 to 1. Alpha value for circle line
 #' @param circle_colors colors to choose from for circles.  passed to ggplot2
 #' color scales.
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and
@@ -380,7 +388,10 @@ ssvFeatureBars = function(object,
     return(p)
 }
 
-#' pie plot of set sizes
+#' ssvFeaturePie
+#'
+#' Generate a ggplot pie plot of set sizes.
+#'
 #' @export
 #' @param object object that ssvMakeMembTable can convert to logical matrix
 #'   membership
@@ -442,9 +453,17 @@ ssvFeaturePie = function(object, slice_colors = NULL, return_data = FALSE) {
 
 
 
-#' binary heatmap indicating membership.
-#' heatmap is sorted by column left to right.
-#' change column order to reveal patterns
+#' ssvFeatureBinaryHeatmap
+#'
+#' Outputs a ggplot binary heatmap, where color indicates TRUE and the other
+#' indicates FALSE in a membership table. The heatmap is sorted, TRUE at the
+#' top, by column left to right. Changes to column order can reveal different
+#' patterns.
+#'
+#' As a svg output, the final plot can be unwieldy. The default of
+#' `raster_approximation` = TRUE is easier to work with, especially for larger
+#' membership tables.
+#'
 #' @export
 #' @param object passed to ssvMakeMembTable
 #' @param raster_approximation If TRUE, instead of standard ggplot, write

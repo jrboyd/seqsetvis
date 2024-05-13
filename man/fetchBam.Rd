@@ -47,7 +47,7 @@ extension. Default is FALSE.}
 }
 \value{
 GRanges containing tag pileup values in score meta column.  tags are
-  optionally extended to fragment length (fragLen) prior to pile up.
+optionally extended to fragment length (fragLen) prior to pile up.
 }
 \description{
 fetch a bam file pileup with the ability to consider read extension to

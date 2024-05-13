@@ -2,8 +2,7 @@
 % Please edit documentation in R/misc_helpers.R
 \name{safeBrew}
 \alias{safeBrew}
-\title{Allows RColorBrew to handle n values less than 3 and greater than 8 without
-warnings and return expected number of colors.}
+\title{safeBrew}
 \usage{
 safeBrew(n, pal = "Dark2")
 }
@@ -16,15 +15,18 @@ unique item or factor level repsectively.}
 }
 \value{
 a character vector of hex coded colors of length n from the color
-  brewer palette pal. If n is supplied as character or factor, output will be
-  named accordingly.
+brewer palette pal. If n is supplied as character or factor, output will be
+named accordingly.
 }
 \description{
+Allows RColorBrew to handle n values less than 3 and greater than 8 without
+warnings and return expected number of colors.
+}
+\details{
 For convenience, instead of the number n requested, n may be a character or
 factor vector and outputs will be appropriately named for use with
 scale_color/fill_manual.
-}
-\details{
+
 Additionally, accepts pal as "gg", "ggplot", or "ggplot2" to reproduce
 default ggplot colors in the same way.
 }

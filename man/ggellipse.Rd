@@ -2,8 +2,7 @@
 % Please edit documentation in R/misc_helpers.R
 \name{ggellipse}
 \alias{ggellipse}
-\title{returns a ggplot with ellipses drawn using specified parameters
-used by ssvFeatureVenn and ssvFeatureEuler}
+\title{ggellipse}
 \usage{
 ggellipse(
   xcentres,
@@ -40,9 +39,9 @@ null safeBrew of Dark2 is used}
 \item{group_names}{character/factor names of color/fill groups.  capital
 letters by default.}
 
-\item{line_alpha}{numeric [0,1] alpha of lines, 1 by default}
+\item{line_alpha}{numeric value from 0 to 1. alpha of lines, 1 by default}
 
-\item{fill_alpha}{numeric [0,1] alpha of fill, .3 by default.}
+\item{fill_alpha}{numeric value from 0 to 1. alpha of fill, .3 by default.}
 
 \item{line_width}{numeric > 0.  passed to size. 2 by default}
 
@@ -53,6 +52,10 @@ letters by default.}
 a ggplot containing ellipses
 }
 \description{
+returns a ggplot with ellipses drawn using specified parameters
+used by ssvFeatureVenn and ssvFeatureEuler
+}
+\details{
 uses eulerr's non-exported ellipse drawing coordinate function
 }
 \examples{

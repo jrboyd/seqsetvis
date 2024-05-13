@@ -1,5 +1,5 @@
 
-valid_sort_strategies = c("hclust", "sort", "left", "right", "reverse")
+valid_sort_strategies = c("hclust", "sort", "left", "right", "none", "reverse")
 
 #' Clustering as for a heatmap.  This is used internally by
 #' \code{\link{ssvSignalHeatmap}} but can also be run before calling
@@ -44,10 +44,10 @@ valid_sort_strategies = c("hclust", "sort", "left", "right", "reverse")
 #' @param clustering_col_max numeric maximum for col range considered when
 #'   clustering, default in Inf
 #' @param within_order_strategy one of "hclust", "sort", "right", "left",
-#'   "reverse".  If "hclust", hierarchical clustering will be used. If "sort", a
-#'   simple decreasing sort of rosSums.  If "left", will atttempt to put high
-#'   signal on left ("right" is opposite).  If "reverse" reverses existing order
-#'   (should only be used after meaningful order imposed).
+#'   "none", "reverse".  If "hclust", hierarchical clustering will be used. If
+#'   "sort", a simple decreasing sort of rosSums.  If "left", will attempt to
+#'   put high signal on left ("right" is opposite).  If "none", existing order
+#'   is preserved.  If "reverse" reverses existing order.
 #' @param dcast_fill value to supply to dcast fill argument. default is NA.
 #' @param iter.max Number of max iterations to allow for k-means. Default is 30.
 #' @param fun.aggregate Function to aggregate when multiple values present for
@@ -67,9 +67,21 @@ valid_sort_strategies = c("hclust", "sort", "left", "right", "reverse")
 #' clust_dt3 = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 2,
 #'     clustering_col_min = -250, clustering_col_max = -150)
 #' ssvSignalHeatmap(clust_dt3)
-#' clust_dt4 = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 2,
-#'     clustering_col_min = 150, clustering_col_max = 250)
+#'
+#' # there are also multiple sorting strategies to apply within each cluster
+#' clust_dt4 = ssvSignalClustering(
+#'   CTCF_in_10a_profiles_gr,
+#'   nclust = 2,
+#'   within_order_strategy = "left"
+#' )
 #' ssvSignalHeatmap(clust_dt4)
+#'
+#' clust_dt5 = ssvSignalClustering(
+#'   CTCF_in_10a_profiles_gr,
+#'   nclust = 2,
+#'   within_order_strategy = "sort"
+#' )
+#' ssvSignalHeatmap(clust_dt5)
 ssvSignalClustering = function(bw_data,
                                nclust = NULL,
                                k_centroids = NULL,
@@ -370,9 +382,15 @@ within_clust_sort.mat_dt = function(mat_dt, mat, within_order_strategy){
         }else if(within_order_strategy == "sort"){
             mat_dt[group__ == i, ]$within_o = rank(-rowSums(cmat))
         }else if(within_order_strategy == "left"){
-            mat_dt[group__ == i, ]$within_o = rank(apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
+            #cmat must be column ordered by position
+            o = order(as.numeric(sapply(strsplit(colnames(cmat), "_"), function(x)x[length(x)])))
+            mat_dt[group__ == i, ]$within_o = rank(apply(cmat[, o], 1, function(x){which.max(x)[1]}))
         }else if(within_order_strategy == "right"){
-            mat_dt[group__ == i, ]$within_o = rank(-apply(cmat, 1, function(x){weighted.mean(seq_along(x), x)}))
+            #cmat must be column ordered by position
+            o = order(as.numeric(sapply(strsplit(colnames(cmat), "_"), function(x)x[length(x)])))
+            mat_dt[group__ == i, ]$within_o = rank(-apply(cmat[, o], 1, function(x){which.max(x)[1]}))
+        }else if(within_order_strategy == "none"){
+            mat_dt[group__ == i, ]$within_o = seq_len(nrow(cmat))
         }else if(within_order_strategy == "reverse"){
             mat_dt[group__ == i, ]$within_o = rev(seq_len(nrow(cmat)))
         }
@@ -446,7 +464,7 @@ within_clust_sort = function(clust_dt,
                              fill_ = "y",
                              facet_ = "sample",
                              cluster_ = "cluster_id",
-                             within_order_strategy = c("hclust", "sort", "left", "right")[2],
+                             within_order_strategy = c("hclust", "sort", "left", "right", "none", "reverse")[2],
                              clustering_col_min = -Inf,
                              clustering_col_max = Inf,
                              dcast_fill = NA) {

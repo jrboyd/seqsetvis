@@ -2,7 +2,7 @@
 % Please edit documentation in R/functions_feature_plots.R
 \name{ssvFeaturePie}
 \alias{ssvFeaturePie}
-\title{pie plot of set sizes}
+\title{ssvFeaturePie}
 \usage{
 ssvFeaturePie(object, slice_colors = NULL, return_data = FALSE)
 }
@@ -19,7 +19,7 @@ instead the data used to generate that plot. Default is FALSE.}
 ggplot pie graph of set sizes
 }
 \description{
-pie plot of set sizes
+Generate a ggplot pie plot of set sizes.
 }
 \examples{
 ssvFeaturePie(list(1:3, 2:6))

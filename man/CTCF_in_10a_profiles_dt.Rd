@@ -11,20 +11,20 @@ A tidy data.table of 2100 rows and 9 columns
 }
 \description{
 A tidy data.table at window size 50 bp within 350 bp of peak center
- The variables are as follows:
+The variables are as follows:
 }
 \details{
 part of \code{\link{CTCF_in_10a_data}}
 \enumerate{
-  \item seqnames. chromosome for GRanges compatibility
-  \item start. start of interval
-  \item end. end of interval
-  \item width. width of interval
-  \item strand. leftover from GRanges.
-  \item id. unique identifier
-  \item y. fold-enrichment over input.
-  \item x. bp relative to center
-  \item sample. name of originating sample
+\item seqnames. chromosome for GRanges compatibility
+\item start. start of interval
+\item end. end of interval
+\item width. width of interval
+\item strand. leftover from GRanges.
+\item id. unique identifier
+\item y. fold-enrichment over input.
+\item x. bp relative to center
+\item sample. name of originating sample
 }
 }
 \keyword{datasets}
