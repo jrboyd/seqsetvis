@@ -39,9 +39,9 @@ null safeBrew of Dark2 is used}
 \item{group_names}{character/factor names of color/fill groups.  capital
 letters by default.}
 
-\item{line_alpha}{numeric \link{0,1} alpha of lines, 1 by default}
+\item{line_alpha}{numeric value from 0 to 1. alpha of lines, 1 by default}
 
-\item{fill_alpha}{numeric \link{0,1} alpha of fill, .3 by default.}
+\item{fill_alpha}{numeric value from 0 to 1. alpha of fill, .3 by default.}
 
 \item{line_width}{numeric > 0.  passed to size. 2 by default}
 

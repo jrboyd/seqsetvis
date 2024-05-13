@@ -619,7 +619,7 @@ shift_anchor = function(score_dt, window_size, anchor) {
 #'
 #' @param qgr GRanges to prepare
 #' @param win_size numeric window size for fetch
-#' @param min_quantile numeric [0,1], lowest possible quantile value.  Only
+#' @param min_quantile numeric value from 0 to 1. Lowest possible quantile value.  Only
 #' relevant if target_size is not specified.
 #' @param target_size numeric final width of qgr if known. Default of NULL
 #' leads to quantile based determination of target_size.
@@ -651,7 +651,7 @@ prepare_fetch_GRanges = function(qgr,
 #'
 #' @param qgr GRanges to prepare
 #' @param win_size numeric window size for fetch
-#' @param min_quantile numeric [0,1], lowest possible quantile value.  Only
+#' @param min_quantile numeric value from 0 to 1. Lowest possible quantile value.  Only
 #' relevant if target_size is not specified.
 #' @param target_size numeric final width of qgr if known. Default of NULL
 #' leads to quantile based determination of target_size.
@@ -714,7 +714,7 @@ prepare_fetch_GRanges_width = function(qgr,
 #' min_quantile quantile of width(qgr)
 #'
 #' @param qgr GRanges to calculate quantile width for
-#' @param min_quantile numeric [0,1] the minimum quantile of width in qgr
+#' @param min_quantile numeric value from 0 to 1. The minimum quantile of width in qgr
 #' @param win_size numeric/integer >=1, returned value will be a multiple of
 #' this
 #' @return numeric that is >= min_quantile and evenly divisible by win_size

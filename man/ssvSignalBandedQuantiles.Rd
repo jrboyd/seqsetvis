@@ -34,9 +34,9 @@ As returned from \code{\link{ssvFetchBam}} and \code{\link{ssvFetchBigwig}}}
 
 \item{hsv_reverse}{logical, should color scale be reversed? default FALSE}
 
-\item{hsv_saturation}{numeric \link{0, 1} saturation for color scale. default 1}
+\item{hsv_saturation}{numeric value from 0 to 1. Saturation for color scale. default 1}
 
-\item{hsv_value}{numeric \link{0, 1} value for color scale. default 1}
+\item{hsv_value}{numeric value from 0 to 1. Value for color scale. default 1}
 
 \item{hsv_grayscale}{logical, if TRUE gray() is used instead of rainbow(). default FALSE}
 

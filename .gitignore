@@ -19,3 +19,5 @@ Meta
 tests/testthat/testthat-problems.rds
 tests/testthat/test_improved_calc_fragLen.R
 tmp.png
+subject_gr.Rds
+annotation_source.Rds

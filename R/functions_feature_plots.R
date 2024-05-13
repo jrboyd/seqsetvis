@@ -31,7 +31,7 @@
 #' @param circle_colors colors to use for circle line colors. Uses Dark2 set
 #' from RColorBrewer by default.
 #' @param fill_alpha alpha value to use for fill, defaults to .3.
-#' @param line_alpha numeric [0,1], alpha value for circle line
+#' @param line_alpha numeric value from 0 to 1. Alpha value for circle line
 #' @param counts_color character. single color to use for displaying counts
 #' @param counts_as_percent if TRUE, convert counts to percentages in plots.
 #' @param percentage_digits The number of digits to round percentages to, default is 1.
@@ -247,8 +247,8 @@ ssvFeatureUpset = function(object,
 #' @param shape shape argument passed to eulerr::euler
 #' @param n_points number of points to use for drawing ellipses, passed to
 #' eulerr:::ellipse
-#' @param fill_alpha numeric [0,1], alpha value for circle fill
-#' @param line_alpha numeric [0,1], alpha value for circle line
+#' @param fill_alpha numeric value from 0 to 1. Alpha value for circle fill
+#' @param line_alpha numeric value from 0 to 1. Alpha value for circle line
 #' @param circle_colors colors to choose from for circles.  passed to ggplot2
 #' color scales.
 #' @param return_data logical.  If TRUE, return value is no longer ggplot and

@@ -69,10 +69,10 @@ clustering, default in -Inf}
 clustering, default in Inf}
 
 \item{within_order_strategy}{one of "hclust", "sort", "right", "left",
-"reverse".  If "hclust", hierarchical clustering will be used. If "sort", a
-simple decreasing sort of rosSums.  If "left", will atttempt to put high
-signal on left ("right" is opposite).  If "reverse" reverses existing order
-(should only be used after meaningful order imposed).}
+"none", "reverse".  If "hclust", hierarchical clustering will be used. If
+"sort", a simple decreasing sort of rosSums.  If "left", will attempt to
+put high signal on left ("right" is opposite).  If "none", existing order
+is preserved.  If "reverse" reverses existing order.}
 
 \item{dcast_fill}{value to supply to dcast fill argument. default is NA.}
 
@@ -107,7 +107,19 @@ ssvSignalHeatmap(clust_dt2)
 clust_dt3 = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 2,
     clustering_col_min = -250, clustering_col_max = -150)
 ssvSignalHeatmap(clust_dt3)
-clust_dt4 = ssvSignalClustering(CTCF_in_10a_profiles_gr, nclust = 2,
-    clustering_col_min = 150, clustering_col_max = 250)
+
+# there are also multiple sorting strategies to apply within each cluster
+clust_dt4 = ssvSignalClustering(
+  CTCF_in_10a_profiles_gr,
+  nclust = 2,
+  within_order_strategy = "left"
+)
 ssvSignalHeatmap(clust_dt4)
+
+clust_dt5 = ssvSignalClustering(
+  CTCF_in_10a_profiles_gr,
+  nclust = 2,
+  within_order_strategy = "sort"
+)
+ssvSignalHeatmap(clust_dt5)
 }

@@ -44,7 +44,7 @@ from RColorBrewer by default.}
 
 \item{fill_alpha}{alpha value to use for fill, defaults to .3.}
 
-\item{line_alpha}{numeric \link{0,1}, alpha value for circle line}
+\item{line_alpha}{numeric value from 0 to 1. Alpha value for circle line}
 
 \item{counts_color}{character. single color to use for displaying counts}
 

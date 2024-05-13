@@ -11,7 +11,7 @@ within_clust_sort(
   fill_ = "y",
   facet_ = "sample",
   cluster_ = "cluster_id",
-  within_order_strategy = c("hclust", "sort", "left", "right")[2],
+  within_order_strategy = c("hclust", "sort", "left", "right", "none", "reverse")[2],
   clustering_col_min = -Inf,
   clustering_col_max = Inf,
   dcast_fill = NA

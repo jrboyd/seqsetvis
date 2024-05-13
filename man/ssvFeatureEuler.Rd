@@ -25,9 +25,9 @@ ssvFeatureEuler(
 \item{n_points}{number of points to use for drawing ellipses, passed to
 eulerr:::ellipse}
 
-\item{fill_alpha}{numeric \link{0,1}, alpha value for circle fill}
+\item{fill_alpha}{numeric value from 0 to 1. Alpha value for circle fill}
 
-\item{line_alpha}{numeric \link{0,1}, alpha value for circle line}
+\item{line_alpha}{numeric value from 0 to 1. Alpha value for circle line}
 
 \item{circle_colors}{colors to choose from for circles.  passed to ggplot2
 color scales.}

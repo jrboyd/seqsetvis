@@ -302,8 +302,8 @@ applyMovingAverage = function(dt, n, centered = TRUE, x_ = "x", y_ = "y", by_ = 
 #' null safeBrew of Dark2 is used
 #' @param group_names character/factor names of color/fill groups.  capital
 #' letters by default.
-#' @param line_alpha numeric [0,1] alpha of lines, 1 by default
-#' @param fill_alpha numeric [0,1] alpha of fill, .3 by default.
+#' @param line_alpha numeric value from 0 to 1. alpha of lines, 1 by default
+#' @param fill_alpha numeric value from 0 to 1. alpha of fill, .3 by default.
 #' @param line_width numeric > 0.  passed to size. 2 by default
 #' @param n_points integer > 1.  number of points to approximate circle with.
 #' 200 by default

@@ -6,8 +6,8 @@
 #' @param x_ the variable name in bw_data for x axis in plot
 #' @param by_ the variable name in bw_data to facet on
 #' @param hsv_reverse logical, should color scale be reversed? default FALSE
-#' @param hsv_saturation numeric [0, 1] saturation for color scale. default 1
-#' @param hsv_value numeric [0, 1] value for color scale. default 1
+#' @param hsv_saturation numeric value from 0 to 1. Saturation for color scale. default 1
+#' @param hsv_value numeric value from 0 to 1. Value for color scale. default 1
 #' @param hsv_grayscale logical, if TRUE gray() is used instead of rainbow(). default FALSE
 #' @param hsv_hue_min numeric [0, hsv_hue_max) hue min of color scale
 #' @param hsv_hue_max numeric (hsv_hue_min, 1] hue max of color scale

@@ -9,7 +9,7 @@ quantileGRangesWidth(qgr, min_quantile = 0.75, win_size = 1)
 \arguments{
 \item{qgr}{GRanges to calculate quantile width for}
 
-\item{min_quantile}{numeric \link{0,1} the minimum quantile of width in qgr}
+\item{min_quantile}{numeric value from 0 to 1. The minimum quantile of width in qgr}
 
 \item{win_size}{numeric/integer >=1, returned value will be a multiple of
 this}
