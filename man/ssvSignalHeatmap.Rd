@@ -106,6 +106,8 @@ See \code{\link{ssvSignalHeatmap.ClusterBars}} for an alternative with more
 control over where the cluster bars appear.
 }
 \examples{
+data(CTCF_in_10a_profiles_gr)
+
 #the simplest use
 ssvSignalHeatmap(CTCF_in_10a_profiles_gr)
 ssvSignalHeatmap(CTCF_in_10a_profiles_gr, show_cluster_bars = FALSE)

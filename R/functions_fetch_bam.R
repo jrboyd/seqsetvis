@@ -59,6 +59,7 @@
 #' @importFrom pbapply pblapply
 #' @examples
 #' if(Sys.info()['sysname'] != "Windows"){
+#' data(CTCF_in_10a_overlaps_gr)
 #' library(GenomicRanges)
 #' bam_f = system.file("extdata/test.bam",
 #'     package = "seqsetvis", mustWork = TRUE)
@@ -627,6 +628,7 @@ harmonize_seqlengths = function(query_gr, bam_file, force_fix = FALSE){
 #' @export
 #' @return numeric of most common read length.
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
 #' bam_file = system.file("extdata/test.bam", package = "seqsetvis", mustWork = TRUE)
 #' getReadLength(bam_file, qgr)
@@ -670,6 +672,7 @@ getReadLength = function(bam_file,
 #' @export
 #' @return data.table with cigar entries expanded
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
 #' bam_file = system.file("extdata/test.bam", package = "seqsetvis", mustWork = TRUE)
 #' raw_dt = ssvFetchBam(bam_file, qgr, return_unprocessed = TRUE)

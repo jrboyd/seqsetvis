@@ -46,6 +46,7 @@ will be calculated individually for each gene in each sample. alternatively
 if \code{by_ = c('gene_id')}
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 #data may be blockier than we'd like
 ggplot(CTCF_in_10a_profiles_dt[, list(y = mean(y)), by = list(sample, x)]) +
     geom_line(aes(x = x, y = y, color = sample))

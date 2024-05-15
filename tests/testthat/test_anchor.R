@@ -4,7 +4,7 @@ library(seqsetvis)
 library(GenomicRanges)
 library(testthat)
 library(data.table)
-
+data(CTCF_in_10a_overlaps_gr)
 qgr = CTCF_in_10a_overlaps_gr[1:5]
 qgr = resize(qgr, 120)
 strand(qgr) = c("+", "-", "-", "+", "-")

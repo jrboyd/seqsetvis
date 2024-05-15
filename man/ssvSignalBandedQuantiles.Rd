@@ -62,6 +62,7 @@ ggplot object using ribbon plots to show quantile distributions
 plot profiles from bigwigs
 }
 \examples{
+data(CTCF_in_10a_profiles_gr)
 #rainbow colors
 qgr = CTCF_in_10a_profiles_gr
 ssvSignalBandedQuantiles(qgr)

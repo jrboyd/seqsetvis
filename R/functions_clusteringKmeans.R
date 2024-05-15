@@ -57,6 +57,7 @@ valid_sort_strategies = c("hclust", "sort", "left", "right", "none", "reverse")
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @return data.table of signal profiles, ready for ssvSignalHeatmap
 #' @examples
+#' data(CTCF_in_10a_profiles_gr)
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr)
 #' ssvSignalHeatmap(clust_dt)
 #'
@@ -245,6 +246,7 @@ ssvSignalClustering = function(bw_data,
 #' @export
 #' @importFrom stats kmeans hclust dist
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' dt = data.table::copy(CTCF_in_10a_profiles_dt)
 #' mat = data.table::dcast(dt, id ~ sample + x, value.var = "y" )
 #' rn = mat$id
@@ -330,6 +332,7 @@ clusteringKmeans = function(mat, nclust, centroids = NULL, iter.max = 30) {
 #'   input matrix rownames and is sorted within each cluster using hierarchical
 #'   clusering group__ column indicates cluster assignment
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' dt = data.table::copy(CTCF_in_10a_profiles_dt)
 #' mat = data.table::dcast(dt, id ~ sample + x, value.var = "y" )
 #' rn = mat$id
@@ -383,11 +386,19 @@ within_clust_sort.mat_dt = function(mat_dt, mat, within_order_strategy){
             mat_dt[group__ == i, ]$within_o = rank(-rowSums(cmat))
         }else if(within_order_strategy == "left"){
             #cmat must be column ordered by position
-            o = order(as.numeric(sapply(strsplit(colnames(cmat), "_"), function(x)x[length(x)])))
+            o = order(as.numeric(
+                vapply(
+                    strsplit(colnames(cmat), "_"),
+                    function(x)x[length(x)],
+                    FUN.VALUE = "1")))
             mat_dt[group__ == i, ]$within_o = rank(apply(cmat[, o], 1, function(x){which.max(x)[1]}))
         }else if(within_order_strategy == "right"){
             #cmat must be column ordered by position
-            o = order(as.numeric(sapply(strsplit(colnames(cmat), "_"), function(x)x[length(x)])))
+            o = order(as.numeric(
+                vapply(
+                    strsplit(colnames(cmat), "_"),
+                    function(x)x[length(x)],
+                    FUN.VALUE = "1")))
             mat_dt[group__ == i, ]$within_o = rank(-apply(cmat[, o], 1, function(x){which.max(x)[1]}))
         }else if(within_order_strategy == "none"){
             mat_dt[group__ == i, ]$within_o = seq_len(nrow(cmat))
@@ -443,6 +454,7 @@ within_clust_sort.mat_dt = function(mat_dt, mat, within_order_strategy){
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' #clustering by relative value per region does a good job highlighting changes
 #' #however, when then plotting raw values the order within clusters is not smooth
 #' #this is a good situation to apply a separate sort within clusters.
@@ -516,6 +528,9 @@ within_clust_sort = function(clust_dt,
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_narrowPeak_grs)
+#' data(CTCF_in_10a_overlaps_gr)
+#' data(CTCF_in_10a_profiles_dt)
 #' #this takes cluster info from signal and applies to peak hits to
 #' #create a heatmap of peak hits clustered by signal.
 #' clust_dt1 = ssvSignalClustering(CTCF_in_10a_profiles_dt)
@@ -590,6 +605,7 @@ copy_clust_info = function(target, to_copy, row_ = "id", cluster_ = "cluster_id"
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 10)
 #' new_dt = reorder_clusters_stepdown(clust_dt)
 #' cowplot::plot_grid(
@@ -673,6 +689,7 @@ reorder_clusters_stepdown = function(clust_dt,
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 10)
 #' new_dt = reorder_clusters_hclust(clust_dt)
 #' cowplot::plot_grid(
@@ -730,6 +747,7 @@ reorder_clusters_hclust = function(clust_dt,
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 #' new_dt = reorder_clusters_manual(clust_dt = clust_dt, manual_order = 2)
 #' cowplot::plot_grid(
@@ -774,6 +792,7 @@ reorder_clusters_manual = function(clust_dt,
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' set.seed(0)
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 6)
 #' ssvSignalHeatmap(clust_dt)
@@ -847,6 +866,7 @@ merge_clusters = function(clust_dt,
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' set.seed(0)
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 #' rev_dt = reverse_clusters(clust_dt)
@@ -910,6 +930,7 @@ reverse_clusters = function(clust_dt,
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' set.seed(0)
 #' clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 #' split_dt = split_cluster(clust_dt, to_split = 2, nclust = 3)

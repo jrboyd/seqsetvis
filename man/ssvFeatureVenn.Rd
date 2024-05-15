@@ -70,6 +70,7 @@ more than 3 sets. \link{ssvFeatureEuler} can work too but can take a very long t
 to run for more than 5 or so.
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
 ssvFeatureVenn(list(1:3, 2:6))
 ssvFeatureVenn(CTCF_in_10a_overlaps_gr)
 ssvFeatureVenn(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])

@@ -62,6 +62,7 @@ for the entire dataset.  If by is "id" (the default) then each region will be
 centered individually across all samples.
 }
 \examples{
+data(CTCF_in_10a_profiles_gr)
 centerAtMax(CTCF_in_10a_profiles_gr, y_ = 'y', by_ = 'id',
   check_by_dupes = FALSE)
 #it's a bit clearer what's happening with trimming disabled

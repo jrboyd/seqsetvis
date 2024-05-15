@@ -20,6 +20,7 @@ a 2 column ("id" and "group") data.frame.
 see \code{\link{ssvMakeMembTable}}
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
 ssvFactorizeMembTable(CTCF_in_10a_overlaps_gr)
 ssvFactorizeMembTable(list(1:4, 2:3, 4:6))
 }

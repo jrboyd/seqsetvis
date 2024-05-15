@@ -44,6 +44,7 @@ fragLen_fromMacs2Xls = function(macs2xls_file){
 #' @import Rsamtools
 #' @export
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' bam_file = system.file("extdata/test.bam",
 #'     package = "seqsetvis")
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
@@ -124,6 +125,7 @@ fragLen_calcStranded = function(bam_f,
 #' @import GenomicRanges GenomicAlignments pbapply S4Vectors
 #' @importFrom Rsamtools ScanBamParam
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' bam_f = system.file("extdata/test.bam",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' query_gr = CTCF_in_10a_overlaps_gr[1:2]

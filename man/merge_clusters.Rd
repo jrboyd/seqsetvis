@@ -34,6 +34,7 @@ data.table as output from \code{\link{ssvSignalClustering}}
 merge_clusters
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 set.seed(0)
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 6)
 ssvSignalHeatmap(clust_dt)

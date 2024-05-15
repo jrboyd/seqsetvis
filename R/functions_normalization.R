@@ -26,6 +26,7 @@
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' calc_norm_factors(CTCF_in_10a_profiles_dt)
 #' calc_norm_factors(CTCF_in_10a_profiles_dt,
 #'   aggFUN1 = mean, aggFUN2 = function(x)quantile(x, .5))
@@ -70,6 +71,7 @@ calc_norm_factors = function(full_dt,
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' append_ynorm(CTCF_in_10a_profiles_dt)
 #' append_ynorm(CTCF_in_10a_profiles_dt,
 #'   aggFUN1 = mean, aggFUN2 = function(x)quantile(x, .5))

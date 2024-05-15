@@ -62,6 +62,8 @@ ggplot of signal potentially facetted by region and sample
 construct line type plots where each region in each sample is represented
 }
 \examples{
+data(CTCF_in_10a_profiles_gr)
+
 bw_gr = CTCF_in_10a_profiles_gr
 ssvSignalLineplot(subset(bw_gr, bw_gr$id \%in\% seq_len(3)), facet_ = "sample")
 ssvSignalLineplot(subset(bw_gr, bw_gr$id \%in\% seq_len(3)),

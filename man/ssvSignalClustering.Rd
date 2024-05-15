@@ -97,6 +97,7 @@ Within each cluster, items will either be sorted by decreasing average signal
 or hierachically clustered; this is controlled via within_order_strategy.
 }
 \examples{
+data(CTCF_in_10a_profiles_gr)
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_gr)
 ssvSignalHeatmap(clust_dt)
 

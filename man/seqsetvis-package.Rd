@@ -14,6 +14,6 @@ seqsetvis allows you to...}
 Otherwise refer to the vignettes to see
 }
 \author{
-\strong{Maintainer}: Joseph R Boyd \email{jrboyd@uvm.edu}
+\strong{Maintainer}: Joseph R Boyd \email{jrboyd@uvm.edu} (\href{https://orcid.org/0000-0002-8969-9676}{ORCID})
 
 }

@@ -41,6 +41,7 @@ named list of results
 Calculate cross correlation by using shiftApply on read coverage Rle
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
 bam_f = system.file("extdata/test.bam",
     package = "seqsetvis", mustWork = TRUE)
 query_gr = CTCF_in_10a_overlaps_gr[1:2]

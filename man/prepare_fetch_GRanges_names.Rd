@@ -18,7 +18,8 @@ and named GRanges based on input qgr.
 If $id is set, that value is used as name and duplicates are checked for.
 }
 \examples{
-qgr = seqsetvis::CTCF_in_10a_overlaps_gr
+data(CTCF_in_10a_overlaps_gr)
+qgr = CTCF_in_10a_overlaps_gr
 names(qgr) = NULL
 #default is to paste "region_" and iteration along length of qgr
 prepare_fetch_GRanges_names(qgr)

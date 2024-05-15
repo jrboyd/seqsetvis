@@ -112,6 +112,17 @@ library(cowplot)
 theme_set(cowplot::theme_cowplot())
 ```
 
+## Load data
+```{r load data}
+data(CTCF_in_10a_narrowPeak_grs)
+data(CTCF_in_10a_overlaps_gr)
+data(CTCF_in_10a_profiles_gr)
+data(chromHMM_demo_state_colors)
+data(chromHMM_demo_bw_states_gr)
+data(chromHMM_demo_overlaps_gr)
+data(chromHMM_demo_state_total_widths)
+```
+
 # Defining sets
 *seqsetvis* has several ways of accepting set information.  Since *seqsetvis* 
 was originally intended to focus on comparing sets of peak calls, a list of 

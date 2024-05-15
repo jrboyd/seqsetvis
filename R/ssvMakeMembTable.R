@@ -33,7 +33,7 @@ setMethod("ssvMakeMembTable", signature(object = "list"), function(object){
         return(ssvMakeMembTable(GRangesList(object)))
     }
     if (any(vapply(object, class, "character") != "character")) {
-        warning("Converting all non-character items to characters.")
+        # warning("Converting all non-character items to characters.")
         object = lapply(object, as.character)
     }
     if (all(vapply(object, class, "character") == "character")) {
@@ -155,6 +155,7 @@ setMethod("ssvMakeMembTable",
 #' "group" is a factor of set combinations
 #' @export
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' ssvFactorizeMembTable(CTCF_in_10a_overlaps_gr)
 #' ssvFactorizeMembTable(list(1:4, 2:3, 4:6))
 ssvFactorizeMembTable = function(object){

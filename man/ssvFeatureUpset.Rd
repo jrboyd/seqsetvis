@@ -39,6 +39,7 @@ ggplot version of UpSetR plot
 Uses the UpSetR package to create an \link[UpSetR:upset]{UpSetR::upset} plot of region overlaps.
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
 ssvFeatureUpset(list(1:3, 2:6))
 ssvFeatureUpset(CTCF_in_10a_overlaps_gr)
 ssvFeatureUpset(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])

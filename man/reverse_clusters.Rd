@@ -45,6 +45,7 @@ data.table as output from \code{\link{ssvSignalClustering}}
 reverse_clusters
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 set.seed(0)
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 rev_dt = reverse_clusters(clust_dt)

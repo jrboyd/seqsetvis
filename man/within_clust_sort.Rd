@@ -66,6 +66,7 @@ heatmap.
 TODO refactor shared code with clusteringKmeansNestedHclust
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 #clustering by relative value per region does a good job highlighting changes
 #however, when then plotting raw values the order within clusters is not smooth
 #this is a good situation to apply a separate sort within clusters.

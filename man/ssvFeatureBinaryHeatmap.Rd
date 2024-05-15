@@ -51,6 +51,7 @@ As a svg output, the final plot can be unwieldy. The default of
 membership tables.
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
 ssvFeatureBinaryHeatmap(list(1:3, 2:6))
 # horizontal version
 ssvFeatureBinaryHeatmap(list(1:3, 2:6)) + coord_flip() +

@@ -55,6 +55,7 @@ centerFixedSizeGRanges = function(grs, fixed_size = 2000) {
 #' @seealso \code{\link{ssvFetchBigwig}}
 #' @importFrom stats spline
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' #data may be blockier than we'd like
 #' ggplot(CTCF_in_10a_profiles_dt[, list(y = mean(y)), by = list(sample, x)]) +
 #'     geom_line(aes(x = x, y = y, color = sample))
@@ -171,6 +172,7 @@ applySpline = function(dt, n, x_ = "x", y_ = "y", by_ = c("id", "sample"),
 #' data.table with x (or xnew if replace_x is FALSE) shifted such that
 #' x = 0 matches the maximum y-value define by by_ grouping
 #' @examples
+#' data(CTCF_in_10a_profiles_gr)
 #' centerAtMax(CTCF_in_10a_profiles_gr, y_ = 'y', by_ = 'id',
 #'   check_by_dupes = FALSE)
 #' #it's a bit clearer what's happening with trimming disabled
@@ -296,6 +298,9 @@ centerAtMax = function(dt,
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
+#' data(CTCF_in_10a_profiles_gr)
+#' data(CTCF_in_10a_profiles_dt)
 #' centerGRangesAtMax(CTCF_in_10a_profiles_dt, CTCF_in_10a_overlaps_gr)
 #' centerGRangesAtMax(CTCF_in_10a_profiles_gr, CTCF_in_10a_overlaps_gr)
 #'
@@ -331,6 +336,9 @@ centerGRangesAtMax = function(prof_dt, qgr, x_ = "x", y_ = "y", by_ = "id", widt
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
+#' data(CTCF_in_10a_profiles_gr)
+#' data(CTCF_in_10a_profiles_dt)
 #' findMaxPos(CTCF_in_10a_profiles_dt, CTCF_in_10a_overlaps_gr)
 #' findMaxPos(CTCF_in_10a_profiles_gr, CTCF_in_10a_overlaps_gr)
 findMaxPos = function(prof_dt, qgr, x_ = "x", y_ = "y", by_ = "id", width = 1){

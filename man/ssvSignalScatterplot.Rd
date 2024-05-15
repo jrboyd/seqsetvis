@@ -54,6 +54,7 @@ ggplot of points comparing signal from 2 samples
 maps signal from 2 sample profiles to the x and y axis. axes are standard or "volcano" min XY vs fold-change Y/X
 }
 \examples{
+data(CTCF_in_10a_profiles_gr)
 ssvSignalScatterplot(CTCF_in_10a_profiles_gr,
     x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF")
 ssvSignalScatterplot(CTCF_in_10a_profiles_gr,

@@ -51,6 +51,7 @@ adds rectangle boxes proportional to cluster sizes of heatmap with optional
 labels.
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 #simplest uses
 add_cluster_annotation(factor(c(rep("A", 3), "B")))
 p = ggplot() + coord_cartesian(xlim = c(0,10))

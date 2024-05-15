@@ -110,7 +110,8 @@ NULL
 #' @docType data
 #' @keywords datasets
 #' @name CTCF_in_10a_narrowPeak_grs
-#' @format named character vector of length 3
+#' @format named list of GRanges of length 3
+#' @return named list of GRanges of length 3
 NULL
 
 #' 4 random peaks for paired-end data
@@ -122,6 +123,7 @@ NULL
 #' @keywords datasets
 #' @name Bcell_peaks
 #' @format GRanges length 4
+#' @return GRanges length 4
 NULL
 
 #' 4 random peaks for single-end data and 4 control regions 30kb downstream from
@@ -135,4 +137,5 @@ NULL
 #' @keywords datasets
 #' @name test_peaks
 #' @format GRanges length 8
+#' @return GRanges length 8
 NULL

@@ -51,6 +51,7 @@ data.table as output from \code{\link{ssvSignalClustering}}
 Applies hierarchical clustering to centroids of clusters to reorder.
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 10)
 new_dt = reorder_clusters_hclust(clust_dt)
 cowplot::plot_grid(

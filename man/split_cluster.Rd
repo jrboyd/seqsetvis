@@ -48,6 +48,7 @@ data.table as output from \code{\link{ssvSignalClustering}}
 Splits one specified cluster in number of new clusters determined by nclust
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 set.seed(0)
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 split_dt = split_cluster(clust_dt, to_split = 2, nclust = 3)

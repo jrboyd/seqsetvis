@@ -22,6 +22,7 @@ ggplot pie graph of set sizes
 Generate a ggplot pie plot of set sizes.
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
 ssvFeaturePie(list(1:3, 2:6))
 ssvFeaturePie(CTCF_in_10a_overlaps_gr)
 ssvFeaturePie(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])

@@ -52,6 +52,7 @@ missing, added as 1:length(score_gr). y - value of score from score_gr. x -
 relative bp position.
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
 bam_file = system.file("extdata/test.bam",
     package = "seqsetvis")
 qgr = CTCF_in_10a_overlaps_gr[seq_len(5)]

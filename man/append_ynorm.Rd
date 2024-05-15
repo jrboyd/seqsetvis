@@ -52,6 +52,7 @@ data.table, full_dt with cap_value_ and norm_value_ values appended.
 see \code{\link{calc_norm_factors}} for normalization details.
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 append_ynorm(CTCF_in_10a_profiles_dt)
 append_ynorm(CTCF_in_10a_profiles_dt,
   aggFUN1 = mean, aggFUN2 = function(x)quantile(x, .5))

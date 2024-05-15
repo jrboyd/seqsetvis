@@ -45,6 +45,7 @@
 #' @import S4Vectors
 #' @importFrom limma vennCounts
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureVenn(list(1:3, 2:6))
 #' ssvFeatureVenn(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureVenn(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
@@ -207,6 +208,7 @@ ssvFeatureVenn = function(object,
 #' @import ggplotify
 #'
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureUpset(list(1:3, 2:6))
 #' ssvFeatureUpset(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureUpset(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
@@ -258,6 +260,7 @@ ssvFeatureUpset = function(object,
 #' @import eulerr
 #' @import S4Vectors
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureEuler(list(1:3, 2:6))
 #' ssvFeatureEuler(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureEuler(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
@@ -328,6 +331,7 @@ ssvFeatureEuler = function(object,
 #' @import ggplot2
 #' @import S4Vectors
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureBars(list(1:3, 2:6))
 #' ssvFeatureBars(CTCF_in_10a_overlaps_gr, count_label_size = 10)
 #' ssvFeatureBars(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
@@ -402,6 +406,7 @@ ssvFeatureBars = function(object,
 #' @import S4Vectors
 #' @return ggplot pie graph of set sizes
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' ssvFeaturePie(list(1:3, 2:6))
 #' ssvFeaturePie(CTCF_in_10a_overlaps_gr)
 #' ssvFeaturePie(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])
@@ -431,10 +436,10 @@ ssvFeaturePie = function(object, slice_colors = NULL, return_data = FALSE) {
         return(as.data.table(hit_counts_df))
     }
 
-    p <- ggplot(hit_counts_df, aes(x = "", y = count, fill = group)) +
+    p = ggplot(hit_counts_df, aes(x = "", y = count, fill = group)) +
         labs(x = "") +
         geom_bar(width = 1, stat = "identity") +
-        guides(x = "none") +
+        # guides(x = "none") +
         theme(axis.text.x = element_blank(),
               axis.line = element_blank(),
               panel.background = element_blank(),
@@ -485,6 +490,7 @@ ssvFeaturePie = function(object, slice_colors = NULL, return_data = FALSE) {
 #' @import ggplot2
 #' @importFrom grid rasterGrob
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' ssvFeatureBinaryHeatmap(list(1:3, 2:6))
 #' # horizontal version
 #' ssvFeatureBinaryHeatmap(list(1:3, 2:6)) + coord_flip() +

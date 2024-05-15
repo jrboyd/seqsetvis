@@ -109,6 +109,7 @@ if \code{qgr} contains the range chr1:1-100 and \code{win_size} is
 }
 \examples{
 if(Sys.info()['sysname'] != "Windows"){
+data(CTCF_in_10a_overlaps_gr)
 library(GenomicRanges)
 bam_f = system.file("extdata/test.bam",
     package = "seqsetvis", mustWork = TRUE)

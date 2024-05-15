@@ -29,6 +29,9 @@ signal in prof_dt and with regions of specified width.
 Centers query GRanges at maximum signal in prof_dt.
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
+data(CTCF_in_10a_profiles_gr)
+data(CTCF_in_10a_profiles_dt)
 centerGRangesAtMax(CTCF_in_10a_profiles_dt, CTCF_in_10a_overlaps_gr)
 centerGRangesAtMax(CTCF_in_10a_profiles_gr, CTCF_in_10a_overlaps_gr)
 

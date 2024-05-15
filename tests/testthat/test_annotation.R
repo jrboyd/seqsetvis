@@ -3,6 +3,7 @@ library(seqsetvis)
 library(GenomicRanges)
 library(testthat)
 
+data(CTCF_in_10a_narrowPeak_grs)
 np_grs = CTCF_in_10a_narrowPeak_grs
 olap_gr = ssvOverlapIntervalSets(np_grs)
 

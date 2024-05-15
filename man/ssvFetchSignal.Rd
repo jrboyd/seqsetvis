@@ -80,6 +80,7 @@ and \code{\link{ssvFetchBam}} for examples.
 }
 \examples{
 library(GenomicRanges)
+data(CTCF_in_10a_overlaps_gr)
 bam_f = system.file("extdata/test.bam",
     package = "seqsetvis", mustWork = TRUE)
 bam_files = c("a" = bam_f, "b" = bam_f)

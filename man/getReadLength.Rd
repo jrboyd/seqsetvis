@@ -22,6 +22,7 @@ selected regions from query_gr.  If fewer than 20 reads are present, loads
 all of query_gr.
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
 qgr = CTCF_in_10a_overlaps_gr[1:5]
 bam_file = system.file("extdata/test.bam", package = "seqsetvis", mustWork = TRUE)
 getReadLength(bam_file, qgr)

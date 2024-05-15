@@ -18,6 +18,7 @@ A grob produced by cowplot::plot_grid
 assemble_heatmap_cluster_bars
 }
 \examples{
+data(CTCF_in_10a_profiles_gr)
 plots = ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, return_unassembled_plots = TRUE)
 assemble_heatmap_cluster_bars(plots)
 }

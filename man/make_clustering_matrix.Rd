@@ -58,6 +58,7 @@ Create a wide matrix from a tidy data.table more suitable for clustering
 methods
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 mat = make_clustering_matrix(CTCF_in_10a_profiles_dt)
 mat[1:5, 1:5]
 }

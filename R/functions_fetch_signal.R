@@ -45,6 +45,7 @@
 #' @import pbmcapply
 #' @examples
 #' library(GenomicRanges)
+#' data(CTCF_in_10a_overlaps_gr)
 #' bam_f = system.file("extdata/test.bam",
 #'     package = "seqsetvis", mustWork = TRUE)
 #' bam_files = c("a" = bam_f, "b" = bam_f)
@@ -195,7 +196,8 @@ ssvFetchSignal = function(file_paths,
 #' @export
 #'
 #' @examples
-#' qgr = seqsetvis::CTCF_in_10a_overlaps_gr
+#' data(CTCF_in_10a_overlaps_gr)
+#' qgr = CTCF_in_10a_overlaps_gr
 #' names(qgr) = NULL
 #' #default is to paste "region_" and iteration along length of qgr
 #' prepare_fetch_GRanges_names(qgr)
@@ -253,6 +255,7 @@ prepare_fetch_GRanges_names = function(qgr, include_id = FALSE){
 #' @export
 #' @import GenomeInfoDb
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' bam_file = system.file("extdata/test.bam",
 #'     package = "seqsetvis")
 #' qgr = CTCF_in_10a_overlaps_gr[seq_len(5)]
@@ -366,6 +369,7 @@ viewGRangesWinSample_dt = function(score_gr,
 #' @export
 #' @importFrom stats weighted.mean
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' bam_file = system.file("extdata/test.bam",
 #'     package = "seqsetvis")
 #' qgr = CTCF_in_10a_overlaps_gr[1:5]
@@ -630,6 +634,7 @@ shift_anchor = function(score_dt, window_size, anchor) {
 #' applied.
 #' @export
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' #use prepare_fetch_GRanges_width instead:
 #' qgr = prepare_fetch_GRanges_width(CTCF_in_10a_overlaps_gr, win_size = 50)
 #' #no warning if qgr is already valid for windowed fetching
@@ -662,6 +667,7 @@ prepare_fetch_GRanges = function(qgr,
 #' applied.
 #' @export
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' qgr = prepare_fetch_GRanges_width(CTCF_in_10a_overlaps_gr, win_size = 50)
 #' #no warning if qgr is already valid for windowed fetching
 #' prepare_fetch_GRanges_width(qgr, win_size = 50)
@@ -720,6 +726,7 @@ prepare_fetch_GRanges_width = function(qgr,
 #' @return numeric that is >= min_quantile and evenly divisible by win_size
 #' @export
 #' @examples
+#' data(CTCF_in_10a_overlaps_gr)
 #' gr = CTCF_in_10a_overlaps_gr
 #' quantileGRangesWidth(gr)
 #' quantileGRangesWidth(gr, min_quantile = .5, win_size = 100)

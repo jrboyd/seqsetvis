@@ -23,6 +23,7 @@
 #' @importFrom stats quantile
 #' @rawNamespace import(data.table, except = c(shift, first, second, last))
 #' @examples
+#' data(CTCF_in_10a_profiles_gr)
 #' #rainbow colors
 #' qgr = CTCF_in_10a_profiles_gr
 #' ssvSignalBandedQuantiles(qgr)
@@ -174,6 +175,7 @@ ssvSignalBandedQuantiles = function(bw_data, y_ = "y", x_ = "x", by_ = "fake",
 #' @import ggplot2
 #' @return ggplot of points comparing signal from 2 samples
 #' @examples
+#' data(CTCF_in_10a_profiles_gr)
 #' ssvSignalScatterplot(CTCF_in_10a_profiles_gr,
 #'     x_name = "MCF10A_CTCF", y_name = "MCF10AT1_CTCF")
 #' ssvSignalScatterplot(CTCF_in_10a_profiles_gr,
@@ -351,6 +353,7 @@ make_facet_str = function(facet_rows = character(), facet_columns = character())
 #' @export
 #' @return A wide matrix version of input tidy data.table
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' mat = make_clustering_matrix(CTCF_in_10a_profiles_dt)
 #' mat[1:5, 1:5]
 make_clustering_matrix = function(tidy_dt,
@@ -437,6 +440,7 @@ make_clustering_matrix = function(tidy_dt,
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' #simplest uses
 #' add_cluster_annotation(factor(c(rep("A", 3), "B")))
 #' p = ggplot() + coord_cartesian(xlim = c(0,10))
@@ -590,6 +594,8 @@ add_cluster_annotation = function(cluster_ids, p = NULL,
 #' @import ggplot2
 #' @return ggplot heatmap of signal profiles, facetted by sample
 #' @examples
+#' data(CTCF_in_10a_profiles_gr)
+#'
 #' #the simplest use
 #' ssvSignalHeatmap(CTCF_in_10a_profiles_gr)
 #' ssvSignalHeatmap(CTCF_in_10a_profiles_gr, show_cluster_bars = FALSE)
@@ -844,6 +850,8 @@ ssvSignalHeatmap = function(bw_data,
 #' @import ggplot2
 #' @return ggplot heatmap of signal profiles, facetted by sample
 #' @examples
+#' data(CTCF_in_10a_profiles_gr)
+#'
 #' #the simplest use
 #' ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr)
 #' ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, rel_widths = c(1, 5))
@@ -970,6 +978,7 @@ ssvSignalHeatmap.ClusterBars = function(bw_data,
 #' @import cowplot
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_gr)
 #' plots = ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, return_unassembled_plots = TRUE)
 #' assemble_heatmap_cluster_bars(plots)
 assemble_heatmap_cluster_bars = function(plots, ...){
@@ -1040,6 +1049,8 @@ sync_height = function(my_plots, sync_width = FALSE){
 #' @import ggplot2
 #' @return ggplot of signal potentially facetted by region and sample
 #' @examples
+#' data(CTCF_in_10a_profiles_gr)
+#'
 #' bw_gr = CTCF_in_10a_profiles_gr
 #' ssvSignalLineplot(subset(bw_gr, bw_gr$id %in% seq_len(3)), facet_ = "sample")
 #' ssvSignalLineplot(subset(bw_gr, bw_gr$id %in% seq_len(3)),

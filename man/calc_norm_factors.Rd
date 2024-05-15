@@ -50,6 +50,7 @@ for H3K4me3 and an infrequent transcription factor it is more appropriate to
 specify appropriate quantile cutoffs per factor.
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 calc_norm_factors(CTCF_in_10a_profiles_dt)
 calc_norm_factors(CTCF_in_10a_profiles_dt,
   aggFUN1 = mean, aggFUN2 = function(x)quantile(x, .5))

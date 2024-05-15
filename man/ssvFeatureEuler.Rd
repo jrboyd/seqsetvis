@@ -42,6 +42,7 @@ ggplot of venneuler results
 Try to load a bed-like file and convert it to a GRanges object
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
 ssvFeatureEuler(list(1:3, 2:6))
 ssvFeatureEuler(CTCF_in_10a_overlaps_gr)
 ssvFeatureEuler(S4Vectors::mcols(CTCF_in_10a_overlaps_gr)[,2:3])

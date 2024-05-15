@@ -59,6 +59,7 @@ TRUE, step_by_facet = TRUE), which does no averaging so it looks at the full
 matrix as plotted.
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 10)
 new_dt = reorder_clusters_stepdown(clust_dt)
 cowplot::plot_grid(

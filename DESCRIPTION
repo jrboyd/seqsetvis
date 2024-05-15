@@ -3,16 +3,17 @@ Type: Package
 Title: Set Based Visualizations for Next-Gen Sequencing Data
 Version: 1.25.1
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
-                  role = c("aut", "cre"))
+                  role = c("aut", "cre"), comment = c(ORCID="0000-0002-8969-9676"))
 Description: seqsetvis enables the visualization and analysis of sets of 
     genomic sites in next gen sequencing data. 
     Although seqsetvis was designed for the comparison of 
     mulitple ChIP-seq samples, this package is domain-agnostic and allows the 
     processing of multiple genomic coordinate files (bed-like files) and 
-    signal files (bigwig files pileups from bam file).
+    signal files (bigwig files pileups from bam file). seqsetvis has multiple
+    functions for fetching data from regions into a tidy format for analysis in 
+    data.table or tidyverse and visualization via ggplot2.
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Suggests: 
     BiocFileCache,
     BiocManager,
@@ -22,7 +23,7 @@ Suggests:
     knitr, 
     rmarkdown, 
     testthat
-Depends: R (>= 3.6), ggplot2
+Depends: R (>= 4.3), ggplot2
 Imports: 
     cowplot, 
     data.table, 

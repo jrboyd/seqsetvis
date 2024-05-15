@@ -120,6 +120,8 @@ Compared to ssvSignalHeatmap, cluster_bars are displayed on the left once
 instead of for each facet
 }
 \examples{
+data(CTCF_in_10a_profiles_gr)
+
 #the simplest use
 ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr)
 ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, rel_widths = c(1, 5))

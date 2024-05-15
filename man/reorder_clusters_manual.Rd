@@ -36,6 +36,7 @@ Manually applies a new order (top to bottom) for cluster using the result of
 ssvSignalClustering.
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 clust_dt = ssvSignalClustering(CTCF_in_10a_profiles_dt, nclust = 3)
 new_dt = reorder_clusters_manual(clust_dt = clust_dt, manual_order = 2)
 cowplot::plot_grid(

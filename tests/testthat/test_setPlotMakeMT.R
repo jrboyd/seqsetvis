@@ -85,13 +85,8 @@ test_that("ssvMakeMembTable NAMED list of GRanges", {
     expect_equal(colnames(mt), colnames(expected_table_named))
 })
 
-test_that("ssvMakeMembTable on mixed type list causes error", {
-    expect_warning(ssvMakeMembTable(list(1, "a")), regexp = "Converting all non-character items to characters.")
-})
-
 test_that("ssvMakeMembTable tolerates NA values with a warning", {
     expect_warning(ssvMakeMembTable(list(c("a", "b", NA), "a")), regexp = "Removing NA values")
-    expect_warning(ssvMakeMembTable(list(c("a", "b", NA), NA)), regexp = "Converting all non-character items to characters.")
     expect_warning(ssvMakeMembTable(list(c("a", "b", NA), NA)), regexp = "Removing NA values")
 })
 

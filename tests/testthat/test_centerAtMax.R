@@ -3,6 +3,12 @@ library(seqsetvis)
 library(testthat)
 library(data.table)
 library(GenomicRanges)
+
+data(CTCF_in_10a_profiles_dt)
+data(CTCF_in_10a_profiles_gr)
+data(CTCF_in_10a_overlaps_gr)
+
+
 n = 8
 xs = (1:n-5)*5
 fun = function(x)(x^2)

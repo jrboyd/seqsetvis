@@ -40,6 +40,7 @@ a newly derived data.table where a movingAverage has been applied.
 http://www.cookbook-r.com/Manipulating_data/Calculating_a_moving_average/
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 agg_dt = CTCF_in_10a_profiles_dt[, list(y = mean(y)), by = list(sample, x)]
 ggplot(agg_dt) +
     geom_line(aes(x = x, y = y, color = sample))

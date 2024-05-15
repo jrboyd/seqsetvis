@@ -192,6 +192,7 @@ movingAverage <- function(y, n = 1, centered = TRUE) {
 #' @export
 #'
 #' @examples
+#' data(CTCF_in_10a_profiles_dt)
 #' agg_dt = CTCF_in_10a_profiles_dt[, list(y = mean(y)), by = list(sample, x)]
 #' ggplot(agg_dt) +
 #'     geom_line(aes(x = x, y = y, color = sample))

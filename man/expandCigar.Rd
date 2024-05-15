@@ -31,6 +31,7 @@ see \href{https://samtools.github.io/hts-specs/SAMv1.pdf}{sam specs} for
 cigar details
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
 qgr = CTCF_in_10a_overlaps_gr[1:5]
 bam_file = system.file("extdata/test.bam", package = "seqsetvis", mustWork = TRUE)
 raw_dt = ssvFetchBam(bam_file, qgr, return_unprocessed = TRUE)

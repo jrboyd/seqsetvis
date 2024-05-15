@@ -28,6 +28,9 @@ related functions.
 copy_clust_info
 }
 \examples{
+data(CTCF_in_10a_narrowPeak_grs)
+data(CTCF_in_10a_overlaps_gr)
+data(CTCF_in_10a_profiles_dt)
 #this takes cluster info from signal and applies to peak hits to
 #create a heatmap of peak hits clustered by signal.
 clust_dt1 = ssvSignalClustering(CTCF_in_10a_profiles_dt)

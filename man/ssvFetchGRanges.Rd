@@ -88,5 +88,7 @@ GRanges (\code{qgr}). Values correspond to the center of each window of size
 plotting using ggplots.
 }
 \examples{
+data(CTCF_in_10a_narrowPeak_grs)
+data(CTCF_in_10a_overlaps_gr)
 ssvFetchGRanges(CTCF_in_10a_narrowPeak_grs, CTCF_in_10a_overlaps_gr, win_size = 200)
 }

@@ -28,6 +28,9 @@ data.table of relative x position from center per id
 findMaxPos
 }
 \examples{
+data(CTCF_in_10a_overlaps_gr)
+data(CTCF_in_10a_profiles_gr)
+data(CTCF_in_10a_profiles_dt)
 findMaxPos(CTCF_in_10a_profiles_dt, CTCF_in_10a_overlaps_gr)
 findMaxPos(CTCF_in_10a_profiles_gr, CTCF_in_10a_overlaps_gr)
 }

@@ -107,6 +107,7 @@
 #'
 #' @examples
 #' library(GenomicRanges)
+#' data(CTCF_in_10a_narrowPeak_grs)
 #' np_grs = CTCF_in_10a_narrowPeak_grs
 #' olap_gr = ssvOverlapIntervalSets(np_grs)
 #' # annotating with a signle GRanges is OK
@@ -136,7 +137,7 @@ setMethod("ssvAnnotateSubjectGRanges", signature(annotation_source = "GRanges"),
 setMethod("ssvAnnotateSubjectGRanges", signature(annotation_source = "list"),
           function(annotation_source, subject_gr,
                    annotation_name = NULL, multi_resolver_FUN = "default"){
-              if(!all(sapply(annotation_source, is, class2 = "GRanges"))){
+              if(!all(vapply(annotation_source, is, FUN.VALUE = TRUE, class2 = "GRanges"))){
                   stop("All items in annotation_source list must be GRanges.")
               }
               if(!is.null(annotation_name)){

@@ -47,6 +47,7 @@ with order matched cluster assignments clusters are sorted using hclust on
 centers the contents of each cluster are sorted using hclust
 }
 \examples{
+data(CTCF_in_10a_profiles_dt)
 dt = data.table::copy(CTCF_in_10a_profiles_dt)
 mat = data.table::dcast(dt, id ~ sample + x, value.var = "y" )
 rn = mat$id
