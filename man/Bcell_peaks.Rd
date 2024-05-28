@@ -7,6 +7,9 @@
 \format{
 GRanges length 4
 }
+\value{
+GRanges length 4
+}
 \description{
 matches \code{system.file("extdata/Bcell_PE.mm10.bam", package = "seqsetvis")}
 }

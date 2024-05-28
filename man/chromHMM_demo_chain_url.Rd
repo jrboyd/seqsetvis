@@ -7,6 +7,9 @@
 \format{
 a character containing a URL
 }
+\value{
+a character containing a URL
+}
 \description{
 URL to download hg19ToHg38 liftover chain from UCSC
 }

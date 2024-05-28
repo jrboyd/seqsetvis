@@ -8,6 +8,10 @@
 a GRanges object of length 4000
 with 5 metadata columns sufficient for use with ggplot2
 }
+\value{
+a GRanges object of length 4000
+with 5 metadata columns sufficient for use with ggplot2
+}
 \description{
 MCF10A CTCF profiles at 20 windows per chromHMM state, hg38.
 }

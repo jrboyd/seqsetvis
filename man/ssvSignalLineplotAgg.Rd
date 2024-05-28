@@ -49,6 +49,7 @@ ggplot of signal aggregated with agg_fun() by sample.
 aggregate line signals in a single line plot
 }
 \examples{
+data(CTCF_in_10a_profiles_gr)
 bw_gr = CTCF_in_10a_profiles_gr
 ssvSignalLineplotAgg(bw_gr) +
     labs(title = "agg regions by sample.")

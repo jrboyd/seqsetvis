@@ -20,8 +20,8 @@ of NULL results in randomly initialized k-means.}
 \item{iter.max}{Number of max iterations to allow for k-means. Default is 30.}
 }
 \value{
-data.table with group__ variable indicating cluster membership and id__
-variable that is a factor indicating order based on within cluster
+data.table with group__ variable indicating cluster membership and
+id__ variable that is a factor indicating order based on within cluster
 similarity
 }
 \description{

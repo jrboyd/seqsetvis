@@ -7,6 +7,9 @@
 \format{
 named numeric of total widths per state
 }
+\value{
+named numeric of total widths per state
+}
 \description{
 state name to total width mappings, hg38
 }

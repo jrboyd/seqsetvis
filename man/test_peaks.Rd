@@ -8,6 +8,9 @@ each peak.}
 \format{
 GRanges length 8
 }
+\value{
+GRanges length 8
+}
 \description{
 matches \code{system.file("extdata/test_peaks.bam", package =
 "seqsetvis")}

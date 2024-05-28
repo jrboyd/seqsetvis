@@ -7,6 +7,9 @@
 \format{
 a named character vector mapping states to hex colors
 }
+\value{
+a named character vector mapping states to hex colors
+}
 \description{
 original state name to color mappings stored in segmentation bed
 }

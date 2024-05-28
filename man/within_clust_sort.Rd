@@ -68,7 +68,7 @@ TODO refactor shared code with clusteringKmeansNestedHclust
 \examples{
 data(CTCF_in_10a_profiles_dt)
 #clustering by relative value per region does a good job highlighting changes
-#however, when then plotting raw values the order within clusters is not smooth
+#when then plotting raw values the order within clusters is not smooth
 #this is a good situation to apply a separate sort within clusters.
 prof_dt = CTCF_in_10a_profiles_dt
 prof_dt = append_ynorm(prof_dt)
@@ -78,8 +78,10 @@ clust_dt = ssvSignalClustering(prof_dt, fill_ = "y_relative")
 clust_dt.sort = within_clust_sort(clust_dt)
 
 cowplot::plot_grid(
-  ssvSignalHeatmap(clust_dt) + labs(title = "clustered by relative, sorted by relative"),
-  ssvSignalHeatmap(clust_dt.sort) + labs(title = "clustered by relative, sorted by raw value")
+  ssvSignalHeatmap(clust_dt) +
+    labs(title = "clustered by relative, sorted by relative"),
+  ssvSignalHeatmap(clust_dt.sort) +
+    labs(title = "clustered by relative, sorted by raw value")
 )
 
 }
