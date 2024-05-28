@@ -41,6 +41,7 @@ NULL
 #' @keywords datasets
 #' @name chromHMM_demo_segmentation_url
 #' @format a character containing a URL
+#' @return a character containing a URL
 NULL
 
 #' URL to download hg19ToHg38 liftover chain from UCSC
@@ -52,6 +53,7 @@ NULL
 #' @keywords datasets
 #' @name chromHMM_demo_chain_url
 #' @format a character containing a URL
+#' @return a character containing a URL
 NULL
 
 #' state name to total width mappings, hg38
@@ -62,6 +64,7 @@ NULL
 #' @keywords datasets
 #' @name chromHMM_demo_state_total_widths
 #' @format named numeric of total widths per state
+#' @return named numeric of total widths per state
 NULL
 
 #' original state name to color mappings stored in segmentation bed
@@ -72,6 +75,7 @@ NULL
 #' @keywords datasets
 #' @name chromHMM_demo_state_colors
 #' @format a named character vector mapping states to hex colors
+#' @return a named character vector mapping states to hex colors
 NULL
 
 #' overlap of MCF10A CTCF with MCF7 chromHMM states, hg38.
@@ -87,6 +91,8 @@ NULL
 #' @name chromHMM_demo_overlaps_gr
 #' @format a GRanges object of length 98
 #' with 10 logical metadata columns, 1 per state.
+#' @return a GRanges object of length 98
+#' with 10 logical metadata columns, 1 per state.
 NULL
 
 #' MCF10A CTCF profiles at 20 windows per chromHMM state, hg38.
@@ -99,5 +105,7 @@ NULL
 #' @keywords datasets
 #' @name chromHMM_demo_bw_states_gr
 #' @format a GRanges object of length 4000
+#' with 5 metadata columns sufficient for use with ggplot2
+#' @return a GRanges object of length 4000
 #' with 5 metadata columns sufficient for use with ggplot2
 NULL
