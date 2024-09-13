@@ -46,10 +46,12 @@
 #' bam_files_esr1 = dir(pkg_dir, pattern = "H1.+R1.ESR1_RNA.+bam$", full.names = TRUE)
 #' names(bam_files_esr1) = sub("_R.+", "", basename(bam_files_esr1))
 #' query_gr = GenomicRanges::GRanges("chr6:151656691-152129619:+")
+#' query_gr = GenomicRanges::GRanges("chr6:152116691-152129619:+")
 #'
 #' strand(query_gr) = "+"
 #'
-#' prof_dt = ssvFetchBamPE.RNA(bam_files_esr1, query_gr, return_data.table = TRUE)
+#' prof_dt = ssvFetchBamPE.RNA(bam_files_esr1, query_gr, return_data.table = TRUE, win_size = 1)
+#' prof_dt
 ssvFetchBamPE.RNA = function(
         file_paths,
         qgr,

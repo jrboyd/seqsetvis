@@ -1,7 +1,7 @@
 Package: seqsetvis
 Type: Package
 Title: Set Based Visualizations for Next-Gen Sequencing Data
-Version: 1.25.2
+Version: 1.25.3
 Authors@R: person("Joseph R", "Boyd", email = "jrboyd@uvm.edu",
                   role = c("aut", "cre"), comment = c(ORCID="0000-0002-8969-9676"))
 Description: seqsetvis enables the visualization and analysis of sets of 

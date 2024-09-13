@@ -1,3 +1,6 @@
+# 1.25.3
+* ssvFetchBamPE.RNA now uses anchor = "left" internally
+
 # 1.23.14
 * reimplemneted "left" and "right" within_cluster_sort_strategy for ssvSignalClustering
 
