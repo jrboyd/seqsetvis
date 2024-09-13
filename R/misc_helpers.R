@@ -252,30 +252,18 @@ applyMovingAverage = function(dt, n, centered = TRUE, x_ = "x", y_ = "y", by_ = 
     extra_cols = setdiff(colnames(dt), c(x_, y_, by_))
     # sdt = dt[, list(n = floor(.N * n)), by = by_]
     sdt = dt[, list(y = maFun(y = get(y_), n = n, centered = centered), x= get(x_)), by = by_]
-    colnames(sdt)[colnames(sdt) == "x"] = x_
-    colnames(sdt)[colnames(sdt) == "y"] = y_
-
-    #repair with columns dropped in by_ apply spline
-    #each row will be duplicated n times
-    if(length(extra_cols) > 0){
-        if(n > 1){
-            repair = dt[rep(seq_len(nrow(dt)), each = n),
-                        c(extra_cols, by_[by_ != ""]), with = FALSE]
-            sdt = cbind(sdt, repair)
-        }else{
-            # warning("")
-            # repair = unique(dt[, c(extra_cols, by_, x_), with = FALSE])
-            # repair = dt
-            # sdt
-            # merge(sdt, repair, by = by_)
-            # unique(sdt[, by_, with = FALSE])
-            # merge(sdt, repair, by = by_)
-        }
-
+    if(x_ != "x"){
+        data.table::setnames(sdt, "x", x_)
+    }
+    if(y_ != "y"){
+        data.table::setnames(sdt, "y", y_)
     }
 
-    k = colnames(dt) %in% colnames(sdt)
-    sdt = sdt[, colnames(dt)[k], with = FALSE]
+    #append extra cols
+    for(cn in by_){
+        stopifnot(dt[[cn]] == sdt[[cn]])
+    }
+    sdt = cbind(sdt, dt[, c(extra_cols), with = FALSE])
     if(output_GRanges){
         sdt = GRanges(sdt)
     }
