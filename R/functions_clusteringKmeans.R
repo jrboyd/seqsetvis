@@ -544,6 +544,8 @@ within_clust_sort = function(
     group__ = id__ = within_o = NULL#declare binding for data.table
 
     mat_dt = unique(clust_dt[, list(id__ = get(row_), group__ = get(cluster_))])
+    mat_dt = mat_dt[order(id__)]
+    stopifnot(all(mat_dt$id__ == rownames(mat)))
     mat_dt = within_clust_sort.mat_dt(
         mat_dt, mat,
         within_order_strategy = within_order_strategy

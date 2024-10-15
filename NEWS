@@ -1,3 +1,6 @@
+# 1.25.5
+* within_clust_sort now respects "none" sort strategy. was bugged
+
 # 1.25.4
 * applyMovingAverage should handle extra columns better now
 
