@@ -253,6 +253,13 @@ centerAtMax = function(dt,
         view_size = c(-view_size, view_size)
     }
     view_size = range(view_size)
+    #verify view_size
+    k = dt[[x_]] >= min(view_size) & dt[[x_]] <= max(view_size)
+    if(!any(k)){
+        stop("view_size is too restrictive for position values. Postions have a range of ", paste(range(dt[[x_]]), collapse = " to "), " and view_size has a range of ", paste(range(view_size), collapse = " to "),
+             ".\nFor summary data, view_sizes are typically fractional values less than 1 and for sample data view size should be in bp.")
+    }
+
     closestToZero = function(x) {
         x[order(abs(x))][1]
     }
