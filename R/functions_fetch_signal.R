@@ -253,7 +253,7 @@ prepare_fetch_GRanges_names = function(qgr, include_id = FALSE){
 #'   "center_unstranded", "left", "left_unstranded"). Default is "center".
 #' @return data.table that is GRanges compatible
 #' @export
-#' @import GenomeInfoDb
+#' @import Seqinfo
 #' @examples
 #' data(CTCF_in_10a_overlaps_gr)
 #' bam_file = system.file("extdata/test.bam",
@@ -314,10 +314,10 @@ viewGRangesWinSample_dt = function(score_gr,
             )
         )[order(queryHits)]
         suppressWarnings({
-            patch_gr = GRanges(GenomeInfoDb::seqlevels(score_gr)[1],
+            patch_gr = GRanges(Seqinfo::seqlevels(score_gr)[1],
                                IRanges::IRanges(1, 1))
             mcols(patch_gr)[[attrib_var]] = fill_value
-            GenomeInfoDb::seqlevels(patch_gr) = GenomeInfoDb::seqlevels(score_gr)
+            Seqinfo::seqlevels(patch_gr) = Seqinfo::seqlevels(score_gr)
             score_gr = c(score_gr,
                          patch_gr)
         })
@@ -365,7 +365,7 @@ viewGRangesWinSample_dt = function(score_gr,
 #'   x=score and w=width numeric vectors as only arguments. default is
 #'   weighted.mean.  limma::weighted.median is a good alternative.
 #' @return data.table that is GRanges compatible
-#' @importFrom GenomeInfoDb seqlevels
+#' @importFrom Seqinfo seqlevels
 #' @export
 #' @importFrom stats weighted.mean
 #' @examples
@@ -443,10 +443,10 @@ viewGRangesWinSummary_dt = function (score_gr,
             )
         )[order(queryHits)]
         suppressWarnings({
-            patch_gr = GRanges(GenomeInfoDb::seqlevels(score_gr)[1],
+            patch_gr = GRanges(Seqinfo::seqlevels(score_gr)[1],
                                IRanges::IRanges(1, 1))
             mcols(patch_gr)[[attrib_var]] = NA
-            GenomeInfoDb::seqlevels(patch_gr) = GenomeInfoDb::seqlevels(score_gr)
+            Seqinfo::seqlevels(patch_gr) = Seqinfo::seqlevels(score_gr)
             score_gr = c(score_gr,
                          patch_gr
             )

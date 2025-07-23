@@ -13,13 +13,6 @@ BiocManager::install("seqsetvis")
 ```
 
 ## From github
-One dependency from bioconductor isn't getting installed automatically
-```{r bioC missed dependency, eval=FALSE}
-if (!requireNamespace("BiocManager", quietly=TRUE))
-    install.packages("BiocManager")
-BiocManager::install("GenomeInfoDbData")
-```
-
 Install devtools if needed
 ```{r devtools check, eval=FALSE}
 if(!require(devtools)){
