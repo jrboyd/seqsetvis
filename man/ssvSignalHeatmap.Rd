@@ -118,19 +118,26 @@ ssvSignalHeatmap(clust_dt)
 
 ssvSignalHeatmap(clust_dt, max_rows = 20, max_cols = 7)
 
-# aggregation, when facet_ is shared by multiple samples
+# aggregation occurs when facet_ is shared by multiple samples
 prof_gr = CTCF_in_10a_profiles_gr
 prof_gr$mark = "CTCF"
-clust_gr = ssvSignalClustering(
-  prof_gr,
-  facet_ = "mark",
-  fun.aggregate = function(x)as.numeric(x > 10)
-)
-table(clust_gr$y)
+
+# by default, aggregation is done by mean
+ssvSignalHeatmap(prof_gr, facet_ = "mark")
+
+# Using fun.aggregate we can control aggregation behavior
+# 'fun.aggregate = mean' preserves the default behavior
 ssvSignalHeatmap(prof_gr, facet_ = "mark",
-  fun.aggregate = function(x)as.numeric(x > 10))
+  fun.aggregate = mean)
+
+
+# maximum and minimum may be useful to plot
 ssvSignalHeatmap(prof_gr, facet_ = "mark",
   fun.aggregate = max)
 ssvSignalHeatmap(prof_gr, facet_ = "mark",
   fun.aggregate = min)
+
+# How many samples have at least a signal value of 10 at each position?
+ssvSignalHeatmap(prof_gr, facet_ = "mark",
+  fun.aggregate = function(x)sum(as.numeric(x > 10)))
 }

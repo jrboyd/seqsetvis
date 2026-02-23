@@ -130,9 +130,26 @@ ssvSignalHeatmap.ClusterBars(CTCF_in_10a_profiles_gr, rel_widths = c(1, 5))
 clust_dt = ssvSignalClustering(data.table::as.data.table(CTCF_in_10a_profiles_gr), nclust = 3)
 ssvSignalHeatmap.ClusterBars(clust_dt)
 
-# aggregation, when facet_ is shared by multiple samples
+# aggregation occurs when facet_ is shared by multiple samples
 prof_gr = CTCF_in_10a_profiles_gr
 prof_gr$mark = "CTCF"
-ssvSignalHeatmap.ClusterBars(prof_gr, facet_ = "mark", fun.aggregate = mean)
-ssvSignalHeatmap.ClusterBars(prof_gr, facet_ = "mark", fun.aggregate = "sum")
+
+# by default, aggregation is done by mean
+ssvSignalHeatmap.ClusterBars(prof_gr, facet_ = "mark")
+
+# Using fun.aggregate we can control aggregation behavior
+# 'fun.aggregate = mean' preserves the default behavior
+ssvSignalHeatmap.ClusterBars(prof_gr, facet_ = "mark",
+  fun.aggregate = mean)
+
+
+# maximum and minimum may be useful to plot
+ssvSignalHeatmap.ClusterBars(prof_gr, facet_ = "mark",
+  fun.aggregate = max)
+ssvSignalHeatmap.ClusterBars(prof_gr, facet_ = "mark",
+  fun.aggregate = min)
+
+# How many samples have at least a signal value of 10 at each position?
+ssvSignalHeatmap.ClusterBars(prof_gr, facet_ = "mark",
+  fun.aggregate = function(x)sum(as.numeric(x > 10)))
 }
