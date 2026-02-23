@@ -1,5 +1,8 @@
-# 1.31.1
+# 1.31.2
+* bugfix for error from ssvSignalHeatmap examples
 
+# 1.27.3
+* centerGRangesAtMax validates view_size range is appropriate for data
 
 # 1.27.2
 * centerGRangesAtMax now supports view_size in the same way as other center functions
