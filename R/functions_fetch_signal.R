@@ -453,8 +453,9 @@ viewGRangesWinSummary_dt = function (score_gr,
         })
     }
     mcols(score_gr) = mcols(score_gr)[attrib_var]
-    cov_dt = cbind(as.data.table(score_gr[olaps$subjectHits])[, -c(1, 4:5)],
-                   as.data.table(tiles[olaps$queryHits])[, -c(1, 4:5)])
+    cov_dt = cbind(as.data.table(score_gr[olaps$subjectHits])[, c("start", "end", "score")],
+                   as.data.table(tiles[olaps$queryHits])[, c("start", "end", "id", "tile_id")])
+    stopifnot(colnames(cov_dt)[4:5] == c("start", "end"))
     colnames(cov_dt)[4:5] = c("tile_start", "tile_end")
 
     cov_dt[start == 1 &

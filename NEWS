@@ -1,3 +1,6 @@
+# 1.33.1
+* compatibility update for Bioc 3.24 and R 4.6.1
+
 # 1.31.2
 * bugfix for error from ssvSignalHeatmap examples
 

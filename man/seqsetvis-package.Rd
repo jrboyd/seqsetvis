@@ -16,4 +16,9 @@ Otherwise refer to the vignettes to see
 \author{
 \strong{Maintainer}: Joseph R Boyd \email{jrboyd@uvm.edu} (\href{https://orcid.org/0000-0002-8969-9676}{ORCID})
 
+Authors:
+\itemize{
+  \item Joseph R Boyd \email{jrboyd@uvm.edu} (\href{https://orcid.org/0000-0002-8969-9676}{ORCID})
+}
+
 }
